@@ -13,6 +13,7 @@ import (
 // DataSourceBillingMeter returns the data source for reading Stripe stripe_billing_meter
 func DataSourceBillingMeter() *schema.Resource {
 	return &schema.Resource{
+		Description: "Use this data source to retrieve information about an existing Stripe Billing Meter.",
 		ReadContext: dataSourceBillingMeterRead,
 
 		Schema: map[string]*schema.Schema{

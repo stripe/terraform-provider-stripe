@@ -34,6 +34,22 @@ terraform apply
 Create a product with a recurring price and a webhook endpoint to receive events:
 
 ```hcl
+terraform {
+  required_providers {
+    stripe = {
+      source  = "stripe/stripe"
+      version = "0.1.0"
+    }
+  }
+}
+
+provider "stripe" {
+  # API key is read from STRIPE_API_KEY environment variable
+  # Alternatively, set it explicitly (not recommended for production)
+  # api_key = "sk_test_..."
+}
+
+
 # Define a product
 resource "stripe_product" "pro_plan" {
   name        = "Pro Plan"
@@ -67,11 +83,6 @@ resource "stripe_webhook_endpoint" "payments" {
 
 output "price_id" {
   value = stripe_price.pro_monthly.id
-}
-
-output "webhook_secret" {
-  value     = stripe_webhook_endpoint.payments.secret
-  sensitive = true
 }
 ```
 
