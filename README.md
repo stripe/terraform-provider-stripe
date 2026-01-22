@@ -6,8 +6,9 @@ The Stripe Terraform Provider enables you to manage Stripe resources using infra
 
 ## Quick start
 
-Create a product with a recurring price and a webhook endpoint to receive events:
+In this quickstart we will create a product with a recurring price and webhook endpoint to receive events. 
 
+Create a new Terraform file, `main.tf`:
 ```hcl
 terraform {
   required_providers {
