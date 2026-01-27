@@ -3,17 +3,27 @@
 package resources
 
 import (
-	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"reflect"
 )
 
-// normalizeDecimalString removes unnecessary trailing .0 from decimal strings
-// This prevents Terraform drift when API returns "2000.0" but user specified "2000"
+// normalizeDecimalString removes unnecessary trailing zeros from decimal strings
+// This prevents Terraform drift when API returns "0.0015000000" but user specified "0.0015"
 func normalizeDecimalString(s string) string {
-	if strings.HasSuffix(s, ".0") {
-		return strings.TrimSuffix(s, ".0")
+	if s == "" {
+		return s
 	}
+	// Only process if there's a decimal point
+	if !strings.Contains(s, ".") {
+		return s
+	}
+	// Remove trailing zeros after decimal point
+	s = strings.TrimRight(s, "0")
+	// Remove trailing decimal point if no fractional part remains
+	s = strings.TrimSuffix(s, ".")
 	return s
 }
 
@@ -22,6 +32,12 @@ func normalizeDecimalString(s string) string {
 func normalizeDecimalFloat(f float64) string {
 	s := strconv.FormatFloat(f, 'f', -1, 64)
 	return normalizeDecimalString(s)
+}
+
+// suppressDecimalDiff compares decimal strings after normalization
+// This prevents false diffs when config has "0.0012500000" but state has "0.00125"
+func suppressDecimalDiff(k, old, new string, d *schema.ResourceData) bool {
+	return normalizeDecimalString(old) == normalizeDecimalString(new)
 }
 
 // paramsHasFields checks if a params struct has any non-nil fields

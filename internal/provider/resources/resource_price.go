@@ -267,9 +267,10 @@ func ResourcePrice() *schema.Resource {
 							Optional:    true,
 						},
 						"flat_amount_decimal": {
-							Type:        schema.TypeString,
-							Description: "Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.",
-							Optional:    true,
+							Type:             schema.TypeString,
+							Description:      "Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.",
+							Optional:         true,
+							DiffSuppressFunc: suppressDecimalDiff,
 						},
 						"unit_amount": {
 							Type:        schema.TypeInt,

@@ -92,10 +92,11 @@ func ResourceV2BillingLicenseFee() *schema.Resource {
 				}, false)),
 			},
 			"unit_amount": {
-				Type:        schema.TypeString,
-				Description: "The per-unit amount to be charged, represented as a decimal string in minor currency units with at most 12 decimal places. Cannot be set if `tiers` is provided.",
-				Optional:    true,
-				Computed:    true,
+				Type:             schema.TypeString,
+				Description:      "The per-unit amount to be charged, represented as a decimal string in minor currency units with at most 12 decimal places. Cannot be set if `tiers` is provided.",
+				Optional:         true,
+				Computed:         true,
+				DiffSuppressFunc: suppressDecimalDiff,
 			},
 			"tiers": {
 				Type:        schema.TypeList,
@@ -104,19 +105,22 @@ func ResourceV2BillingLicenseFee() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"flat_amount": {
-							Type:        schema.TypeString,
-							Description: "Price for the entire tier, represented as a decimal string in minor currency units with at most 12 decimal places.",
-							Optional:    true,
+							Type:             schema.TypeString,
+							Description:      "Price for the entire tier, represented as a decimal string in minor currency units with at most 12 decimal places.",
+							Optional:         true,
+							DiffSuppressFunc: suppressDecimalDiff,
 						},
 						"unit_amount": {
-							Type:        schema.TypeString,
-							Description: "Per-unit price for units included in this tier, represented as a decimal string in minor currency units with at most 12 decimal places.",
-							Optional:    true,
+							Type:             schema.TypeString,
+							Description:      "Per-unit price for units included in this tier, represented as a decimal string in minor currency units with at most 12 decimal places.",
+							Optional:         true,
+							DiffSuppressFunc: suppressDecimalDiff,
 						},
 						"up_to_decimal": {
-							Type:        schema.TypeString,
-							Description: "Up to and including this quantity will be contained in the tier. Only one of `up_to_decimal` and `up_to_inf` may be set.",
-							Optional:    true,
+							Type:             schema.TypeString,
+							Description:      "Up to and including this quantity will be contained in the tier. Only one of `up_to_decimal` and `up_to_inf` may be set.",
+							Optional:         true,
+							DiffSuppressFunc: suppressDecimalDiff,
 						},
 						"up_to_inf": {
 							Type:        schema.TypeString,
@@ -261,13 +265,13 @@ func resourceV2BillingLicenseFeeRead(ctx context.Context, d *schema.ResourceData
 			for i, item := range v2_billing_license_fee.Tiers {
 				itemData := make(map[string]interface{})
 				if item.FlatAmount != "" {
-					itemData["flat_amount"] = item.FlatAmount
+					itemData["flat_amount"] = normalizeDecimalString(item.FlatAmount)
 				}
 				if item.UnitAmount != "" {
-					itemData["unit_amount"] = item.UnitAmount
+					itemData["unit_amount"] = normalizeDecimalString(item.UnitAmount)
 				}
 				if item.UpToDecimal != "" {
-					itemData["up_to_decimal"] = item.UpToDecimal
+					itemData["up_to_decimal"] = normalizeDecimalString(item.UpToDecimal)
 				}
 				if item.UpToInf != "" {
 					itemData["up_to_inf"] = item.UpToInf
