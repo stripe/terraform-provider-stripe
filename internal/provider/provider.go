@@ -32,6 +32,7 @@ func New(version string) func() *schema.Provider {
 				"stripe_price":                             resources.ResourcePrice(),
 				"stripe_customer":                          resources.ResourceCustomer(),
 				"stripe_coupon":                            resources.ResourceCoupon(),
+				"stripe_promotion_code":                    resources.ResourcePromotionCode(),
 				"stripe_shipping_rate":                     resources.ResourceShippingRate(),
 				"stripe_tax_rate":                          resources.ResourceTaxRate(),
 				"stripe_entitlements_feature":              resources.ResourceEntitlementsFeature(),
