@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
-	"github.com/stripe/stripe-terraform/internal/provider"
+	"github.com/stripe/terraform-provider-stripe/internal/provider"
 )
 
 // version is set via ldflags during build

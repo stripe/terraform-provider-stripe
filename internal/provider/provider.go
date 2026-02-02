@@ -9,8 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stripe/stripe-go/v84"
 
-	"github.com/stripe/stripe-terraform/internal/provider/datasources"
-	"github.com/stripe/stripe-terraform/internal/provider/resources"
+	"github.com/stripe/terraform-provider-stripe/internal/provider/datasources"
+	"github.com/stripe/terraform-provider-stripe/internal/provider/resources"
 )
 
 // New returns a new Stripe Terraform provider

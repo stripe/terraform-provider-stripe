@@ -1,4 +1,4 @@
-module github.com/stripe/stripe-terraform
+module github.com/stripe/terraform-provider-stripe
 
 go 1.24.0
 
