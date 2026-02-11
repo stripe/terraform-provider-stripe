@@ -46,6 +46,7 @@ func New(version string) func() *schema.Provider {
 				"stripe_v2_billing_rate_card":              resources.ResourceV2BillingRateCard(),
 				"stripe_v2_billing_rate_card_rate":         resources.ResourceV2BillingRateCardRate(),
 				"stripe_v2_billing_service_action":         resources.ResourceV2BillingServiceAction(),
+				"stripe_v2_core_event_destination":         resources.ResourceV2CoreEventDestination(),
 			},
 
 			DataSourcesMap: map[string]*schema.Resource{
