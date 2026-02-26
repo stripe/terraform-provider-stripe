@@ -16,7 +16,10 @@ import (
 // ResourceWebhookEndpoint returns the schema for the stripe_webhook_endpoint resource
 func ResourceWebhookEndpoint() *schema.Resource {
 	return &schema.Resource{
-		Description: "You can configure [webhook endpoints](https://docs.stripe.com/webhooks/) via the API to be notified about events that happen in your Stripe account or connected accounts. Most users configure webhooks from [the dashboard](https://dashboard.stripe.com/webhooks), which provides a user interface for registering and testing your webhook endpoints. Related guide: [Setting up webhooks](https://docs.stripe.com/webhooks/configure)",
+		Description: "You can configure [webhook endpoints](https://docs.stripe.com/webhooks/) via the API to be notified about events that happen in your Stripe account or connected accounts. Most users configure webhooks from [the dashboard](https://dashboard.stripe.com/webhooks), which provides a user interface for registering and testing your webhook endpoints. Related guide: [Setting up webhooks](https://docs.stripe.com/webhooks/configure)" +
+			"\n\nNote: The `secret` attribute is only populated on resource creation. " +
+			"If you import an existing webhook endpoint, you must manually update " +
+			"the `secret` in state (e.g., via `terraform state` commands) or recreate the resource.",
 
 		Schema: map[string]*schema.Schema{
 			"id": {
@@ -179,6 +182,12 @@ func ResourceWebhookEndpoint() *schema.Resource {
 				Description: "The URL of the webhook endpoint.",
 				Required:    true,
 			},
+			"secret": {
+				Type:        schema.TypeString,
+				Description: "The endpoint's secret, used to generate webhook signatures. Only populated at creation time.",
+				Computed:    true,
+				Sensitive:   true,
+			},
 		},
 
 		CreateContext: resourceWebhookEndpointCreate,
@@ -229,6 +238,9 @@ func resourceWebhookEndpointCreate(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	d.SetId(webhook_endpoint.ID)
+	if err := d.Set("secret", webhook_endpoint.Secret); err != nil {
+		return diag.FromErr(err)
+	}
 	return resourceWebhookEndpointRead(ctx, d, meta)
 }
 

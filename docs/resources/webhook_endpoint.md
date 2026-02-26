@@ -30,3 +30,4 @@ You can configure [webhook endpoints](https://docs.stripe.com/webhooks/) via the
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `secret` (String, Sensitive) The endpoint's secret, used to generate webhook signatures. Only populated at creation time.
