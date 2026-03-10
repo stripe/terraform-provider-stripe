@@ -638,6 +638,9 @@ func resourceCustomerRead(ctx context.Context, d *schema.ResourceData, meta inte
 			if customer.CashBalance.Customer != "" {
 				nestedData["customer"] = customer.CashBalance.Customer
 			}
+			if customer.CashBalance.CustomerAccount != "" {
+				nestedData["customer_account"] = customer.CashBalance.CustomerAccount
+			}
 			if customer.CashBalance.Settings != nil {
 				nestedData0 := make(map[string]interface{})
 				if customer.CashBalance.Settings.ReconciliationMode != "" {

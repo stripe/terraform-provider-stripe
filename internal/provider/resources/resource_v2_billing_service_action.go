@@ -348,10 +348,16 @@ func resourceV2BillingServiceActionRead(ctx context.Context, d *schema.ResourceD
 						if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.DisplayName != "" {
 							nestedData2["display_name"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.DisplayName
 						}
+						if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.ID != "" {
+							nestedData2["id"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.ID
+						}
 						if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.LookupKey != "" {
 							nestedData2["lookup_key"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.LookupKey
 						}
 						nestedData1["custom_pricing_unit_details"] = []interface{}{nestedData2}
+					}
+					if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.ID != "" {
+						nestedData1["id"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.ID
 					}
 					if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.Value != "" {
 						nestedData1["value"] = normalizeDecimalString(v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.Value)

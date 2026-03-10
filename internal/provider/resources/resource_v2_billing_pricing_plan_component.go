@@ -239,6 +239,7 @@ func resourceV2BillingPricingPlanComponentRead(ctx context.Context, d *schema.Re
 	if _, ok := d.GetOk("license_fee"); ok {
 		if v2_billing_pricing_plan_component.LicenseFee != nil {
 			nestedData := make(map[string]interface{})
+			nestedData["id"] = v2_billing_pricing_plan_component.LicenseFee.ID
 			nestedData["version"] = v2_billing_pricing_plan_component.LicenseFee.Version
 			if len(nestedData) > 0 {
 				if err := d.Set("license_fee", []interface{}{nestedData}); err != nil {
@@ -250,6 +251,7 @@ func resourceV2BillingPricingPlanComponentRead(ctx context.Context, d *schema.Re
 	if _, ok := d.GetOk("rate_card"); ok {
 		if v2_billing_pricing_plan_component.RateCard != nil {
 			nestedData := make(map[string]interface{})
+			nestedData["id"] = v2_billing_pricing_plan_component.RateCard.ID
 			nestedData["version"] = v2_billing_pricing_plan_component.RateCard.Version
 			if len(nestedData) > 0 {
 				if err := d.Set("rate_card", []interface{}{nestedData}); err != nil {
@@ -261,6 +263,7 @@ func resourceV2BillingPricingPlanComponentRead(ctx context.Context, d *schema.Re
 	if _, ok := d.GetOk("service_action"); ok {
 		if v2_billing_pricing_plan_component.ServiceAction != nil {
 			nestedData := make(map[string]interface{})
+			nestedData["id"] = v2_billing_pricing_plan_component.ServiceAction.ID
 			if len(nestedData) > 0 {
 				if err := d.Set("service_action", []interface{}{nestedData}); err != nil {
 					diags = append(diags, diag.FromErr(err)...)
