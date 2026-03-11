@@ -68,6 +68,7 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 							Type:        schema.TypeList,
 							MaxItems:    1,
 							Required:    true,
+							ForceNew:    true,
 							Description: "The amount of the credit grant.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -75,6 +76,7 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 										Type:        schema.TypeList,
 										MaxItems:    1,
 										Optional:    true,
+										ForceNew:    true,
 										Description: "The custom pricing unit amount of the credit grant. Required if `type` is `custom_pricing_unit`.",
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
@@ -82,11 +84,13 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 													Type:        schema.TypeString,
 													Description: "The id of the custom pricing unit.",
 													Required:    true,
+													ForceNew:    true,
 												},
 												"value": {
 													Type:        schema.TypeString,
 													Description: "The value of the credit grant, decimal value represented as a string.",
 													Required:    true,
+													ForceNew:    true,
 												},
 											},
 										},
@@ -95,6 +99,7 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 										Type:        schema.TypeList,
 										MaxItems:    1,
 										Optional:    true,
+										ForceNew:    true,
 										Description: "The monetary amount of the credit grant. Required if `type` is `monetary`.",
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
@@ -102,11 +107,13 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 													Type:        schema.TypeString,
 													Description: "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).",
 													Required:    true,
+													ForceNew:    true,
 												},
 												"value": {
 													Type:        schema.TypeInt,
 													Description: "A non-negative integer representing how much to charge in the [smallest currency unit](https://docs.stripe.com/currencies#minor-units).",
 													Required:    true,
+													ForceNew:    true,
 												},
 											},
 										},
@@ -115,6 +122,7 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 										Type:        schema.TypeString,
 										Description: "The type of the credit grant amount. We currently support `monetary` and `custom_pricing_unit` billing credits.",
 										Required:    true,
+										ForceNew:    true,
 										ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{
 											"custom_pricing_unit",
 											"monetary",
@@ -127,6 +135,7 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 							Type:        schema.TypeList,
 							MaxItems:    1,
 							Required:    true,
+							ForceNew:    true,
 							Description: "Defines the scope where the credit grant is applicable.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -134,6 +143,7 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 										Type:        schema.TypeList,
 										MaxItems:    1,
 										Required:    true,
+										ForceNew:    true,
 										Description: "The applicability scope of the credit grant.",
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
@@ -141,12 +151,14 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 													Type:        schema.TypeList,
 													Description: "The billable items to apply the credit grant to.",
 													Optional:    true,
+													ForceNew:    true,
 													Elem:        &schema.Schema{Type: schema.TypeString},
 												},
 												"price_type": {
 													Type:        schema.TypeString,
 													Description: "The price type that credit grants can apply to. We currently only support the `metered` price type. This will apply to metered prices and rate cards. Cannot be used in combination with `billable_items`.",
 													Optional:    true,
+													ForceNew:    true,
 													ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{
 														"metered",
 													}, false)),
@@ -172,6 +184,7 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 							Type:        schema.TypeList,
 							MaxItems:    1,
 							Required:    true,
+							ForceNew:    true,
 							Description: "The expiry configuration for the credit grant.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -179,6 +192,7 @@ func ResourceV2BillingServiceAction() *schema.Resource {
 										Type:        schema.TypeString,
 										Description: "The type of the expiry configuration. We currently support `end_of_service_period`.",
 										Required:    true,
+										ForceNew:    true,
 										ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{
 											"end_of_service_period",
 										}, false)),
