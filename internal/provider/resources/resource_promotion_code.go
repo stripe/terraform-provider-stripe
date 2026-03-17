@@ -268,8 +268,10 @@ func resourcePromotionCodeRead(ctx context.Context, d *schema.ResourceData, meta
 	if err := d.Set("code", promotion_code.Code); err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
-	if err := d.Set("customer", promotion_code.Customer); err != nil {
-		diags = append(diags, diag.FromErr(err)...)
+	if promotion_code.Customer != nil {
+		if err := d.Set("customer", promotion_code.Customer.ID); err != nil {
+			diags = append(diags, diag.FromErr(err)...)
+		}
 	}
 	if err := d.Set("customer_account", promotion_code.CustomerAccount); err != nil {
 		diags = append(diags, diag.FromErr(err)...)
