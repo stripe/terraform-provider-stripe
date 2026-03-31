@@ -343,7 +343,7 @@ func ResourcePrice() *schema.Resource {
 						},
 						"unit_amount_decimal": {
 							Type:             schema.TypeString,
-							Description:      "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+							Description:      "Same as `unit_amount`, but accepts a decimal value in cents with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
 							Optional:         true,
 							DiffSuppressFunc: suppressDecimalDiff,
 						},

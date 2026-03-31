@@ -123,3 +123,4 @@ Optional:
 - `flat_amount` (Number) The flat billing amount for an entire tier, regardless of the number of units in the tier.
 - `flat_amount_decimal` (String) Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.
 - `unit_amount` (Number) The per unit billing amount for each individual unit for which this tier applies.
+- `unit_amount_decimal` (String) Same as `unit_amount`, but accepts a decimal value in cents with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
