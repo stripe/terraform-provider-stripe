@@ -491,13 +491,12 @@ func resourcePriceCreate(ctx context.Context, d *schema.ResourceData, meta inter
 					condition.FlatAmountDecimal = stripe.Float64(f)
 				}
 			}
-			if val, ok := data["unit_amount"].(int); ok {
-				condition.UnitAmount = stripe.Int64(int64(val))
-			}
 			if unit_amount_decimal, ok := data["unit_amount_decimal"].(string); ok && unit_amount_decimal != "" {
 				if f, err := strconv.ParseFloat(unit_amount_decimal, 64); err == nil {
 					condition.UnitAmountDecimal = stripe.Float64(f)
 				}
+			} else if val, ok := data["unit_amount"].(int); ok {
+				condition.UnitAmount = stripe.Int64(int64(val))
 			}
 			if up_to, ok := data["up_to"].(string); ok && up_to != "" {
 				if up_to == "inf" {
