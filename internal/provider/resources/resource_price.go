@@ -341,6 +341,12 @@ func ResourcePrice() *schema.Resource {
 							Description: "The per unit billing amount for each individual unit for which this tier applies.",
 							Optional:    true,
 						},
+						"unit_amount_decimal": {
+							Type:             schema.TypeString,
+							Description:      "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+							Optional:         true,
+							DiffSuppressFunc: suppressDecimalDiff,
+						},
 						"up_to": {
 							Type:     schema.TypeString,
 							Required: true,
@@ -487,6 +493,11 @@ func resourcePriceCreate(ctx context.Context, d *schema.ResourceData, meta inter
 			}
 			if val, ok := data["unit_amount"].(int); ok {
 				condition.UnitAmount = stripe.Int64(int64(val))
+			}
+			if unit_amount_decimal, ok := data["unit_amount_decimal"].(string); ok && unit_amount_decimal != "" {
+				if f, err := strconv.ParseFloat(unit_amount_decimal, 64); err == nil {
+					condition.UnitAmountDecimal = stripe.Float64(f)
+				}
 			}
 			if up_to, ok := data["up_to"].(string); ok && up_to != "" {
 				if up_to == "inf" {
