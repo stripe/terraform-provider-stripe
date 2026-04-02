@@ -191,6 +191,21 @@ func ResourceCustomer() *schema.Resource {
 								},
 							},
 						},
+						"available": {
+							Type:        schema.TypeMap,
+							Description: "A hash of all cash balances available to this customer. You cannot delete a customer with any cash balances, even if the balance is 0. Amounts are represented in the [smallest currency unit](https://stripe.com/docs/currencies#zero-decimal).",
+							Computed:    true,
+						},
+						"customer": {
+							Type:        schema.TypeString,
+							Description: "The ID of the customer whose cash balance this object represents.",
+							Computed:    true,
+						},
+						"customer_account": {
+							Type:        schema.TypeString,
+							Description: "The ID of the account whose cash balance this object represents.",
+							Computed:    true,
+						},
 					},
 				},
 			},
@@ -299,6 +314,16 @@ func ResourceCustomer() *schema.Resource {
 							Description: "Customer phone (including extension).",
 							Optional:    true,
 						},
+						"carrier": {
+							Type:        schema.TypeString,
+							Description: "The delivery service that shipped a physical product, such as Fedex, UPS, USPS, etc.",
+							Computed:    true,
+						},
+						"tracking_number": {
+							Type:        schema.TypeString,
+							Description: "The tracking number for a physical product, obtained from the delivery service. If multiple tracking numbers were generated for this purchase, please separate them with commas.",
+							Computed:    true,
+						},
 					},
 				},
 			},
@@ -321,6 +346,16 @@ func ResourceCustomer() *schema.Resource {
 								"deferred",
 								"immediately",
 							}, false)),
+						},
+						"automatic_tax": {
+							Type:        schema.TypeString,
+							Description: "Surfaces if automatic tax computation is possible given the current customer location information.",
+							Computed:    true,
+						},
+						"provider": {
+							Type:        schema.TypeString,
+							Description: "The tax calculation provider used for location resolution. Defaults to `stripe` when not using a [third-party provider](/tax/third-party-apps).",
+							Computed:    true,
 						},
 					},
 				},
@@ -752,6 +787,9 @@ func resourceCustomerRead(ctx context.Context, d *schema.ResourceData, meta inte
 			}
 			if customer.Tax.Provider != "" {
 				nestedData["provider"] = customer.Tax.Provider
+			}
+			if v, ok := d.GetOk("tax.0.validate_location"); ok {
+				nestedData["validate_location"] = v
 			}
 			if len(nestedData) > 0 {
 				if err := d.Set("tax", []interface{}{nestedData}); err != nil {

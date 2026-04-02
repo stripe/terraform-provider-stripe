@@ -107,6 +107,16 @@ func ResourceV2CoreEventDestination() *schema.Resource {
 							Required:    true,
 							ForceNew:    true,
 						},
+						"aws_event_source_arn": {
+							Type:        schema.TypeString,
+							Description: "The ARN of the AWS event source.",
+							Computed:    true,
+						},
+						"aws_event_source_status": {
+							Type:        schema.TypeString,
+							Description: "The state of the AWS event source.",
+							Computed:    true,
+						},
 					},
 				},
 			},
@@ -121,6 +131,11 @@ func ResourceV2CoreEventDestination() *schema.Resource {
 							Type:        schema.TypeString,
 							Description: "The URL of the webhook endpoint.",
 							Required:    true,
+						},
+						"signing_secret": {
+							Type:        schema.TypeString,
+							Description: "The signing secret of the webhook endpoint, only includable on creation.",
+							Computed:    true,
 						},
 					},
 				},
@@ -270,6 +285,9 @@ func resourceV2CoreEventDestinationRead(ctx context.Context, d *schema.ResourceD
 			nestedData["aws_account_id"] = v2_core_event_destination.AmazonEventbridge.AwsAccountID
 			nestedData["aws_event_source_arn"] = v2_core_event_destination.AmazonEventbridge.AwsEventSourceArn
 			nestedData["aws_event_source_status"] = v2_core_event_destination.AmazonEventbridge.AwsEventSourceStatus
+			if v, ok := d.GetOk("amazon_eventbridge.0.aws_region"); ok {
+				nestedData["aws_region"] = v
+			}
 			if len(nestedData) > 0 {
 				if err := d.Set("amazon_eventbridge", []interface{}{nestedData}); err != nil {
 					diags = append(diags, diag.FromErr(err)...)

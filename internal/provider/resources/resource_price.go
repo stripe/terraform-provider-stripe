@@ -591,6 +591,9 @@ func resourcePriceRead(ctx context.Context, d *schema.ResourceData, meta interfa
 			nestedData["maximum"] = int(price.CustomUnitAmount.Maximum)
 			nestedData["minimum"] = int(price.CustomUnitAmount.Minimum)
 			nestedData["preset"] = int(price.CustomUnitAmount.Preset)
+			if v, ok := d.GetOk("custom_unit_amount.0.enabled"); ok {
+				nestedData["enabled"] = v.(bool)
+			}
 			if len(nestedData) > 0 {
 				if err := d.Set("custom_unit_amount", []interface{}{nestedData}); err != nil {
 					diags = append(diags, diag.FromErr(err)...)

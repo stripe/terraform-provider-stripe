@@ -162,6 +162,11 @@ func ResourceCoupon() *schema.Resource {
 							Required:    true,
 							ForceNew:    true,
 						},
+						"display_name": {
+							Type:        schema.TypeString,
+							Description: "The name of the script used to calculate the discount.",
+							Computed:    true,
+						},
 					},
 				},
 			},
