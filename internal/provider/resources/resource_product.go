@@ -5,6 +5,7 @@ package resources
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -178,6 +179,13 @@ func ResourceProduct() *schema.Resource {
 										Computed:    true,
 										ForceNew:    true,
 									},
+									"unit_amount_decimal": {
+										Type:        schema.TypeString,
+										Description: "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+										Optional:    true,
+										Computed:    true,
+										ForceNew:    true,
+									},
 								},
 							},
 						},
@@ -267,6 +275,13 @@ func ResourceProduct() *schema.Resource {
 						"unit_amount": {
 							Type:        schema.TypeInt,
 							Description: "A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge. One of `unit_amount`, `unit_amount_decimal`, or `custom_unit_amount` is required.",
+							Optional:    true,
+							Computed:    true,
+							ForceNew:    true,
+						},
+						"unit_amount_decimal": {
+							Type:        schema.TypeString,
+							Description: "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
 							Optional:    true,
 							Computed:    true,
 							ForceNew:    true,
@@ -398,6 +413,11 @@ func resourceProductCreate(ctx context.Context, d *schema.ResourceData, meta int
 					if val, ok := item["unit_amount"].(int); ok {
 						entry.UnitAmount = stripe.Int64(int64(val))
 					}
+					if val, ok := item["unit_amount_decimal"].(string); ok && val != "" {
+						if f, err := strconv.ParseFloat(val, 64); err == nil {
+							entry.UnitAmountDecimal = stripe.Float64(f)
+						}
+					}
 					params.DefaultPriceData.CurrencyOptions[key] = entry
 				}
 			}
@@ -430,6 +450,11 @@ func resourceProductCreate(ctx context.Context, d *schema.ResourceData, meta int
 		}
 		if val, ok := data["unit_amount"].(int); ok && val > 0 {
 			params.DefaultPriceData.UnitAmount = stripe.Int64(int64(val))
+		}
+		if val, ok := data["unit_amount_decimal"].(string); ok && val != "" {
+			if f, err := strconv.ParseFloat(val, 64); err == nil {
+				params.DefaultPriceData.UnitAmountDecimal = stripe.Float64(f)
+			}
 		}
 	}
 	if v, ok := d.Get("package_dimensions").([]interface{}); ok && len(v) > 0 {

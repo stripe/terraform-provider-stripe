@@ -109,6 +109,11 @@ func ResourcePrice() *schema.Resource {
 							Description: "A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge.",
 							Optional:    true,
 						},
+						"unit_amount_decimal": {
+							Type:        schema.TypeString,
+							Description: "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+							Optional:    true,
+						},
 					},
 				},
 			},
@@ -166,6 +171,14 @@ func ResourcePrice() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				ForceNew:    true,
+			},
+			"unit_amount_decimal": {
+				Type:             schema.TypeString,
+				Description:      "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+				Optional:         true,
+				Computed:         true,
+				ForceNew:         true,
+				DiffSuppressFunc: suppressDecimalDiff,
 			},
 			"type": {
 				Type:        schema.TypeString,
@@ -341,6 +354,12 @@ func ResourcePrice() *schema.Resource {
 							Description: "The per unit billing amount for each individual unit for which this tier applies.",
 							Optional:    true,
 						},
+						"unit_amount_decimal": {
+							Type:             schema.TypeString,
+							Description:      "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+							Optional:         true,
+							DiffSuppressFunc: suppressDecimalDiff,
+						},
 						"up_to": {
 							Type:     schema.TypeString,
 							Required: true,
@@ -397,6 +416,11 @@ func resourcePriceCreate(ctx context.Context, d *schema.ResourceData, meta inter
 	}
 	if !d.GetRawConfig().GetAttr("unit_amount").IsNull() {
 		params.UnitAmount = stripe.Int64(int64(d.Get("unit_amount").(int)))
+	}
+	if v, ok := d.Get("unit_amount_decimal").(string); ok && v != "" {
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			params.UnitAmountDecimal = stripe.Float64(f)
+		}
 	}
 	if v, ok := d.Get("custom_unit_amount").([]interface{}); ok && len(v) > 0 {
 		data := v[0].(map[string]interface{})
@@ -465,7 +489,11 @@ func resourcePriceCreate(ctx context.Context, d *schema.ResourceData, meta inter
 				if val, ok := item["tax_behavior"].(string); ok && val != "" {
 					entry.TaxBehavior = stripe.String(val)
 				}
-				if val, ok := item["unit_amount"].(int); ok {
+				if val, ok := item["unit_amount_decimal"].(string); ok && val != "" {
+					if f, err := strconv.ParseFloat(val, 64); err == nil {
+						entry.UnitAmountDecimal = stripe.Float64(f)
+					}
+				} else if val, ok := item["unit_amount"].(int); ok {
 					entry.UnitAmount = stripe.Int64(int64(val))
 				}
 				params.CurrencyOptions[key] = entry
@@ -477,15 +505,18 @@ func resourcePriceCreate(ctx context.Context, d *schema.ResourceData, meta inter
 		for i, item := range v {
 			data := item.(map[string]interface{})
 			condition := &stripe.PriceCreateTierParams{}
-			if val, ok := data["flat_amount"].(int); ok {
-				condition.FlatAmount = stripe.Int64(int64(val))
-			}
 			if flat_amount_decimal, ok := data["flat_amount_decimal"].(string); ok && flat_amount_decimal != "" {
 				if f, err := strconv.ParseFloat(flat_amount_decimal, 64); err == nil {
 					condition.FlatAmountDecimal = stripe.Float64(f)
 				}
+			} else if val, ok := data["flat_amount"].(int); ok {
+				condition.FlatAmount = stripe.Int64(int64(val))
 			}
-			if val, ok := data["unit_amount"].(int); ok {
+			if unit_amount_decimal, ok := data["unit_amount_decimal"].(string); ok && unit_amount_decimal != "" {
+				if f, err := strconv.ParseFloat(unit_amount_decimal, 64); err == nil {
+					condition.UnitAmountDecimal = stripe.Float64(f)
+				}
+			} else if val, ok := data["unit_amount"].(int); ok {
 				condition.UnitAmount = stripe.Int64(int64(val))
 			}
 			if up_to, ok := data["up_to"].(string); ok && up_to != "" {
@@ -577,6 +608,9 @@ func resourcePriceRead(ctx context.Context, d *schema.ResourceData, meta interfa
 	if err := d.Set("unit_amount", price.UnitAmount); err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
+	if err := d.Set("unit_amount_decimal", normalizeDecimalFloat(price.UnitAmountDecimal)); err != nil {
+		diags = append(diags, diag.FromErr(err)...)
+	}
 	if err := d.Set("type", price.Type); err != nil {
 		diags = append(diags, diag.FromErr(err)...)
 	}
@@ -622,14 +656,18 @@ func resourcePriceRead(ctx context.Context, d *schema.ResourceData, meta interfa
 			for i, item := range price.Tiers {
 				itemData := make(map[string]interface{})
 				itemData["flat_amount"] = int(item.FlatAmount)
-				if item.FlatAmountDecimal != 0 {
+				if item.FlatAmount == 0 && item.FlatAmountDecimal != 0 {
 					itemData["flat_amount_decimal"] = normalizeDecimalFloat(item.FlatAmountDecimal)
 				}
 				itemData["unit_amount"] = int(item.UnitAmount)
-				if item.UnitAmountDecimal != 0 {
+				if item.UnitAmount == 0 && item.UnitAmountDecimal != 0 {
 					itemData["unit_amount_decimal"] = normalizeDecimalFloat(item.UnitAmountDecimal)
 				}
-				itemData["up_to"] = strconv.FormatInt(item.UpTo, 10)
+				if item.UpTo == 0 {
+					itemData["up_to"] = "inf"
+				} else {
+					itemData["up_to"] = strconv.FormatInt(item.UpTo, 10)
+				}
 				itemsData[i] = itemData
 			}
 			if err := d.Set("tiers", itemsData); err != nil {
@@ -704,7 +742,11 @@ func resourcePriceUpdate(ctx context.Context, d *schema.ResourceData, meta inter
 					if val, ok := item["tax_behavior"].(string); ok && val != "" {
 						entry.TaxBehavior = stripe.String(val)
 					}
-					if val, ok := item["unit_amount"].(int); ok {
+					if val, ok := item["unit_amount_decimal"].(string); ok && val != "" {
+						if f, err := strconv.ParseFloat(val, 64); err == nil {
+							entry.UnitAmountDecimal = stripe.Float64(f)
+						}
+					} else if val, ok := item["unit_amount"].(int); ok {
 						entry.UnitAmount = stripe.Int64(int64(val))
 					}
 					params.CurrencyOptions[key] = entry
