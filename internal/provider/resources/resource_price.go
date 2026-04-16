@@ -149,6 +149,12 @@ func ResourcePrice() *schema.Resource {
 					"unspecified",
 				}, false)),
 			},
+			"transfer_lookup_key": {
+				Type:        schema.TypeBool,
+				Description: "If set to true, will atomically remove the lookup key from the existing price, and assign it to this price.",
+				Optional:    true,
+				ForceNew:    true,
+			},
 			"tiers_mode": {
 				Type:        schema.TypeString,
 				Description: "Defines if the tiering price should be `graduated` or `volume` based. In `volume`-based tiering, the maximum quantity within a period determines the per unit price, in `graduated` tiering pricing can successively change as the quantity grows.",
@@ -391,6 +397,9 @@ func resourcePriceCreate(ctx context.Context, d *schema.ResourceData, meta inter
 	}
 	if v, ok := d.Get("tax_behavior").(string); ok && v != "" {
 		params.TaxBehavior = stripe.String(v)
+	}
+	if v, ok := d.GetOk("transfer_lookup_key"); ok {
+		params.TransferLookupKey = stripe.Bool(v.(bool))
 	}
 	if v, ok := d.Get("tiers_mode").(string); ok && v != "" {
 		params.TiersMode = stripe.String(v)
