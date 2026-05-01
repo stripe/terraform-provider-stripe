@@ -356,37 +356,43 @@ func resourceV2BillingServiceActionRead(ctx context.Context, d *schema.ResourceD
 			nestedData := make(map[string]interface{})
 			if v2_billing_service_action.CreditGrant.Amount != nil {
 				nestedData0 := make(map[string]interface{})
-				if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit != nil {
-					nestedData1 := make(map[string]interface{})
-					if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails != nil {
-						nestedData2 := make(map[string]interface{})
-						nestedData2["active"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.Active
-						if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.DisplayName != "" {
-							nestedData2["display_name"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.DisplayName
+				if _, ok := d.GetOk("credit_grant.0.amount.0.custom_pricing_unit"); importing || ok {
+					if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit != nil {
+						nestedData1 := make(map[string]interface{})
+						if _, ok := d.GetOk("credit_grant.0.amount.0.custom_pricing_unit.0.custom_pricing_unit_details"); importing || ok {
+							if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails != nil {
+								nestedData2 := make(map[string]interface{})
+								nestedData2["active"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.Active
+								if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.DisplayName != "" {
+									nestedData2["display_name"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.DisplayName
+								}
+								if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.ID != "" {
+									nestedData2["id"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.ID
+								}
+								if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.LookupKey != "" {
+									nestedData2["lookup_key"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.LookupKey
+								}
+								nestedData1["custom_pricing_unit_details"] = []interface{}{nestedData2}
+							}
 						}
-						if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.ID != "" {
-							nestedData2["id"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.ID
+						if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.ID != "" {
+							nestedData1["id"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.ID
 						}
-						if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.LookupKey != "" {
-							nestedData2["lookup_key"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.CustomPricingUnitDetails.LookupKey
+						if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.Value != "" {
+							nestedData1["value"] = normalizeDecimalString(v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.Value)
 						}
-						nestedData1["custom_pricing_unit_details"] = []interface{}{nestedData2}
+						nestedData0["custom_pricing_unit"] = []interface{}{nestedData1}
 					}
-					if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.ID != "" {
-						nestedData1["id"] = v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.ID
-					}
-					if v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.Value != "" {
-						nestedData1["value"] = normalizeDecimalString(v2_billing_service_action.CreditGrant.Amount.CustomPricingUnit.Value)
-					}
-					nestedData0["custom_pricing_unit"] = []interface{}{nestedData1}
 				}
-				if v2_billing_service_action.CreditGrant.Amount.Monetary != nil {
-					nestedData1 := make(map[string]interface{})
-					if v2_billing_service_action.CreditGrant.Amount.Monetary.Currency != "" {
-						nestedData1["currency"] = v2_billing_service_action.CreditGrant.Amount.Monetary.Currency
+				if _, ok := d.GetOk("credit_grant.0.amount.0.monetary"); importing || ok {
+					if v2_billing_service_action.CreditGrant.Amount.Monetary != nil {
+						nestedData1 := make(map[string]interface{})
+						if v2_billing_service_action.CreditGrant.Amount.Monetary.Currency != "" {
+							nestedData1["currency"] = v2_billing_service_action.CreditGrant.Amount.Monetary.Currency
+						}
+						nestedData1["value"] = int(v2_billing_service_action.CreditGrant.Amount.Monetary.Value)
+						nestedData0["monetary"] = []interface{}{nestedData1}
 					}
-					nestedData1["value"] = int(v2_billing_service_action.CreditGrant.Amount.Monetary.Value)
-					nestedData0["monetary"] = []interface{}{nestedData1}
 				}
 				if v2_billing_service_action.CreditGrant.Amount.Type != "" {
 					nestedData0["type"] = v2_billing_service_action.CreditGrant.Amount.Type
@@ -397,6 +403,13 @@ func resourceV2BillingServiceActionRead(ctx context.Context, d *schema.ResourceD
 				nestedData0 := make(map[string]interface{})
 				if v2_billing_service_action.CreditGrant.ApplicabilityConfig.Scope != nil {
 					nestedData1 := make(map[string]interface{})
+					if len(v2_billing_service_action.CreditGrant.ApplicabilityConfig.Scope.BillableItems) > 0 {
+						arrBillableItems2 := make([]interface{}, len(v2_billing_service_action.CreditGrant.ApplicabilityConfig.Scope.BillableItems))
+						for i, v := range v2_billing_service_action.CreditGrant.ApplicabilityConfig.Scope.BillableItems {
+							arrBillableItems2[i] = string(v)
+						}
+						nestedData1["billable_items"] = arrBillableItems2
+					}
 					if v2_billing_service_action.CreditGrant.ApplicabilityConfig.Scope.PriceType != "" {
 						nestedData1["price_type"] = v2_billing_service_action.CreditGrant.ApplicabilityConfig.Scope.PriceType
 					}

@@ -678,13 +678,15 @@ func resourceCustomerRead(ctx context.Context, d *schema.ResourceData, meta inte
 			if customer.CashBalance.CustomerAccount != "" {
 				nestedData["customer_account"] = customer.CashBalance.CustomerAccount
 			}
-			if customer.CashBalance.Settings != nil {
-				nestedData0 := make(map[string]interface{})
-				if customer.CashBalance.Settings.ReconciliationMode != "" {
-					nestedData0["reconciliation_mode"] = customer.CashBalance.Settings.ReconciliationMode
+			if _, ok := d.GetOk("cash_balance.0.settings"); importing || ok {
+				if customer.CashBalance.Settings != nil {
+					nestedData0 := make(map[string]interface{})
+					if customer.CashBalance.Settings.ReconciliationMode != "" {
+						nestedData0["reconciliation_mode"] = customer.CashBalance.Settings.ReconciliationMode
+					}
+					nestedData0["using_merchant_default"] = customer.CashBalance.Settings.UsingMerchantDefault
+					nestedData["settings"] = []interface{}{nestedData0}
 				}
-				nestedData0["using_merchant_default"] = customer.CashBalance.Settings.UsingMerchantDefault
-				nestedData["settings"] = []interface{}{nestedData0}
 			}
 			if len(nestedData) > 0 {
 				if err := d.Set("cash_balance", []interface{}{nestedData}); err != nil {
@@ -702,15 +704,17 @@ func resourceCustomerRead(ctx context.Context, d *schema.ResourceData, meta inte
 			if customer.InvoiceSettings.Footer != "" {
 				nestedData["footer"] = customer.InvoiceSettings.Footer
 			}
-			if customer.InvoiceSettings.RenderingOptions != nil {
-				nestedData0 := make(map[string]interface{})
-				if customer.InvoiceSettings.RenderingOptions.AmountTaxDisplay != "" {
-					nestedData0["amount_tax_display"] = customer.InvoiceSettings.RenderingOptions.AmountTaxDisplay
+			if _, ok := d.GetOk("invoice_settings.0.rendering_options"); importing || ok {
+				if customer.InvoiceSettings.RenderingOptions != nil {
+					nestedData0 := make(map[string]interface{})
+					if customer.InvoiceSettings.RenderingOptions.AmountTaxDisplay != "" {
+						nestedData0["amount_tax_display"] = customer.InvoiceSettings.RenderingOptions.AmountTaxDisplay
+					}
+					if customer.InvoiceSettings.RenderingOptions.Template != "" {
+						nestedData0["template"] = customer.InvoiceSettings.RenderingOptions.Template
+					}
+					nestedData["rendering_options"] = []interface{}{nestedData0}
 				}
-				if customer.InvoiceSettings.RenderingOptions.Template != "" {
-					nestedData0["template"] = customer.InvoiceSettings.RenderingOptions.Template
-				}
-				nestedData["rendering_options"] = []interface{}{nestedData0}
 			}
 			if len(nestedData) > 0 {
 				if err := d.Set("invoice_settings", []interface{}{nestedData}); err != nil {
@@ -772,18 +776,20 @@ func resourceCustomerRead(ctx context.Context, d *schema.ResourceData, meta inte
 			if customer.Tax.IPAddress != "" {
 				nestedData["ip_address"] = customer.Tax.IPAddress
 			}
-			if customer.Tax.Location != nil {
-				nestedData0 := make(map[string]interface{})
-				if customer.Tax.Location.Country != "" {
-					nestedData0["country"] = customer.Tax.Location.Country
+			if _, ok := d.GetOk("tax.0.location"); importing || ok {
+				if customer.Tax.Location != nil {
+					nestedData0 := make(map[string]interface{})
+					if customer.Tax.Location.Country != "" {
+						nestedData0["country"] = customer.Tax.Location.Country
+					}
+					if customer.Tax.Location.Source != "" {
+						nestedData0["source"] = customer.Tax.Location.Source
+					}
+					if customer.Tax.Location.State != "" {
+						nestedData0["state"] = customer.Tax.Location.State
+					}
+					nestedData["location"] = []interface{}{nestedData0}
 				}
-				if customer.Tax.Location.Source != "" {
-					nestedData0["source"] = customer.Tax.Location.Source
-				}
-				if customer.Tax.Location.State != "" {
-					nestedData0["state"] = customer.Tax.Location.State
-				}
-				nestedData["location"] = []interface{}{nestedData0}
 			}
 			if customer.Tax.Provider != "" {
 				nestedData["provider"] = customer.Tax.Provider
