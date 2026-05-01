@@ -294,4 +294,4 @@ This configuration creates approximately 15 Stripe resources with correct depend
 
 ## Contributing
 
-Thanks for your interest in the Stripe Terraform Provider. Published releases are built from this repository; the OpenAPI-driven **generator** lives in [stripe/stripe-terraform-generator](https://github.com/stripe/stripe-terraform-generator). If you find a bug or want a feature, open an issue here or on the generator, and we will route schema or codegen fixes through the generator where appropriate.
+Thanks for your interest in the Stripe Terraform Provider! This repository is automatically generated from Stripe's internal tooling. If you've found a bug or have a feature request, open an issue and we'll incorporate the changes through our generator.
