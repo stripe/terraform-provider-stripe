@@ -87,7 +87,13 @@ terraform output  # View created resource IDs
 | `stripe_coupon` | Discount coupons |
 | `stripe_shipping_rate` | Shipping rate configurations |
 | `stripe_tax_rate` | Tax rate definitions |
-| `stripe_entitlements_feature` | Feature flags for entitlements |
+
+### Entitlements
+
+| Resource | Description |
+|----------|-------------|
+| `stripe_entitlements_feature` | Entitlement feature definitions |
+| `stripe_product_feature` | Attach entitlement features to products |
 
 ### Core Resources
 
@@ -117,6 +123,44 @@ These resources are part of the V2 Billing API and require access to the private
 | Data Source | Description |
 |-------------|-------------|
 | `stripe_billing_meter` | Look up existing billing meters |
+| `stripe_entitlements_feature` | Look up existing entitlement features by ID or lookup key |
+| `stripe_entitlements_active_entitlements` | List the active entitlements for a customer |
+
+## Modeling Stripe Entitlements
+
+Stripe Entitlements has three important layers:
+
+1. Define an entitlement feature with `stripe_entitlements_feature`
+2. Attach it to a product with `stripe_product_feature`
+3. Let Stripe derive customer access as active entitlements from subscriptions
+
+`stripe_product.marketing_features` remain display-only metadata for pricing tables. They do not attach Stripe Entitlements features to a product.
+
+```hcl
+resource "stripe_product" "growth" {
+  name = "Growth"
+
+  marketing_features {
+    name = "API access"
+  }
+}
+
+resource "stripe_entitlements_feature" "api_access" {
+  lookup_key = "api_access"
+  name       = "API access"
+}
+
+resource "stripe_product_feature" "growth_api_access" {
+  product             = stripe_product.growth.id
+  entitlement_feature = stripe_entitlements_feature.api_access.id
+}
+
+# Read runtime access derived from subscriptions
+# after the customer has purchased the product.
+data "stripe_entitlements_active_entitlements" "customer_access" {
+  customer = "cus_123"
+}
+```
 
 ## Installation
 

@@ -1,0 +1,1 @@
+terraform import stripe_product_feature.growth_api_access prod_123/pftr_123
