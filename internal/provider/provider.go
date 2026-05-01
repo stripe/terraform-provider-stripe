@@ -37,6 +37,7 @@ func New(version string) func() *schema.Provider {
 				"stripe_tax_rate":                          resources.ResourceTaxRate(),
 				"stripe_entitlements_feature":              resources.ResourceEntitlementsFeature(),
 				"stripe_webhook_endpoint":                  resources.ResourceWebhookEndpoint(),
+				"stripe_billing_portal_configuration":      resources.ResourceBillingPortalConfiguration(),
 				"stripe_billing_meter":                     resources.ResourceBillingMeter(),
 				"stripe_v2_billing_pricing_plan":           resources.ResourceV2BillingPricingPlan(),
 				"stripe_v2_billing_pricing_plan_component": resources.ResourceV2BillingPricingPlanComponent(),

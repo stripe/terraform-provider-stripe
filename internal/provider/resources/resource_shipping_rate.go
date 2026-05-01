@@ -326,17 +326,21 @@ func resourceShippingRateRead(ctx context.Context, d *schema.ResourceData, meta 
 	if _, ok := d.GetOk("delivery_estimate"); importing || ok {
 		if shipping_rate.DeliveryEstimate != nil {
 			nestedData := make(map[string]interface{})
-			if shipping_rate.DeliveryEstimate.Maximum != nil {
-				nestedData0 := make(map[string]interface{})
-				nestedData0["unit"] = shipping_rate.DeliveryEstimate.Maximum.Unit
-				nestedData0["value"] = int(shipping_rate.DeliveryEstimate.Maximum.Value)
-				nestedData["maximum"] = []interface{}{nestedData0}
+			if _, ok := d.GetOk("delivery_estimate.0.maximum"); importing || ok {
+				if shipping_rate.DeliveryEstimate.Maximum != nil {
+					nestedData0 := make(map[string]interface{})
+					nestedData0["unit"] = shipping_rate.DeliveryEstimate.Maximum.Unit
+					nestedData0["value"] = int(shipping_rate.DeliveryEstimate.Maximum.Value)
+					nestedData["maximum"] = []interface{}{nestedData0}
+				}
 			}
-			if shipping_rate.DeliveryEstimate.Minimum != nil {
-				nestedData0 := make(map[string]interface{})
-				nestedData0["unit"] = shipping_rate.DeliveryEstimate.Minimum.Unit
-				nestedData0["value"] = int(shipping_rate.DeliveryEstimate.Minimum.Value)
-				nestedData["minimum"] = []interface{}{nestedData0}
+			if _, ok := d.GetOk("delivery_estimate.0.minimum"); importing || ok {
+				if shipping_rate.DeliveryEstimate.Minimum != nil {
+					nestedData0 := make(map[string]interface{})
+					nestedData0["unit"] = shipping_rate.DeliveryEstimate.Minimum.Unit
+					nestedData0["value"] = int(shipping_rate.DeliveryEstimate.Minimum.Value)
+					nestedData["minimum"] = []interface{}{nestedData0}
+				}
 			}
 			if len(nestedData) > 0 {
 				if err := d.Set("delivery_estimate", []interface{}{nestedData}); err != nil {

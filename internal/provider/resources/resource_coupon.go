@@ -339,6 +339,13 @@ func resourceCouponRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if _, ok := d.GetOk("applies_to"); importing || ok {
 		if coupon.AppliesTo != nil {
 			nestedData := make(map[string]interface{})
+			if len(coupon.AppliesTo.Products) > 0 {
+				arrProducts0 := make([]interface{}, len(coupon.AppliesTo.Products))
+				for i, v := range coupon.AppliesTo.Products {
+					arrProducts0[i] = string(v)
+				}
+				nestedData["products"] = arrProducts0
+			}
 			if len(nestedData) > 0 {
 				if err := d.Set("applies_to", []interface{}{nestedData}); err != nil {
 					diags = append(diags, diag.FromErr(err)...)
