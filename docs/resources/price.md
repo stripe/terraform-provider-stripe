@@ -34,6 +34,7 @@ Prices define the unit cost, currency, and (optional) billing cycle for both rec
 - `tax_behavior` (String) Only required if a [default tax behavior](https://stripe.com/docs/tax/products-prices-tax-categories-tax-behavior#setting-a-default-tax-behavior-(recommended)) was not provided in the Stripe Tax settings. Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`. Once specified as either `inclusive` or `exclusive`, it cannot be changed.
 - `tiers` (Block List) Each element represents a pricing tier. This parameter requires `billing_scheme` to be set to `tiered`. See also the documentation for `billing_scheme`. (see [below for nested schema](#nestedblock--tiers))
 - `tiers_mode` (String) Defines if the tiering price should be `graduated` or `volume` based. In `volume`-based tiering, the maximum quantity within a period determines the per unit price, in `graduated` tiering pricing can successively change as the quantity grows.
+- `transfer_lookup_key` (Boolean) If set to true, will atomically remove the lookup key from the existing price, and assign it to this price.
 - `unit_amount` (Number) A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge. One of `unit_amount`, `unit_amount_decimal`, or `custom_unit_amount` is required, unless `billing_scheme=tiered`.
 
 ### Read-Only
