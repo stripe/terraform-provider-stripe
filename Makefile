@@ -4,7 +4,7 @@ HOSTNAME=registry.terraform.io
 NAMESPACE=stripe
 NAME=stripe
 BINARY=terraform-provider-${NAME}
-VERSION=0.1.0
+VERSION=0.2.2
 
 # Detect OS and architecture
 OS=$(shell go env GOOS)
@@ -79,4 +79,3 @@ help:
 	@echo "  vet        - Run go vet"
 	@echo "  deps       - Download and tidy dependencies"
 	@echo "  help       - Show this help message"
-

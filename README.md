@@ -14,7 +14,7 @@ terraform {
   required_providers {
     stripe = {
       source = "stripe/stripe"
-      version = "0.1.3"
+      version = "0.2.2"
     }
   }
 }
@@ -123,34 +123,18 @@ These resources are part of the V2 Billing API and require access to the private
 ### Prerequisites
 
 - Terraform 1.0 or later
-- Go 1.19 or later
 - Your [Stripe API key](https://dashboard.stripe.com/apikeys) (test mode recommended for initial setup)
 
-### Building and installing the provider
+### Install from the Terraform Registry
 
-The provider is not yet published to the Terraform Registry. Install it locally from the GitHub repository:
-
-```bash
-# Clone the repository
-git clone https://github.com/stripe/stripe-terraform.git
-cd stripe-terraform
-
-# Build and install the provider to your local Terraform plugins directory
-make install
-```
-
-The `make install` command builds the provider binary and installs it to `~/.terraform.d/plugins/registry.terraform.io/stripe/stripe/0.1.0/` for your operating system and architecture.
-
-### Provider configuration
-
-Create a `main.tf` file with the provider configuration:
+The provider is published to the Terraform Registry as [`stripe/stripe`](https://registry.terraform.io/providers/stripe/stripe/latest). Add it to your Terraform configuration:
 
 ```hcl
 terraform {
   required_providers {
     stripe = {
       source  = "stripe/stripe"
-      version = "0.1.0"
+      version = "0.2.2"
     }
   }
 }
@@ -168,13 +152,44 @@ Set your [Stripe API key](https://dashboard.stripe.com/apikeys) as an environmen
 export STRIPE_API_KEY="sk_test_..."
 ```
 
-Initialize Terraform (this will use the locally installed provider):
+Initialize Terraform:
 
 ```bash
 terraform init
 ```
 
-Terraform will find and use the provider from your local plugins directory.
+Terraform will download the provider from the Registry.
+
+### Local development install
+
+To build and test a local checkout of the provider, install Go 1.19 or later, then run:
+
+```bash
+git clone https://github.com/stripe/terraform-provider-stripe.git
+cd terraform-provider-stripe
+make install
+```
+
+The `make install` command builds the provider binary and installs it to `~/.terraform.d/plugins/registry.terraform.io/stripe/stripe/0.2.2/` for your operating system and architecture. Use this path only when developing the provider locally.
+
+Configure Terraform to use the locally installed development build:
+
+```hcl
+terraform {
+  required_providers {
+    stripe = {
+      source  = "stripe/stripe"
+      version = "0.2.2"
+    }
+  }
+}
+
+provider "stripe" {
+  # API key is read from STRIPE_API_KEY environment variable
+  # Alternatively, set it explicitly (not recommended for production)
+  # api_key = "sk_test_..."
+}
+```
 
 ### Project organization
 
@@ -187,7 +202,7 @@ my-stripe-infrastructure/
 ├── outputs.tf           # Outputs
 └── terraform.tfvars     # Variable values (don't commit secrets!)
 
-stripe-terraform/
+terraform-provider-stripe/
   └── modules/
       └── token-billing/
 ```
@@ -196,7 +211,7 @@ With this structure, reference modules using relative paths:
 
 ```hcl
 module "my_plan" {
-  source = "../stripe-terraform/modules/token-billing"
+  source = "../terraform-provider-stripe/modules/token-billing"
   # ...
 }
 ```
@@ -246,7 +261,7 @@ Modules provide simplified interfaces for common Stripe billing patterns. Instea
 
 The token-billing module creates AI token-based pricing plans. It handles the coordination of multiple Stripe billing resources including pricing plans, meters, metered items, rate cards, and license fees.
 
-Modules are located in the cloned repository at `stripe-terraform/stripe-terraform/modules/`. Reference them using a relative or absolute path to the module directory.
+Modules are located in the cloned repository at `terraform-provider-stripe/modules/`. Reference them using a relative or absolute path to the module directory.
 
 #### Basic configuration
 
@@ -254,7 +269,7 @@ Create a pricing plan with a monthly subscription fee and usage-based pricing fo
 
 ```hcl
 module "ai_plan" {
-  source = "../stripe-terraform/stripe-terraform/modules/token-billing"
+  source = "../terraform-provider-stripe/modules/token-billing"
   
   plan_name = "AI Pro Plan"
   
