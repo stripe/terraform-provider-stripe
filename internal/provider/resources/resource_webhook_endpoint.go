@@ -148,6 +148,9 @@ func ResourceWebhookEndpoint() *schema.Resource {
 					"2025-09-30.clover",
 					"2025-10-29.clover",
 					"2025-11-17.clover",
+					"2026-03-25.dahlia",
+					"2026-04-22.dahlia",
+					"2026-05-27.dahlia",
 				}, false)),
 			},
 			"connect": {
