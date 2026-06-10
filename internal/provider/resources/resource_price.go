@@ -546,7 +546,11 @@ func resourcePriceRead(ctx context.Context, d *schema.ResourceData, meta interfa
 	tflog.Debug(ctx, "Reading stripe_price resource", map[string]interface{}{"id": d.Id()})
 	c := meta.(*stripe.Client)
 
-	price, err := c.V1Prices.Retrieve(ctx, d.Id(), nil)
+	price, err := c.V1Prices.Retrieve(ctx, d.Id(), &stripe.PriceRetrieveParams{
+		Params: stripe.Params{
+			Expand: []*string{stripe.String("tiers")},
+		},
+	})
 	if err != nil {
 		// Check if it's a 404 (resource was deleted) vs other errors
 		if stripeErr, ok := err.(*stripe.Error); ok && stripeErr.HTTPStatusCode == 404 {
