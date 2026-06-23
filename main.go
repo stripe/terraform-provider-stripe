@@ -1,4 +1,6 @@
-//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name stripe
+//
+// File generated from our OpenAPI spec
+//
 
 package main
 
@@ -7,32 +9,25 @@ import (
 	"flag"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+
 	"github.com/stripe/terraform-provider-stripe/internal/provider"
 )
 
-// version is set via ldflags during build
-var version = "dev"
+var version string = "dev"
 
 func main() {
-	var debugMode bool
-
-	flag.BoolVar(&debugMode, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	var debug bool
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers")
 	flag.Parse()
 
-	opts := &plugin.ServeOpts{
-		Debug:        debugMode,
-		ProviderAddr: "registry.terraform.io/stripe/stripe",
-		ProviderFunc: provider.New(version),
+	opts := providerserver.ServeOpts{
+		Address: "registry.terraform.io/stripe/stripe",
+		Debug:   debug,
 	}
 
-	if debugMode {
-		err := plugin.Debug(context.Background(), opts.ProviderAddr, opts)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		return
+	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+	if err != nil {
+		log.Fatal(err.Error())
 	}
-
-	plugin.Serve(opts)
 }

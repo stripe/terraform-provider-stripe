@@ -1,0 +1,61 @@
+//
+//
+// File generated from our OpenAPI spec
+//
+//
+
+package stripe
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/stripe/stripe-go/v86/form"
+)
+
+// v1IssuingTokenService is used to invoke /v1/issuing/tokens APIs.
+type v1IssuingTokenService struct {
+	B   Backend
+	Key string
+}
+
+// Retrieves an Issuing Token object.
+func (c v1IssuingTokenService) Retrieve(ctx context.Context, id string, params *IssuingTokenRetrieveParams) (*IssuingToken, error) {
+	if params == nil {
+		params = &IssuingTokenRetrieveParams{}
+	}
+	params.Context = ctx
+	path := FormatURLPath("/v1/issuing/tokens/%s", id)
+	token := &IssuingToken{}
+	err := c.B.Call(http.MethodGet, path, c.Key, params, token)
+	return token, err
+}
+
+// Attempts to update the specified Issuing Token object to the status specified.
+func (c v1IssuingTokenService) Update(ctx context.Context, id string, params *IssuingTokenUpdateParams) (*IssuingToken, error) {
+	if params == nil {
+		params = &IssuingTokenUpdateParams{}
+	}
+	params.Context = ctx
+	path := FormatURLPath("/v1/issuing/tokens/%s", id)
+	token := &IssuingToken{}
+	err := c.B.Call(http.MethodPost, path, c.Key, params, token)
+	return token, err
+}
+
+// Lists all Issuing Token objects for a given card.
+func (c v1IssuingTokenService) List(ctx context.Context, listParams *IssuingTokenListParams) *V1List[*IssuingToken] {
+	if listParams == nil {
+		listParams = &IssuingTokenListParams{}
+	}
+	listParams.Context = ctx
+	return newV1List(ctx, listParams, func(ctx context.Context, p *Params, b *form.Values) (*v1Page[*IssuingToken], error) {
+		list := &v1Page[*IssuingToken]{}
+		if p == nil {
+			p = &Params{}
+		}
+		p.Context = ctx
+		err := c.B.CallRaw(http.MethodGet, "/v1/issuing/tokens", c.Key, []byte(b.Encode()), p, list)
+		return list, err
+	})
+}

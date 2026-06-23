@@ -1,0 +1,120 @@
+//
+//
+// File generated from our OpenAPI spec
+//
+//
+
+// Package capability provides the /v1/accounts/{account}/capabilities APIs
+package capability
+
+import (
+	"fmt"
+	"net/http"
+
+	stripe "github.com/stripe/stripe-go/v86"
+	"github.com/stripe/stripe-go/v86/form"
+)
+
+// Client is used to invoke /v1/accounts/{account}/capabilities APIs.
+// Deprecated: Use [stripe.Client] instead. See the [migration guide] for more info.
+//
+// [migration guide]: https://github.com/stripe/stripe-go/wiki/Migration-guide-for-Stripe-Client
+type Client struct {
+	B   stripe.Backend
+	Key string
+}
+
+// Retrieves information about the specified Account Capability.
+func Get(id string, params *stripe.CapabilityParams) (*stripe.Capability, error) {
+	return getC().Get(id, params)
+}
+
+// Retrieves information about the specified Account Capability.
+//
+// Deprecated: Client methods are deprecated. This should be accessed instead through [stripe.Client]. See the [migration guide] for more info.
+//
+// [migration guide]: https://github.com/stripe/stripe-go/wiki/Migration-guide-for-Stripe-Client
+func (c Client) Get(id string, params *stripe.CapabilityParams) (*stripe.Capability, error) {
+	if params == nil {
+		return nil, fmt.Errorf(
+			"params cannot be nil, and params.Account must be set")
+	}
+	path := stripe.FormatURLPath(
+		"/v1/accounts/%s/capabilities/%s", stripe.StringValue(params.Account), id)
+	capability := &stripe.Capability{}
+	err := c.B.Call(http.MethodGet, path, c.Key, params, capability)
+	return capability, err
+}
+
+// Updates an existing Account Capability. Request or remove a capability by updating its requested parameter.
+func Update(id string, params *stripe.CapabilityParams) (*stripe.Capability, error) {
+	return getC().Update(id, params)
+}
+
+// Updates an existing Account Capability. Request or remove a capability by updating its requested parameter.
+//
+// Deprecated: Client methods are deprecated. This should be accessed instead through [stripe.Client]. See the [migration guide] for more info.
+//
+// [migration guide]: https://github.com/stripe/stripe-go/wiki/Migration-guide-for-Stripe-Client
+func (c Client) Update(id string, params *stripe.CapabilityParams) (*stripe.Capability, error) {
+	path := stripe.FormatURLPath(
+		"/v1/accounts/%s/capabilities/%s", stripe.StringValue(params.Account), id)
+	capability := &stripe.Capability{}
+	err := c.B.Call(http.MethodPost, path, c.Key, params, capability)
+	return capability, err
+}
+
+// Returns a list of capabilities associated with the account. The capabilities are returned sorted by creation date, with the most recent capability appearing first.
+func List(params *stripe.CapabilityListParams) *Iter {
+	return getC().List(params)
+}
+
+// Returns a list of capabilities associated with the account. The capabilities are returned sorted by creation date, with the most recent capability appearing first.
+//
+// Deprecated: Client methods are deprecated. This should be accessed instead through [stripe.Client]. See the [migration guide] for more info.
+//
+// [migration guide]: https://github.com/stripe/stripe-go/wiki/Migration-guide-for-Stripe-Client
+func (c Client) List(listParams *stripe.CapabilityListParams) *Iter {
+	if listParams == nil {
+		listParams = &stripe.CapabilityListParams{}
+	}
+	p := listParams.GetParams()
+	path := stripe.FormatURLPath(
+		"/v1/accounts/%s/capabilities", stripe.StringValue(listParams.Account))
+	queryParams := &form.Values{}
+	form.AppendTo(queryParams, listParams)
+	return &Iter{
+		Iter: stripe.GetIter(nil, func(_ *stripe.Params, _ *form.Values) ([]interface{}, stripe.ListContainer, error) {
+			list := &stripe.CapabilityList{}
+			err := c.B.CallRaw(http.MethodGet, path, c.Key, []byte(queryParams.Encode()), p, list)
+
+			ret := make([]interface{}, len(list.Data))
+			for i, v := range list.Data {
+				ret[i] = v
+			}
+
+			return ret, list, err
+		}),
+	}
+}
+
+// Iter is an iterator for capabilities.
+type Iter struct {
+	*stripe.Iter
+}
+
+// Capability returns the capability which the iterator is currently pointing to.
+func (i *Iter) Capability() *stripe.Capability {
+	return i.Current().(*stripe.Capability)
+}
+
+// CapabilityList returns the current list object which the iterator is
+// currently using. List objects will change as new API calls are made to
+// continue pagination.
+func (i *Iter) CapabilityList() *stripe.CapabilityList {
+	return i.List().(*stripe.CapabilityList)
+}
+
+func getC() Client {
+	return Client{stripe.GetBackend(stripe.APIBackend), stripe.Key}
+}

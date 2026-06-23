@@ -1,0 +1,13 @@
+# File generated from our OpenAPI spec and handwritten Terraform acceptance templates.
+# Handwritten Terraform acceptance source emitted by sdk-codegen.
+resource "stripe_terminal_reader" "test" {
+  registration_code = "{{TERMINAL_READER_REGISTRATION_CODE_UPDATE}}"
+  label             = "SDK Codegen Reader Update Final"
+  location          = "{{TERMINAL_LOCATION}}"
+
+  metadata = {
+    suite = "sdk-codegen"
+    case  = "terminal_reader_label_update"
+    phase = "update"
+  }
+}

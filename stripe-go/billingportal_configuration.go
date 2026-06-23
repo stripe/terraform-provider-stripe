@@ -1,0 +1,1029 @@
+//
+//
+// File generated from our OpenAPI spec
+//
+//
+
+package stripe
+
+import "encoding/json"
+
+// The types of customer updates that are supported. When empty, customers are not updateable.
+type BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate string
+
+// List of values that BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate can take
+const (
+	BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdateAddress  BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate = "address"
+	BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdateEmail    BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate = "email"
+	BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdateName     BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate = "name"
+	BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdatePhone    BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate = "phone"
+	BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdateShipping BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate = "shipping"
+	BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdateTaxID    BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate = "tax_id"
+)
+
+// Which cancellation reasons will be given as options to the customer.
+type BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption string
+
+// List of values that BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption can take
+const (
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOptionCustomerService BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption = "customer_service"
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOptionLowQuality      BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption = "low_quality"
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOptionMissingFeatures BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption = "missing_features"
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOptionOther           BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption = "other"
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOptionSwitchedService BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption = "switched_service"
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOptionTooComplex      BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption = "too_complex"
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOptionTooExpensive    BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption = "too_expensive"
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOptionUnused          BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption = "unused"
+)
+
+// Whether to cancel subscriptions immediately or at the end of the billing period.
+type BillingPortalConfigurationFeaturesSubscriptionCancelMode string
+
+// List of values that BillingPortalConfigurationFeaturesSubscriptionCancelMode can take
+const (
+	BillingPortalConfigurationFeaturesSubscriptionCancelModeAtPeriodEnd BillingPortalConfigurationFeaturesSubscriptionCancelMode = "at_period_end"
+	BillingPortalConfigurationFeaturesSubscriptionCancelModeImmediately BillingPortalConfigurationFeaturesSubscriptionCancelMode = "immediately"
+)
+
+// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`.
+type BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehavior string
+
+// List of values that BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehavior can take
+const (
+	BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehaviorAlwaysInvoice    BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehavior = "always_invoice"
+	BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehaviorCreateProrations BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehavior = "create_prorations"
+	BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehaviorNone             BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehavior = "none"
+)
+
+// Determines the value to use for the billing cycle anchor on subscription updates. Valid values are `now` or `unchanged`, and the default value is `unchanged`. Setting the value to `now` resets the subscription's billing cycle anchor to the current time (in UTC). For more information, see the billing cycle [documentation](https://docs.stripe.com/billing/subscriptions/billing-cycle).
+type BillingPortalConfigurationFeaturesSubscriptionUpdateBillingCycleAnchor string
+
+// List of values that BillingPortalConfigurationFeaturesSubscriptionUpdateBillingCycleAnchor can take
+const (
+	BillingPortalConfigurationFeaturesSubscriptionUpdateBillingCycleAnchorNow       BillingPortalConfigurationFeaturesSubscriptionUpdateBillingCycleAnchor = "now"
+	BillingPortalConfigurationFeaturesSubscriptionUpdateBillingCycleAnchorUnchanged BillingPortalConfigurationFeaturesSubscriptionUpdateBillingCycleAnchor = "unchanged"
+)
+
+// The types of subscription updates that are supported for items listed in the `products` attribute. When empty, subscriptions are not updateable.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdate string
+
+// List of values that BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdate can take
+const (
+	BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdatePrice         BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdate = "price"
+	BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdatePromotionCode BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdate = "promotion_code"
+	BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdateQuantity      BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdate = "quantity"
+)
+
+// Determines how to handle prorations resulting from subscription updates. Valid values are `none`, `create_prorations`, and `always_invoice`. Defaults to a value of `none` if you don't set it during creation.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehavior string
+
+// List of values that BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehavior can take
+const (
+	BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehaviorAlwaysInvoice    BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehavior = "always_invoice"
+	BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehaviorCreateProrations BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehavior = "create_prorations"
+	BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehaviorNone             BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehavior = "none"
+)
+
+// The type of condition.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionType string
+
+// List of values that BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionType can take
+const (
+	BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeDecreasingItemAmount BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionType = "decreasing_item_amount"
+	BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionTypeShorteningInterval   BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionType = "shortening_interval"
+)
+
+// Determines how handle updates to trialing subscriptions. Valid values are `end_trial` and `continue_trial`. Defaults to a value of `end_trial` if you don't set it during creation.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateTrialUpdateBehavior string
+
+// List of values that BillingPortalConfigurationFeaturesSubscriptionUpdateTrialUpdateBehavior can take
+const (
+	BillingPortalConfigurationFeaturesSubscriptionUpdateTrialUpdateBehaviorContinueTrial BillingPortalConfigurationFeaturesSubscriptionUpdateTrialUpdateBehavior = "continue_trial"
+	BillingPortalConfigurationFeaturesSubscriptionUpdateTrialUpdateBehaviorEndTrial      BillingPortalConfigurationFeaturesSubscriptionUpdateTrialUpdateBehavior = "end_trial"
+)
+
+// Returns a list of configurations that describe the functionality of the customer portal.
+type BillingPortalConfigurationListParams struct {
+	ListParams `form:"*"`
+	// Only return configurations that are active or inactive (e.g., pass `true` to only list active configurations).
+	Active *bool `form:"active" json:"active,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Only return the default or non-default configurations (e.g., pass `true` to only list the default configuration).
+	IsDefault *bool `form:"is_default" json:"is_default,omitempty"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *BillingPortalConfigurationListParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// The business information shown to customers in the portal.
+type BillingPortalConfigurationBusinessProfileParams struct {
+	// The messaging shown to customers in the portal.
+	Headline *string `form:"headline" json:"headline,omitempty"`
+	// A link to the business's publicly available privacy policy.
+	PrivacyPolicyURL *string `form:"privacy_policy_url" json:"privacy_policy_url,omitempty"`
+	// A link to the business's publicly available terms of service.
+	TermsOfServiceURL *string                                                     `form:"terms_of_service_url" json:"terms_of_service_url,omitempty"`
+	UnsetFields       []BillingPortalConfigurationBusinessProfileParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationBusinessProfileParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationBusinessProfileParams.
+type BillingPortalConfigurationBusinessProfileParamsUnsetField string
+
+const (
+	BillingPortalConfigurationBusinessProfileParamsUnsetFieldHeadline          BillingPortalConfigurationBusinessProfileParamsUnsetField = "headline"
+	BillingPortalConfigurationBusinessProfileParamsUnsetFieldPrivacyPolicyURL  BillingPortalConfigurationBusinessProfileParamsUnsetField = "privacy_policy_url"
+	BillingPortalConfigurationBusinessProfileParamsUnsetFieldTermsOfServiceURL BillingPortalConfigurationBusinessProfileParamsUnsetField = "terms_of_service_url"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationBusinessProfileParams) AddUnsetField(field BillingPortalConfigurationBusinessProfileParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about updating the customer details in the portal.
+type BillingPortalConfigurationFeaturesCustomerUpdateParams struct {
+	// The types of customer updates that are supported. When empty, customers are not updateable.
+	AllowedUpdates []*string `form:"allowed_updates" json:"allowed_updates,omitempty"`
+	// Whether the feature is enabled.
+	Enabled     *bool                                                              `form:"enabled" json:"enabled,omitempty"`
+	UnsetFields []BillingPortalConfigurationFeaturesCustomerUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationFeaturesCustomerUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationFeaturesCustomerUpdateParams.
+type BillingPortalConfigurationFeaturesCustomerUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationFeaturesCustomerUpdateParamsUnsetFieldAllowedUpdates BillingPortalConfigurationFeaturesCustomerUpdateParamsUnsetField = "allowed_updates"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationFeaturesCustomerUpdateParams) AddUnsetField(field BillingPortalConfigurationFeaturesCustomerUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about showing the billing history in the portal.
+type BillingPortalConfigurationFeaturesInvoiceHistoryParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Information about updating payment methods in the portal.
+type BillingPortalConfigurationFeaturesPaymentMethodUpdateParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The [Payment Method Configuration](https://docs.stripe.com/api/payment_method_configurations) to use for this portal session. When specified, customers will be able to update their payment method to one of the options specified by the payment method configuration. If not set or set to an empty string, the default payment method configuration is used.
+	PaymentMethodConfiguration *string                                                                 `form:"payment_method_configuration" json:"payment_method_configuration,omitempty"`
+	UnsetFields                []BillingPortalConfigurationFeaturesPaymentMethodUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationFeaturesPaymentMethodUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationFeaturesPaymentMethodUpdateParams.
+type BillingPortalConfigurationFeaturesPaymentMethodUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationFeaturesPaymentMethodUpdateParamsUnsetFieldPaymentMethodConfiguration BillingPortalConfigurationFeaturesPaymentMethodUpdateParamsUnsetField = "payment_method_configuration"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationFeaturesPaymentMethodUpdateParams) AddUnsetField(field BillingPortalConfigurationFeaturesPaymentMethodUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Whether the cancellation reasons will be collected in the portal and which options are exposed to the customer
+type BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// Which cancellation reasons will be given as options to the customer.
+	Options     []*string                                                                                `form:"options" json:"options,omitempty"`
+	UnsetFields []BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParams.
+type BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField string
+
+const (
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParams) AddUnsetField(field BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about canceling subscriptions in the portal.
+type BillingPortalConfigurationFeaturesSubscriptionCancelParams struct {
+	// Whether the cancellation reasons will be collected in the portal and which options are exposed to the customer
+	CancellationReason *BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParams `form:"cancellation_reason" json:"cancellation_reason,omitempty"`
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled,omitempty"`
+	// Whether to cancel subscriptions immediately or at the end of the billing period.
+	Mode *string `form:"mode" json:"mode,omitempty"`
+	// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`, which is only compatible with `mode=immediately`. Passing `always_invoice` will result in an error. No prorations are generated when canceling a subscription at the end of its natural billing period.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+}
+
+// Control whether the quantity of the product can be adjusted.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateProductAdjustableQuantityParams struct {
+	// Set to true if the quantity can be adjusted to any non-negative integer.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The maximum quantity that can be set for the product.
+	Maximum *int64 `form:"maximum" json:"maximum,omitempty"`
+	// The minimum quantity that can be set for the product.
+	Minimum *int64 `form:"minimum" json:"minimum,omitempty"`
+}
+
+// The list of up to 10 products that support subscription updates.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateProductParams struct {
+	// Control whether the quantity of the product can be adjusted.
+	AdjustableQuantity *BillingPortalConfigurationFeaturesSubscriptionUpdateProductAdjustableQuantityParams `form:"adjustable_quantity" json:"adjustable_quantity,omitempty"`
+	// The list of price IDs for the product that a subscription can be updated to.
+	Prices []*string `form:"prices" json:"prices"`
+	// The product id.
+	Product *string `form:"product" json:"product"`
+}
+
+// List of conditions. When any condition is true, the update will be scheduled at the end of the current period.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams struct {
+	// The type of condition.
+	Type *string `form:"type" json:"type"`
+}
+
+// Setting to control when an update should be scheduled at the end of the period instead of applying immediately.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParams struct {
+	// List of conditions. When any condition is true, the update will be scheduled at the end of the current period.
+	Conditions  []*BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams `form:"conditions" json:"conditions,omitempty"`
+	UnsetFields []BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParams.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField string
+
+const (
+	BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetFieldConditions BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField = "conditions"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParams) AddUnsetField(field BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about updating subscriptions in the portal.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateParams struct {
+	// Determines the value to use for the billing cycle anchor on subscription updates. Valid values are `now` or `unchanged`, and the default value is `unchanged`. Setting the value to `now` resets the subscription's billing cycle anchor to the current time (in UTC). For more information, see the billing cycle [documentation](https://docs.stripe.com/billing/subscriptions/billing-cycle).
+	BillingCycleAnchor *string `form:"billing_cycle_anchor" json:"billing_cycle_anchor,omitempty"`
+	// The types of subscription updates that are supported. When empty, subscriptions are not updateable.
+	DefaultAllowedUpdates []*string `form:"default_allowed_updates" json:"default_allowed_updates,omitempty"`
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled,omitempty"`
+	// The list of up to 10 products that support subscription updates.
+	Products []*BillingPortalConfigurationFeaturesSubscriptionUpdateProductParams `form:"products" json:"products,omitempty"`
+	// Determines how to handle prorations resulting from subscription updates. Valid values are `none`, `create_prorations`, and `always_invoice`.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+	// Setting to control when an update should be scheduled at the end of the period instead of applying immediately.
+	ScheduleAtPeriodEnd *BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndParams `form:"schedule_at_period_end" json:"schedule_at_period_end,omitempty"`
+	// The behavior when updating a subscription that is trialing.
+	TrialUpdateBehavior *string                                                                `form:"trial_update_behavior" json:"trial_update_behavior,omitempty"`
+	UnsetFields         []BillingPortalConfigurationFeaturesSubscriptionUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationFeaturesSubscriptionUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationFeaturesSubscriptionUpdateParams.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationFeaturesSubscriptionUpdateParamsUnsetFieldDefaultAllowedUpdates BillingPortalConfigurationFeaturesSubscriptionUpdateParamsUnsetField = "default_allowed_updates"
+	BillingPortalConfigurationFeaturesSubscriptionUpdateParamsUnsetFieldProducts              BillingPortalConfigurationFeaturesSubscriptionUpdateParamsUnsetField = "products"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationFeaturesSubscriptionUpdateParams) AddUnsetField(field BillingPortalConfigurationFeaturesSubscriptionUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about the features available in the portal.
+type BillingPortalConfigurationFeaturesParams struct {
+	// Information about updating the customer details in the portal.
+	CustomerUpdate *BillingPortalConfigurationFeaturesCustomerUpdateParams `form:"customer_update" json:"customer_update,omitempty"`
+	// Information about showing the billing history in the portal.
+	InvoiceHistory *BillingPortalConfigurationFeaturesInvoiceHistoryParams `form:"invoice_history" json:"invoice_history,omitempty"`
+	// Information about updating payment methods in the portal.
+	PaymentMethodUpdate *BillingPortalConfigurationFeaturesPaymentMethodUpdateParams `form:"payment_method_update" json:"payment_method_update,omitempty"`
+	// Information about canceling subscriptions in the portal.
+	SubscriptionCancel *BillingPortalConfigurationFeaturesSubscriptionCancelParams `form:"subscription_cancel" json:"subscription_cancel,omitempty"`
+	// Information about updating subscriptions in the portal.
+	SubscriptionUpdate *BillingPortalConfigurationFeaturesSubscriptionUpdateParams `form:"subscription_update" json:"subscription_update,omitempty"`
+}
+
+// The hosted login page for this configuration. Learn more about the portal login page in our [integration docs](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal#share).
+type BillingPortalConfigurationLoginPageParams struct {
+	// Set to `true` to generate a shareable URL [`login_page.url`](https://docs.stripe.com/api/customer_portal/configuration#portal_configuration_object-login_page-url) that will take your customers to a hosted login page for the customer portal.
+	//
+	// Set to `false` to deactivate the `login_page.url`.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Creates a configuration that describes the functionality and behavior of a PortalSession
+type BillingPortalConfigurationParams struct {
+	Params `form:"*"`
+	// Whether the configuration is active and can be used to create portal sessions.
+	Active *bool `form:"active" json:"active,omitempty"`
+	// The business information shown to customers in the portal.
+	BusinessProfile *BillingPortalConfigurationBusinessProfileParams `form:"business_profile" json:"business_profile,omitempty"`
+	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
+	DefaultReturnURL *string `form:"default_return_url" json:"default_return_url,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Information about the features available in the portal.
+	Features *BillingPortalConfigurationFeaturesParams `form:"features" json:"features,omitempty"`
+	// The hosted login page for this configuration. Learn more about the portal login page in our [integration docs](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal#share).
+	LoginPage *BillingPortalConfigurationLoginPageParams `form:"login_page" json:"login_page,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
+	// The name of the configuration.
+	Name        *string                                      `form:"name" json:"name,omitempty"`
+	UnsetFields []BillingPortalConfigurationParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationParams.
+type BillingPortalConfigurationParamsUnsetField string
+
+const (
+	BillingPortalConfigurationParamsUnsetFieldDefaultReturnURL BillingPortalConfigurationParamsUnsetField = "default_return_url"
+	BillingPortalConfigurationParamsUnsetFieldMetadata         BillingPortalConfigurationParamsUnsetField = "metadata"
+	BillingPortalConfigurationParamsUnsetFieldName             BillingPortalConfigurationParamsUnsetField = "name"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationParams) AddUnsetField(field BillingPortalConfigurationParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *BillingPortalConfigurationParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *BillingPortalConfigurationParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+// The business information shown to customers in the portal.
+type BillingPortalConfigurationCreateBusinessProfileParams struct {
+	// The messaging shown to customers in the portal.
+	Headline *string `form:"headline" json:"headline,omitempty"`
+	// A link to the business's publicly available privacy policy.
+	PrivacyPolicyURL *string `form:"privacy_policy_url" json:"privacy_policy_url,omitempty"`
+	// A link to the business's publicly available terms of service.
+	TermsOfServiceURL *string                                                           `form:"terms_of_service_url" json:"terms_of_service_url,omitempty"`
+	UnsetFields       []BillingPortalConfigurationCreateBusinessProfileParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationCreateBusinessProfileParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationCreateBusinessProfileParams.
+type BillingPortalConfigurationCreateBusinessProfileParamsUnsetField string
+
+const (
+	BillingPortalConfigurationCreateBusinessProfileParamsUnsetFieldHeadline BillingPortalConfigurationCreateBusinessProfileParamsUnsetField = "headline"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationCreateBusinessProfileParams) AddUnsetField(field BillingPortalConfigurationCreateBusinessProfileParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about updating the customer details in the portal.
+type BillingPortalConfigurationCreateFeaturesCustomerUpdateParams struct {
+	// The types of customer updates that are supported. When empty, customers are not updateable.
+	AllowedUpdates []*string `form:"allowed_updates" json:"allowed_updates,omitempty"`
+	// Whether the feature is enabled.
+	Enabled     *bool                                                                    `form:"enabled" json:"enabled"`
+	UnsetFields []BillingPortalConfigurationCreateFeaturesCustomerUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationCreateFeaturesCustomerUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationCreateFeaturesCustomerUpdateParams.
+type BillingPortalConfigurationCreateFeaturesCustomerUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationCreateFeaturesCustomerUpdateParamsUnsetFieldAllowedUpdates BillingPortalConfigurationCreateFeaturesCustomerUpdateParamsUnsetField = "allowed_updates"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationCreateFeaturesCustomerUpdateParams) AddUnsetField(field BillingPortalConfigurationCreateFeaturesCustomerUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about showing the billing history in the portal.
+type BillingPortalConfigurationCreateFeaturesInvoiceHistoryParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Information about updating payment methods in the portal.
+type BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The [Payment Method Configuration](https://docs.stripe.com/api/payment_method_configurations) to use for this portal session. When specified, customers will be able to update their payment method to one of the options specified by the payment method configuration. If not set or set to an empty string, the default payment method configuration is used.
+	PaymentMethodConfiguration *string                                                                       `form:"payment_method_configuration" json:"payment_method_configuration,omitempty"`
+	UnsetFields                []BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParams.
+type BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParamsUnsetFieldPaymentMethodConfiguration BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParamsUnsetField = "payment_method_configuration"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParams) AddUnsetField(field BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Whether the cancellation reasons will be collected in the portal and which options are exposed to the customer
+type BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// Which cancellation reasons will be given as options to the customer.
+	Options     []*string                                                                                      `form:"options" json:"options"`
+	UnsetFields []BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParams.
+type BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField string
+
+const (
+	BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParams) AddUnsetField(field BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about canceling subscriptions in the portal.
+type BillingPortalConfigurationCreateFeaturesSubscriptionCancelParams struct {
+	// Whether the cancellation reasons will be collected in the portal and which options are exposed to the customer
+	CancellationReason *BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParams `form:"cancellation_reason" json:"cancellation_reason,omitempty"`
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// Whether to cancel subscriptions immediately or at the end of the billing period.
+	Mode *string `form:"mode" json:"mode,omitempty"`
+	// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`, which is only compatible with `mode=immediately`. Passing `always_invoice` will result in an error. No prorations are generated when canceling a subscription at the end of its natural billing period.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+}
+
+// Control whether the quantity of the product can be adjusted.
+type BillingPortalConfigurationCreateFeaturesSubscriptionUpdateProductAdjustableQuantityParams struct {
+	// Set to true if the quantity can be adjusted to any non-negative integer.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The maximum quantity that can be set for the product.
+	Maximum *int64 `form:"maximum" json:"maximum,omitempty"`
+	// The minimum quantity that can be set for the product.
+	Minimum *int64 `form:"minimum" json:"minimum,omitempty"`
+}
+
+// The list of up to 10 products that support subscription updates.
+type BillingPortalConfigurationCreateFeaturesSubscriptionUpdateProductParams struct {
+	// Control whether the quantity of the product can be adjusted.
+	AdjustableQuantity *BillingPortalConfigurationCreateFeaturesSubscriptionUpdateProductAdjustableQuantityParams `form:"adjustable_quantity" json:"adjustable_quantity,omitempty"`
+	// The list of price IDs for the product that a subscription can be updated to.
+	Prices []*string `form:"prices" json:"prices"`
+	// The product id.
+	Product *string `form:"product" json:"product"`
+}
+
+// List of conditions. When any condition is true, the update will be scheduled at the end of the current period.
+type BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams struct {
+	// The type of condition.
+	Type *string `form:"type" json:"type"`
+}
+
+// Setting to control when an update should be scheduled at the end of the period instead of applying immediately.
+type BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams struct {
+	// List of conditions. When any condition is true, the update will be scheduled at the end of the current period.
+	Conditions []*BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams `form:"conditions" json:"conditions,omitempty"`
+}
+
+// Information about updating subscriptions in the portal.
+type BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParams struct {
+	// Determines the value to use for the billing cycle anchor on subscription updates. Valid values are `now` or `unchanged`, and the default value is `unchanged`. Setting the value to `now` resets the subscription's billing cycle anchor to the current time (in UTC). For more information, see the billing cycle [documentation](https://docs.stripe.com/billing/subscriptions/billing-cycle).
+	BillingCycleAnchor *string `form:"billing_cycle_anchor" json:"billing_cycle_anchor,omitempty"`
+	// The types of subscription updates that are supported. When empty, subscriptions are not updateable.
+	DefaultAllowedUpdates []*string `form:"default_allowed_updates" json:"default_allowed_updates,omitempty"`
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The list of up to 10 products that support subscription updates.
+	Products []*BillingPortalConfigurationCreateFeaturesSubscriptionUpdateProductParams `form:"products" json:"products,omitempty"`
+	// Determines how to handle prorations resulting from subscription updates. Valid values are `none`, `create_prorations`, and `always_invoice`.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+	// Setting to control when an update should be scheduled at the end of the period instead of applying immediately.
+	ScheduleAtPeriodEnd *BillingPortalConfigurationCreateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams `form:"schedule_at_period_end" json:"schedule_at_period_end,omitempty"`
+	// The behavior when updating a subscription that is trialing.
+	TrialUpdateBehavior *string                                                                      `form:"trial_update_behavior" json:"trial_update_behavior,omitempty"`
+	UnsetFields         []BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParams.
+type BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParamsUnsetFieldDefaultAllowedUpdates BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParamsUnsetField = "default_allowed_updates"
+	BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParamsUnsetFieldProducts              BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParamsUnsetField = "products"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParams) AddUnsetField(field BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about the features available in the portal.
+type BillingPortalConfigurationCreateFeaturesParams struct {
+	// Information about updating the customer details in the portal.
+	CustomerUpdate *BillingPortalConfigurationCreateFeaturesCustomerUpdateParams `form:"customer_update" json:"customer_update,omitempty"`
+	// Information about showing the billing history in the portal.
+	InvoiceHistory *BillingPortalConfigurationCreateFeaturesInvoiceHistoryParams `form:"invoice_history" json:"invoice_history,omitempty"`
+	// Information about updating payment methods in the portal.
+	PaymentMethodUpdate *BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParams `form:"payment_method_update" json:"payment_method_update,omitempty"`
+	// Information about canceling subscriptions in the portal.
+	SubscriptionCancel *BillingPortalConfigurationCreateFeaturesSubscriptionCancelParams `form:"subscription_cancel" json:"subscription_cancel,omitempty"`
+	// Information about updating subscriptions in the portal.
+	SubscriptionUpdate *BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParams `form:"subscription_update" json:"subscription_update,omitempty"`
+}
+
+// The hosted login page for this configuration. Learn more about the portal login page in our [integration docs](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal#share).
+type BillingPortalConfigurationCreateLoginPageParams struct {
+	// Set to `true` to generate a shareable URL [`login_page.url`](https://docs.stripe.com/api/customer_portal/configuration#portal_configuration_object-login_page-url) that will take your customers to a hosted login page for the customer portal.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Creates a configuration that describes the functionality and behavior of a PortalSession
+type BillingPortalConfigurationCreateParams struct {
+	Params `form:"*"`
+	// The business information shown to customers in the portal.
+	BusinessProfile *BillingPortalConfigurationCreateBusinessProfileParams `form:"business_profile" json:"business_profile,omitempty"`
+	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
+	DefaultReturnURL *string `form:"default_return_url" json:"default_return_url,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Information about the features available in the portal.
+	Features *BillingPortalConfigurationCreateFeaturesParams `form:"features" json:"features"`
+	// The hosted login page for this configuration. Learn more about the portal login page in our [integration docs](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal#share).
+	LoginPage *BillingPortalConfigurationCreateLoginPageParams `form:"login_page" json:"login_page,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
+	// The name of the configuration.
+	Name        *string                                            `form:"name" json:"name,omitempty"`
+	UnsetFields []BillingPortalConfigurationCreateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationCreateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationCreateParams.
+type BillingPortalConfigurationCreateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationCreateParamsUnsetFieldDefaultReturnURL BillingPortalConfigurationCreateParamsUnsetField = "default_return_url"
+	BillingPortalConfigurationCreateParamsUnsetFieldName             BillingPortalConfigurationCreateParamsUnsetField = "name"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationCreateParams) AddUnsetField(field BillingPortalConfigurationCreateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *BillingPortalConfigurationCreateParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *BillingPortalConfigurationCreateParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+// Retrieves a configuration that describes the functionality of the customer portal.
+type BillingPortalConfigurationRetrieveParams struct {
+	Params `form:"*"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *BillingPortalConfigurationRetrieveParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// The business information shown to customers in the portal.
+type BillingPortalConfigurationUpdateBusinessProfileParams struct {
+	// The messaging shown to customers in the portal.
+	Headline *string `form:"headline" json:"headline,omitempty"`
+	// A link to the business's publicly available privacy policy.
+	PrivacyPolicyURL *string `form:"privacy_policy_url" json:"privacy_policy_url,omitempty"`
+	// A link to the business's publicly available terms of service.
+	TermsOfServiceURL *string                                                           `form:"terms_of_service_url" json:"terms_of_service_url,omitempty"`
+	UnsetFields       []BillingPortalConfigurationUpdateBusinessProfileParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationUpdateBusinessProfileParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationUpdateBusinessProfileParams.
+type BillingPortalConfigurationUpdateBusinessProfileParamsUnsetField string
+
+const (
+	BillingPortalConfigurationUpdateBusinessProfileParamsUnsetFieldHeadline          BillingPortalConfigurationUpdateBusinessProfileParamsUnsetField = "headline"
+	BillingPortalConfigurationUpdateBusinessProfileParamsUnsetFieldPrivacyPolicyURL  BillingPortalConfigurationUpdateBusinessProfileParamsUnsetField = "privacy_policy_url"
+	BillingPortalConfigurationUpdateBusinessProfileParamsUnsetFieldTermsOfServiceURL BillingPortalConfigurationUpdateBusinessProfileParamsUnsetField = "terms_of_service_url"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationUpdateBusinessProfileParams) AddUnsetField(field BillingPortalConfigurationUpdateBusinessProfileParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about updating the customer details in the portal.
+type BillingPortalConfigurationUpdateFeaturesCustomerUpdateParams struct {
+	// The types of customer updates that are supported. When empty, customers are not updateable.
+	AllowedUpdates []*string `form:"allowed_updates" json:"allowed_updates,omitempty"`
+	// Whether the feature is enabled.
+	Enabled     *bool                                                                    `form:"enabled" json:"enabled,omitempty"`
+	UnsetFields []BillingPortalConfigurationUpdateFeaturesCustomerUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationUpdateFeaturesCustomerUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationUpdateFeaturesCustomerUpdateParams.
+type BillingPortalConfigurationUpdateFeaturesCustomerUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationUpdateFeaturesCustomerUpdateParamsUnsetFieldAllowedUpdates BillingPortalConfigurationUpdateFeaturesCustomerUpdateParamsUnsetField = "allowed_updates"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationUpdateFeaturesCustomerUpdateParams) AddUnsetField(field BillingPortalConfigurationUpdateFeaturesCustomerUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about showing the billing history in the portal.
+type BillingPortalConfigurationUpdateFeaturesInvoiceHistoryParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Information about updating payment methods in the portal.
+type BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The [Payment Method Configuration](https://docs.stripe.com/api/payment_method_configurations) to use for this portal session. When specified, customers will be able to update their payment method to one of the options specified by the payment method configuration. If not set or set to an empty string, the default payment method configuration is used.
+	PaymentMethodConfiguration *string                                                                       `form:"payment_method_configuration" json:"payment_method_configuration,omitempty"`
+	UnsetFields                []BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParams.
+type BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParamsUnsetFieldPaymentMethodConfiguration BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParamsUnsetField = "payment_method_configuration"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParams) AddUnsetField(field BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Whether the cancellation reasons will be collected in the portal and which options are exposed to the customer
+type BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParams struct {
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// Which cancellation reasons will be given as options to the customer.
+	Options     []*string                                                                                      `form:"options" json:"options,omitempty"`
+	UnsetFields []BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParams.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField string
+
+const (
+	BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParams) AddUnsetField(field BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about canceling subscriptions in the portal.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionCancelParams struct {
+	// Whether the cancellation reasons will be collected in the portal and which options are exposed to the customer
+	CancellationReason *BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParams `form:"cancellation_reason" json:"cancellation_reason,omitempty"`
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled,omitempty"`
+	// Whether to cancel subscriptions immediately or at the end of the billing period.
+	Mode *string `form:"mode" json:"mode,omitempty"`
+	// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`, which is only compatible with `mode=immediately`. Passing `always_invoice` will result in an error. No prorations are generated when canceling a subscription at the end of its natural billing period.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+}
+
+// Control whether the quantity of the product can be adjusted.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateProductAdjustableQuantityParams struct {
+	// Set to true if the quantity can be adjusted to any non-negative integer.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The maximum quantity that can be set for the product.
+	Maximum *int64 `form:"maximum" json:"maximum,omitempty"`
+	// The minimum quantity that can be set for the product.
+	Minimum *int64 `form:"minimum" json:"minimum,omitempty"`
+}
+
+// The list of up to 10 products that support subscription updates.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateProductParams struct {
+	// Control whether the quantity of the product can be adjusted.
+	AdjustableQuantity *BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateProductAdjustableQuantityParams `form:"adjustable_quantity" json:"adjustable_quantity,omitempty"`
+	// The list of price IDs for the product that a subscription can be updated to.
+	Prices []*string `form:"prices" json:"prices"`
+	// The product id.
+	Product *string `form:"product" json:"product"`
+}
+
+// List of conditions. When any condition is true, the update will be scheduled at the end of the current period.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams struct {
+	// The type of condition.
+	Type *string `form:"type" json:"type"`
+}
+
+// Setting to control when an update should be scheduled at the end of the period instead of applying immediately.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams struct {
+	// List of conditions. When any condition is true, the update will be scheduled at the end of the current period.
+	Conditions  []*BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionParams `form:"conditions" json:"conditions,omitempty"`
+	UnsetFields []BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField string
+
+const (
+	BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetFieldConditions BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField = "conditions"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams) AddUnsetField(field BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about updating subscriptions in the portal.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParams struct {
+	// Determines the value to use for the billing cycle anchor on subscription updates. Valid values are `now` or `unchanged`, and the default value is `unchanged`. Setting the value to `now` resets the subscription's billing cycle anchor to the current time (in UTC). For more information, see the billing cycle [documentation](https://docs.stripe.com/billing/subscriptions/billing-cycle).
+	BillingCycleAnchor *string `form:"billing_cycle_anchor" json:"billing_cycle_anchor,omitempty"`
+	// The types of subscription updates that are supported. When empty, subscriptions are not updateable.
+	DefaultAllowedUpdates []*string `form:"default_allowed_updates" json:"default_allowed_updates,omitempty"`
+	// Whether the feature is enabled.
+	Enabled *bool `form:"enabled" json:"enabled,omitempty"`
+	// The list of up to 10 products that support subscription updates.
+	Products []*BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateProductParams `form:"products" json:"products,omitempty"`
+	// Determines how to handle prorations resulting from subscription updates. Valid values are `none`, `create_prorations`, and `always_invoice`.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+	// Setting to control when an update should be scheduled at the end of the period instead of applying immediately.
+	ScheduleAtPeriodEnd *BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateScheduleAtPeriodEndParams `form:"schedule_at_period_end" json:"schedule_at_period_end,omitempty"`
+	// The behavior when updating a subscription that is trialing.
+	TrialUpdateBehavior *string                                                                      `form:"trial_update_behavior" json:"trial_update_behavior,omitempty"`
+	UnsetFields         []BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParams.
+type BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParamsUnsetFieldDefaultAllowedUpdates BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParamsUnsetField = "default_allowed_updates"
+	BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParamsUnsetFieldProducts              BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParamsUnsetField = "products"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParams) AddUnsetField(field BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Information about the features available in the portal.
+type BillingPortalConfigurationUpdateFeaturesParams struct {
+	// Information about updating the customer details in the portal.
+	CustomerUpdate *BillingPortalConfigurationUpdateFeaturesCustomerUpdateParams `form:"customer_update" json:"customer_update,omitempty"`
+	// Information about showing the billing history in the portal.
+	InvoiceHistory *BillingPortalConfigurationUpdateFeaturesInvoiceHistoryParams `form:"invoice_history" json:"invoice_history,omitempty"`
+	// Information about updating payment methods in the portal.
+	PaymentMethodUpdate *BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParams `form:"payment_method_update" json:"payment_method_update,omitempty"`
+	// Information about canceling subscriptions in the portal.
+	SubscriptionCancel *BillingPortalConfigurationUpdateFeaturesSubscriptionCancelParams `form:"subscription_cancel" json:"subscription_cancel,omitempty"`
+	// Information about updating subscriptions in the portal.
+	SubscriptionUpdate *BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParams `form:"subscription_update" json:"subscription_update,omitempty"`
+}
+
+// The hosted login page for this configuration. Learn more about the portal login page in our [integration docs](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal#share).
+type BillingPortalConfigurationUpdateLoginPageParams struct {
+	// Set to `true` to generate a shareable URL [`login_page.url`](https://docs.stripe.com/api/customer_portal/configuration#portal_configuration_object-login_page-url) that will take your customers to a hosted login page for the customer portal.
+	//
+	// Set to `false` to deactivate the `login_page.url`.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Updates a configuration that describes the functionality of the customer portal.
+type BillingPortalConfigurationUpdateParams struct {
+	Params `form:"*"`
+	// Whether the configuration is active and can be used to create portal sessions.
+	Active *bool `form:"active" json:"active,omitempty"`
+	// The business information shown to customers in the portal.
+	BusinessProfile *BillingPortalConfigurationUpdateBusinessProfileParams `form:"business_profile" json:"business_profile,omitempty"`
+	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
+	DefaultReturnURL *string `form:"default_return_url" json:"default_return_url,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Information about the features available in the portal.
+	Features *BillingPortalConfigurationUpdateFeaturesParams `form:"features" json:"features,omitempty"`
+	// The hosted login page for this configuration. Learn more about the portal login page in our [integration docs](https://stripe.com/docs/billing/subscriptions/integrating-customer-portal#share).
+	LoginPage *BillingPortalConfigurationUpdateLoginPageParams `form:"login_page" json:"login_page,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
+	// The name of the configuration.
+	Name        *string                                            `form:"name" json:"name,omitempty"`
+	UnsetFields []BillingPortalConfigurationUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// BillingPortalConfigurationUpdateParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationUpdateParams.
+type BillingPortalConfigurationUpdateParamsUnsetField string
+
+const (
+	BillingPortalConfigurationUpdateParamsUnsetFieldDefaultReturnURL BillingPortalConfigurationUpdateParamsUnsetField = "default_return_url"
+	BillingPortalConfigurationUpdateParamsUnsetFieldMetadata         BillingPortalConfigurationUpdateParamsUnsetField = "metadata"
+	BillingPortalConfigurationUpdateParamsUnsetFieldName             BillingPortalConfigurationUpdateParamsUnsetField = "name"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *BillingPortalConfigurationUpdateParams) AddUnsetField(field BillingPortalConfigurationUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *BillingPortalConfigurationUpdateParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *BillingPortalConfigurationUpdateParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+type BillingPortalConfigurationBusinessProfile struct {
+	// The messaging shown to customers in the portal.
+	Headline string `json:"headline"`
+	// A link to the business's publicly available privacy policy.
+	PrivacyPolicyURL string `json:"privacy_policy_url"`
+	// A link to the business's publicly available terms of service.
+	TermsOfServiceURL string `json:"terms_of_service_url"`
+}
+type BillingPortalConfigurationFeaturesCustomerUpdate struct {
+	// The types of customer updates that are supported. When empty, customers are not updateable.
+	AllowedUpdates []BillingPortalConfigurationFeaturesCustomerUpdateAllowedUpdate `json:"allowed_updates"`
+	// Whether the feature is enabled.
+	Enabled bool `json:"enabled"`
+}
+type BillingPortalConfigurationFeaturesInvoiceHistory struct {
+	// Whether the feature is enabled.
+	Enabled bool `json:"enabled"`
+}
+type BillingPortalConfigurationFeaturesPaymentMethodUpdate struct {
+	// Whether the feature is enabled.
+	Enabled bool `json:"enabled"`
+	// The [Payment Method Configuration](https://docs.stripe.com/api/payment_method_configurations) to use for this portal session. When specified, customers will be able to update their payment method to one of the options specified by the payment method configuration. If not set, the default payment method configuration is used.
+	PaymentMethodConfiguration string `json:"payment_method_configuration"`
+}
+type BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReason struct {
+	// Whether the feature is enabled.
+	Enabled bool `json:"enabled"`
+	// Which cancellation reasons will be given as options to the customer.
+	Options []BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption `json:"options"`
+}
+type BillingPortalConfigurationFeaturesSubscriptionCancel struct {
+	CancellationReason *BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReason `json:"cancellation_reason"`
+	// Whether the feature is enabled.
+	Enabled bool `json:"enabled"`
+	// Whether to cancel subscriptions immediately or at the end of the billing period.
+	Mode BillingPortalConfigurationFeaturesSubscriptionCancelMode `json:"mode"`
+	// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`.
+	ProrationBehavior BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehavior `json:"proration_behavior"`
+}
+type BillingPortalConfigurationFeaturesSubscriptionUpdateProductAdjustableQuantity struct {
+	// If true, the quantity can be adjusted to any non-negative integer.
+	Enabled bool `json:"enabled"`
+	// The maximum quantity that can be set for the product.
+	Maximum int64 `json:"maximum"`
+	// The minimum quantity that can be set for the product.
+	Minimum int64 `json:"minimum"`
+}
+
+// The list of up to 10 products that support subscription updates.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateProduct struct {
+	AdjustableQuantity *BillingPortalConfigurationFeaturesSubscriptionUpdateProductAdjustableQuantity `json:"adjustable_quantity"`
+	// The list of price IDs which, when subscribed to, a subscription can be updated.
+	Prices []string `json:"prices"`
+	// The product ID.
+	Product string `json:"product"`
+}
+
+// List of conditions. When any condition is true, an update will be scheduled at the end of the current period.
+type BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndCondition struct {
+	// The type of condition.
+	Type BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndConditionType `json:"type"`
+}
+type BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEnd struct {
+	// List of conditions. When any condition is true, an update will be scheduled at the end of the current period.
+	Conditions []*BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEndCondition `json:"conditions"`
+}
+type BillingPortalConfigurationFeaturesSubscriptionUpdate struct {
+	// Determines the value to use for the billing cycle anchor on subscription updates. Valid values are `now` or `unchanged`, and the default value is `unchanged`. Setting the value to `now` resets the subscription's billing cycle anchor to the current time (in UTC). For more information, see the billing cycle [documentation](https://docs.stripe.com/billing/subscriptions/billing-cycle).
+	BillingCycleAnchor BillingPortalConfigurationFeaturesSubscriptionUpdateBillingCycleAnchor `json:"billing_cycle_anchor"`
+	// The types of subscription updates that are supported for items listed in the `products` attribute. When empty, subscriptions are not updateable.
+	DefaultAllowedUpdates []BillingPortalConfigurationFeaturesSubscriptionUpdateDefaultAllowedUpdate `json:"default_allowed_updates"`
+	// Whether the feature is enabled.
+	Enabled bool `json:"enabled"`
+	// The list of up to 10 products that support subscription updates.
+	Products []*BillingPortalConfigurationFeaturesSubscriptionUpdateProduct `json:"products,omitempty"`
+	// Determines how to handle prorations resulting from subscription updates. Valid values are `none`, `create_prorations`, and `always_invoice`. Defaults to a value of `none` if you don't set it during creation.
+	ProrationBehavior   BillingPortalConfigurationFeaturesSubscriptionUpdateProrationBehavior    `json:"proration_behavior"`
+	ScheduleAtPeriodEnd *BillingPortalConfigurationFeaturesSubscriptionUpdateScheduleAtPeriodEnd `json:"schedule_at_period_end"`
+	// Determines how handle updates to trialing subscriptions. Valid values are `end_trial` and `continue_trial`. Defaults to a value of `end_trial` if you don't set it during creation.
+	TrialUpdateBehavior BillingPortalConfigurationFeaturesSubscriptionUpdateTrialUpdateBehavior `json:"trial_update_behavior"`
+}
+type BillingPortalConfigurationFeatures struct {
+	CustomerUpdate      *BillingPortalConfigurationFeaturesCustomerUpdate      `json:"customer_update"`
+	InvoiceHistory      *BillingPortalConfigurationFeaturesInvoiceHistory      `json:"invoice_history"`
+	PaymentMethodUpdate *BillingPortalConfigurationFeaturesPaymentMethodUpdate `json:"payment_method_update"`
+	SubscriptionCancel  *BillingPortalConfigurationFeaturesSubscriptionCancel  `json:"subscription_cancel"`
+	SubscriptionUpdate  *BillingPortalConfigurationFeaturesSubscriptionUpdate  `json:"subscription_update"`
+}
+type BillingPortalConfigurationLoginPage struct {
+	// If `true`, a shareable `url` will be generated that will take your customers to a hosted login page for the customer portal.
+	//
+	// If `false`, the previously generated `url`, if any, will be deactivated.
+	Enabled bool `json:"enabled"`
+	// A shareable URL to the hosted portal login page. Your customers will be able to log in with their [email](https://docs.stripe.com/api/customers/object#customer_object-email) and receive a link to their customer portal.
+	URL string `json:"url"`
+}
+
+// A portal configuration describes the functionality and behavior you embed in a portal session. Related guide: [Configure the customer portal](https://docs.stripe.com/customer-management/configure-portal).
+type BillingPortalConfiguration struct {
+	APIResource
+	// Whether the configuration is active and can be used to create portal sessions.
+	Active bool `json:"active"`
+	// ID of the Connect Application that created the configuration.
+	Application     *Application                               `json:"application"`
+	BusinessProfile *BillingPortalConfigurationBusinessProfile `json:"business_profile"`
+	// Time at which the object was created. Measured in seconds since the Unix epoch.
+	Created int64 `json:"created"`
+	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
+	DefaultReturnURL string                              `json:"default_return_url"`
+	Features         *BillingPortalConfigurationFeatures `json:"features"`
+	// Unique identifier for the object.
+	ID string `json:"id"`
+	// Whether the configuration is the default. If `true`, this configuration can be managed in the Dashboard and portal sessions will use this configuration unless it is overriden when creating the session.
+	IsDefault bool `json:"is_default"`
+	// If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.
+	Livemode  bool                                 `json:"livemode"`
+	LoginPage *BillingPortalConfigurationLoginPage `json:"login_page"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
+	Metadata map[string]string `json:"metadata"`
+	// The name of the configuration.
+	Name string `json:"name"`
+	// String representing the object's type. Objects of the same type share the same value.
+	Object string `json:"object"`
+	// Time at which the object was last updated. Measured in seconds since the Unix epoch.
+	Updated int64 `json:"updated"`
+}
+
+// BillingPortalConfigurationList is a list of Configurations as retrieved from a list endpoint.
+type BillingPortalConfigurationList struct {
+	APIResource
+	ListMeta
+	Data []*BillingPortalConfiguration `json:"data"`
+}
+
+// UnmarshalJSON handles deserialization of a BillingPortalConfiguration.
+// This custom unmarshaling is needed because the resulting
+// property may be an id or the full struct if it was expanded.
+func (b *BillingPortalConfiguration) UnmarshalJSON(data []byte) error {
+	if id, ok := ParseID(data); ok {
+		b.ID = id
+		return nil
+	}
+
+	type billingPortalConfiguration BillingPortalConfiguration
+	var v billingPortalConfiguration
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	*b = BillingPortalConfiguration(v)
+	return nil
+}

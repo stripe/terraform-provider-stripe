@@ -1,0 +1,413 @@
+//
+//
+// File generated from our OpenAPI spec
+//
+//
+
+package stripe
+
+// Deletes an item from the subscription. Removing a subscription item from a subscription will not cancel the subscription.
+type SubscriptionItemParams struct {
+	Params `form:"*"`
+	// Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period. Pass an empty string to remove previously-defined thresholds.
+	BillingThresholds *SubscriptionItemBillingThresholdsParams `form:"billing_thresholds" json:"billing_thresholds,omitempty"`
+	// Delete all usage for the given subscription item. Allowed only when the current plan's `usage_type` is `metered`.
+	ClearUsage *bool `form:"clear_usage" json:"clear_usage,omitempty"`
+	// The coupons to redeem into discounts for the subscription item.
+	Discounts []*SubscriptionItemDiscountParams `form:"discounts" json:"discounts,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
+	// Only supported on update
+	// Indicates if a customer is on or off-session while an invoice payment is attempted. Defaults to `false` (on-session).
+	OffSession *bool `form:"off_session" json:"off_session,omitempty"`
+	// Controls how Stripe handles payment when a subscription update requires payment and `collection_method=charge_automatically`.
+	PaymentBehavior *string `form:"payment_behavior" json:"payment_behavior,omitempty"`
+	// The identifier of the new plan for this subscription item.
+	Plan *string `form:"plan" json:"plan,omitempty"`
+	// The ID of the price object. One of `price` or `price_data` is required. When changing a subscription item's price, `quantity` is set to 1 unless a `quantity` parameter is provided.
+	Price *string `form:"price" json:"price,omitempty"`
+	// Data used to generate a new [Price](https://docs.stripe.com/api/prices) object inline. One of `price` or `price_data` is required.
+	PriceData *SubscriptionItemPriceDataParams `form:"price_data" json:"price_data,omitempty"`
+	// Determines how to handle [prorations](https://docs.stripe.com/billing/subscriptions/prorations) when the billing cycle changes (e.g., when switching plans, resetting `billing_cycle_anchor=now`, or starting a trial), or if an item's `quantity` changes. The default value is `create_prorations`.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+	// If set, the proration will be calculated as though the subscription was updated at the given time. This can be used to apply the same proration that was previewed with the [upcoming invoice](https://docs.stripe.com/api/invoices/create_preview) endpoint.
+	ProrationDate *int64 `form:"proration_date" json:"proration_date,omitempty"`
+	// The quantity you'd like to apply to the subscription item you're creating.
+	Quantity *int64 `form:"quantity" json:"quantity,omitempty"`
+	// The identifier of the subscription to modify.
+	Subscription *string `form:"subscription" json:"subscription,omitempty"`
+	// A list of [Tax Rate](https://docs.stripe.com/api/tax_rates) ids. These Tax Rates will override the [`default_tax_rates`](https://docs.stripe.com/api/subscriptions/create#create_subscription-default_tax_rates) on the Subscription. When updating, pass an empty string to remove previously-defined tax rates.
+	TaxRates    []*string                          `form:"tax_rates" json:"tax_rates,omitempty"`
+	UnsetFields []SubscriptionItemParamsUnsetField `form:"-" json:"-"`
+}
+
+// SubscriptionItemParamsUnsetField is the list of fields that can be cleared/unset on SubscriptionItemParams.
+type SubscriptionItemParamsUnsetField string
+
+const (
+	SubscriptionItemParamsUnsetFieldBillingThresholds SubscriptionItemParamsUnsetField = "billing_thresholds"
+	SubscriptionItemParamsUnsetFieldDiscounts         SubscriptionItemParamsUnsetField = "discounts"
+	SubscriptionItemParamsUnsetFieldMetadata          SubscriptionItemParamsUnsetField = "metadata"
+	SubscriptionItemParamsUnsetFieldTaxRates          SubscriptionItemParamsUnsetField = "tax_rates"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *SubscriptionItemParams) AddUnsetField(field SubscriptionItemParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *SubscriptionItemParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *SubscriptionItemParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+// Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period. Pass an empty string to remove previously-defined thresholds.
+type SubscriptionItemBillingThresholdsParams struct {
+	// Number of units that meets the billing threshold to advance the subscription to a new billing period (e.g., it takes 10 $5 units to meet a $50 [monetary threshold](https://docs.stripe.com/api/subscriptions/update#update_subscription-billing_thresholds-amount_gte))
+	UsageGTE *int64 `form:"usage_gte" json:"usage_gte"`
+}
+
+// The coupons to redeem into discounts for the subscription item.
+type SubscriptionItemDiscountParams struct {
+	// ID of the coupon to create a new discount for.
+	Coupon *string `form:"coupon" json:"coupon,omitempty"`
+	// ID of an existing discount on the object (or one of its ancestors) to reuse.
+	Discount *string `form:"discount" json:"discount,omitempty"`
+	// ID of the promotion code to create a new discount for.
+	PromotionCode *string `form:"promotion_code" json:"promotion_code,omitempty"`
+}
+
+// The recurring components of a price such as `interval` and `interval_count`.
+type SubscriptionItemPriceDataRecurringParams struct {
+	// Specifies billing frequency. Either `day`, `week`, `month` or `year`.
+	Interval *string `form:"interval" json:"interval"`
+	// The number of intervals between subscription billings. For example, `interval=month` and `interval_count=3` bills every 3 months. Maximum of three years interval allowed (3 years, 36 months, or 156 weeks).
+	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
+}
+
+// Data used to generate a new [Price](https://docs.stripe.com/api/prices) object inline. One of `price` or `price_data` is required.
+type SubscriptionItemPriceDataParams struct {
+	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
+	Currency *string `form:"currency" json:"currency"`
+	// The ID of the [Product](https://docs.stripe.com/api/products) that this [Price](https://docs.stripe.com/api/prices) will belong to.
+	Product *string `form:"product" json:"product"`
+	// The recurring components of a price such as `interval` and `interval_count`.
+	Recurring *SubscriptionItemPriceDataRecurringParams `form:"recurring" json:"recurring"`
+	// Only required if a [default tax behavior](https://docs.stripe.com/tax/products-prices-tax-categories-tax-behavior#setting-a-default-tax-behavior-(recommended)) was not provided in the Stripe Tax settings. Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`. Once specified as either `inclusive` or `exclusive`, it cannot be changed.
+	TaxBehavior *string `form:"tax_behavior" json:"tax_behavior,omitempty"`
+	// A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge.
+	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
+	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
+	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+}
+
+// Returns a list of your subscription items for a given subscription.
+type SubscriptionItemListParams struct {
+	ListParams `form:"*"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// The ID of the subscription whose items will be retrieved.
+	Subscription *string `form:"subscription" json:"subscription"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *SubscriptionItemListParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// Deletes an item from the subscription. Removing a subscription item from a subscription will not cancel the subscription.
+type SubscriptionItemDeleteParams struct {
+	Params `form:"*"`
+	// Delete all usage for the given subscription item. Allowed only when the current plan's `usage_type` is `metered`.
+	ClearUsage *bool `form:"clear_usage" json:"clear_usage,omitempty"`
+	// Controls how Stripe handles payment when a subscription update requires payment and `collection_method=charge_automatically`.
+	PaymentBehavior *string `form:"payment_behavior" json:"payment_behavior,omitempty"`
+	// Determines how to handle [prorations](https://docs.stripe.com/billing/subscriptions/prorations) when the billing cycle changes (e.g., when switching plans, resetting `billing_cycle_anchor=now`, or starting a trial), or if an item's `quantity` changes. The default value is `create_prorations`.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+	// If set, the proration will be calculated as though the subscription was updated at the given time. This can be used to apply the same proration that was previewed with the [upcoming invoice](https://docs.stripe.com/api/invoices/create_preview) endpoint.
+	ProrationDate *int64 `form:"proration_date" json:"proration_date,omitempty"`
+}
+
+// Retrieves the subscription item with the given ID.
+type SubscriptionItemRetrieveParams struct {
+	Params `form:"*"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *SubscriptionItemRetrieveParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period. Pass an empty string to remove previously-defined thresholds.
+type SubscriptionItemUpdateBillingThresholdsParams struct {
+	// Number of units that meets the billing threshold to advance the subscription to a new billing period (e.g., it takes 10 $5 units to meet a $50 [monetary threshold](https://docs.stripe.com/api/subscriptions/update#update_subscription-billing_thresholds-amount_gte))
+	UsageGTE *int64 `form:"usage_gte" json:"usage_gte"`
+}
+
+// The coupons to redeem into discounts for the subscription item.
+type SubscriptionItemUpdateDiscountParams struct {
+	// ID of the coupon to create a new discount for.
+	Coupon *string `form:"coupon" json:"coupon,omitempty"`
+	// ID of an existing discount on the object (or one of its ancestors) to reuse.
+	Discount *string `form:"discount" json:"discount,omitempty"`
+	// ID of the promotion code to create a new discount for.
+	PromotionCode *string `form:"promotion_code" json:"promotion_code,omitempty"`
+}
+
+// The recurring components of a price such as `interval` and `interval_count`.
+type SubscriptionItemUpdatePriceDataRecurringParams struct {
+	// Specifies billing frequency. Either `day`, `week`, `month` or `year`.
+	Interval *string `form:"interval" json:"interval"`
+	// The number of intervals between subscription billings. For example, `interval=month` and `interval_count=3` bills every 3 months. Maximum of three years interval allowed (3 years, 36 months, or 156 weeks).
+	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
+}
+
+// Data used to generate a new [Price](https://docs.stripe.com/api/prices) object inline. One of `price` or `price_data` is required.
+type SubscriptionItemUpdatePriceDataParams struct {
+	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
+	Currency *string `form:"currency" json:"currency"`
+	// The ID of the [Product](https://docs.stripe.com/api/products) that this [Price](https://docs.stripe.com/api/prices) will belong to.
+	Product *string `form:"product" json:"product"`
+	// The recurring components of a price such as `interval` and `interval_count`.
+	Recurring *SubscriptionItemUpdatePriceDataRecurringParams `form:"recurring" json:"recurring"`
+	// Only required if a [default tax behavior](https://docs.stripe.com/tax/products-prices-tax-categories-tax-behavior#setting-a-default-tax-behavior-(recommended)) was not provided in the Stripe Tax settings. Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`. Once specified as either `inclusive` or `exclusive`, it cannot be changed.
+	TaxBehavior *string `form:"tax_behavior" json:"tax_behavior,omitempty"`
+	// A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge.
+	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
+	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
+	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+}
+
+// Updates the plan or quantity of an item on a current subscription.
+type SubscriptionItemUpdateParams struct {
+	Params `form:"*"`
+	// Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period. Pass an empty string to remove previously-defined thresholds.
+	BillingThresholds *SubscriptionItemUpdateBillingThresholdsParams `form:"billing_thresholds" json:"billing_thresholds,omitempty"`
+	// The coupons to redeem into discounts for the subscription item.
+	Discounts []*SubscriptionItemUpdateDiscountParams `form:"discounts" json:"discounts,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
+	// Indicates if a customer is on or off-session while an invoice payment is attempted. Defaults to `false` (on-session).
+	OffSession *bool `form:"off_session" json:"off_session,omitempty"`
+	// Controls how Stripe handles payment when a subscription update requires payment and `collection_method=charge_automatically`.
+	PaymentBehavior *string `form:"payment_behavior" json:"payment_behavior,omitempty"`
+	// The identifier of the new plan for this subscription item.
+	Plan *string `form:"plan" json:"plan,omitempty"`
+	// The ID of the price object. One of `price` or `price_data` is required. When changing a subscription item's price, `quantity` is set to 1 unless a `quantity` parameter is provided.
+	Price *string `form:"price" json:"price,omitempty"`
+	// Data used to generate a new [Price](https://docs.stripe.com/api/prices) object inline. One of `price` or `price_data` is required.
+	PriceData *SubscriptionItemUpdatePriceDataParams `form:"price_data" json:"price_data,omitempty"`
+	// Determines how to handle [prorations](https://docs.stripe.com/billing/subscriptions/prorations) when the billing cycle changes (e.g., when switching plans, resetting `billing_cycle_anchor=now`, or starting a trial), or if an item's `quantity` changes. The default value is `create_prorations`.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+	// If set, the proration will be calculated as though the subscription was updated at the given time. This can be used to apply the same proration that was previewed with the [upcoming invoice](https://docs.stripe.com/api/invoices/create_preview) endpoint.
+	ProrationDate *int64 `form:"proration_date" json:"proration_date,omitempty"`
+	// The quantity you'd like to apply to the subscription item you're creating.
+	Quantity *int64 `form:"quantity" json:"quantity,omitempty"`
+	// A list of [Tax Rate](https://docs.stripe.com/api/tax_rates) ids. These Tax Rates will override the [`default_tax_rates`](https://docs.stripe.com/api/subscriptions/create#create_subscription-default_tax_rates) on the Subscription. When updating, pass an empty string to remove previously-defined tax rates.
+	TaxRates    []*string                                `form:"tax_rates" json:"tax_rates,omitempty"`
+	UnsetFields []SubscriptionItemUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// SubscriptionItemUpdateParamsUnsetField is the list of fields that can be cleared/unset on SubscriptionItemUpdateParams.
+type SubscriptionItemUpdateParamsUnsetField string
+
+const (
+	SubscriptionItemUpdateParamsUnsetFieldBillingThresholds SubscriptionItemUpdateParamsUnsetField = "billing_thresholds"
+	SubscriptionItemUpdateParamsUnsetFieldDiscounts         SubscriptionItemUpdateParamsUnsetField = "discounts"
+	SubscriptionItemUpdateParamsUnsetFieldMetadata          SubscriptionItemUpdateParamsUnsetField = "metadata"
+	SubscriptionItemUpdateParamsUnsetFieldTaxRates          SubscriptionItemUpdateParamsUnsetField = "tax_rates"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *SubscriptionItemUpdateParams) AddUnsetField(field SubscriptionItemUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *SubscriptionItemUpdateParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *SubscriptionItemUpdateParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+// Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period. Pass an empty string to remove previously-defined thresholds.
+type SubscriptionItemCreateBillingThresholdsParams struct {
+	// Number of units that meets the billing threshold to advance the subscription to a new billing period (e.g., it takes 10 $5 units to meet a $50 [monetary threshold](https://docs.stripe.com/api/subscriptions/update#update_subscription-billing_thresholds-amount_gte))
+	UsageGTE *int64 `form:"usage_gte" json:"usage_gte"`
+}
+
+// The coupons to redeem into discounts for the subscription item.
+type SubscriptionItemCreateDiscountParams struct {
+	// ID of the coupon to create a new discount for.
+	Coupon *string `form:"coupon" json:"coupon,omitempty"`
+	// ID of an existing discount on the object (or one of its ancestors) to reuse.
+	Discount *string `form:"discount" json:"discount,omitempty"`
+	// ID of the promotion code to create a new discount for.
+	PromotionCode *string `form:"promotion_code" json:"promotion_code,omitempty"`
+}
+
+// The recurring components of a price such as `interval` and `interval_count`.
+type SubscriptionItemCreatePriceDataRecurringParams struct {
+	// Specifies billing frequency. Either `day`, `week`, `month` or `year`.
+	Interval *string `form:"interval" json:"interval"`
+	// The number of intervals between subscription billings. For example, `interval=month` and `interval_count=3` bills every 3 months. Maximum of three years interval allowed (3 years, 36 months, or 156 weeks).
+	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
+}
+
+// Data used to generate a new [Price](https://docs.stripe.com/api/prices) object inline.
+type SubscriptionItemCreatePriceDataParams struct {
+	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
+	Currency *string `form:"currency" json:"currency"`
+	// The ID of the [Product](https://docs.stripe.com/api/products) that this [Price](https://docs.stripe.com/api/prices) will belong to.
+	Product *string `form:"product" json:"product"`
+	// The recurring components of a price such as `interval` and `interval_count`.
+	Recurring *SubscriptionItemCreatePriceDataRecurringParams `form:"recurring" json:"recurring"`
+	// Only required if a [default tax behavior](https://docs.stripe.com/tax/products-prices-tax-categories-tax-behavior#setting-a-default-tax-behavior-(recommended)) was not provided in the Stripe Tax settings. Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`. Once specified as either `inclusive` or `exclusive`, it cannot be changed.
+	TaxBehavior *string `form:"tax_behavior" json:"tax_behavior,omitempty"`
+	// A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge.
+	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
+	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
+	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+}
+
+// Adds a new item to an existing subscription. No existing items will be changed or replaced.
+type SubscriptionItemCreateParams struct {
+	Params `form:"*"`
+	// Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period. Pass an empty string to remove previously-defined thresholds.
+	BillingThresholds *SubscriptionItemCreateBillingThresholdsParams `form:"billing_thresholds" json:"billing_thresholds,omitempty"`
+	// The coupons to redeem into discounts for the subscription item.
+	Discounts []*SubscriptionItemCreateDiscountParams `form:"discounts" json:"discounts,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
+	// Controls how Stripe handles payment when a subscription update requires payment and `collection_method=charge_automatically`.
+	PaymentBehavior *string `form:"payment_behavior" json:"payment_behavior,omitempty"`
+	// The identifier of the plan to add to the subscription.
+	Plan *string `form:"plan" json:"plan,omitempty"`
+	// The ID of the price object.
+	Price *string `form:"price" json:"price,omitempty"`
+	// Data used to generate a new [Price](https://docs.stripe.com/api/prices) object inline.
+	PriceData *SubscriptionItemCreatePriceDataParams `form:"price_data" json:"price_data,omitempty"`
+	// Determines how to handle [prorations](https://docs.stripe.com/billing/subscriptions/prorations) when the billing cycle changes (e.g., when switching plans, resetting `billing_cycle_anchor=now`, or starting a trial), or if an item's `quantity` changes. The default value is `create_prorations`.
+	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
+	// If set, the proration will be calculated as though the subscription was updated at the given time. This can be used to apply the same proration that was previewed with the [upcoming invoice](https://docs.stripe.com/api/invoices/create_preview) endpoint.
+	ProrationDate *int64 `form:"proration_date" json:"proration_date,omitempty"`
+	// The quantity you'd like to apply to the subscription item you're creating.
+	Quantity *int64 `form:"quantity" json:"quantity,omitempty"`
+	// The identifier of the subscription to modify.
+	Subscription *string `form:"subscription" json:"subscription"`
+	// A list of [Tax Rate](https://docs.stripe.com/api/tax_rates) ids. These Tax Rates will override the [`default_tax_rates`](https://docs.stripe.com/api/subscriptions/create#create_subscription-default_tax_rates) on the Subscription. When updating, pass an empty string to remove previously-defined tax rates.
+	TaxRates    []*string                                `form:"tax_rates" json:"tax_rates,omitempty"`
+	UnsetFields []SubscriptionItemCreateParamsUnsetField `form:"-" json:"-"`
+}
+
+// SubscriptionItemCreateParamsUnsetField is the list of fields that can be cleared/unset on SubscriptionItemCreateParams.
+type SubscriptionItemCreateParamsUnsetField string
+
+const (
+	SubscriptionItemCreateParamsUnsetFieldBillingThresholds SubscriptionItemCreateParamsUnsetField = "billing_thresholds"
+	SubscriptionItemCreateParamsUnsetFieldDiscounts         SubscriptionItemCreateParamsUnsetField = "discounts"
+	SubscriptionItemCreateParamsUnsetFieldTaxRates          SubscriptionItemCreateParamsUnsetField = "tax_rates"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *SubscriptionItemCreateParams) AddUnsetField(field SubscriptionItemCreateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *SubscriptionItemCreateParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *SubscriptionItemCreateParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+// Define thresholds at which an invoice will be sent, and the related subscription advanced to a new billing period
+type SubscriptionItemBillingThresholds struct {
+	// Usage threshold that triggers the subscription to create an invoice
+	UsageGTE int64 `json:"usage_gte"`
+}
+
+// Subscription items allow you to create customer subscriptions with more than
+// one plan, making it easy to represent complex billing relationships.
+type SubscriptionItem struct {
+	APIResource
+	// The time period the subscription item has been billed for.
+	BilledUntil int64 `json:"billed_until,omitempty"`
+	// Define thresholds at which an invoice will be sent, and the related subscription advanced to a new billing period
+	BillingThresholds *SubscriptionItemBillingThresholds `json:"billing_thresholds"`
+	// Time at which the object was created. Measured in seconds since the Unix epoch.
+	Created int64 `json:"created"`
+	// The end time of this subscription item's current billing period.
+	CurrentPeriodEnd int64 `json:"current_period_end"`
+	// The start time of this subscription item's current billing period.
+	CurrentPeriodStart int64 `json:"current_period_start"`
+	Deleted            bool  `json:"deleted,omitempty"`
+	// The discounts applied to the subscription item. Subscription item discounts are applied before subscription discounts. Use `expand[]=discounts` to expand each discount.
+	Discounts []*Discount `json:"discounts"`
+	// Unique identifier for the object.
+	ID string `json:"id"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
+	Metadata map[string]string `json:"metadata"`
+	// String representing the object's type. Objects of the same type share the same value.
+	Object string `json:"object"`
+	// You can now model subscriptions more flexibly using the [Prices API](https://api.stripe.com#prices). It replaces the Plans API and is backwards compatible to simplify your migration.
+	//
+	// Plans define the base price, currency, and billing cycle for recurring purchases of products.
+	// [Products](https://api.stripe.com#products) help you track inventory or provisioning, and plans help you track pricing. Different physical goods or levels of service should be represented by products, and pricing options should be represented by plans. This approach lets you change prices without having to change your provisioning scheme.
+	//
+	// For example, you might have a single "gold" product that has plans for $10/month, $100/year, €9/month, and €90/year.
+	//
+	// Related guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription) and more about [products and prices](https://docs.stripe.com/products-prices/overview).
+	Plan *Plan `json:"plan"`
+	// Prices define the unit cost, currency, and (optional) billing cycle for both recurring and one-time purchases of products.
+	// [Products](https://api.stripe.com#products) help you track inventory or provisioning, and prices help you track payment terms. Different physical goods or levels of service should be represented by products, and pricing options should be represented by prices. This approach lets you change prices without having to change your provisioning scheme.
+	//
+	// For example, you might have a single "gold" product that has prices for $10/month, $100/year, and €9 once.
+	//
+	// Related guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription), [create an invoice](https://docs.stripe.com/billing/invoices/create), and more about [products and prices](https://docs.stripe.com/products-prices/overview).
+	Price *Price `json:"price"`
+	// The [quantity](https://docs.stripe.com/subscriptions/quantities) of the plan to which the customer should be subscribed.
+	Quantity int64 `json:"quantity,omitempty"`
+	// The `subscription` this `subscription_item` belongs to.
+	Subscription string `json:"subscription"`
+	// The tax rates which apply to this `subscription_item`. When set, the `default_tax_rates` on the subscription do not apply to this `subscription_item`.
+	TaxRates []*TaxRate `json:"tax_rates"`
+}
+
+// SubscriptionItemList is a list of SubscriptionItems as retrieved from a list endpoint.
+type SubscriptionItemList struct {
+	APIResource
+	ListMeta
+	Data []*SubscriptionItem `json:"data"`
+}

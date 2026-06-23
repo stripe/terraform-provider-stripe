@@ -1,0 +1,271 @@
+//
+//
+// File generated from our OpenAPI spec
+//
+//
+
+package stripe
+
+import "encoding/json"
+
+// The status of the top-up is either `canceled`, `failed`, `pending`, `reversed`, or `succeeded`.
+type TopupStatus string
+
+// List of values that TopupStatus can take
+const (
+	TopupStatusCanceled  TopupStatus = "canceled"
+	TopupStatusFailed    TopupStatus = "failed"
+	TopupStatusPending   TopupStatus = "pending"
+	TopupStatusReversed  TopupStatus = "reversed"
+	TopupStatusSucceeded TopupStatus = "succeeded"
+)
+
+// Returns a list of top-ups.
+type TopupListParams struct {
+	ListParams `form:"*"`
+	// A positive integer representing how much to transfer.
+	Amount *int64 `form:"amount" json:"amount,omitempty"`
+	// A positive integer representing how much to transfer.
+	AmountRange *RangeQueryParams `form:"amount" json:"-"`
+	// A filter on the list, based on the object `created` field. The value can be a string with an integer Unix timestamp, or it can be a dictionary with a number of different query options.
+	Created *int64 `form:"created" json:"created,omitempty"`
+	// A filter on the list, based on the object `created` field. The value can be a string with an integer Unix timestamp, or it can be a dictionary with a number of different query options.
+	CreatedRange *RangeQueryParams `form:"created" json:"-"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Only return top-ups that have the given status. One of `canceled`, `failed`, `pending` or `succeeded`.
+	Status *string `form:"status" json:"status,omitempty"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *TopupListParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// Top up the balance of an account
+type TopupParams struct {
+	Params `form:"*"`
+	// A positive integer representing how much to transfer.
+	Amount *int64 `form:"amount" json:"amount,omitempty"`
+	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
+	Currency *string `form:"currency" json:"currency,omitempty"`
+	// An arbitrary string attached to the object. Often useful for displaying to users.
+	Description *string `form:"description" json:"description,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
+	// The ID of a source to transfer funds from. For most users, this should be left unspecified which will use the bank account that was set up in the dashboard for the specified currency. In test mode, this can be a test bank token (see [Testing Top-ups](https://docs.stripe.com/connect/testing#testing-top-ups)).
+	Source *string `form:"source" json:"source,omitempty"`
+	// Extra information about a top-up for the source's bank statement. Limited to 15 ASCII characters.
+	StatementDescriptor *string `form:"statement_descriptor" json:"statement_descriptor,omitempty"`
+	// A string that identifies this top-up as part of a group.
+	TransferGroup *string                 `form:"transfer_group" json:"transfer_group,omitempty"`
+	UnsetFields   []TopupParamsUnsetField `form:"-" json:"-"`
+}
+
+// TopupParamsUnsetField is the list of fields that can be cleared/unset on TopupParams.
+type TopupParamsUnsetField string
+
+const (
+	TopupParamsUnsetFieldMetadata TopupParamsUnsetField = "metadata"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TopupParams) AddUnsetField(field TopupParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *TopupParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *TopupParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+// Top up the balance of an account
+type TopupCreateParams struct {
+	Params `form:"*"`
+	// A positive integer representing how much to transfer.
+	Amount *int64 `form:"amount" json:"amount"`
+	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
+	Currency *string `form:"currency" json:"currency"`
+	// An arbitrary string attached to the object. Often useful for displaying to users.
+	Description *string `form:"description" json:"description,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
+	// The ID of a source to transfer funds from. For most users, this should be left unspecified which will use the bank account that was set up in the dashboard for the specified currency. In test mode, this can be a test bank token (see [Testing Top-ups](https://docs.stripe.com/connect/testing#testing-top-ups)).
+	Source *string `form:"source" json:"source,omitempty"`
+	// Extra information about a top-up for the source's bank statement. Limited to 15 ASCII characters.
+	StatementDescriptor *string `form:"statement_descriptor" json:"statement_descriptor,omitempty"`
+	// A string that identifies this top-up as part of a group.
+	TransferGroup *string                       `form:"transfer_group" json:"transfer_group,omitempty"`
+	UnsetFields   []TopupCreateParamsUnsetField `form:"-" json:"-"`
+}
+
+// TopupCreateParamsUnsetField is the list of fields that can be cleared/unset on TopupCreateParams.
+type TopupCreateParamsUnsetField string
+
+const (
+	TopupCreateParamsUnsetFieldMetadata TopupCreateParamsUnsetField = "metadata"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TopupCreateParams) AddUnsetField(field TopupCreateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *TopupCreateParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *TopupCreateParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+// Cancels a top-up. Only pending top-ups can be canceled.
+type TopupCancelParams struct {
+	Params `form:"*"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *TopupCancelParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// Retrieves the details of a top-up that has previously been created. Supply the unique top-up ID that was returned from your previous request, and Stripe will return the corresponding top-up information.
+type TopupRetrieveParams struct {
+	Params `form:"*"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *TopupRetrieveParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// Updates the metadata of a top-up. Other top-up details are not editable by design.
+type TopupUpdateParams struct {
+	Params `form:"*"`
+	// An arbitrary string attached to the object. Often useful for displaying to users.
+	Description *string `form:"description" json:"description,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
+	Metadata    map[string]string             `form:"metadata" json:"metadata,omitempty"`
+	UnsetFields []TopupUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// TopupUpdateParamsUnsetField is the list of fields that can be cleared/unset on TopupUpdateParams.
+type TopupUpdateParamsUnsetField string
+
+const (
+	TopupUpdateParamsUnsetFieldMetadata TopupUpdateParamsUnsetField = "metadata"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TopupUpdateParams) AddUnsetField(field TopupUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *TopupUpdateParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// AddMetadata adds a new key-value pair to the Metadata.
+func (p *TopupUpdateParams) AddMetadata(key string, value string) {
+	if p.Metadata == nil {
+		p.Metadata = make(map[string]string)
+	}
+
+	p.Metadata[key] = value
+}
+
+// To top up your Stripe balance, you create a top-up object. You can retrieve
+// individual top-ups, as well as list all top-ups. Top-ups are identified by a
+// unique, random ID.
+//
+// Related guide: [Topping up your platform account](https://docs.stripe.com/connect/top-ups)
+type Topup struct {
+	APIResource
+	// Amount transferred.
+	Amount int64 `json:"amount"`
+	// ID of the balance transaction that describes the impact of this top-up on your account balance. May not be specified depending on status of top-up.
+	BalanceTransaction *BalanceTransaction `json:"balance_transaction"`
+	// Time at which the object was created. Measured in seconds since the Unix epoch.
+	Created int64 `json:"created"`
+	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
+	Currency Currency `json:"currency"`
+	// An arbitrary string attached to the object. Often useful for displaying to users.
+	Description string `json:"description"`
+	// Date the funds are expected to arrive in your Stripe account for payouts. This factors in delays like weekends or bank holidays. May not be specified depending on status of top-up.
+	ExpectedAvailabilityDate int64 `json:"expected_availability_date"`
+	// Error code explaining reason for top-up failure if available (see [the errors section](https://docs.stripe.com/api/errors) for a list of codes).
+	FailureCode string `json:"failure_code"`
+	// Message to user further explaining reason for top-up failure if available.
+	FailureMessage string `json:"failure_message"`
+	// Unique identifier for the object.
+	ID string `json:"id"`
+	// If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.
+	Livemode bool `json:"livemode"`
+	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
+	Metadata map[string]string `json:"metadata"`
+	// String representing the object's type. Objects of the same type share the same value.
+	Object string `json:"object"`
+	// The source field is deprecated. It might not always be present in the API response.
+	Source *PaymentSource `json:"source"`
+	// Extra information about a top-up. This will appear on your source's bank statement. It must contain at least one letter.
+	StatementDescriptor string `json:"statement_descriptor"`
+	// The status of the top-up is either `canceled`, `failed`, `pending`, `reversed`, or `succeeded`.
+	Status TopupStatus `json:"status"`
+	// A string that identifies this top-up as part of a group.
+	TransferGroup string `json:"transfer_group"`
+
+	// The following property is deprecated
+	ArrivalDate int64 `json:"arrival_date"`
+}
+
+// TopupList is a list of Topups as retrieved from a list endpoint.
+type TopupList struct {
+	APIResource
+	ListMeta
+	Data []*Topup `json:"data"`
+}
+
+// UnmarshalJSON handles deserialization of a Topup.
+// This custom unmarshaling is needed because the resulting
+// property may be an id or the full struct if it was expanded.
+func (t *Topup) UnmarshalJSON(data []byte) error {
+	if id, ok := ParseID(data); ok {
+		t.ID = id
+		return nil
+	}
+
+	type topup Topup
+	var v topup
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	*t = Topup(v)
+	return nil
+}

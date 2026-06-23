@@ -1,0 +1,37 @@
+//
+//
+// File generated from our OpenAPI spec
+//
+//
+
+package stripe
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/stripe/stripe-go/v86/form"
+)
+
+// v1SetupAttemptService is used to invoke /v1/setup_attempts APIs.
+type v1SetupAttemptService struct {
+	B   Backend
+	Key string
+}
+
+// Returns a list of SetupAttempts that associate with a provided SetupIntent.
+func (c v1SetupAttemptService) List(ctx context.Context, listParams *SetupAttemptListParams) *V1List[*SetupAttempt] {
+	if listParams == nil {
+		listParams = &SetupAttemptListParams{}
+	}
+	listParams.Context = ctx
+	return newV1List(ctx, listParams, func(ctx context.Context, p *Params, b *form.Values) (*v1Page[*SetupAttempt], error) {
+		list := &v1Page[*SetupAttempt]{}
+		if p == nil {
+			p = &Params{}
+		}
+		p.Context = ctx
+		err := c.B.CallRaw(http.MethodGet, "/v1/setup_attempts", c.Key, []byte(b.Encode()), p, list)
+		return list, err
+	})
+}

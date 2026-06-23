@@ -1,0 +1,2036 @@
+//
+//
+// File generated from our OpenAPI spec
+//
+//
+
+package stripe
+
+// Security type of the WiFi network. The hash with the corresponding name contains the credentials for this security type.
+type TerminalConfigurationWifiType string
+
+// List of values that TerminalConfigurationWifiType can take
+const (
+	TerminalConfigurationWifiTypeEnterpriseEapPeap TerminalConfigurationWifiType = "enterprise_eap_peap"
+	TerminalConfigurationWifiTypeEnterpriseEapTLS  TerminalConfigurationWifiType = "enterprise_eap_tls"
+	TerminalConfigurationWifiTypePersonalPsk       TerminalConfigurationWifiType = "personal_psk"
+)
+
+// Deletes a Configuration object.
+type TerminalConfigurationParams struct {
+	Params `form:"*"`
+	// An object containing device type specific settings for BBPOS WisePad 3 readers.
+	BBPOSWisePad3 *TerminalConfigurationBBPOSWisePad3Params `form:"bbpos_wisepad3" json:"bbpos_wisepad3,omitempty"`
+	// An object containing device type specific settings for BBPOS WisePOS E readers.
+	BBPOSWisePOSE *TerminalConfigurationBBPOSWisePOSEParams `form:"bbpos_wisepos_e" json:"bbpos_wisepos_e,omitempty"`
+	// Configuration for cellular connectivity.
+	Cellular *TerminalConfigurationCellularParams `form:"cellular" json:"cellular,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Name of the configuration
+	Name *string `form:"name" json:"name,omitempty"`
+	// Configurations for collecting transactions offline.
+	Offline *TerminalConfigurationOfflineParams `form:"offline" json:"offline,omitempty"`
+	// Reboot time settings for readers. that support customized reboot time configuration.
+	RebootWindow *TerminalConfigurationRebootWindowParams `form:"reboot_window" json:"reboot_window,omitempty"`
+	// An object containing device type specific settings for Stripe S700 readers.
+	StripeS700 *TerminalConfigurationStripeS700Params `form:"stripe_s700" json:"stripe_s700,omitempty"`
+	// An object containing device type specific settings for Stripe S710 readers.
+	StripeS710 *TerminalConfigurationStripeS710Params `form:"stripe_s710" json:"stripe_s710,omitempty"`
+	// Tipping configurations for readers that support on-reader tips.
+	Tipping *TerminalConfigurationTippingParams `form:"tipping" json:"tipping,omitempty"`
+	// An object containing device type specific settings for Verifone M425 readers.
+	VerifoneM425 *TerminalConfigurationVerifoneM425Params `form:"verifone_m425" json:"verifone_m425,omitempty"`
+	// An object containing device type specific settings for Verifone P400 readers.
+	VerifoneP400 *TerminalConfigurationVerifoneP400Params `form:"verifone_p400" json:"verifone_p400,omitempty"`
+	// An object containing device type specific settings for Verifone P630 readers.
+	VerifoneP630 *TerminalConfigurationVerifoneP630Params `form:"verifone_p630" json:"verifone_p630,omitempty"`
+	// An object containing device type specific settings for Verifone UX700 readers.
+	VerifoneUx700 *TerminalConfigurationVerifoneUx700Params `form:"verifone_ux700" json:"verifone_ux700,omitempty"`
+	// An object containing device type specific settings for Verifone V660p readers.
+	VerifoneV660p *TerminalConfigurationVerifoneV660pParams `form:"verifone_v660p" json:"verifone_v660p,omitempty"`
+	// Configurations for connecting to a WiFi network.
+	Wifi        *TerminalConfigurationWifiParams        `form:"wifi" json:"wifi,omitempty"`
+	UnsetFields []TerminalConfigurationParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationParams.
+type TerminalConfigurationParamsUnsetField string
+
+const (
+	TerminalConfigurationParamsUnsetFieldBBPOSWisePad3 TerminalConfigurationParamsUnsetField = "bbpos_wisepad3"
+	TerminalConfigurationParamsUnsetFieldBBPOSWisePOSE TerminalConfigurationParamsUnsetField = "bbpos_wisepos_e"
+	TerminalConfigurationParamsUnsetFieldCellular      TerminalConfigurationParamsUnsetField = "cellular"
+	TerminalConfigurationParamsUnsetFieldOffline       TerminalConfigurationParamsUnsetField = "offline"
+	TerminalConfigurationParamsUnsetFieldRebootWindow  TerminalConfigurationParamsUnsetField = "reboot_window"
+	TerminalConfigurationParamsUnsetFieldStripeS700    TerminalConfigurationParamsUnsetField = "stripe_s700"
+	TerminalConfigurationParamsUnsetFieldStripeS710    TerminalConfigurationParamsUnsetField = "stripe_s710"
+	TerminalConfigurationParamsUnsetFieldTipping       TerminalConfigurationParamsUnsetField = "tipping"
+	TerminalConfigurationParamsUnsetFieldVerifoneM425  TerminalConfigurationParamsUnsetField = "verifone_m425"
+	TerminalConfigurationParamsUnsetFieldVerifoneP400  TerminalConfigurationParamsUnsetField = "verifone_p400"
+	TerminalConfigurationParamsUnsetFieldVerifoneP630  TerminalConfigurationParamsUnsetField = "verifone_p630"
+	TerminalConfigurationParamsUnsetFieldVerifoneUx700 TerminalConfigurationParamsUnsetField = "verifone_ux700"
+	TerminalConfigurationParamsUnsetFieldVerifoneV660p TerminalConfigurationParamsUnsetField = "verifone_v660p"
+	TerminalConfigurationParamsUnsetFieldWifi          TerminalConfigurationParamsUnsetField = "wifi"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationParams) AddUnsetField(field TerminalConfigurationParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *TerminalConfigurationParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// An object containing device type specific settings for BBPOS WisePad 3 readers.
+type TerminalConfigurationBBPOSWisePad3Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                              `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationBBPOSWisePad3ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationBBPOSWisePad3ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationBBPOSWisePad3Params.
+type TerminalConfigurationBBPOSWisePad3ParamsUnsetField string
+
+const (
+	TerminalConfigurationBBPOSWisePad3ParamsUnsetFieldSplashscreen TerminalConfigurationBBPOSWisePad3ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationBBPOSWisePad3Params) AddUnsetField(field TerminalConfigurationBBPOSWisePad3ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for BBPOS WisePOS E readers.
+type TerminalConfigurationBBPOSWisePOSEParams struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *string                                              `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationBBPOSWisePOSEParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationBBPOSWisePOSEParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationBBPOSWisePOSEParams.
+type TerminalConfigurationBBPOSWisePOSEParamsUnsetField string
+
+const (
+	TerminalConfigurationBBPOSWisePOSEParamsUnsetFieldSplashscreen TerminalConfigurationBBPOSWisePOSEParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationBBPOSWisePOSEParams) AddUnsetField(field TerminalConfigurationBBPOSWisePOSEParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Configuration for cellular connectivity.
+type TerminalConfigurationCellularParams struct {
+	// Determines whether to allow the reader to connect to a cellular network. Defaults to false.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Configurations for collecting transactions offline.
+type TerminalConfigurationOfflineParams struct {
+	// Determines whether to allow transactions to be collected while reader is offline. Defaults to false.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Reboot time settings for readers. that support customized reboot time configuration.
+type TerminalConfigurationRebootWindowParams struct {
+	// Integer between 0 to 23 that represents the end hour of the reboot time window. The value must be different than the start_hour.
+	EndHour *int64 `form:"end_hour" json:"end_hour"`
+	// Integer between 0 to 23 that represents the start hour of the reboot time window.
+	StartHour *int64 `form:"start_hour" json:"start_hour"`
+}
+
+// An object containing device type specific settings for Stripe S700 readers.
+type TerminalConfigurationStripeS700Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                           `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationStripeS700ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationStripeS700ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationStripeS700Params.
+type TerminalConfigurationStripeS700ParamsUnsetField string
+
+const (
+	TerminalConfigurationStripeS700ParamsUnsetFieldSplashscreen TerminalConfigurationStripeS700ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationStripeS700Params) AddUnsetField(field TerminalConfigurationStripeS700ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Stripe S710 readers.
+type TerminalConfigurationStripeS710Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                           `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationStripeS710ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationStripeS710ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationStripeS710Params.
+type TerminalConfigurationStripeS710ParamsUnsetField string
+
+const (
+	TerminalConfigurationStripeS710ParamsUnsetFieldSplashscreen TerminalConfigurationStripeS710ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationStripeS710Params) AddUnsetField(field TerminalConfigurationStripeS710ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Tipping configuration for AED
+type TerminalConfigurationTippingAedParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for AUD
+type TerminalConfigurationTippingAUDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CAD
+type TerminalConfigurationTippingCADParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CHF
+type TerminalConfigurationTippingCHFParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CZK
+type TerminalConfigurationTippingCZKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for DKK
+type TerminalConfigurationTippingDKKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for EUR
+type TerminalConfigurationTippingEURParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for GBP
+type TerminalConfigurationTippingGBPParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for GIP
+type TerminalConfigurationTippingGipParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for HKD
+type TerminalConfigurationTippingHKDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for HUF
+type TerminalConfigurationTippingHufParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for JPY
+type TerminalConfigurationTippingJPYParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for MXN
+type TerminalConfigurationTippingMxnParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for MYR
+type TerminalConfigurationTippingMYRParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for NOK
+type TerminalConfigurationTippingNOKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for NZD
+type TerminalConfigurationTippingNZDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for PLN
+type TerminalConfigurationTippingPLNParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for RON
+type TerminalConfigurationTippingRonParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for SEK
+type TerminalConfigurationTippingSEKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for SGD
+type TerminalConfigurationTippingSGDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for USD
+type TerminalConfigurationTippingUSDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configurations for readers that support on-reader tips.
+type TerminalConfigurationTippingParams struct {
+	// Tipping configuration for AED
+	Aed *TerminalConfigurationTippingAedParams `form:"aed" json:"aed,omitempty"`
+	// Tipping configuration for AUD
+	AUD *TerminalConfigurationTippingAUDParams `form:"aud" json:"aud,omitempty"`
+	// Tipping configuration for CAD
+	CAD *TerminalConfigurationTippingCADParams `form:"cad" json:"cad,omitempty"`
+	// Tipping configuration for CHF
+	CHF *TerminalConfigurationTippingCHFParams `form:"chf" json:"chf,omitempty"`
+	// Tipping configuration for CZK
+	CZK *TerminalConfigurationTippingCZKParams `form:"czk" json:"czk,omitempty"`
+	// Tipping configuration for DKK
+	DKK *TerminalConfigurationTippingDKKParams `form:"dkk" json:"dkk,omitempty"`
+	// Tipping configuration for EUR
+	EUR *TerminalConfigurationTippingEURParams `form:"eur" json:"eur,omitempty"`
+	// Tipping configuration for GBP
+	GBP *TerminalConfigurationTippingGBPParams `form:"gbp" json:"gbp,omitempty"`
+	// Tipping configuration for GIP
+	Gip *TerminalConfigurationTippingGipParams `form:"gip" json:"gip,omitempty"`
+	// Tipping configuration for HKD
+	HKD *TerminalConfigurationTippingHKDParams `form:"hkd" json:"hkd,omitempty"`
+	// Tipping configuration for HUF
+	Huf *TerminalConfigurationTippingHufParams `form:"huf" json:"huf,omitempty"`
+	// Tipping configuration for JPY
+	JPY *TerminalConfigurationTippingJPYParams `form:"jpy" json:"jpy,omitempty"`
+	// Tipping configuration for MXN
+	Mxn *TerminalConfigurationTippingMxnParams `form:"mxn" json:"mxn,omitempty"`
+	// Tipping configuration for MYR
+	MYR *TerminalConfigurationTippingMYRParams `form:"myr" json:"myr,omitempty"`
+	// Tipping configuration for NOK
+	NOK *TerminalConfigurationTippingNOKParams `form:"nok" json:"nok,omitempty"`
+	// Tipping configuration for NZD
+	NZD *TerminalConfigurationTippingNZDParams `form:"nzd" json:"nzd,omitempty"`
+	// Tipping configuration for PLN
+	PLN *TerminalConfigurationTippingPLNParams `form:"pln" json:"pln,omitempty"`
+	// Tipping configuration for RON
+	Ron *TerminalConfigurationTippingRonParams `form:"ron" json:"ron,omitempty"`
+	// Tipping configuration for SEK
+	SEK *TerminalConfigurationTippingSEKParams `form:"sek" json:"sek,omitempty"`
+	// Tipping configuration for SGD
+	SGD *TerminalConfigurationTippingSGDParams `form:"sgd" json:"sgd,omitempty"`
+	// Tipping configuration for USD
+	USD *TerminalConfigurationTippingUSDParams `form:"usd" json:"usd,omitempty"`
+}
+
+// An object containing device type specific settings for Verifone M425 readers.
+type TerminalConfigurationVerifoneM425Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                             `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationVerifoneM425ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationVerifoneM425ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationVerifoneM425Params.
+type TerminalConfigurationVerifoneM425ParamsUnsetField string
+
+const (
+	TerminalConfigurationVerifoneM425ParamsUnsetFieldSplashscreen TerminalConfigurationVerifoneM425ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationVerifoneM425Params) AddUnsetField(field TerminalConfigurationVerifoneM425ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone P400 readers.
+type TerminalConfigurationVerifoneP400Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                             `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationVerifoneP400ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationVerifoneP400ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationVerifoneP400Params.
+type TerminalConfigurationVerifoneP400ParamsUnsetField string
+
+const (
+	TerminalConfigurationVerifoneP400ParamsUnsetFieldSplashscreen TerminalConfigurationVerifoneP400ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationVerifoneP400Params) AddUnsetField(field TerminalConfigurationVerifoneP400ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone P630 readers.
+type TerminalConfigurationVerifoneP630Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                             `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationVerifoneP630ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationVerifoneP630ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationVerifoneP630Params.
+type TerminalConfigurationVerifoneP630ParamsUnsetField string
+
+const (
+	TerminalConfigurationVerifoneP630ParamsUnsetFieldSplashscreen TerminalConfigurationVerifoneP630ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationVerifoneP630Params) AddUnsetField(field TerminalConfigurationVerifoneP630ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone UX700 readers.
+type TerminalConfigurationVerifoneUx700Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                              `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationVerifoneUx700ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationVerifoneUx700ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationVerifoneUx700Params.
+type TerminalConfigurationVerifoneUx700ParamsUnsetField string
+
+const (
+	TerminalConfigurationVerifoneUx700ParamsUnsetFieldSplashscreen TerminalConfigurationVerifoneUx700ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationVerifoneUx700Params) AddUnsetField(field TerminalConfigurationVerifoneUx700ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone V660p readers.
+type TerminalConfigurationVerifoneV660pParams struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                              `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationVerifoneV660pParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationVerifoneV660pParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationVerifoneV660pParams.
+type TerminalConfigurationVerifoneV660pParamsUnsetField string
+
+const (
+	TerminalConfigurationVerifoneV660pParamsUnsetFieldSplashscreen TerminalConfigurationVerifoneV660pParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationVerifoneV660pParams) AddUnsetField(field TerminalConfigurationVerifoneV660pParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Credentials for a WPA-Enterprise WiFi network using the EAP-PEAP authentication method.
+type TerminalConfigurationWifiEnterpriseEapPeapParams struct {
+	// A File ID representing a PEM file containing the server certificate
+	CaCertificateFile *string `form:"ca_certificate_file" json:"ca_certificate_file,omitempty"`
+	// Password for connecting to the WiFi network
+	Password *string `form:"password" json:"password"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+	// Username for connecting to the WiFi network
+	Username *string `form:"username" json:"username"`
+}
+
+// Credentials for a WPA-Enterprise WiFi network using the EAP-TLS authentication method.
+type TerminalConfigurationWifiEnterpriseEapTLSParams struct {
+	// A File ID representing a PEM file containing the server certificate
+	CaCertificateFile *string `form:"ca_certificate_file" json:"ca_certificate_file,omitempty"`
+	// A File ID representing a PEM file containing the client certificate
+	ClientCertificateFile *string `form:"client_certificate_file" json:"client_certificate_file"`
+	// A File ID representing a PEM file containing the client RSA private key
+	PrivateKeyFile *string `form:"private_key_file" json:"private_key_file"`
+	// Password for the private key file
+	PrivateKeyFilePassword *string `form:"private_key_file_password" json:"private_key_file_password,omitempty"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+}
+
+// Credentials for a WPA-Personal WiFi network.
+type TerminalConfigurationWifiPersonalPskParams struct {
+	// Password for connecting to the WiFi network
+	Password *string `form:"password" json:"password"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+}
+
+// Configurations for connecting to a WiFi network.
+type TerminalConfigurationWifiParams struct {
+	// Credentials for a WPA-Enterprise WiFi network using the EAP-PEAP authentication method.
+	EnterpriseEapPeap *TerminalConfigurationWifiEnterpriseEapPeapParams `form:"enterprise_eap_peap" json:"enterprise_eap_peap,omitempty"`
+	// Credentials for a WPA-Enterprise WiFi network using the EAP-TLS authentication method.
+	EnterpriseEapTLS *TerminalConfigurationWifiEnterpriseEapTLSParams `form:"enterprise_eap_tls" json:"enterprise_eap_tls,omitempty"`
+	// Credentials for a WPA-Personal WiFi network.
+	PersonalPsk *TerminalConfigurationWifiPersonalPskParams `form:"personal_psk" json:"personal_psk,omitempty"`
+	// Security type of the WiFi network. Fill out the hash with the corresponding name to provide the set of credentials for this security type.
+	Type *string `form:"type" json:"type"`
+}
+
+// Returns a list of Configuration objects.
+type TerminalConfigurationListParams struct {
+	ListParams `form:"*"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// if present, only return the account default or non-default configurations.
+	IsAccountDefault *bool `form:"is_account_default" json:"is_account_default,omitempty"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *TerminalConfigurationListParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// Deletes a Configuration object.
+type TerminalConfigurationDeleteParams struct {
+	Params `form:"*"`
+}
+
+// Retrieves a Configuration object.
+type TerminalConfigurationRetrieveParams struct {
+	Params `form:"*"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+}
+
+// AddExpand appends a new field to expand.
+func (p *TerminalConfigurationRetrieveParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// An object containing device type specific settings for BBPOS WisePad 3 readers.
+type TerminalConfigurationUpdateBBPOSWisePad3Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                    `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateBBPOSWisePad3ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateBBPOSWisePad3ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateBBPOSWisePad3Params.
+type TerminalConfigurationUpdateBBPOSWisePad3ParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateBBPOSWisePad3ParamsUnsetFieldSplashscreen TerminalConfigurationUpdateBBPOSWisePad3ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateBBPOSWisePad3Params) AddUnsetField(field TerminalConfigurationUpdateBBPOSWisePad3ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for BBPOS WisePOS E readers.
+type TerminalConfigurationUpdateBBPOSWisePOSEParams struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *string                                                    `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateBBPOSWisePOSEParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateBBPOSWisePOSEParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateBBPOSWisePOSEParams.
+type TerminalConfigurationUpdateBBPOSWisePOSEParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateBBPOSWisePOSEParamsUnsetFieldSplashscreen TerminalConfigurationUpdateBBPOSWisePOSEParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateBBPOSWisePOSEParams) AddUnsetField(field TerminalConfigurationUpdateBBPOSWisePOSEParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Configuration for cellular connectivity.
+type TerminalConfigurationUpdateCellularParams struct {
+	// Determines whether to allow the reader to connect to a cellular network. Defaults to false.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Configurations for collecting transactions offline.
+type TerminalConfigurationUpdateOfflineParams struct {
+	// Determines whether to allow transactions to be collected while reader is offline. Defaults to false.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Reboot time settings for readers. that support customized reboot time configuration.
+type TerminalConfigurationUpdateRebootWindowParams struct {
+	// Integer between 0 to 23 that represents the end hour of the reboot time window. The value must be different than the start_hour.
+	EndHour *int64 `form:"end_hour" json:"end_hour"`
+	// Integer between 0 to 23 that represents the start hour of the reboot time window.
+	StartHour *int64 `form:"start_hour" json:"start_hour"`
+}
+
+// An object containing device type specific settings for Stripe S700 readers.
+type TerminalConfigurationUpdateStripeS700Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                 `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateStripeS700ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateStripeS700ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateStripeS700Params.
+type TerminalConfigurationUpdateStripeS700ParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateStripeS700ParamsUnsetFieldSplashscreen TerminalConfigurationUpdateStripeS700ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateStripeS700Params) AddUnsetField(field TerminalConfigurationUpdateStripeS700ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Stripe S710 readers.
+type TerminalConfigurationUpdateStripeS710Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                 `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateStripeS710ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateStripeS710ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateStripeS710Params.
+type TerminalConfigurationUpdateStripeS710ParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateStripeS710ParamsUnsetFieldSplashscreen TerminalConfigurationUpdateStripeS710ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateStripeS710Params) AddUnsetField(field TerminalConfigurationUpdateStripeS710ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Tipping configuration for AED
+type TerminalConfigurationUpdateTippingAedParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for AUD
+type TerminalConfigurationUpdateTippingAUDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CAD
+type TerminalConfigurationUpdateTippingCADParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CHF
+type TerminalConfigurationUpdateTippingCHFParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CZK
+type TerminalConfigurationUpdateTippingCZKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for DKK
+type TerminalConfigurationUpdateTippingDKKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for EUR
+type TerminalConfigurationUpdateTippingEURParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for GBP
+type TerminalConfigurationUpdateTippingGBPParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for GIP
+type TerminalConfigurationUpdateTippingGipParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for HKD
+type TerminalConfigurationUpdateTippingHKDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for HUF
+type TerminalConfigurationUpdateTippingHufParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for JPY
+type TerminalConfigurationUpdateTippingJPYParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for MXN
+type TerminalConfigurationUpdateTippingMxnParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for MYR
+type TerminalConfigurationUpdateTippingMYRParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for NOK
+type TerminalConfigurationUpdateTippingNOKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for NZD
+type TerminalConfigurationUpdateTippingNZDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for PLN
+type TerminalConfigurationUpdateTippingPLNParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for RON
+type TerminalConfigurationUpdateTippingRonParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for SEK
+type TerminalConfigurationUpdateTippingSEKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for SGD
+type TerminalConfigurationUpdateTippingSGDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for USD
+type TerminalConfigurationUpdateTippingUSDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configurations for readers that support on-reader tips.
+type TerminalConfigurationUpdateTippingParams struct {
+	// Tipping configuration for AED
+	Aed *TerminalConfigurationUpdateTippingAedParams `form:"aed" json:"aed,omitempty"`
+	// Tipping configuration for AUD
+	AUD *TerminalConfigurationUpdateTippingAUDParams `form:"aud" json:"aud,omitempty"`
+	// Tipping configuration for CAD
+	CAD *TerminalConfigurationUpdateTippingCADParams `form:"cad" json:"cad,omitempty"`
+	// Tipping configuration for CHF
+	CHF *TerminalConfigurationUpdateTippingCHFParams `form:"chf" json:"chf,omitempty"`
+	// Tipping configuration for CZK
+	CZK *TerminalConfigurationUpdateTippingCZKParams `form:"czk" json:"czk,omitempty"`
+	// Tipping configuration for DKK
+	DKK *TerminalConfigurationUpdateTippingDKKParams `form:"dkk" json:"dkk,omitempty"`
+	// Tipping configuration for EUR
+	EUR *TerminalConfigurationUpdateTippingEURParams `form:"eur" json:"eur,omitempty"`
+	// Tipping configuration for GBP
+	GBP *TerminalConfigurationUpdateTippingGBPParams `form:"gbp" json:"gbp,omitempty"`
+	// Tipping configuration for GIP
+	Gip *TerminalConfigurationUpdateTippingGipParams `form:"gip" json:"gip,omitempty"`
+	// Tipping configuration for HKD
+	HKD *TerminalConfigurationUpdateTippingHKDParams `form:"hkd" json:"hkd,omitempty"`
+	// Tipping configuration for HUF
+	Huf *TerminalConfigurationUpdateTippingHufParams `form:"huf" json:"huf,omitempty"`
+	// Tipping configuration for JPY
+	JPY *TerminalConfigurationUpdateTippingJPYParams `form:"jpy" json:"jpy,omitempty"`
+	// Tipping configuration for MXN
+	Mxn *TerminalConfigurationUpdateTippingMxnParams `form:"mxn" json:"mxn,omitempty"`
+	// Tipping configuration for MYR
+	MYR *TerminalConfigurationUpdateTippingMYRParams `form:"myr" json:"myr,omitempty"`
+	// Tipping configuration for NOK
+	NOK *TerminalConfigurationUpdateTippingNOKParams `form:"nok" json:"nok,omitempty"`
+	// Tipping configuration for NZD
+	NZD *TerminalConfigurationUpdateTippingNZDParams `form:"nzd" json:"nzd,omitempty"`
+	// Tipping configuration for PLN
+	PLN *TerminalConfigurationUpdateTippingPLNParams `form:"pln" json:"pln,omitempty"`
+	// Tipping configuration for RON
+	Ron *TerminalConfigurationUpdateTippingRonParams `form:"ron" json:"ron,omitempty"`
+	// Tipping configuration for SEK
+	SEK *TerminalConfigurationUpdateTippingSEKParams `form:"sek" json:"sek,omitempty"`
+	// Tipping configuration for SGD
+	SGD *TerminalConfigurationUpdateTippingSGDParams `form:"sgd" json:"sgd,omitempty"`
+	// Tipping configuration for USD
+	USD *TerminalConfigurationUpdateTippingUSDParams `form:"usd" json:"usd,omitempty"`
+}
+
+// An object containing device type specific settings for Verifone M425 readers.
+type TerminalConfigurationUpdateVerifoneM425Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                   `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateVerifoneM425ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateVerifoneM425ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateVerifoneM425Params.
+type TerminalConfigurationUpdateVerifoneM425ParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateVerifoneM425ParamsUnsetFieldSplashscreen TerminalConfigurationUpdateVerifoneM425ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateVerifoneM425Params) AddUnsetField(field TerminalConfigurationUpdateVerifoneM425ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone P400 readers.
+type TerminalConfigurationUpdateVerifoneP400Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                   `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateVerifoneP400ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateVerifoneP400ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateVerifoneP400Params.
+type TerminalConfigurationUpdateVerifoneP400ParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateVerifoneP400ParamsUnsetFieldSplashscreen TerminalConfigurationUpdateVerifoneP400ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateVerifoneP400Params) AddUnsetField(field TerminalConfigurationUpdateVerifoneP400ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone P630 readers.
+type TerminalConfigurationUpdateVerifoneP630Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                   `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateVerifoneP630ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateVerifoneP630ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateVerifoneP630Params.
+type TerminalConfigurationUpdateVerifoneP630ParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateVerifoneP630ParamsUnsetFieldSplashscreen TerminalConfigurationUpdateVerifoneP630ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateVerifoneP630Params) AddUnsetField(field TerminalConfigurationUpdateVerifoneP630ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone UX700 readers.
+type TerminalConfigurationUpdateVerifoneUx700Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                    `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateVerifoneUx700ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateVerifoneUx700ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateVerifoneUx700Params.
+type TerminalConfigurationUpdateVerifoneUx700ParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateVerifoneUx700ParamsUnsetFieldSplashscreen TerminalConfigurationUpdateVerifoneUx700ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateVerifoneUx700Params) AddUnsetField(field TerminalConfigurationUpdateVerifoneUx700ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone V660p readers.
+type TerminalConfigurationUpdateVerifoneV660pParams struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                    `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationUpdateVerifoneV660pParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateVerifoneV660pParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateVerifoneV660pParams.
+type TerminalConfigurationUpdateVerifoneV660pParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateVerifoneV660pParamsUnsetFieldSplashscreen TerminalConfigurationUpdateVerifoneV660pParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateVerifoneV660pParams) AddUnsetField(field TerminalConfigurationUpdateVerifoneV660pParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Credentials for a WPA-Enterprise WiFi network using the EAP-PEAP authentication method.
+type TerminalConfigurationUpdateWifiEnterpriseEapPeapParams struct {
+	// A File ID representing a PEM file containing the server certificate
+	CaCertificateFile *string `form:"ca_certificate_file" json:"ca_certificate_file,omitempty"`
+	// Password for connecting to the WiFi network
+	Password *string `form:"password" json:"password"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+	// Username for connecting to the WiFi network
+	Username *string `form:"username" json:"username"`
+}
+
+// Credentials for a WPA-Enterprise WiFi network using the EAP-TLS authentication method.
+type TerminalConfigurationUpdateWifiEnterpriseEapTLSParams struct {
+	// A File ID representing a PEM file containing the server certificate
+	CaCertificateFile *string `form:"ca_certificate_file" json:"ca_certificate_file,omitempty"`
+	// A File ID representing a PEM file containing the client certificate
+	ClientCertificateFile *string `form:"client_certificate_file" json:"client_certificate_file"`
+	// A File ID representing a PEM file containing the client RSA private key
+	PrivateKeyFile *string `form:"private_key_file" json:"private_key_file"`
+	// Password for the private key file
+	PrivateKeyFilePassword *string `form:"private_key_file_password" json:"private_key_file_password,omitempty"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+}
+
+// Credentials for a WPA-Personal WiFi network.
+type TerminalConfigurationUpdateWifiPersonalPskParams struct {
+	// Password for connecting to the WiFi network
+	Password *string `form:"password" json:"password"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+}
+
+// Configurations for connecting to a WiFi network.
+type TerminalConfigurationUpdateWifiParams struct {
+	// Credentials for a WPA-Enterprise WiFi network using the EAP-PEAP authentication method.
+	EnterpriseEapPeap *TerminalConfigurationUpdateWifiEnterpriseEapPeapParams `form:"enterprise_eap_peap" json:"enterprise_eap_peap,omitempty"`
+	// Credentials for a WPA-Enterprise WiFi network using the EAP-TLS authentication method.
+	EnterpriseEapTLS *TerminalConfigurationUpdateWifiEnterpriseEapTLSParams `form:"enterprise_eap_tls" json:"enterprise_eap_tls,omitempty"`
+	// Credentials for a WPA-Personal WiFi network.
+	PersonalPsk *TerminalConfigurationUpdateWifiPersonalPskParams `form:"personal_psk" json:"personal_psk,omitempty"`
+	// Security type of the WiFi network. Fill out the hash with the corresponding name to provide the set of credentials for this security type.
+	Type *string `form:"type" json:"type"`
+}
+
+// Updates a new Configuration object.
+type TerminalConfigurationUpdateParams struct {
+	Params `form:"*"`
+	// An object containing device type specific settings for BBPOS WisePad 3 readers.
+	BBPOSWisePad3 *TerminalConfigurationUpdateBBPOSWisePad3Params `form:"bbpos_wisepad3" json:"bbpos_wisepad3,omitempty"`
+	// An object containing device type specific settings for BBPOS WisePOS E readers.
+	BBPOSWisePOSE *TerminalConfigurationUpdateBBPOSWisePOSEParams `form:"bbpos_wisepos_e" json:"bbpos_wisepos_e,omitempty"`
+	// Configuration for cellular connectivity.
+	Cellular *TerminalConfigurationUpdateCellularParams `form:"cellular" json:"cellular,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Name of the configuration
+	Name *string `form:"name" json:"name,omitempty"`
+	// Configurations for collecting transactions offline.
+	Offline *TerminalConfigurationUpdateOfflineParams `form:"offline" json:"offline,omitempty"`
+	// Reboot time settings for readers. that support customized reboot time configuration.
+	RebootWindow *TerminalConfigurationUpdateRebootWindowParams `form:"reboot_window" json:"reboot_window,omitempty"`
+	// An object containing device type specific settings for Stripe S700 readers.
+	StripeS700 *TerminalConfigurationUpdateStripeS700Params `form:"stripe_s700" json:"stripe_s700,omitempty"`
+	// An object containing device type specific settings for Stripe S710 readers.
+	StripeS710 *TerminalConfigurationUpdateStripeS710Params `form:"stripe_s710" json:"stripe_s710,omitempty"`
+	// Tipping configurations for readers that support on-reader tips.
+	Tipping *TerminalConfigurationUpdateTippingParams `form:"tipping" json:"tipping,omitempty"`
+	// An object containing device type specific settings for Verifone M425 readers.
+	VerifoneM425 *TerminalConfigurationUpdateVerifoneM425Params `form:"verifone_m425" json:"verifone_m425,omitempty"`
+	// An object containing device type specific settings for Verifone P400 readers.
+	VerifoneP400 *TerminalConfigurationUpdateVerifoneP400Params `form:"verifone_p400" json:"verifone_p400,omitempty"`
+	// An object containing device type specific settings for Verifone P630 readers.
+	VerifoneP630 *TerminalConfigurationUpdateVerifoneP630Params `form:"verifone_p630" json:"verifone_p630,omitempty"`
+	// An object containing device type specific settings for Verifone UX700 readers.
+	VerifoneUx700 *TerminalConfigurationUpdateVerifoneUx700Params `form:"verifone_ux700" json:"verifone_ux700,omitempty"`
+	// An object containing device type specific settings for Verifone V660p readers.
+	VerifoneV660p *TerminalConfigurationUpdateVerifoneV660pParams `form:"verifone_v660p" json:"verifone_v660p,omitempty"`
+	// Configurations for connecting to a WiFi network.
+	Wifi        *TerminalConfigurationUpdateWifiParams        `form:"wifi" json:"wifi,omitempty"`
+	UnsetFields []TerminalConfigurationUpdateParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationUpdateParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationUpdateParams.
+type TerminalConfigurationUpdateParamsUnsetField string
+
+const (
+	TerminalConfigurationUpdateParamsUnsetFieldBBPOSWisePad3 TerminalConfigurationUpdateParamsUnsetField = "bbpos_wisepad3"
+	TerminalConfigurationUpdateParamsUnsetFieldBBPOSWisePOSE TerminalConfigurationUpdateParamsUnsetField = "bbpos_wisepos_e"
+	TerminalConfigurationUpdateParamsUnsetFieldCellular      TerminalConfigurationUpdateParamsUnsetField = "cellular"
+	TerminalConfigurationUpdateParamsUnsetFieldOffline       TerminalConfigurationUpdateParamsUnsetField = "offline"
+	TerminalConfigurationUpdateParamsUnsetFieldRebootWindow  TerminalConfigurationUpdateParamsUnsetField = "reboot_window"
+	TerminalConfigurationUpdateParamsUnsetFieldStripeS700    TerminalConfigurationUpdateParamsUnsetField = "stripe_s700"
+	TerminalConfigurationUpdateParamsUnsetFieldStripeS710    TerminalConfigurationUpdateParamsUnsetField = "stripe_s710"
+	TerminalConfigurationUpdateParamsUnsetFieldTipping       TerminalConfigurationUpdateParamsUnsetField = "tipping"
+	TerminalConfigurationUpdateParamsUnsetFieldVerifoneM425  TerminalConfigurationUpdateParamsUnsetField = "verifone_m425"
+	TerminalConfigurationUpdateParamsUnsetFieldVerifoneP400  TerminalConfigurationUpdateParamsUnsetField = "verifone_p400"
+	TerminalConfigurationUpdateParamsUnsetFieldVerifoneP630  TerminalConfigurationUpdateParamsUnsetField = "verifone_p630"
+	TerminalConfigurationUpdateParamsUnsetFieldVerifoneUx700 TerminalConfigurationUpdateParamsUnsetField = "verifone_ux700"
+	TerminalConfigurationUpdateParamsUnsetFieldVerifoneV660p TerminalConfigurationUpdateParamsUnsetField = "verifone_v660p"
+	TerminalConfigurationUpdateParamsUnsetFieldWifi          TerminalConfigurationUpdateParamsUnsetField = "wifi"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationUpdateParams) AddUnsetField(field TerminalConfigurationUpdateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *TerminalConfigurationUpdateParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+// An object containing device type specific settings for BBPOS WisePad 3 readers.
+type TerminalConfigurationCreateBBPOSWisePad3Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                    `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateBBPOSWisePad3ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateBBPOSWisePad3ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateBBPOSWisePad3Params.
+type TerminalConfigurationCreateBBPOSWisePad3ParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateBBPOSWisePad3ParamsUnsetFieldSplashscreen TerminalConfigurationCreateBBPOSWisePad3ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateBBPOSWisePad3Params) AddUnsetField(field TerminalConfigurationCreateBBPOSWisePad3ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for BBPOS WisePOS E readers.
+type TerminalConfigurationCreateBBPOSWisePOSEParams struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *string                                                    `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateBBPOSWisePOSEParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateBBPOSWisePOSEParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateBBPOSWisePOSEParams.
+type TerminalConfigurationCreateBBPOSWisePOSEParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateBBPOSWisePOSEParamsUnsetFieldSplashscreen TerminalConfigurationCreateBBPOSWisePOSEParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateBBPOSWisePOSEParams) AddUnsetField(field TerminalConfigurationCreateBBPOSWisePOSEParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Configuration for cellular connectivity.
+type TerminalConfigurationCreateCellularParams struct {
+	// Determines whether to allow the reader to connect to a cellular network. Defaults to false.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Configurations for collecting transactions offline.
+type TerminalConfigurationCreateOfflineParams struct {
+	// Determines whether to allow transactions to be collected while reader is offline. Defaults to false.
+	Enabled *bool `form:"enabled" json:"enabled"`
+}
+
+// Reboot time settings for readers. that support customized reboot time configuration.
+type TerminalConfigurationCreateRebootWindowParams struct {
+	// Integer between 0 to 23 that represents the end hour of the reboot time window. The value must be different than the start_hour.
+	EndHour *int64 `form:"end_hour" json:"end_hour"`
+	// Integer between 0 to 23 that represents the start hour of the reboot time window.
+	StartHour *int64 `form:"start_hour" json:"start_hour"`
+}
+
+// An object containing device type specific settings for Stripe S700 readers.
+type TerminalConfigurationCreateStripeS700Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                 `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateStripeS700ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateStripeS700ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateStripeS700Params.
+type TerminalConfigurationCreateStripeS700ParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateStripeS700ParamsUnsetFieldSplashscreen TerminalConfigurationCreateStripeS700ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateStripeS700Params) AddUnsetField(field TerminalConfigurationCreateStripeS700ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Stripe S710 readers.
+type TerminalConfigurationCreateStripeS710Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                 `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateStripeS710ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateStripeS710ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateStripeS710Params.
+type TerminalConfigurationCreateStripeS710ParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateStripeS710ParamsUnsetFieldSplashscreen TerminalConfigurationCreateStripeS710ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateStripeS710Params) AddUnsetField(field TerminalConfigurationCreateStripeS710ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Tipping configuration for AED
+type TerminalConfigurationCreateTippingAedParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for AUD
+type TerminalConfigurationCreateTippingAUDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CAD
+type TerminalConfigurationCreateTippingCADParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CHF
+type TerminalConfigurationCreateTippingCHFParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for CZK
+type TerminalConfigurationCreateTippingCZKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for DKK
+type TerminalConfigurationCreateTippingDKKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for EUR
+type TerminalConfigurationCreateTippingEURParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for GBP
+type TerminalConfigurationCreateTippingGBPParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for GIP
+type TerminalConfigurationCreateTippingGipParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for HKD
+type TerminalConfigurationCreateTippingHKDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for HUF
+type TerminalConfigurationCreateTippingHufParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for JPY
+type TerminalConfigurationCreateTippingJPYParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for MXN
+type TerminalConfigurationCreateTippingMxnParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for MYR
+type TerminalConfigurationCreateTippingMYRParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for NOK
+type TerminalConfigurationCreateTippingNOKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for NZD
+type TerminalConfigurationCreateTippingNZDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for PLN
+type TerminalConfigurationCreateTippingPLNParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for RON
+type TerminalConfigurationCreateTippingRonParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for SEK
+type TerminalConfigurationCreateTippingSEKParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for SGD
+type TerminalConfigurationCreateTippingSGDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configuration for USD
+type TerminalConfigurationCreateTippingUSDParams struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []*int64 `form:"fixed_amounts" json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []*int64 `form:"percentages" json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold *int64 `form:"smart_tip_threshold" json:"smart_tip_threshold,omitempty"`
+}
+
+// Tipping configurations for readers that support on-reader tips.
+type TerminalConfigurationCreateTippingParams struct {
+	// Tipping configuration for AED
+	Aed *TerminalConfigurationCreateTippingAedParams `form:"aed" json:"aed,omitempty"`
+	// Tipping configuration for AUD
+	AUD *TerminalConfigurationCreateTippingAUDParams `form:"aud" json:"aud,omitempty"`
+	// Tipping configuration for CAD
+	CAD *TerminalConfigurationCreateTippingCADParams `form:"cad" json:"cad,omitempty"`
+	// Tipping configuration for CHF
+	CHF *TerminalConfigurationCreateTippingCHFParams `form:"chf" json:"chf,omitempty"`
+	// Tipping configuration for CZK
+	CZK *TerminalConfigurationCreateTippingCZKParams `form:"czk" json:"czk,omitempty"`
+	// Tipping configuration for DKK
+	DKK *TerminalConfigurationCreateTippingDKKParams `form:"dkk" json:"dkk,omitempty"`
+	// Tipping configuration for EUR
+	EUR *TerminalConfigurationCreateTippingEURParams `form:"eur" json:"eur,omitempty"`
+	// Tipping configuration for GBP
+	GBP *TerminalConfigurationCreateTippingGBPParams `form:"gbp" json:"gbp,omitempty"`
+	// Tipping configuration for GIP
+	Gip *TerminalConfigurationCreateTippingGipParams `form:"gip" json:"gip,omitempty"`
+	// Tipping configuration for HKD
+	HKD *TerminalConfigurationCreateTippingHKDParams `form:"hkd" json:"hkd,omitempty"`
+	// Tipping configuration for HUF
+	Huf *TerminalConfigurationCreateTippingHufParams `form:"huf" json:"huf,omitempty"`
+	// Tipping configuration for JPY
+	JPY *TerminalConfigurationCreateTippingJPYParams `form:"jpy" json:"jpy,omitempty"`
+	// Tipping configuration for MXN
+	Mxn *TerminalConfigurationCreateTippingMxnParams `form:"mxn" json:"mxn,omitempty"`
+	// Tipping configuration for MYR
+	MYR *TerminalConfigurationCreateTippingMYRParams `form:"myr" json:"myr,omitempty"`
+	// Tipping configuration for NOK
+	NOK *TerminalConfigurationCreateTippingNOKParams `form:"nok" json:"nok,omitempty"`
+	// Tipping configuration for NZD
+	NZD *TerminalConfigurationCreateTippingNZDParams `form:"nzd" json:"nzd,omitempty"`
+	// Tipping configuration for PLN
+	PLN *TerminalConfigurationCreateTippingPLNParams `form:"pln" json:"pln,omitempty"`
+	// Tipping configuration for RON
+	Ron *TerminalConfigurationCreateTippingRonParams `form:"ron" json:"ron,omitempty"`
+	// Tipping configuration for SEK
+	SEK *TerminalConfigurationCreateTippingSEKParams `form:"sek" json:"sek,omitempty"`
+	// Tipping configuration for SGD
+	SGD *TerminalConfigurationCreateTippingSGDParams `form:"sgd" json:"sgd,omitempty"`
+	// Tipping configuration for USD
+	USD *TerminalConfigurationCreateTippingUSDParams `form:"usd" json:"usd,omitempty"`
+}
+
+// An object containing device type specific settings for Verifone M425 readers.
+type TerminalConfigurationCreateVerifoneM425Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                   `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateVerifoneM425ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateVerifoneM425ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateVerifoneM425Params.
+type TerminalConfigurationCreateVerifoneM425ParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateVerifoneM425ParamsUnsetFieldSplashscreen TerminalConfigurationCreateVerifoneM425ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateVerifoneM425Params) AddUnsetField(field TerminalConfigurationCreateVerifoneM425ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone P400 readers.
+type TerminalConfigurationCreateVerifoneP400Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                   `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateVerifoneP400ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateVerifoneP400ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateVerifoneP400Params.
+type TerminalConfigurationCreateVerifoneP400ParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateVerifoneP400ParamsUnsetFieldSplashscreen TerminalConfigurationCreateVerifoneP400ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateVerifoneP400Params) AddUnsetField(field TerminalConfigurationCreateVerifoneP400ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone P630 readers.
+type TerminalConfigurationCreateVerifoneP630Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                   `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateVerifoneP630ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateVerifoneP630ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateVerifoneP630Params.
+type TerminalConfigurationCreateVerifoneP630ParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateVerifoneP630ParamsUnsetFieldSplashscreen TerminalConfigurationCreateVerifoneP630ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateVerifoneP630Params) AddUnsetField(field TerminalConfigurationCreateVerifoneP630ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone UX700 readers.
+type TerminalConfigurationCreateVerifoneUx700Params struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                    `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateVerifoneUx700ParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateVerifoneUx700ParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateVerifoneUx700Params.
+type TerminalConfigurationCreateVerifoneUx700ParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateVerifoneUx700ParamsUnsetFieldSplashscreen TerminalConfigurationCreateVerifoneUx700ParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateVerifoneUx700Params) AddUnsetField(field TerminalConfigurationCreateVerifoneUx700ParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// An object containing device type specific settings for Verifone V660p readers.
+type TerminalConfigurationCreateVerifoneV660pParams struct {
+	// A File ID representing an image you want to display on the reader.
+	Splashscreen *string                                                    `form:"splashscreen" json:"splashscreen,omitempty"`
+	UnsetFields  []TerminalConfigurationCreateVerifoneV660pParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateVerifoneV660pParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateVerifoneV660pParams.
+type TerminalConfigurationCreateVerifoneV660pParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateVerifoneV660pParamsUnsetFieldSplashscreen TerminalConfigurationCreateVerifoneV660pParamsUnsetField = "splashscreen"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateVerifoneV660pParams) AddUnsetField(field TerminalConfigurationCreateVerifoneV660pParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Credentials for a WPA-Enterprise WiFi network using the EAP-PEAP authentication method.
+type TerminalConfigurationCreateWifiEnterpriseEapPeapParams struct {
+	// A File ID representing a PEM file containing the server certificate
+	CaCertificateFile *string `form:"ca_certificate_file" json:"ca_certificate_file,omitempty"`
+	// Password for connecting to the WiFi network
+	Password *string `form:"password" json:"password"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+	// Username for connecting to the WiFi network
+	Username *string `form:"username" json:"username"`
+}
+
+// Credentials for a WPA-Enterprise WiFi network using the EAP-TLS authentication method.
+type TerminalConfigurationCreateWifiEnterpriseEapTLSParams struct {
+	// A File ID representing a PEM file containing the server certificate
+	CaCertificateFile *string `form:"ca_certificate_file" json:"ca_certificate_file,omitempty"`
+	// A File ID representing a PEM file containing the client certificate
+	ClientCertificateFile *string `form:"client_certificate_file" json:"client_certificate_file"`
+	// A File ID representing a PEM file containing the client RSA private key
+	PrivateKeyFile *string `form:"private_key_file" json:"private_key_file"`
+	// Password for the private key file
+	PrivateKeyFilePassword *string `form:"private_key_file_password" json:"private_key_file_password,omitempty"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+}
+
+// Credentials for a WPA-Personal WiFi network.
+type TerminalConfigurationCreateWifiPersonalPskParams struct {
+	// Password for connecting to the WiFi network
+	Password *string `form:"password" json:"password"`
+	// Name of the WiFi network
+	Ssid *string `form:"ssid" json:"ssid"`
+}
+
+// Configurations for connecting to a WiFi network.
+type TerminalConfigurationCreateWifiParams struct {
+	// Credentials for a WPA-Enterprise WiFi network using the EAP-PEAP authentication method.
+	EnterpriseEapPeap *TerminalConfigurationCreateWifiEnterpriseEapPeapParams `form:"enterprise_eap_peap" json:"enterprise_eap_peap,omitempty"`
+	// Credentials for a WPA-Enterprise WiFi network using the EAP-TLS authentication method.
+	EnterpriseEapTLS *TerminalConfigurationCreateWifiEnterpriseEapTLSParams `form:"enterprise_eap_tls" json:"enterprise_eap_tls,omitempty"`
+	// Credentials for a WPA-Personal WiFi network.
+	PersonalPsk *TerminalConfigurationCreateWifiPersonalPskParams `form:"personal_psk" json:"personal_psk,omitempty"`
+	// Security type of the WiFi network. Fill out the hash with the corresponding name to provide the set of credentials for this security type.
+	Type *string `form:"type" json:"type"`
+}
+
+// Creates a new Configuration object.
+type TerminalConfigurationCreateParams struct {
+	Params `form:"*"`
+	// An object containing device type specific settings for BBPOS WisePad 3 readers.
+	BBPOSWisePad3 *TerminalConfigurationCreateBBPOSWisePad3Params `form:"bbpos_wisepad3" json:"bbpos_wisepad3,omitempty"`
+	// An object containing device type specific settings for BBPOS WisePOS E readers.
+	BBPOSWisePOSE *TerminalConfigurationCreateBBPOSWisePOSEParams `form:"bbpos_wisepos_e" json:"bbpos_wisepos_e,omitempty"`
+	// Configuration for cellular connectivity.
+	Cellular *TerminalConfigurationCreateCellularParams `form:"cellular" json:"cellular,omitempty"`
+	// Specifies which fields in the response should be expanded.
+	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Name of the configuration
+	Name *string `form:"name" json:"name,omitempty"`
+	// Configurations for collecting transactions offline.
+	Offline *TerminalConfigurationCreateOfflineParams `form:"offline" json:"offline,omitempty"`
+	// Reboot time settings for readers. that support customized reboot time configuration.
+	RebootWindow *TerminalConfigurationCreateRebootWindowParams `form:"reboot_window" json:"reboot_window,omitempty"`
+	// An object containing device type specific settings for Stripe S700 readers.
+	StripeS700 *TerminalConfigurationCreateStripeS700Params `form:"stripe_s700" json:"stripe_s700,omitempty"`
+	// An object containing device type specific settings for Stripe S710 readers.
+	StripeS710 *TerminalConfigurationCreateStripeS710Params `form:"stripe_s710" json:"stripe_s710,omitempty"`
+	// Tipping configurations for readers that support on-reader tips.
+	Tipping *TerminalConfigurationCreateTippingParams `form:"tipping" json:"tipping,omitempty"`
+	// An object containing device type specific settings for Verifone M425 readers.
+	VerifoneM425 *TerminalConfigurationCreateVerifoneM425Params `form:"verifone_m425" json:"verifone_m425,omitempty"`
+	// An object containing device type specific settings for Verifone P400 readers.
+	VerifoneP400 *TerminalConfigurationCreateVerifoneP400Params `form:"verifone_p400" json:"verifone_p400,omitempty"`
+	// An object containing device type specific settings for Verifone P630 readers.
+	VerifoneP630 *TerminalConfigurationCreateVerifoneP630Params `form:"verifone_p630" json:"verifone_p630,omitempty"`
+	// An object containing device type specific settings for Verifone UX700 readers.
+	VerifoneUx700 *TerminalConfigurationCreateVerifoneUx700Params `form:"verifone_ux700" json:"verifone_ux700,omitempty"`
+	// An object containing device type specific settings for Verifone V660p readers.
+	VerifoneV660p *TerminalConfigurationCreateVerifoneV660pParams `form:"verifone_v660p" json:"verifone_v660p,omitempty"`
+	// Configurations for connecting to a WiFi network.
+	Wifi        *TerminalConfigurationCreateWifiParams        `form:"wifi" json:"wifi,omitempty"`
+	UnsetFields []TerminalConfigurationCreateParamsUnsetField `form:"-" json:"-"`
+}
+
+// TerminalConfigurationCreateParamsUnsetField is the list of fields that can be cleared/unset on TerminalConfigurationCreateParams.
+type TerminalConfigurationCreateParamsUnsetField string
+
+const (
+	TerminalConfigurationCreateParamsUnsetFieldCellular TerminalConfigurationCreateParamsUnsetField = "cellular"
+	TerminalConfigurationCreateParamsUnsetFieldOffline  TerminalConfigurationCreateParamsUnsetField = "offline"
+	TerminalConfigurationCreateParamsUnsetFieldTipping  TerminalConfigurationCreateParamsUnsetField = "tipping"
+	TerminalConfigurationCreateParamsUnsetFieldWifi     TerminalConfigurationCreateParamsUnsetField = "wifi"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *TerminalConfigurationCreateParams) AddUnsetField(field TerminalConfigurationCreateParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// AddExpand appends a new field to expand.
+func (p *TerminalConfigurationCreateParams) AddExpand(f string) {
+	p.Expand = append(p.Expand, &f)
+}
+
+type TerminalConfigurationBBPOSWisePad3 struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationBBPOSWisePOSE struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationCellular struct {
+	// Whether a cellular-capable reader can connect to the internet over cellular.
+	Enabled bool `json:"enabled"`
+}
+type TerminalConfigurationOffline struct {
+	// Determines whether to allow transactions to be collected while reader is offline. Defaults to false.
+	Enabled bool `json:"enabled"`
+}
+type TerminalConfigurationRebootWindow struct {
+	// Integer between 0 to 23 that represents the end hour of the reboot time window. The value must be different than the start_hour.
+	EndHour int64 `json:"end_hour"`
+	// Integer between 0 to 23 that represents the start hour of the reboot time window.
+	StartHour int64 `json:"start_hour"`
+}
+type TerminalConfigurationStripeS700 struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationStripeS710 struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationTippingAed struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingAUD struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingCAD struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingCHF struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingCZK struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingDKK struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingEUR struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingGBP struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingGip struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingHKD struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingHuf struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingJPY struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingMxn struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingMYR struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingNOK struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingNZD struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingPLN struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingRon struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingSEK struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingSGD struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTippingUSD struct {
+	// Fixed amounts displayed when collecting a tip
+	FixedAmounts []int64 `json:"fixed_amounts,omitempty"`
+	// Percentages displayed when collecting a tip
+	Percentages []int64 `json:"percentages,omitempty"`
+	// Below this amount, fixed amounts will be displayed; above it, percentages will be displayed
+	SmartTipThreshold int64 `json:"smart_tip_threshold,omitempty"`
+}
+type TerminalConfigurationTipping struct {
+	Aed *TerminalConfigurationTippingAed `json:"aed,omitempty"`
+	AUD *TerminalConfigurationTippingAUD `json:"aud,omitempty"`
+	CAD *TerminalConfigurationTippingCAD `json:"cad,omitempty"`
+	CHF *TerminalConfigurationTippingCHF `json:"chf,omitempty"`
+	CZK *TerminalConfigurationTippingCZK `json:"czk,omitempty"`
+	DKK *TerminalConfigurationTippingDKK `json:"dkk,omitempty"`
+	EUR *TerminalConfigurationTippingEUR `json:"eur,omitempty"`
+	GBP *TerminalConfigurationTippingGBP `json:"gbp,omitempty"`
+	Gip *TerminalConfigurationTippingGip `json:"gip,omitempty"`
+	HKD *TerminalConfigurationTippingHKD `json:"hkd,omitempty"`
+	Huf *TerminalConfigurationTippingHuf `json:"huf,omitempty"`
+	JPY *TerminalConfigurationTippingJPY `json:"jpy,omitempty"`
+	Mxn *TerminalConfigurationTippingMxn `json:"mxn,omitempty"`
+	MYR *TerminalConfigurationTippingMYR `json:"myr,omitempty"`
+	NOK *TerminalConfigurationTippingNOK `json:"nok,omitempty"`
+	NZD *TerminalConfigurationTippingNZD `json:"nzd,omitempty"`
+	PLN *TerminalConfigurationTippingPLN `json:"pln,omitempty"`
+	Ron *TerminalConfigurationTippingRon `json:"ron,omitempty"`
+	SEK *TerminalConfigurationTippingSEK `json:"sek,omitempty"`
+	SGD *TerminalConfigurationTippingSGD `json:"sgd,omitempty"`
+	USD *TerminalConfigurationTippingUSD `json:"usd,omitempty"`
+}
+type TerminalConfigurationVerifoneM425 struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationVerifoneP400 struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationVerifoneP630 struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationVerifoneUx700 struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationVerifoneV660p struct {
+	// A File ID representing an image to display on the reader
+	Splashscreen *File `json:"splashscreen,omitempty"`
+}
+type TerminalConfigurationWifiEnterpriseEapPeap struct {
+	// A File ID representing a PEM file containing the server certificate
+	CaCertificateFile string `json:"ca_certificate_file,omitempty"`
+	// Password for connecting to the WiFi network
+	Password string `json:"password"`
+	// Name of the WiFi network
+	Ssid string `json:"ssid"`
+	// Username for connecting to the WiFi network
+	Username string `json:"username"`
+}
+type TerminalConfigurationWifiEnterpriseEapTLS struct {
+	// A File ID representing a PEM file containing the server certificate
+	CaCertificateFile string `json:"ca_certificate_file,omitempty"`
+	// A File ID representing a PEM file containing the client certificate
+	ClientCertificateFile string `json:"client_certificate_file"`
+	// A File ID representing a PEM file containing the client RSA private key
+	PrivateKeyFile string `json:"private_key_file"`
+	// Password for the private key file
+	PrivateKeyFilePassword string `json:"private_key_file_password,omitempty"`
+	// Name of the WiFi network
+	Ssid string `json:"ssid"`
+}
+type TerminalConfigurationWifiPersonalPsk struct {
+	// Password for connecting to the WiFi network
+	Password string `json:"password"`
+	// Name of the WiFi network
+	Ssid string `json:"ssid"`
+}
+type TerminalConfigurationWifi struct {
+	EnterpriseEapPeap *TerminalConfigurationWifiEnterpriseEapPeap `json:"enterprise_eap_peap,omitempty"`
+	EnterpriseEapTLS  *TerminalConfigurationWifiEnterpriseEapTLS  `json:"enterprise_eap_tls,omitempty"`
+	PersonalPsk       *TerminalConfigurationWifiPersonalPsk       `json:"personal_psk,omitempty"`
+	// Security type of the WiFi network. The hash with the corresponding name contains the credentials for this security type.
+	Type TerminalConfigurationWifiType `json:"type"`
+}
+
+// A Configurations object represents how features should be configured for terminal readers.
+// For information about how to use it, see the [Terminal configurations documentation](https://docs.stripe.com/terminal/fleet/configurations-overview).
+type TerminalConfiguration struct {
+	APIResource
+	BBPOSWisePad3 *TerminalConfigurationBBPOSWisePad3 `json:"bbpos_wisepad3,omitempty"`
+	BBPOSWisePOSE *TerminalConfigurationBBPOSWisePOSE `json:"bbpos_wisepos_e,omitempty"`
+	Cellular      *TerminalConfigurationCellular      `json:"cellular,omitempty"`
+	Deleted       bool                                `json:"deleted,omitempty"`
+	// Unique identifier for the object.
+	ID string `json:"id"`
+	// Whether this Configuration is the default for your account
+	IsAccountDefault bool `json:"is_account_default"`
+	// If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.
+	Livemode bool `json:"livemode"`
+	// String indicating the name of the Configuration object, set by the user
+	Name string `json:"name"`
+	// String representing the object's type. Objects of the same type share the same value.
+	Object        string                              `json:"object"`
+	Offline       *TerminalConfigurationOffline       `json:"offline,omitempty"`
+	RebootWindow  *TerminalConfigurationRebootWindow  `json:"reboot_window,omitempty"`
+	StripeS700    *TerminalConfigurationStripeS700    `json:"stripe_s700,omitempty"`
+	StripeS710    *TerminalConfigurationStripeS710    `json:"stripe_s710,omitempty"`
+	Tipping       *TerminalConfigurationTipping       `json:"tipping,omitempty"`
+	VerifoneM425  *TerminalConfigurationVerifoneM425  `json:"verifone_m425,omitempty"`
+	VerifoneP400  *TerminalConfigurationVerifoneP400  `json:"verifone_p400,omitempty"`
+	VerifoneP630  *TerminalConfigurationVerifoneP630  `json:"verifone_p630,omitempty"`
+	VerifoneUx700 *TerminalConfigurationVerifoneUx700 `json:"verifone_ux700,omitempty"`
+	VerifoneV660p *TerminalConfigurationVerifoneV660p `json:"verifone_v660p,omitempty"`
+	Wifi          *TerminalConfigurationWifi          `json:"wifi,omitempty"`
+}
+
+// TerminalConfigurationList is a list of Configurations as retrieved from a list endpoint.
+type TerminalConfigurationList struct {
+	APIResource
+	ListMeta
+	Data []*TerminalConfiguration `json:"data"`
+}
