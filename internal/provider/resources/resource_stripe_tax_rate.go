@@ -263,6 +263,8 @@ var taxrateStateUpgradeRootMeta = map[string]taxrateStateUpgradeAttrMeta{"object
 
 var taxrateStateUpgradeSingletonPaths = map[string]struct{}{}
 
+var taxrateStateUpgradeLegacyObjectPaths = map[string]struct{}{}
+
 func taxrateAttrMapFromModel(model interface{}) map[string]attr.Value {
 	value := reflect.ValueOf(model)
 	if value.Kind() == reflect.Ptr {
@@ -542,6 +544,31 @@ func taxrateUpgradeSingletonListToObject(path []string, meta taxrateStateUpgrade
 	return types.ObjectValueMust(objectType.AttrTypes, upgradedAttrs)
 }
 
+func taxrateUpgradeObjectValueToSingletonList(path []string, meta taxrateStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	objectValue, ok := priorValue.(types.Object)
+	if !ok {
+		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
+			objectValue = types.Object(baseObject)
+		} else {
+			return taxrateNullValueForType(meta.AttrType)
+		}
+	}
+	if objectValue.IsNull() {
+		return types.ListNull(listType.ElemType)
+	}
+	if objectValue.IsUnknown() {
+		return types.ListUnknown(listType.ElemType)
+	}
+
+	elementObjectType, ok := listType.ElemType.(basetypes.ObjectType)
+	if !ok {
+		return taxrateNullValueForType(meta.AttrType)
+	}
+
+	upgradedObject := taxrateUpgradeObjectValue(path, meta, elementObjectType, objectValue)
+	return types.ListValueMust(listType.ElemType, []attr.Value{upgradedObject})
+}
+
 func taxrateUpgradeListValue(path []string, meta taxrateStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
 	listValue, ok := priorValue.(types.List)
 	if !ok {
@@ -602,6 +629,9 @@ func taxrateUpgradeValue(path []string, meta taxrateStateUpgradeAttrMeta, priorV
 		}
 		return taxrateUpgradeObjectValue(path, meta, attrType, objectValue)
 	case basetypes.ListType:
+		if _, ok := taxrateStateUpgradeLegacyObjectPaths[pathKey]; ok {
+			return taxrateUpgradeObjectValueToSingletonList(path, meta, attrType, priorValue)
+		}
 		return taxrateUpgradeListValue(path, meta, attrType, priorValue)
 	default:
 		return priorValue

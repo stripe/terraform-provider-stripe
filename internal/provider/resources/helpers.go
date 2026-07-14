@@ -289,6 +289,12 @@ func keyedListCurrentEntries(items []interface{}, keyField string) (map[string]i
 func plainMapToKeyedListWithCurrent(plain map[string]interface{}, current []interface{}, keyField string) []interface{} {
 	currentEntries, currentOrder, ok := keyedListCurrentEntries(current, keyField)
 	if !ok {
+		if len(current) == 1 {
+			return []interface{}{applyConfiguredKeyedListShapes(plain, current[0])}
+		}
+		if len(current) > 1 {
+			return nil
+		}
 		converted, _ := plainMapToKeyedList(plain, keyField).([]interface{})
 		return converted
 	}
@@ -614,6 +620,59 @@ func extractListObjectData(plain interface{}) interface{} {
 	return data
 }
 
+func wrapPlainSingletonList(plain interface{}) interface{} {
+	switch typed := plain.(type) {
+	case []interface{}:
+		return typed
+	case map[string]interface{}:
+		return []interface{}{typed}
+	default:
+		return plain
+	}
+}
+
+func applyPlainSingletonListShapePath(plain interface{}, path []string) interface{} {
+	if len(path) == 0 {
+		return wrapPlainSingletonList(plain)
+	}
+	switch typed := plain.(type) {
+	case []interface{}:
+		result := make([]interface{}, 0, len(typed))
+		for _, item := range typed {
+			result = append(result, applyPlainSingletonListShapePath(item, path))
+		}
+		return result
+	case map[string]interface{}:
+		next, ok := typed[path[0]]
+		if !ok {
+			return plain
+		}
+		typed[path[0]] = applyPlainSingletonListShapePath(next, path[1:])
+		return typed
+	default:
+		return plain
+	}
+}
+
+func applyPlainSingletonListShapePaths(plain interface{}, paths [][]string) interface{} {
+	result := plain
+	for _, path := range paths {
+		result = applyPlainSingletonListShapePath(result, path)
+	}
+	return result
+}
+
+func unwrapPlainSingletonList(plain interface{}) interface{} {
+	items, ok := plain.([]interface{})
+	if !ok {
+		return plain
+	}
+	if len(items) == 0 {
+		return nil
+	}
+	return items[0]
+}
+
 func plainValueIsEmpty(plain interface{}) bool {
 	switch v := plain.(type) {
 	case nil:
@@ -907,6 +966,9 @@ func transformPlainForTargetType(value interface{}, targetType reflect.Type) int
 	}
 	switch targetType.Kind() {
 	case reflect.Struct:
+		if items, ok := value.([]interface{}); ok && len(items) == 1 {
+			value = items[0]
+		}
 		sourceMap, ok := value.(map[string]interface{})
 		if !ok {
 			return value
@@ -1009,6 +1071,9 @@ func collectHighPrecisionExtraValues(plain interface{}, targetType reflect.Type,
 	}
 	switch targetType.Kind() {
 	case reflect.Struct:
+		if items, ok := plain.([]interface{}); ok && len(items) == 1 {
+			plain = items[0]
+		}
 		sourceMap, ok := plain.(map[string]interface{})
 		if !ok {
 			return

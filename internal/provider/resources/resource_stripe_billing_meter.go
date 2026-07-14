@@ -47,8 +47,8 @@ type BillingMeterResource struct {
 type BillingMeterResourceModel struct {
 	Object             types.String `tfsdk:"object"`
 	Created            types.Int64  `tfsdk:"created"`
-	CustomerMapping    types.Object `tfsdk:"customer_mapping"`
-	DefaultAggregation types.Object `tfsdk:"default_aggregation"`
+	CustomerMapping    types.List   `tfsdk:"customer_mapping"`
+	DefaultAggregation types.List   `tfsdk:"default_aggregation"`
 	DisplayName        types.String `tfsdk:"display_name"`
 	EventName          types.String `tfsdk:"event_name"`
 	EventTimeWindow    types.String `tfsdk:"event_time_window"`
@@ -57,7 +57,7 @@ type BillingMeterResourceModel struct {
 	Status             types.String `tfsdk:"status"`
 	StatusTransitions  types.Object `tfsdk:"status_transitions"`
 	Updated            types.Int64  `tfsdk:"updated"`
-	ValueSettings      types.Object `tfsdk:"value_settings"`
+	ValueSettings      types.List   `tfsdk:"value_settings"`
 }
 
 func (r *BillingMeterResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -82,7 +82,7 @@ var _ resource.ResourceWithUpgradeState = &BillingMeterResource{}
 
 func (r *BillingMeterResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		0: {
+		1: {
 			PriorSchema: billingMeterResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
 				var prior BillingMeterResourceV0Model
@@ -91,7 +91,7 @@ func (r *BillingMeterResource) UpgradeState(ctx context.Context) map[int64]resou
 					return
 				}
 
-				upgraded, diags := upgradeBillingMeterStateV0(ctx, prior)
+				upgraded, diags := upgradeBillingMeterStateV1(ctx, prior)
 				resp.Diagnostics.Append(diags...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -117,6 +117,37 @@ func billingMeterResourceV0Schema() *schema.Schema {
 				Computed:      true,
 				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"customer_mapping": schema.SingleNestedAttribute{
+				Optional: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"event_payload_key": schema.StringAttribute{
+						Required:      true,
+						Description:   "The key in the meter event payload to use for mapping the event to a customer.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+					},
+					"type": schema.StringAttribute{
+						Required:      true,
+						Description:   "The method for mapping a meter event to a customer.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						Validators:    []validator.String{stringvalidator.OneOf("by_id")},
+					},
+				},
+			},
+			"default_aggregation": schema.SingleNestedAttribute{
+				Optional: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"formula": schema.StringAttribute{
+						Required:      true,
+						Description:   "Specifies how events are aggregated.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						Validators:    []validator.String{stringvalidator.OneOf("count", "last", "sum")},
+					},
+				},
 			},
 			"display_name": schema.StringAttribute{
 				Required:    true,
@@ -166,49 +197,16 @@ func billingMeterResourceV0Schema() *schema.Schema {
 				Computed:    true,
 				Description: "Time at which the object was last updated. Measured in seconds since the Unix epoch.",
 			},
-		},
-		Blocks: map[string]schema.Block{
-			"customer_mapping": schema.ListNestedBlock{
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"event_payload_key": schema.StringAttribute{
-							Required:      true,
-							Description:   "The key in the meter event payload to use for mapping the event to a customer.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-						},
-						"type": schema.StringAttribute{
-							Required:      true,
-							Description:   "The method for mapping a meter event to a customer.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-							Validators:    []validator.String{stringvalidator.OneOf("by_id")},
-						},
-					},
-				},
-			},
-			"default_aggregation": schema.ListNestedBlock{
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"formula": schema.StringAttribute{
-							Required:      true,
-							Description:   "Specifies how events are aggregated.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-							Validators:    []validator.String{stringvalidator.OneOf("count", "last", "sum")},
-						},
-					},
-				},
-			},
-			"value_settings": schema.ListNestedBlock{
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"event_payload_key": schema.StringAttribute{
-							Optional:      true,
-							Computed:      true,
-							Description:   "The key in the meter event payload to use as the value for this meter.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
-						},
+			"value_settings": schema.SingleNestedAttribute{
+				Optional: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"event_payload_key": schema.StringAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "The key in the meter event payload to use as the value for this meter.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 					},
 				},
 			},
@@ -219,8 +217,8 @@ func billingMeterResourceV0Schema() *schema.Schema {
 type BillingMeterResourceV0Model struct {
 	Object             types.String `tfsdk:"object"`
 	Created            types.Int64  `tfsdk:"created"`
-	CustomerMapping    types.List   `tfsdk:"customer_mapping"`
-	DefaultAggregation types.List   `tfsdk:"default_aggregation"`
+	CustomerMapping    types.Object `tfsdk:"customer_mapping"`
+	DefaultAggregation types.Object `tfsdk:"default_aggregation"`
 	DisplayName        types.String `tfsdk:"display_name"`
 	EventName          types.String `tfsdk:"event_name"`
 	EventTimeWindow    types.String `tfsdk:"event_time_window"`
@@ -229,7 +227,7 @@ type BillingMeterResourceV0Model struct {
 	Status             types.String `tfsdk:"status"`
 	StatusTransitions  types.Object `tfsdk:"status_transitions"`
 	Updated            types.Int64  `tfsdk:"updated"`
-	ValueSettings      types.List   `tfsdk:"value_settings"`
+	ValueSettings      types.Object `tfsdk:"value_settings"`
 }
 
 type billingmeterStateUpgradeAttrMeta struct {
@@ -240,9 +238,11 @@ type billingmeterStateUpgradeAttrMeta struct {
 	Nested                  map[string]billingmeterStateUpgradeAttrMeta
 }
 
-var billingmeterStateUpgradeRootMeta = map[string]billingmeterStateUpgradeAttrMeta{"object": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "created": billingmeterStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "customer_mapping": billingmeterStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType, "type": types.StringType}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]billingmeterStateUpgradeAttrMeta{"event_payload_key": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "type": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "default_aggregation": billingmeterStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"formula": types.StringType}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]billingmeterStateUpgradeAttrMeta{"formula": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "display_name": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "event_name": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "event_time_window": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": billingmeterStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "status": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "status_transitions": billingmeterStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"deactivated_at": types.Int64Type}}, Behavior: "computed", LegacyBehavior: "computed", Nested: map[string]billingmeterStateUpgradeAttrMeta{"deactivated_at": billingmeterStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}}}, "updated": billingmeterStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "value_settings": billingmeterStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]billingmeterStateUpgradeAttrMeta{"event_payload_key": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}}
+var billingmeterStateUpgradeRootMeta = map[string]billingmeterStateUpgradeAttrMeta{"object": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "created": billingmeterStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "customer_mapping": billingmeterStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType, "type": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]billingmeterStateUpgradeAttrMeta{"event_payload_key": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "type": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "default_aggregation": billingmeterStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"formula": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]billingmeterStateUpgradeAttrMeta{"formula": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "display_name": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "event_name": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "event_time_window": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": billingmeterStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "status": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "status_transitions": billingmeterStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"deactivated_at": types.Int64Type}}, Behavior: "computed", LegacyBehavior: "computed", Nested: map[string]billingmeterStateUpgradeAttrMeta{"deactivated_at": billingmeterStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}}}, "updated": billingmeterStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "value_settings": billingmeterStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]billingmeterStateUpgradeAttrMeta{"event_payload_key": billingmeterStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}}
 
-var billingmeterStateUpgradeSingletonPaths = map[string]struct{}{"customer_mapping": struct{}{}, "default_aggregation": struct{}{}, "value_settings": struct{}{}}
+var billingmeterStateUpgradeSingletonPaths = map[string]struct{}{}
+
+var billingmeterStateUpgradeLegacyObjectPaths = map[string]struct{}{"customer_mapping": struct{}{}, "default_aggregation": struct{}{}, "value_settings": struct{}{}}
 
 func billingmeterAttrMapFromModel(model interface{}) map[string]attr.Value {
 	value := reflect.ValueOf(model)
@@ -523,6 +523,31 @@ func billingmeterUpgradeSingletonListToObject(path []string, meta billingmeterSt
 	return types.ObjectValueMust(objectType.AttrTypes, upgradedAttrs)
 }
 
+func billingmeterUpgradeObjectValueToSingletonList(path []string, meta billingmeterStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	objectValue, ok := priorValue.(types.Object)
+	if !ok {
+		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
+			objectValue = types.Object(baseObject)
+		} else {
+			return billingmeterNullValueForType(meta.AttrType)
+		}
+	}
+	if objectValue.IsNull() {
+		return types.ListNull(listType.ElemType)
+	}
+	if objectValue.IsUnknown() {
+		return types.ListUnknown(listType.ElemType)
+	}
+
+	elementObjectType, ok := listType.ElemType.(basetypes.ObjectType)
+	if !ok {
+		return billingmeterNullValueForType(meta.AttrType)
+	}
+
+	upgradedObject := billingmeterUpgradeObjectValue(path, meta, elementObjectType, objectValue)
+	return types.ListValueMust(listType.ElemType, []attr.Value{upgradedObject})
+}
+
 func billingmeterUpgradeListValue(path []string, meta billingmeterStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
 	listValue, ok := priorValue.(types.List)
 	if !ok {
@@ -583,13 +608,16 @@ func billingmeterUpgradeValue(path []string, meta billingmeterStateUpgradeAttrMe
 		}
 		return billingmeterUpgradeObjectValue(path, meta, attrType, objectValue)
 	case basetypes.ListType:
+		if _, ok := billingmeterStateUpgradeLegacyObjectPaths[pathKey]; ok {
+			return billingmeterUpgradeObjectValueToSingletonList(path, meta, attrType, priorValue)
+		}
 		return billingmeterUpgradeListValue(path, meta, attrType, priorValue)
 	default:
 		return priorValue
 	}
 }
 
-func upgradeBillingMeterStateV0(ctx context.Context, prior BillingMeterResourceV0Model) (BillingMeterResourceModel, diag.Diagnostics) {
+func upgradeBillingMeterStateV1(ctx context.Context, prior BillingMeterResourceV0Model) (BillingMeterResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := billingmeterUpgradeAttrs(nil, billingmeterStateUpgradeRootMeta, billingmeterAttrMapFromModel(prior))
 	var upgraded BillingMeterResourceModel
@@ -599,7 +627,7 @@ func upgradeBillingMeterStateV0(ctx context.Context, prior BillingMeterResourceV
 
 func (r *BillingMeterResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Version:     1,
+		Version:     2,
 		Description: "Meters specify how to aggregate meter events over a billing period. Meter events represent the actions that customers take in your system. Meters attach to prices and form the basis of the bill.\n\nRelated guide: [Usage based billing](https://docs.stripe.com/billing/subscriptions/usage-based)",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
@@ -663,41 +691,47 @@ func (r *BillingMeterResource) Schema(_ context.Context, _ resource.SchemaReques
 			},
 		},
 		Blocks: map[string]schema.Block{
-			"customer_mapping": schema.SingleNestedBlock{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
-				Attributes: map[string]schema.Attribute{
-					"event_payload_key": schema.StringAttribute{
-						Optional:      true,
-						Description:   "The key in the meter event payload to use for mapping the event to a customer.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-					},
-					"type": schema.StringAttribute{
-						Optional:      true,
-						Description:   "The method for mapping a meter event to a customer.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-						Validators:    []validator.String{stringvalidator.OneOf("by_id")},
-					},
-				},
-			},
-			"default_aggregation": schema.SingleNestedBlock{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
-				Attributes: map[string]schema.Attribute{
-					"formula": schema.StringAttribute{
-						Optional:      true,
-						Description:   "Specifies how events are aggregated.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-						Validators:    []validator.String{stringvalidator.OneOf("count", "last", "sum")},
+			"customer_mapping": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"event_payload_key": schema.StringAttribute{
+							Required:      true,
+							Description:   "The key in the meter event payload to use for mapping the event to a customer.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"type": schema.StringAttribute{
+							Required:      true,
+							Description:   "The method for mapping a meter event to a customer.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+							Validators:    []validator.String{stringvalidator.OneOf("by_id")},
+						},
 					},
 				},
 			},
-			"value_settings": schema.SingleNestedBlock{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
-				Attributes: map[string]schema.Attribute{
-					"event_payload_key": schema.StringAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "The key in the meter event payload to use as the value for this meter.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			"default_aggregation": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"formula": schema.StringAttribute{
+							Required:      true,
+							Description:   "Specifies how events are aggregated.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+							Validators:    []validator.String{stringvalidator.OneOf("count", "last", "sum")},
+						},
+					},
+				},
+			},
+			"value_settings": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"event_payload_key": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "The key in the meter event payload to use as the value for this meter.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+						},
 					},
 				},
 			},
@@ -934,11 +968,11 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 		if rawValueCustomerMapping, rawOk := plainValueAtPath(raw, "customer_mapping"); rawOk {
 			hadRawCustomerMapping = true
 			if rawValueCustomerMapping != nil {
-				sourceCustomerMapping := applyConfiguredKeyedListShapes(rawValueCustomerMapping, attrValueToPlain(state.CustomerMapping))
-				if valueCustomerMapping, err := flattenPlainValue(sourceCustomerMapping, types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType, "type": types.StringType}}, "customer_mapping", "raw response"); err != nil {
+				sourceCustomerMapping := applyConfiguredKeyedListShapes(rawValueCustomerMapping, unwrapPlainSingletonList(attrValueToPlain(state.CustomerMapping)))
+				if valueCustomerMapping, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceCustomerMapping, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType, "type": types.StringType}}}, "customer_mapping", "raw response"); err != nil {
 					return err
 				} else {
-					if typedCustomerMapping, ok := valueCustomerMapping.(types.Object); ok {
+					if typedCustomerMapping, ok := valueCustomerMapping.(types.List); ok {
 						state.CustomerMapping = typedCustomerMapping
 						assignedCustomerMapping = true
 					}
@@ -948,16 +982,16 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 		if !assignedCustomerMapping {
 			if !hasRaw {
 				if responseValueCustomerMapping, ok := plainFromResponseField(obj, "CustomerMapping"); ok {
-					sourceCustomerMapping := applyConfiguredKeyedListShapes(responseValueCustomerMapping, attrValueToPlain(state.CustomerMapping))
+					sourceCustomerMapping := applyConfiguredKeyedListShapes(responseValueCustomerMapping, unwrapPlainSingletonList(attrValueToPlain(state.CustomerMapping)))
 					if valueCustomerMapping, err := flattenPlainValue(
-						sourceCustomerMapping,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType, "type": types.StringType}},
+						applyPlainSingletonListShapePaths(sourceCustomerMapping, [][]string{[]string{}}),
+						types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType, "type": types.StringType}}},
 						"customer_mapping",
 						"response struct",
 					); err != nil {
 						return err
 					} else {
-						if typedCustomerMapping, ok := valueCustomerMapping.(types.Object); ok {
+						if typedCustomerMapping, ok := valueCustomerMapping.(types.List); ok {
 							state.CustomerMapping = typedCustomerMapping
 							assignedCustomerMapping = true
 						}
@@ -966,8 +1000,8 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 			}
 		}
 		if !assignedCustomerMapping && hadRawCustomerMapping {
-			if nullCustomerMapping, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType, "type": types.StringType}}); ok {
-				if typedCustomerMapping, ok := nullCustomerMapping.(types.Object); ok {
+			if nullCustomerMapping, ok := nullTerraformValue(types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType, "type": types.StringType}}}); ok {
+				if typedCustomerMapping, ok := nullCustomerMapping.(types.List); ok {
 					state.CustomerMapping = typedCustomerMapping
 				}
 			}
@@ -979,11 +1013,11 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 		if rawValueDefaultAggregation, rawOk := plainValueAtPath(raw, "default_aggregation"); rawOk {
 			hadRawDefaultAggregation = true
 			if rawValueDefaultAggregation != nil {
-				sourceDefaultAggregation := applyConfiguredKeyedListShapes(rawValueDefaultAggregation, attrValueToPlain(state.DefaultAggregation))
-				if valueDefaultAggregation, err := flattenPlainValue(sourceDefaultAggregation, types.ObjectType{AttrTypes: map[string]attr.Type{"formula": types.StringType}}, "default_aggregation", "raw response"); err != nil {
+				sourceDefaultAggregation := applyConfiguredKeyedListShapes(rawValueDefaultAggregation, unwrapPlainSingletonList(attrValueToPlain(state.DefaultAggregation)))
+				if valueDefaultAggregation, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceDefaultAggregation, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"formula": types.StringType}}}, "default_aggregation", "raw response"); err != nil {
 					return err
 				} else {
-					if typedDefaultAggregation, ok := valueDefaultAggregation.(types.Object); ok {
+					if typedDefaultAggregation, ok := valueDefaultAggregation.(types.List); ok {
 						state.DefaultAggregation = typedDefaultAggregation
 						assignedDefaultAggregation = true
 					}
@@ -993,16 +1027,16 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 		if !assignedDefaultAggregation {
 			if !hasRaw {
 				if responseValueDefaultAggregation, ok := plainFromResponseField(obj, "DefaultAggregation"); ok {
-					sourceDefaultAggregation := applyConfiguredKeyedListShapes(responseValueDefaultAggregation, attrValueToPlain(state.DefaultAggregation))
+					sourceDefaultAggregation := applyConfiguredKeyedListShapes(responseValueDefaultAggregation, unwrapPlainSingletonList(attrValueToPlain(state.DefaultAggregation)))
 					if valueDefaultAggregation, err := flattenPlainValue(
-						sourceDefaultAggregation,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"formula": types.StringType}},
+						applyPlainSingletonListShapePaths(sourceDefaultAggregation, [][]string{[]string{}}),
+						types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"formula": types.StringType}}},
 						"default_aggregation",
 						"response struct",
 					); err != nil {
 						return err
 					} else {
-						if typedDefaultAggregation, ok := valueDefaultAggregation.(types.Object); ok {
+						if typedDefaultAggregation, ok := valueDefaultAggregation.(types.List); ok {
 							state.DefaultAggregation = typedDefaultAggregation
 							assignedDefaultAggregation = true
 						}
@@ -1011,8 +1045,8 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 			}
 		}
 		if !assignedDefaultAggregation && hadRawDefaultAggregation {
-			if nullDefaultAggregation, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"formula": types.StringType}}); ok {
-				if typedDefaultAggregation, ok := nullDefaultAggregation.(types.Object); ok {
+			if nullDefaultAggregation, ok := nullTerraformValue(types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"formula": types.StringType}}}); ok {
+				if typedDefaultAggregation, ok := nullDefaultAggregation.(types.List); ok {
 					state.DefaultAggregation = typedDefaultAggregation
 				}
 			}
@@ -1216,11 +1250,11 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 		if rawValueValueSettings, rawOk := plainValueAtPath(raw, "value_settings"); rawOk {
 			hadRawValueSettings = true
 			if rawValueValueSettings != nil {
-				sourceValueSettings := applyConfiguredKeyedListShapes(rawValueValueSettings, attrValueToPlain(state.ValueSettings))
-				if valueValueSettings, err := flattenPlainValue(sourceValueSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType}}, "value_settings", "raw response"); err != nil {
+				sourceValueSettings := applyConfiguredKeyedListShapes(rawValueValueSettings, unwrapPlainSingletonList(attrValueToPlain(state.ValueSettings)))
+				if valueValueSettings, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceValueSettings, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType}}}, "value_settings", "raw response"); err != nil {
 					return err
 				} else {
-					if typedValueSettings, ok := valueValueSettings.(types.Object); ok {
+					if typedValueSettings, ok := valueValueSettings.(types.List); ok {
 						state.ValueSettings = typedValueSettings
 						assignedValueSettings = true
 					}
@@ -1230,16 +1264,16 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 		if !assignedValueSettings {
 			if !hasRaw {
 				if responseValueValueSettings, ok := plainFromResponseField(obj, "ValueSettings"); ok {
-					sourceValueSettings := applyConfiguredKeyedListShapes(responseValueValueSettings, attrValueToPlain(state.ValueSettings))
+					sourceValueSettings := applyConfiguredKeyedListShapes(responseValueValueSettings, unwrapPlainSingletonList(attrValueToPlain(state.ValueSettings)))
 					if valueValueSettings, err := flattenPlainValue(
-						sourceValueSettings,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType}},
+						applyPlainSingletonListShapePaths(sourceValueSettings, [][]string{[]string{}}),
+						types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType}}},
 						"value_settings",
 						"response struct",
 					); err != nil {
 						return err
 					} else {
-						if typedValueSettings, ok := valueValueSettings.(types.Object); ok {
+						if typedValueSettings, ok := valueValueSettings.(types.List); ok {
 							state.ValueSettings = typedValueSettings
 							assignedValueSettings = true
 						}
@@ -1248,8 +1282,8 @@ func flattenBillingMeter(obj *stripe.BillingMeter, state *BillingMeterResourceMo
 			}
 		}
 		if !assignedValueSettings && hadRawValueSettings {
-			if nullValueSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType}}); ok {
-				if typedValueSettings, ok := nullValueSettings.(types.Object); ok {
+			if nullValueSettings, ok := nullTerraformValue(types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"event_payload_key": types.StringType}}}); ok {
+				if typedValueSettings, ok := nullValueSettings.(types.List); ok {
 					state.ValueSettings = typedValueSettings
 				}
 			}

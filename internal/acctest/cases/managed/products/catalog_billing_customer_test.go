@@ -316,6 +316,10 @@ func TestAccManagedProductDefaultPriceData(t *testing.T) {
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "default_price_data.0.currency", Expected: "usd"},
+				{Attribute: "default_price_data.0.recurring.0.interval", Expected: "month"},
+			},
 			CheckDefaultPrice: true,
 			ExpectedDefaultPrice: productDefaultPriceExpectation{
 				Currency:      "usd",
@@ -331,6 +335,10 @@ func TestAccManagedProductDefaultPriceData(t *testing.T) {
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "default_price_data.0.currency", Expected: "usd"},
+				{Attribute: "default_price_data.0.recurring.0.interval", Expected: "month"},
+			},
 			CheckDefaultPrice: true,
 			ExpectedDefaultPrice: productDefaultPriceExpectation{
 				Currency:      "usd",
@@ -357,6 +365,10 @@ func TestAccManagedProductDefaultPriceDataLegacyUpgrade(t *testing.T) {
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "default_price_data.0.currency", Expected: "usd"},
+				{Attribute: "default_price_data.0.recurring.0.interval", Expected: "month"},
+			},
 			CheckDefaultPrice: true,
 			ExpectedDefaultPrice: productDefaultPriceExpectation{
 				Currency:      "usd",
@@ -411,7 +423,7 @@ func TestAccManagedPriceBasic(t *testing.T) {
 		true,
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -429,7 +441,7 @@ func TestAccManagedPriceBasic(t *testing.T) {
 		}),
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -461,7 +473,7 @@ func TestAccManagedPriceDecimalAmounts(t *testing.T) {
 		[]string{"unit_amount_decimal", "currency_options"},
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -480,7 +492,7 @@ func TestAccManagedPriceDecimalAmounts(t *testing.T) {
 		}),
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -514,7 +526,7 @@ func TestAccManagedPriceDecimalAmountsLegacyUpgrade(t *testing.T) {
 		"price_decimal_amounts_create.tf",
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -604,7 +616,7 @@ func TestAccManagedPriceActiveToggle(t *testing.T) {
 		true,
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -622,7 +634,7 @@ func TestAccManagedPriceActiveToggle(t *testing.T) {
 		}),
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        false,
@@ -720,7 +732,7 @@ func TestAccManagedPriceTransformQuantity(t *testing.T) {
 		true,
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -741,7 +753,7 @@ func TestAccManagedPriceTransformQuantity(t *testing.T) {
 		}),
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -775,7 +787,7 @@ func TestAccManagedPriceTiered(t *testing.T) {
 		true,
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -810,7 +822,7 @@ func TestAccManagedPriceTieredLegacyUpgrade(t *testing.T) {
 		"price_tiered_create.tf",
 		verifyPrice(priceExpectations{
 			Address:               "stripe_price.test",
-			CompareStateAttrs:     []string{"currency", "product"},
+			CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
 			CompareMetadata:       true,
 			CheckActive:           true,
 			ExpectedActive:        true,
@@ -1093,6 +1105,7 @@ func TestAccManagedV2CoreEventDestinationBasic(t *testing.T) {
 					"description",
 					"type",
 					"event_payload",
+					"amazon_eventbridge.0.aws_account_id",
 				},
 				CompareMetadata:    true,
 				CheckEnabledEvents: true,
@@ -1111,6 +1124,7 @@ func TestAccManagedV2CoreEventDestinationBasic(t *testing.T) {
 					"description",
 					"type",
 					"event_payload",
+					"webhook_endpoint.0.url",
 				},
 				CompareMetadata:    true,
 				CheckEnabledEvents: true,
@@ -1184,6 +1198,7 @@ func TestAccManagedV2CoreEventDestinationSnapshot(t *testing.T) {
 					"type",
 					"event_payload",
 					"snapshot_api_version",
+					"amazon_eventbridge.0.aws_account_id",
 				},
 				CompareMetadata:    true,
 				CheckEnabledEvents: true,
@@ -1203,6 +1218,7 @@ func TestAccManagedV2CoreEventDestinationSnapshot(t *testing.T) {
 					"type",
 					"event_payload",
 					"snapshot_api_version",
+					"webhook_endpoint.0.url",
 				},
 				CompareMetadata:    true,
 				CheckEnabledEvents: true,
@@ -1279,6 +1295,7 @@ func TestAccManagedV2CoreEventDestinationLegacyUpgrade(t *testing.T) {
 					"description",
 					"type",
 					"event_payload",
+					"amazon_eventbridge.0.aws_account_id",
 				},
 				CompareMetadata:    true,
 				CheckEnabledEvents: true,
@@ -1297,6 +1314,7 @@ func TestAccManagedV2CoreEventDestinationLegacyUpgrade(t *testing.T) {
 					"description",
 					"type",
 					"event_payload",
+					"webhook_endpoint.0.url",
 				},
 				CompareMetadata:    true,
 				CheckEnabledEvents: true,
@@ -1327,10 +1345,10 @@ func TestAccManagedBillingMeterBasic(t *testing.T) {
 			CompareStateAttrs: []string{
 				"display_name",
 				"event_name",
-				"customer_mapping.event_payload_key",
-				"customer_mapping.type",
-				"default_aggregation.formula",
-				"value_settings.event_payload_key",
+				"customer_mapping.0.event_payload_key",
+				"customer_mapping.0.type",
+				"default_aggregation.0.formula",
+				"value_settings.0.event_payload_key",
 			},
 			CheckStatus:    true,
 			ExpectedStatus: "active",
@@ -1340,10 +1358,10 @@ func TestAccManagedBillingMeterBasic(t *testing.T) {
 			CompareStateAttrs: []string{
 				"display_name",
 				"event_name",
-				"customer_mapping.event_payload_key",
-				"customer_mapping.type",
-				"default_aggregation.formula",
-				"value_settings.event_payload_key",
+				"customer_mapping.0.event_payload_key",
+				"customer_mapping.0.type",
+				"default_aggregation.0.formula",
+				"value_settings.0.event_payload_key",
 			},
 			CheckStatus:    true,
 			ExpectedStatus: "active",
@@ -1364,10 +1382,10 @@ func TestAccManagedBillingMeterLegacyUpgrade(t *testing.T) {
 			CompareStateAttrs: []string{
 				"display_name",
 				"event_name",
-				"customer_mapping.event_payload_key",
-				"customer_mapping.type",
-				"default_aggregation.formula",
-				"value_settings.event_payload_key",
+				"customer_mapping.0.event_payload_key",
+				"customer_mapping.0.type",
+				"default_aggregation.0.formula",
+				"value_settings.0.event_payload_key",
 			},
 			CheckStatus:    true,
 			ExpectedStatus: "active",
@@ -1390,10 +1408,10 @@ func TestAccManagedBillingMeterDeactivate(t *testing.T) {
 			CompareStateAttrs: []string{
 				"display_name",
 				"event_name",
-				"customer_mapping.event_payload_key",
-				"customer_mapping.type",
-				"default_aggregation.formula",
-				"value_settings.event_payload_key",
+				"customer_mapping.0.event_payload_key",
+				"customer_mapping.0.type",
+				"default_aggregation.0.formula",
+				"value_settings.0.event_payload_key",
 			},
 			CheckStatus:    true,
 			ExpectedStatus: "active",
@@ -1417,10 +1435,10 @@ func TestAccManagedBillingMeterCountAggregation(t *testing.T) {
 			CompareStateAttrs: []string{
 				"display_name",
 				"event_name",
-				"customer_mapping.event_payload_key",
-				"customer_mapping.type",
-				"default_aggregation.formula",
-				"value_settings.event_payload_key",
+				"customer_mapping.0.event_payload_key",
+				"customer_mapping.0.type",
+				"default_aggregation.0.formula",
+				"value_settings.0.event_payload_key",
 			},
 			CheckStatus:    true,
 			ExpectedStatus: "active",
@@ -1430,10 +1448,10 @@ func TestAccManagedBillingMeterCountAggregation(t *testing.T) {
 			CompareStateAttrs: []string{
 				"display_name",
 				"event_name",
-				"customer_mapping.event_payload_key",
-				"customer_mapping.type",
-				"default_aggregation.formula",
-				"value_settings.event_payload_key",
+				"customer_mapping.0.event_payload_key",
+				"customer_mapping.0.type",
+				"default_aggregation.0.formula",
+				"value_settings.0.event_payload_key",
 			},
 			CheckStatus:    true,
 			ExpectedStatus: "active",
@@ -1638,9 +1656,9 @@ func TestAccManagedCouponAppliesTo(t *testing.T) {
 		[]string{
 			"applies_to",
 			"applies_to.%", // sdkv2 import path retained in failure diff output
-			"applies_to.products",
-			"applies_to.products.#",
-			"applies_to.products.0",
+			"applies_to.0.products",
+			"applies_to.0.products.#",
+			"applies_to.0.products.0",
 		},
 		verifyCoupon(couponExpectations{
 			Address:                 "stripe_coupon.test",
@@ -1672,9 +1690,9 @@ func TestAccManagedCouponAppliesToProductUpdate(t *testing.T) {
 		[]string{
 			"applies_to",
 			"applies_to.%",
-			"applies_to.products",
-			"applies_to.products.#",
-			"applies_to.products.0",
+			"applies_to.0.products",
+			"applies_to.0.products.#",
+			"applies_to.0.products.0",
 		},
 		verifyCoupon(couponExpectations{
 			Address:                 "stripe_coupon.test",
@@ -1727,11 +1745,21 @@ func TestAccManagedCustomerBasic(t *testing.T) {
 			Address:           "stripe_customer.test",
 			CompareStateAttrs: []string{"name", "email", "description"},
 			CompareMetadata:   true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "address.0.city", Expected: "San Francisco"},
+				{Attribute: "invoice_settings.0.footer", Expected: "sdk-codegen customer footer"},
+				{Attribute: "shipping.0.address.0.city", Expected: "San Francisco"},
+			},
 		}),
 		verifyCustomer(customerExpectations{
 			Address:           "stripe_customer.test",
 			CompareStateAttrs: []string{"name", "email", "description"},
 			CompareMetadata:   true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "address.0.city", Expected: "San Francisco"},
+				{Attribute: "invoice_settings.0.footer", Expected: "sdk-codegen customer footer"},
+				{Attribute: "shipping.0.address.0.city", Expected: "San Francisco"},
+			},
 		}),
 		verifyCustomerDestroyDeleted,
 	)
@@ -1778,6 +1806,10 @@ func TestAccManagedCustomerInvoiceTax(t *testing.T) {
 				"tax_exempt",
 			},
 			CompareMetadata: true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "address.0.city", Expected: "San Francisco"},
+				{Attribute: "invoice_settings.0.footer", Expected: "sdk-codegen customer invoice footer"},
+			},
 		}),
 		verifyCustomer(customerExpectations{
 			Address: "stripe_customer.test",
@@ -1788,6 +1820,10 @@ func TestAccManagedCustomerInvoiceTax(t *testing.T) {
 				"tax_exempt",
 			},
 			CompareMetadata: true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "address.0.city", Expected: "San Francisco"},
+				{Attribute: "invoice_settings.0.footer", Expected: "sdk-codegen customer invoice footer"},
+			},
 		}),
 		verifyCustomerDestroyDeleted,
 	)
@@ -1804,6 +1840,11 @@ func TestAccManagedCustomerLegacyUpgrade(t *testing.T) {
 			Address:           "stripe_customer.test",
 			CompareStateAttrs: []string{"name", "email", "description"},
 			CompareMetadata:   true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "address.0.city", Expected: "San Francisco"},
+				{Attribute: "invoice_settings.0.footer", Expected: "sdk-codegen customer footer"},
+				{Attribute: "shipping.0.address.0.city", Expected: "San Francisco"},
+			},
 		}),
 		verifyCustomerDestroyDeleted,
 	)
@@ -1825,6 +1866,10 @@ func TestAccManagedCustomerInvoiceTaxLegacyUpgrade(t *testing.T) {
 				"tax_exempt",
 			},
 			CompareMetadata: true,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "address.0.city", Expected: "San Francisco"},
+				{Attribute: "invoice_settings.0.footer", Expected: "sdk-codegen customer invoice footer"},
+			},
 		}),
 		verifyCustomerDestroyDeleted,
 	)
@@ -1841,14 +1886,14 @@ func TestAccManagedPromotionCodeCustomer(t *testing.T) {
 		true,
 		verifyPromotionCode(promotionCodeExpectations{
 			Address:           "stripe_promotion_code.test",
-			CompareStateAttrs: []string{"code", "customer", "promotion.coupon"},
+			CompareStateAttrs: []string{"code", "customer", "promotion.0.coupon"},
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    true,
 		}),
 		verifyPromotionCode(promotionCodeExpectations{
 			Address:           "stripe_promotion_code.test",
-			CompareStateAttrs: []string{"code", "customer", "promotion.coupon"},
+			CompareStateAttrs: []string{"code", "customer", "promotion.0.coupon"},
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    false,
@@ -1865,8 +1910,12 @@ func TestAccManagedPromotionCodeLegacyUpgrade(t *testing.T) {
 		"stripe_promotion_code.test",
 		"promotion_code_restrictions_create.tf",
 		verifyPromotionCode(promotionCodeExpectations{
-			Address:           "stripe_promotion_code.test",
-			CompareStateAttrs: []string{"code", "promotion.coupon"},
+			Address: "stripe_promotion_code.test",
+			CompareStateAttrs: []string{
+				"code",
+				"promotion.0.coupon",
+				"restrictions.0.minimum_amount_currency",
+			},
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    true,
@@ -1892,14 +1941,14 @@ func TestAccManagedPromotionCodeBasic(t *testing.T) {
 		true,
 		verifyPromotionCode(promotionCodeExpectations{
 			Address:           "stripe_promotion_code.test",
-			CompareStateAttrs: []string{"code", "promotion.coupon"},
+			CompareStateAttrs: []string{"code", "promotion.0.coupon"},
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    true,
 		}),
 		verifyPromotionCode(promotionCodeExpectations{
 			Address:           "stripe_promotion_code.test",
-			CompareStateAttrs: []string{"code", "promotion.coupon"},
+			CompareStateAttrs: []string{"code", "promotion.0.coupon"},
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    false,
@@ -1918,8 +1967,12 @@ func TestAccManagedPromotionCodeRestrictions(t *testing.T) {
 		"",
 		true,
 		verifyPromotionCode(promotionCodeExpectations{
-			Address:           "stripe_promotion_code.test",
-			CompareStateAttrs: []string{"code", "promotion.coupon"},
+			Address: "stripe_promotion_code.test",
+			CompareStateAttrs: []string{
+				"code",
+				"promotion.0.coupon",
+				"restrictions.0.minimum_amount_currency",
+			},
 			CompareMetadata:   true,
 			CheckActive:       true,
 			ExpectedActive:    true,

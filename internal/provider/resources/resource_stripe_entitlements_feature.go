@@ -162,6 +162,8 @@ var entitlementsfeatureStateUpgradeRootMeta = map[string]entitlementsfeatureStat
 
 var entitlementsfeatureStateUpgradeSingletonPaths = map[string]struct{}{}
 
+var entitlementsfeatureStateUpgradeLegacyObjectPaths = map[string]struct{}{}
+
 func entitlementsfeatureAttrMapFromModel(model interface{}) map[string]attr.Value {
 	value := reflect.ValueOf(model)
 	if value.Kind() == reflect.Ptr {
@@ -441,6 +443,31 @@ func entitlementsfeatureUpgradeSingletonListToObject(path []string, meta entitle
 	return types.ObjectValueMust(objectType.AttrTypes, upgradedAttrs)
 }
 
+func entitlementsfeatureUpgradeObjectValueToSingletonList(path []string, meta entitlementsfeatureStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	objectValue, ok := priorValue.(types.Object)
+	if !ok {
+		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
+			objectValue = types.Object(baseObject)
+		} else {
+			return entitlementsfeatureNullValueForType(meta.AttrType)
+		}
+	}
+	if objectValue.IsNull() {
+		return types.ListNull(listType.ElemType)
+	}
+	if objectValue.IsUnknown() {
+		return types.ListUnknown(listType.ElemType)
+	}
+
+	elementObjectType, ok := listType.ElemType.(basetypes.ObjectType)
+	if !ok {
+		return entitlementsfeatureNullValueForType(meta.AttrType)
+	}
+
+	upgradedObject := entitlementsfeatureUpgradeObjectValue(path, meta, elementObjectType, objectValue)
+	return types.ListValueMust(listType.ElemType, []attr.Value{upgradedObject})
+}
+
 func entitlementsfeatureUpgradeListValue(path []string, meta entitlementsfeatureStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
 	listValue, ok := priorValue.(types.List)
 	if !ok {
@@ -501,6 +528,9 @@ func entitlementsfeatureUpgradeValue(path []string, meta entitlementsfeatureStat
 		}
 		return entitlementsfeatureUpgradeObjectValue(path, meta, attrType, objectValue)
 	case basetypes.ListType:
+		if _, ok := entitlementsfeatureStateUpgradeLegacyObjectPaths[pathKey]; ok {
+			return entitlementsfeatureUpgradeObjectValueToSingletonList(path, meta, attrType, priorValue)
+		}
 		return entitlementsfeatureUpgradeListValue(path, meta, attrType, priorValue)
 	default:
 		return priorValue

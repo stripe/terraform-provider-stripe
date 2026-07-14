@@ -742,6 +742,11 @@ func TestAccManagedShippingRateBasic(t *testing.T) {
 			ExpectedMinimumValue:        1,
 			ExpectedMaximumUnit:         "business_day",
 			ExpectedMaximumValue:        3,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "fixed_amount.0.currency", Expected: "usd"},
+				{Attribute: "delivery_estimate.0.minimum.0.unit", Expected: "business_day"},
+				{Attribute: "delivery_estimate.0.maximum.0.unit", Expected: "business_day"},
+			},
 			ExpectedMetadata: map[string]string{
 				"suite": "sdk-codegen",
 				"case":  "shipping_rate_basic",

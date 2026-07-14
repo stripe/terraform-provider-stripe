@@ -208,6 +208,8 @@ var webhookendpointStateUpgradeRootMeta = map[string]webhookendpointStateUpgrade
 
 var webhookendpointStateUpgradeSingletonPaths = map[string]struct{}{}
 
+var webhookendpointStateUpgradeLegacyObjectPaths = map[string]struct{}{}
+
 func webhookendpointAttrMapFromModel(model interface{}) map[string]attr.Value {
 	value := reflect.ValueOf(model)
 	if value.Kind() == reflect.Ptr {
@@ -487,6 +489,31 @@ func webhookendpointUpgradeSingletonListToObject(path []string, meta webhookendp
 	return types.ObjectValueMust(objectType.AttrTypes, upgradedAttrs)
 }
 
+func webhookendpointUpgradeObjectValueToSingletonList(path []string, meta webhookendpointStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	objectValue, ok := priorValue.(types.Object)
+	if !ok {
+		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
+			objectValue = types.Object(baseObject)
+		} else {
+			return webhookendpointNullValueForType(meta.AttrType)
+		}
+	}
+	if objectValue.IsNull() {
+		return types.ListNull(listType.ElemType)
+	}
+	if objectValue.IsUnknown() {
+		return types.ListUnknown(listType.ElemType)
+	}
+
+	elementObjectType, ok := listType.ElemType.(basetypes.ObjectType)
+	if !ok {
+		return webhookendpointNullValueForType(meta.AttrType)
+	}
+
+	upgradedObject := webhookendpointUpgradeObjectValue(path, meta, elementObjectType, objectValue)
+	return types.ListValueMust(listType.ElemType, []attr.Value{upgradedObject})
+}
+
 func webhookendpointUpgradeListValue(path []string, meta webhookendpointStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
 	listValue, ok := priorValue.(types.List)
 	if !ok {
@@ -547,6 +574,9 @@ func webhookendpointUpgradeValue(path []string, meta webhookendpointStateUpgrade
 		}
 		return webhookendpointUpgradeObjectValue(path, meta, attrType, objectValue)
 	case basetypes.ListType:
+		if _, ok := webhookendpointStateUpgradeLegacyObjectPaths[pathKey]; ok {
+			return webhookendpointUpgradeObjectValueToSingletonList(path, meta, attrType, priorValue)
+		}
 		return webhookendpointUpgradeListValue(path, meta, attrType, priorValue)
 	default:
 		return priorValue

@@ -57,8 +57,8 @@ type PromotionCodeResourceModel struct {
 	Livemode        types.Bool   `tfsdk:"livemode"`
 	MaxRedemptions  types.Int64  `tfsdk:"max_redemptions"`
 	Metadata        types.Map    `tfsdk:"metadata"`
-	Promotion       types.Object `tfsdk:"promotion"`
-	Restrictions    types.Object `tfsdk:"restrictions"`
+	Promotion       types.List   `tfsdk:"promotion"`
+	Restrictions    types.List   `tfsdk:"restrictions"`
 	TimesRedeemed   types.Int64  `tfsdk:"times_redeemed"`
 }
 
@@ -84,7 +84,7 @@ var _ resource.ResourceWithUpgradeState = &PromotionCodeResource{}
 
 func (r *PromotionCodeResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		0: {
+		1: {
 			PriorSchema: promotionCodeResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
 				var prior PromotionCodeResourceV0Model
@@ -93,7 +93,7 @@ func (r *PromotionCodeResource) UpgradeState(ctx context.Context) map[int64]reso
 					return
 				}
 
-				upgraded, diags := upgradePromotionCodeStateV0(ctx, prior)
+				upgraded, diags := upgradePromotionCodeStateV1(ctx, prior)
 				resp.Diagnostics.Append(diags...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -173,74 +173,71 @@ func promotionCodeResourceV0Schema() *schema.Schema {
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
 				ElementType:   types.StringType,
 			},
-			"times_redeemed": schema.Int64Attribute{
-				Computed:      true,
-				Description:   "Number of times this promotion code has been used.",
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-			},
-		},
-		Blocks: map[string]schema.Block{
-			"promotion": schema.ListNestedBlock{
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"coupon": schema.StringAttribute{
-							Optional:      true,
-							Computed:      true,
-							Description:   "If promotion `type` is `coupon`, the coupon for this promotion.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
-						},
-						"type": schema.StringAttribute{
-							Required:      true,
-							Description:   "The type of promotion.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-							Validators:    []validator.String{stringvalidator.OneOf("coupon")},
-						},
+			"promotion": schema.SingleNestedAttribute{
+				Optional: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"coupon": schema.StringAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "If promotion `type` is `coupon`, the coupon for this promotion.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+					},
+					"type": schema.StringAttribute{
+						Required:      true,
+						Description:   "The type of promotion.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						Validators:    []validator.String{stringvalidator.OneOf("coupon")},
 					},
 				},
 			},
-			"restrictions": schema.ListNestedBlock{
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"first_time_transaction": schema.BoolAttribute{
-							Optional:      true,
-							Computed:      true,
-							Description:   "A Boolean indicating if the Promotion Code should only be redeemed for Customers without any successful payments or invoices",
-							PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown(), boolplanmodifier.RequiresReplace()},
-						},
-						"minimum_amount": schema.Int64Attribute{
-							Optional:      true,
-							Computed:      true,
-							Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
-							PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
-						},
-						"minimum_amount_currency": schema.StringAttribute{
-							Optional:      true,
-							Computed:      true,
-							Description:   "Three-letter [ISO code](https://stripe.com/docs/currencies) for minimum_amount",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
-						},
-					},
-					Blocks: map[string]schema.Block{
-						"currency_options": schema.ListNestedBlock{
-							Description: "Promotion code restrictions defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
-							NestedObject: schema.NestedBlockObject{
-								Attributes: map[string]schema.Attribute{
-									"key": schema.StringAttribute{
-										Required:    true,
-										Description: "Key for this entry.",
-									},
-									"minimum_amount": schema.Int64Attribute{
-										Optional:      true,
-										Computed:      true,
-										Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
-										PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-									},
+			"restrictions": schema.SingleNestedAttribute{
+				Optional: true,
+
+				Attributes: map[string]schema.Attribute{
+					"currency_options": schema.ListNestedAttribute{
+						Optional:    true,
+						Description: "Promotion code restrictions defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"key": schema.StringAttribute{
+									Required:    true,
+									Description: "Key for this entry.",
+								},
+								"minimum_amount": schema.Int64Attribute{
+									Optional:      true,
+									Computed:      true,
+									Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
+									PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 								},
 							},
 						},
 					},
+					"first_time_transaction": schema.BoolAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "A Boolean indicating if the Promotion Code should only be redeemed for Customers without any successful payments or invoices",
+						PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown(), boolplanmodifier.RequiresReplace()},
+					},
+					"minimum_amount": schema.Int64Attribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+					},
+					"minimum_amount_currency": schema.StringAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "Three-letter [ISO code](https://stripe.com/docs/currencies) for minimum_amount",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+					},
 				},
+			},
+			"times_redeemed": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Number of times this promotion code has been used.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 		},
 	}
@@ -258,8 +255,8 @@ type PromotionCodeResourceV0Model struct {
 	Livemode        types.Bool   `tfsdk:"livemode"`
 	MaxRedemptions  types.Int64  `tfsdk:"max_redemptions"`
 	Metadata        types.Map    `tfsdk:"metadata"`
-	Promotion       types.List   `tfsdk:"promotion"`
-	Restrictions    types.List   `tfsdk:"restrictions"`
+	Promotion       types.Object `tfsdk:"promotion"`
+	Restrictions    types.Object `tfsdk:"restrictions"`
 	TimesRedeemed   types.Int64  `tfsdk:"times_redeemed"`
 }
 
@@ -271,9 +268,11 @@ type promotioncodeStateUpgradeAttrMeta struct {
 	Nested                  map[string]promotioncodeStateUpgradeAttrMeta
 }
 
-var promotioncodeStateUpgradeRootMeta = map[string]promotioncodeStateUpgradeAttrMeta{"object": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "active": promotioncodeStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "code": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "created": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "customer": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "customer_account": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "expires_at": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": promotioncodeStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "max_redemptions": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "metadata": promotioncodeStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "promotion": promotioncodeStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "type": types.StringType}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]promotioncodeStateUpgradeAttrMeta{"coupon": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "type": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "restrictions": promotioncodeStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, "first_time_transaction": types.BoolType, "minimum_amount": types.Int64Type, "minimum_amount_currency": types.StringType}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]promotioncodeStateUpgradeAttrMeta{"currency_options": promotioncodeStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]promotioncodeStateUpgradeAttrMeta{"key": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "minimum_amount": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "first_time_transaction": promotioncodeStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "minimum_amount": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "minimum_amount_currency": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "times_redeemed": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}}
+var promotioncodeStateUpgradeRootMeta = map[string]promotioncodeStateUpgradeAttrMeta{"object": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "active": promotioncodeStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "code": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "created": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "customer": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "customer_account": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "expires_at": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": promotioncodeStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "max_redemptions": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "metadata": promotioncodeStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "promotion": promotioncodeStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "type": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]promotioncodeStateUpgradeAttrMeta{"coupon": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "type": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "restrictions": promotioncodeStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, "first_time_transaction": types.BoolType, "minimum_amount": types.Int64Type, "minimum_amount_currency": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]promotioncodeStateUpgradeAttrMeta{"currency_options": promotioncodeStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]promotioncodeStateUpgradeAttrMeta{"key": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "minimum_amount": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "first_time_transaction": promotioncodeStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "minimum_amount": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "minimum_amount_currency": promotioncodeStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "times_redeemed": promotioncodeStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}}
 
-var promotioncodeStateUpgradeSingletonPaths = map[string]struct{}{"promotion": struct{}{}, "restrictions": struct{}{}}
+var promotioncodeStateUpgradeSingletonPaths = map[string]struct{}{}
+
+var promotioncodeStateUpgradeLegacyObjectPaths = map[string]struct{}{"promotion": struct{}{}, "restrictions": struct{}{}}
 
 func promotioncodeAttrMapFromModel(model interface{}) map[string]attr.Value {
 	value := reflect.ValueOf(model)
@@ -554,6 +553,31 @@ func promotioncodeUpgradeSingletonListToObject(path []string, meta promotioncode
 	return types.ObjectValueMust(objectType.AttrTypes, upgradedAttrs)
 }
 
+func promotioncodeUpgradeObjectValueToSingletonList(path []string, meta promotioncodeStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	objectValue, ok := priorValue.(types.Object)
+	if !ok {
+		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
+			objectValue = types.Object(baseObject)
+		} else {
+			return promotioncodeNullValueForType(meta.AttrType)
+		}
+	}
+	if objectValue.IsNull() {
+		return types.ListNull(listType.ElemType)
+	}
+	if objectValue.IsUnknown() {
+		return types.ListUnknown(listType.ElemType)
+	}
+
+	elementObjectType, ok := listType.ElemType.(basetypes.ObjectType)
+	if !ok {
+		return promotioncodeNullValueForType(meta.AttrType)
+	}
+
+	upgradedObject := promotioncodeUpgradeObjectValue(path, meta, elementObjectType, objectValue)
+	return types.ListValueMust(listType.ElemType, []attr.Value{upgradedObject})
+}
+
 func promotioncodeUpgradeListValue(path []string, meta promotioncodeStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
 	listValue, ok := priorValue.(types.List)
 	if !ok {
@@ -614,13 +638,16 @@ func promotioncodeUpgradeValue(path []string, meta promotioncodeStateUpgradeAttr
 		}
 		return promotioncodeUpgradeObjectValue(path, meta, attrType, objectValue)
 	case basetypes.ListType:
+		if _, ok := promotioncodeStateUpgradeLegacyObjectPaths[pathKey]; ok {
+			return promotioncodeUpgradeObjectValueToSingletonList(path, meta, attrType, priorValue)
+		}
 		return promotioncodeUpgradeListValue(path, meta, attrType, priorValue)
 	default:
 		return priorValue
 	}
 }
 
-func upgradePromotionCodeStateV0(ctx context.Context, prior PromotionCodeResourceV0Model) (PromotionCodeResourceModel, diag.Diagnostics) {
+func upgradePromotionCodeStateV1(ctx context.Context, prior PromotionCodeResourceV0Model) (PromotionCodeResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := promotioncodeUpgradeAttrs(nil, promotioncodeStateUpgradeRootMeta, promotioncodeAttrMapFromModel(prior))
 	var upgraded PromotionCodeResourceModel
@@ -630,7 +657,7 @@ func upgradePromotionCodeStateV0(ctx context.Context, prior PromotionCodeResourc
 
 func (r *PromotionCodeResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Version:     1,
+		Version:     2,
 		Description: "A Promotion Code represents a customer-redeemable code for an underlying promotion.\nYou can create multiple codes for a single promotion.\n\nIf you enable promotion codes in your [customer portal configuration](https://docs.stripe.com/customer-management/configure-portal), then customers can redeem a code themselves when updating a subscription in the portal.\nCustomers can also view the currently active promotion codes and coupons on each of their subscriptions in the portal.",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
@@ -704,58 +731,62 @@ func (r *PromotionCodeResource) Schema(_ context.Context, _ resource.SchemaReque
 			},
 		},
 		Blocks: map[string]schema.Block{
-			"promotion": schema.SingleNestedBlock{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
-				Attributes: map[string]schema.Attribute{
-					"coupon": schema.StringAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "If promotion `type` is `coupon`, the coupon for this promotion.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
-					},
-					"type": schema.StringAttribute{
-						Optional:      true,
-						Description:   "The type of promotion.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-						Validators:    []validator.String{stringvalidator.OneOf("coupon")},
+			"promotion": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"coupon": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "If promotion `type` is `coupon`, the coupon for this promotion.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+						},
+						"type": schema.StringAttribute{
+							Required:      true,
+							Description:   "The type of promotion.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+							Validators:    []validator.String{stringvalidator.OneOf("coupon")},
+						},
 					},
 				},
 			},
-			"restrictions": schema.SingleNestedBlock{
-				Attributes: map[string]schema.Attribute{
-					"first_time_transaction": schema.BoolAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "A Boolean indicating if the Promotion Code should only be redeemed for Customers without any successful payments or invoices",
-						PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown(), boolplanmodifier.RequiresReplace()},
+			"restrictions": schema.ListNestedBlock{
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"first_time_transaction": schema.BoolAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "A Boolean indicating if the Promotion Code should only be redeemed for Customers without any successful payments or invoices",
+							PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown(), boolplanmodifier.RequiresReplace()},
+						},
+						"minimum_amount": schema.Int64Attribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+						},
+						"minimum_amount_currency": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Three-letter [ISO code](https://stripe.com/docs/currencies) for minimum_amount",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+						},
 					},
-					"minimum_amount": schema.Int64Attribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
-						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
-					},
-					"minimum_amount_currency": schema.StringAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "Three-letter [ISO code](https://stripe.com/docs/currencies) for minimum_amount",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
-					},
-				},
-				Blocks: map[string]schema.Block{
-					"currency_options": schema.ListNestedBlock{
-						Description: "Promotion code restrictions defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
-						NestedObject: schema.NestedBlockObject{
-							Attributes: map[string]schema.Attribute{
-								"key": schema.StringAttribute{
-									Required:    true,
-									Description: "Key for this entry.",
-								},
-								"minimum_amount": schema.Int64Attribute{
-									Optional:      true,
-									Computed:      true,
-									Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
-									PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+					Blocks: map[string]schema.Block{
+						"currency_options": schema.ListNestedBlock{
+							Description: "Promotion code restrictions defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"key": schema.StringAttribute{
+										Required:    true,
+										Description: "Key for this entry.",
+									},
+									"minimum_amount": schema.Int64Attribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+									},
 								},
 							},
 						},
@@ -1223,11 +1254,11 @@ func flattenPromotionCode(obj *stripe.PromotionCode, state *PromotionCodeResourc
 		if rawValuePromotion, rawOk := plainValueAtPath(raw, "promotion"); rawOk {
 			hadRawPromotion = true
 			if rawValuePromotion != nil {
-				sourcePromotion := applyConfiguredKeyedListShapes(rawValuePromotion, attrValueToPlain(state.Promotion))
-				if valuePromotion, err := flattenPlainValue(sourcePromotion, types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "type": types.StringType}}, "promotion", "raw response"); err != nil {
+				sourcePromotion := applyConfiguredKeyedListShapes(rawValuePromotion, unwrapPlainSingletonList(attrValueToPlain(state.Promotion)))
+				if valuePromotion, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourcePromotion, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "type": types.StringType}}}, "promotion", "raw response"); err != nil {
 					return err
 				} else {
-					if typedPromotion, ok := valuePromotion.(types.Object); ok {
+					if typedPromotion, ok := valuePromotion.(types.List); ok {
 						state.Promotion = typedPromotion
 						assignedPromotion = true
 					}
@@ -1237,16 +1268,16 @@ func flattenPromotionCode(obj *stripe.PromotionCode, state *PromotionCodeResourc
 		if !assignedPromotion {
 			if !hasRaw {
 				if responseValuePromotion, ok := plainFromResponseField(obj, "Promotion"); ok {
-					sourcePromotion := applyConfiguredKeyedListShapes(responseValuePromotion, attrValueToPlain(state.Promotion))
+					sourcePromotion := applyConfiguredKeyedListShapes(responseValuePromotion, unwrapPlainSingletonList(attrValueToPlain(state.Promotion)))
 					if valuePromotion, err := flattenPlainValue(
-						sourcePromotion,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "type": types.StringType}},
+						applyPlainSingletonListShapePaths(sourcePromotion, [][]string{[]string{}}),
+						types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "type": types.StringType}}},
 						"promotion",
 						"response struct",
 					); err != nil {
 						return err
 					} else {
-						if typedPromotion, ok := valuePromotion.(types.Object); ok {
+						if typedPromotion, ok := valuePromotion.(types.List); ok {
 							state.Promotion = typedPromotion
 							assignedPromotion = true
 						}
@@ -1255,8 +1286,8 @@ func flattenPromotionCode(obj *stripe.PromotionCode, state *PromotionCodeResourc
 			}
 		}
 		if !assignedPromotion && hadRawPromotion {
-			if nullPromotion, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "type": types.StringType}}); ok {
-				if typedPromotion, ok := nullPromotion.(types.Object); ok {
+			if nullPromotion, ok := nullTerraformValue(types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "type": types.StringType}}}); ok {
+				if typedPromotion, ok := nullPromotion.(types.List); ok {
 					state.Promotion = typedPromotion
 				}
 			}
@@ -1268,12 +1299,12 @@ func flattenPromotionCode(obj *stripe.PromotionCode, state *PromotionCodeResourc
 		if rawValueRestrictions, rawOk := plainValueAtPath(raw, "restrictions"); rawOk {
 			hadRawRestrictions = true
 			if rawValueRestrictions != nil {
-				sourceRestrictions := applyConfiguredKeyedListShapes(rawValueRestrictions, attrValueToPlain(state.Restrictions))
+				sourceRestrictions := applyConfiguredKeyedListShapes(rawValueRestrictions, unwrapPlainSingletonList(attrValueToPlain(state.Restrictions)))
 				if !plainValueIsEmpty(sourceRestrictions) || state.Restrictions.IsUnknown() || !state.Restrictions.IsNull() {
-					if valueRestrictions, err := flattenPlainValue(sourceRestrictions, types.ObjectType{AttrTypes: map[string]attr.Type{"currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, "first_time_transaction": types.BoolType, "minimum_amount": types.Int64Type, "minimum_amount_currency": types.StringType}}, "restrictions", "raw response"); err != nil {
+					if valueRestrictions, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceRestrictions, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, "first_time_transaction": types.BoolType, "minimum_amount": types.Int64Type, "minimum_amount_currency": types.StringType}}}, "restrictions", "raw response"); err != nil {
 						return err
 					} else {
-						if typedRestrictions, ok := valueRestrictions.(types.Object); ok {
+						if typedRestrictions, ok := valueRestrictions.(types.List); ok {
 							state.Restrictions = typedRestrictions
 							assignedRestrictions = true
 						}
@@ -1284,17 +1315,17 @@ func flattenPromotionCode(obj *stripe.PromotionCode, state *PromotionCodeResourc
 		if !assignedRestrictions {
 			if !hasRaw {
 				if responseValueRestrictions, ok := plainFromResponseField(obj, "Restrictions"); ok {
-					sourceRestrictions := applyConfiguredKeyedListShapes(responseValueRestrictions, attrValueToPlain(state.Restrictions))
+					sourceRestrictions := applyConfiguredKeyedListShapes(responseValueRestrictions, unwrapPlainSingletonList(attrValueToPlain(state.Restrictions)))
 					if !plainValueIsEmpty(sourceRestrictions) || state.Restrictions.IsUnknown() || !state.Restrictions.IsNull() {
 						if valueRestrictions, err := flattenPlainValue(
-							sourceRestrictions,
-							types.ObjectType{AttrTypes: map[string]attr.Type{"currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, "first_time_transaction": types.BoolType, "minimum_amount": types.Int64Type, "minimum_amount_currency": types.StringType}},
+							applyPlainSingletonListShapePaths(sourceRestrictions, [][]string{[]string{}}),
+							types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, "first_time_transaction": types.BoolType, "minimum_amount": types.Int64Type, "minimum_amount_currency": types.StringType}}},
 							"restrictions",
 							"response struct",
 						); err != nil {
 							return err
 						} else {
-							if typedRestrictions, ok := valueRestrictions.(types.Object); ok {
+							if typedRestrictions, ok := valueRestrictions.(types.List); ok {
 								state.Restrictions = typedRestrictions
 								assignedRestrictions = true
 							}
@@ -1304,8 +1335,8 @@ func flattenPromotionCode(obj *stripe.PromotionCode, state *PromotionCodeResourc
 			}
 		}
 		if !assignedRestrictions && hadRawRestrictions {
-			if nullRestrictions, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, "first_time_transaction": types.BoolType, "minimum_amount": types.Int64Type, "minimum_amount_currency": types.StringType}}); ok {
-				if typedRestrictions, ok := nullRestrictions.(types.Object); ok {
+			if nullRestrictions, ok := nullTerraformValue(types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "minimum_amount": types.Int64Type}}}, "first_time_transaction": types.BoolType, "minimum_amount": types.Int64Type, "minimum_amount_currency": types.StringType}}}); ok {
+				if typedRestrictions, ok := nullRestrictions.(types.List); ok {
 					state.Restrictions = typedRestrictions
 				}
 			}

@@ -46,7 +46,7 @@ type V2CoreEventDestinationResource struct {
 
 type V2CoreEventDestinationResourceModel struct {
 	Object             types.String `tfsdk:"object"`
-	AmazonEventbridge  types.Object `tfsdk:"amazon_eventbridge"`
+	AmazonEventbridge  types.List   `tfsdk:"amazon_eventbridge"`
 	AzureEventGrid     types.Object `tfsdk:"azure_event_grid"`
 	Created            types.String `tfsdk:"created"`
 	Description        types.String `tfsdk:"description"`
@@ -62,7 +62,7 @@ type V2CoreEventDestinationResourceModel struct {
 	StatusDetails      types.Object `tfsdk:"status_details"`
 	Type               types.String `tfsdk:"type"`
 	Updated            types.String `tfsdk:"updated"`
-	WebhookEndpoint    types.Object `tfsdk:"webhook_endpoint"`
+	WebhookEndpoint    types.List   `tfsdk:"webhook_endpoint"`
 	Include            types.List   `tfsdk:"include"`
 }
 
@@ -88,7 +88,7 @@ var _ resource.ResourceWithUpgradeState = &V2CoreEventDestinationResource{}
 
 func (r *V2CoreEventDestinationResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		0: {
+		1: {
 			PriorSchema: v2CoreEventDestinationResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
 				var prior V2CoreEventDestinationResourceV0Model
@@ -97,7 +97,7 @@ func (r *V2CoreEventDestinationResource) UpgradeState(ctx context.Context) map[i
 					return
 				}
 
-				upgraded, diags := upgradeV2CoreEventDestinationStateV0(ctx, prior)
+				upgraded, diags := upgradeV2CoreEventDestinationStateV1(ctx, prior)
 				resp.Diagnostics.Append(diags...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -118,6 +118,35 @@ func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 				Description:   "String representing the object's type. Objects of the same type share the same value of the object field.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators:    []validator.String{stringvalidator.OneOf("v2.core.event_destination")},
+			},
+			"amazon_eventbridge": schema.SingleNestedAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Amazon EventBridge configuration.",
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"aws_account_id": schema.StringAttribute{
+						Required:      true,
+						Description:   "The AWS account ID.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+					},
+					"aws_event_source_arn": schema.StringAttribute{
+						Computed:      true,
+						Description:   "The ARN of the AWS event source.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
+					"aws_event_source_status": schema.StringAttribute{
+						Computed:      true,
+						Description:   "The state of the AWS event source.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Validators:    []validator.String{stringvalidator.OneOf("active", "deleted", "pending", "unknown")},
+					},
+					"aws_region": schema.StringAttribute{
+						Required:      true,
+						Description:   "The region of the AWS event source.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+					},
+				},
 			},
 			"azure_event_grid": schema.SingleNestedAttribute{
 				Optional:      true,
@@ -245,6 +274,23 @@ func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 				Computed:    true,
 				Description: "Time at which the object was last updated.",
 			},
+			"webhook_endpoint": schema.SingleNestedAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Webhook endpoint configuration.",
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Attributes: map[string]schema.Attribute{
+					"signing_secret": schema.StringAttribute{
+						Computed:      true,
+						Description:   "The signing secret of the webhook endpoint, only includable on creation.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
+					"url": schema.StringAttribute{
+						Required:    true,
+						Description: "The URL of the webhook endpoint, includable.",
+					},
+				},
+			},
 			"include": schema.ListAttribute{
 				Optional:    true,
 				Description: "Additional fields to include in the response.",
@@ -252,60 +298,12 @@ func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 				ElementType: types.StringType,
 			},
 		},
-		Blocks: map[string]schema.Block{
-			"amazon_eventbridge": schema.ListNestedBlock{
-				Description:   "Amazon EventBridge configuration.",
-				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"aws_account_id": schema.StringAttribute{
-							Required:      true,
-							Description:   "The AWS account ID.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-						},
-						"aws_event_source_arn": schema.StringAttribute{
-							Computed:      true,
-							Description:   "The ARN of the AWS event source.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
-						"aws_event_source_status": schema.StringAttribute{
-							Computed:      true,
-							Description:   "The state of the AWS event source.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-							Validators:    []validator.String{stringvalidator.OneOf("active", "deleted", "pending", "unknown")},
-						},
-						"aws_region": schema.StringAttribute{
-							Required:      true,
-							Description:   "The region of the AWS event source.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-						},
-					},
-				},
-			},
-			"webhook_endpoint": schema.ListNestedBlock{
-				Description:   "Webhook endpoint configuration.",
-				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"signing_secret": schema.StringAttribute{
-							Computed:      true,
-							Description:   "The signing secret of the webhook endpoint, only includable on creation.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
-						"url": schema.StringAttribute{
-							Required:    true,
-							Description: "The URL of the webhook endpoint, includable.",
-						},
-					},
-				},
-			},
-		},
 	}
 }
 
 type V2CoreEventDestinationResourceV0Model struct {
 	Object             types.String `tfsdk:"object"`
-	AmazonEventbridge  types.List   `tfsdk:"amazon_eventbridge"`
+	AmazonEventbridge  types.Object `tfsdk:"amazon_eventbridge"`
 	AzureEventGrid     types.Object `tfsdk:"azure_event_grid"`
 	Created            types.String `tfsdk:"created"`
 	Description        types.String `tfsdk:"description"`
@@ -321,7 +319,7 @@ type V2CoreEventDestinationResourceV0Model struct {
 	StatusDetails      types.Object `tfsdk:"status_details"`
 	Type               types.String `tfsdk:"type"`
 	Updated            types.String `tfsdk:"updated"`
-	WebhookEndpoint    types.List   `tfsdk:"webhook_endpoint"`
+	WebhookEndpoint    types.Object `tfsdk:"webhook_endpoint"`
 	Include            types.List   `tfsdk:"include"`
 }
 
@@ -333,9 +331,11 @@ type v2coreeventdestinationStateUpgradeAttrMeta struct {
 	Nested                  map[string]v2coreeventdestinationStateUpgradeAttrMeta
 }
 
-var v2coreeventdestinationStateUpgradeRootMeta = map[string]v2coreeventdestinationStateUpgradeAttrMeta{"object": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "amazon_eventbridge": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"aws_account_id": types.StringType, "aws_event_source_arn": types.StringType, "aws_event_source_status": types.StringType, "aws_region": types.StringType}}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed", Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"aws_account_id": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "aws_event_source_arn": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "aws_event_source_status": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "aws_region": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "azure_event_grid": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"azure_partner_topic_name": types.StringType, "azure_partner_topic_status": types.StringType, "azure_region": types.StringType, "azure_resource_group_name": types.StringType, "azure_subscription_id": types.StringType}}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed", Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"azure_partner_topic_name": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "azure_partner_topic_status": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "azure_region": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "azure_resource_group_name": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "azure_subscription_id": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "created": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "description": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "enabled_events": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "required", LegacyBehavior: "required"}, "event_payload": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "events_from": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "metadata": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "name": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "snapshot_api_version": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "status": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "status_details": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"disabled": types.ObjectType{AttrTypes: map[string]attr.Type{"reason": types.StringType}}}}, Behavior: "computed", LegacyBehavior: "computed", Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"disabled": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"reason": types.StringType}}, Behavior: "computed", LegacyBehavior: "computed", Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"reason": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}}}}}, "type": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "updated": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "webhook_endpoint": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"signing_secret": types.StringType, "url": types.StringType}}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed", PreserveConfiguredValue: true, Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"signing_secret": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "url": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "include": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional", LegacyBehavior: "optional"}}
+var v2coreeventdestinationStateUpgradeRootMeta = map[string]v2coreeventdestinationStateUpgradeAttrMeta{"object": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "amazon_eventbridge": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"aws_account_id": types.StringType, "aws_event_source_arn": types.StringType, "aws_event_source_status": types.StringType, "aws_region": types.StringType}}}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed", PreserveConfiguredValue: true, Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"aws_account_id": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "aws_event_source_arn": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "aws_event_source_status": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "aws_region": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "azure_event_grid": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"azure_partner_topic_name": types.StringType, "azure_partner_topic_status": types.StringType, "azure_region": types.StringType, "azure_resource_group_name": types.StringType, "azure_subscription_id": types.StringType}}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed", Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"azure_partner_topic_name": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "azure_partner_topic_status": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "azure_region": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "azure_resource_group_name": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "azure_subscription_id": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "created": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "description": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "enabled_events": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "required", LegacyBehavior: "required"}, "event_payload": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "events_from": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "metadata": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "name": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "snapshot_api_version": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "status": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "status_details": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"disabled": types.ObjectType{AttrTypes: map[string]attr.Type{"reason": types.StringType}}}}, Behavior: "computed", LegacyBehavior: "computed", Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"disabled": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"reason": types.StringType}}, Behavior: "computed", LegacyBehavior: "computed", Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"reason": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}}}}}, "type": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "updated": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "webhook_endpoint": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"signing_secret": types.StringType, "url": types.StringType}}}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed", PreserveConfiguredValue: true, Nested: map[string]v2coreeventdestinationStateUpgradeAttrMeta{"signing_secret": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "url": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "include": v2coreeventdestinationStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional", LegacyBehavior: "optional"}}
 
-var v2coreeventdestinationStateUpgradeSingletonPaths = map[string]struct{}{"amazon_eventbridge": struct{}{}, "webhook_endpoint": struct{}{}}
+var v2coreeventdestinationStateUpgradeSingletonPaths = map[string]struct{}{}
+
+var v2coreeventdestinationStateUpgradeLegacyObjectPaths = map[string]struct{}{"amazon_eventbridge": struct{}{}, "webhook_endpoint": struct{}{}}
 
 func v2coreeventdestinationAttrMapFromModel(model interface{}) map[string]attr.Value {
 	value := reflect.ValueOf(model)
@@ -616,6 +616,31 @@ func v2coreeventdestinationUpgradeSingletonListToObject(path []string, meta v2co
 	return types.ObjectValueMust(objectType.AttrTypes, upgradedAttrs)
 }
 
+func v2coreeventdestinationUpgradeObjectValueToSingletonList(path []string, meta v2coreeventdestinationStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	objectValue, ok := priorValue.(types.Object)
+	if !ok {
+		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
+			objectValue = types.Object(baseObject)
+		} else {
+			return v2coreeventdestinationNullValueForType(meta.AttrType)
+		}
+	}
+	if objectValue.IsNull() {
+		return types.ListNull(listType.ElemType)
+	}
+	if objectValue.IsUnknown() {
+		return types.ListUnknown(listType.ElemType)
+	}
+
+	elementObjectType, ok := listType.ElemType.(basetypes.ObjectType)
+	if !ok {
+		return v2coreeventdestinationNullValueForType(meta.AttrType)
+	}
+
+	upgradedObject := v2coreeventdestinationUpgradeObjectValue(path, meta, elementObjectType, objectValue)
+	return types.ListValueMust(listType.ElemType, []attr.Value{upgradedObject})
+}
+
 func v2coreeventdestinationUpgradeListValue(path []string, meta v2coreeventdestinationStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
 	listValue, ok := priorValue.(types.List)
 	if !ok {
@@ -676,13 +701,16 @@ func v2coreeventdestinationUpgradeValue(path []string, meta v2coreeventdestinati
 		}
 		return v2coreeventdestinationUpgradeObjectValue(path, meta, attrType, objectValue)
 	case basetypes.ListType:
+		if _, ok := v2coreeventdestinationStateUpgradeLegacyObjectPaths[pathKey]; ok {
+			return v2coreeventdestinationUpgradeObjectValueToSingletonList(path, meta, attrType, priorValue)
+		}
 		return v2coreeventdestinationUpgradeListValue(path, meta, attrType, priorValue)
 	default:
 		return priorValue
 	}
 }
 
-func upgradeV2CoreEventDestinationStateV0(ctx context.Context, prior V2CoreEventDestinationResourceV0Model) (V2CoreEventDestinationResourceModel, diag.Diagnostics) {
+func upgradeV2CoreEventDestinationStateV1(ctx context.Context, prior V2CoreEventDestinationResourceV0Model) (V2CoreEventDestinationResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := v2coreeventdestinationUpgradeAttrs(nil, v2coreeventdestinationStateUpgradeRootMeta, v2coreeventdestinationAttrMapFromModel(prior))
 	var upgraded V2CoreEventDestinationResourceModel
@@ -692,7 +720,7 @@ func upgradeV2CoreEventDestinationStateV0(ctx context.Context, prior V2CoreEvent
 
 func (r *V2CoreEventDestinationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Version:     1,
+		Version:     2,
 		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks) and [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
@@ -835,45 +863,49 @@ func (r *V2CoreEventDestinationResource) Schema(_ context.Context, _ resource.Sc
 			},
 		},
 		Blocks: map[string]schema.Block{
-			"amazon_eventbridge": schema.SingleNestedBlock{
+			"amazon_eventbridge": schema.ListNestedBlock{
 				Description:   "Amazon EventBridge configuration.",
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
-				Attributes: map[string]schema.Attribute{
-					"aws_account_id": schema.StringAttribute{
-						Optional:      true,
-						Description:   "The AWS account ID.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-					},
-					"aws_event_source_arn": schema.StringAttribute{
-						Computed:      true,
-						Description:   "The ARN of the AWS event source.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-					},
-					"aws_event_source_status": schema.StringAttribute{
-						Computed:      true,
-						Description:   "The state of the AWS event source.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Validators:    []validator.String{stringvalidator.OneOf("active", "deleted", "pending", "unknown")},
-					},
-					"aws_region": schema.StringAttribute{
-						Optional:      true,
-						Description:   "The region of the AWS event source.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"aws_account_id": schema.StringAttribute{
+							Required:      true,
+							Description:   "The AWS account ID.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"aws_event_source_arn": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The ARN of the AWS event source.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"aws_event_source_status": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The state of the AWS event source.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							Validators:    []validator.String{stringvalidator.OneOf("active", "deleted", "pending", "unknown")},
+						},
+						"aws_region": schema.StringAttribute{
+							Required:      true,
+							Description:   "The region of the AWS event source.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
 					},
 				},
 			},
-			"webhook_endpoint": schema.SingleNestedBlock{
+			"webhook_endpoint": schema.ListNestedBlock{
 				Description:   "Webhook endpoint configuration.",
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Attributes: map[string]schema.Attribute{
-					"signing_secret": schema.StringAttribute{
-						Computed:      true,
-						Description:   "The signing secret of the webhook endpoint, only includable on creation.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-					},
-					"url": schema.StringAttribute{
-						Optional:    true,
-						Description: "The URL of the webhook endpoint, includable.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"signing_secret": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The signing secret of the webhook endpoint, only includable on creation.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"url": schema.StringAttribute{
+							Required:    true,
+							Description: "The URL of the webhook endpoint, includable.",
+						},
 					},
 				},
 			},
@@ -1198,15 +1230,13 @@ func flattenV2CoreEventDestination(obj *stripe.V2CoreEventDestination, state *V2
 	}
 	{
 		assignedAmazonEventbridge := false
-		hadRawAmazonEventbridge := false
 		if rawValueAmazonEventbridge, rawOk := plainValueAtPath(raw, "amazon_eventbridge"); rawOk {
-			hadRawAmazonEventbridge = true
 			if rawValueAmazonEventbridge != nil {
-				sourceAmazonEventbridge := applyConfiguredKeyedListShapes(rawValueAmazonEventbridge, attrValueToPlain(state.AmazonEventbridge))
-				if valueAmazonEventbridge, err := flattenPlainValue(sourceAmazonEventbridge, types.ObjectType{AttrTypes: map[string]attr.Type{"aws_account_id": types.StringType, "aws_event_source_arn": types.StringType, "aws_event_source_status": types.StringType, "aws_region": types.StringType}}, "amazon_eventbridge", "raw response"); err != nil {
+				sourceAmazonEventbridge := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(rawValueAmazonEventbridge, unwrapPlainSingletonList(attrValueToPlain(state.AmazonEventbridge))), unwrapPlainSingletonList(attrValueToPlain(state.AmazonEventbridge)))
+				if valueAmazonEventbridge, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceAmazonEventbridge, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"aws_account_id": types.StringType, "aws_event_source_arn": types.StringType, "aws_event_source_status": types.StringType, "aws_region": types.StringType}}}, "amazon_eventbridge", "raw response"); err != nil {
 					return err
 				} else {
-					if typedAmazonEventbridge, ok := valueAmazonEventbridge.(types.Object); ok {
+					if typedAmazonEventbridge, ok := valueAmazonEventbridge.(types.List); ok {
 						state.AmazonEventbridge = typedAmazonEventbridge
 						assignedAmazonEventbridge = true
 					}
@@ -1216,27 +1246,20 @@ func flattenV2CoreEventDestination(obj *stripe.V2CoreEventDestination, state *V2
 		if !assignedAmazonEventbridge {
 			if !hasRaw {
 				if responseValueAmazonEventbridge, ok := plainFromResponseField(obj, "AmazonEventbridge"); ok {
-					sourceAmazonEventbridge := applyConfiguredKeyedListShapes(responseValueAmazonEventbridge, attrValueToPlain(state.AmazonEventbridge))
+					sourceAmazonEventbridge := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(responseValueAmazonEventbridge, unwrapPlainSingletonList(attrValueToPlain(state.AmazonEventbridge))), unwrapPlainSingletonList(attrValueToPlain(state.AmazonEventbridge)))
 					if valueAmazonEventbridge, err := flattenPlainValue(
-						sourceAmazonEventbridge,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"aws_account_id": types.StringType, "aws_event_source_arn": types.StringType, "aws_event_source_status": types.StringType, "aws_region": types.StringType}},
+						applyPlainSingletonListShapePaths(sourceAmazonEventbridge, [][]string{[]string{}}),
+						types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"aws_account_id": types.StringType, "aws_event_source_arn": types.StringType, "aws_event_source_status": types.StringType, "aws_region": types.StringType}}},
 						"amazon_eventbridge",
 						"response struct",
 					); err != nil {
 						return err
 					} else {
-						if typedAmazonEventbridge, ok := valueAmazonEventbridge.(types.Object); ok {
+						if typedAmazonEventbridge, ok := valueAmazonEventbridge.(types.List); ok {
 							state.AmazonEventbridge = typedAmazonEventbridge
 							assignedAmazonEventbridge = true
 						}
 					}
-				}
-			}
-		}
-		if !assignedAmazonEventbridge && hadRawAmazonEventbridge {
-			if nullAmazonEventbridge, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"aws_account_id": types.StringType, "aws_event_source_arn": types.StringType, "aws_event_source_status": types.StringType, "aws_region": types.StringType}}); ok {
-				if typedAmazonEventbridge, ok := nullAmazonEventbridge.(types.Object); ok {
-					state.AmazonEventbridge = typedAmazonEventbridge
 				}
 			}
 		}
@@ -1623,11 +1646,11 @@ func flattenV2CoreEventDestination(obj *stripe.V2CoreEventDestination, state *V2
 		assignedWebhookEndpoint := false
 		if rawValueWebhookEndpoint, rawOk := plainValueAtPath(raw, "webhook_endpoint"); rawOk {
 			if rawValueWebhookEndpoint != nil {
-				sourceWebhookEndpoint := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(rawValueWebhookEndpoint, attrValueToPlain(state.WebhookEndpoint)), attrValueToPlain(state.WebhookEndpoint))
-				if valueWebhookEndpoint, err := flattenPlainValue(sourceWebhookEndpoint, types.ObjectType{AttrTypes: map[string]attr.Type{"signing_secret": types.StringType, "url": types.StringType}}, "webhook_endpoint", "raw response"); err != nil {
+				sourceWebhookEndpoint := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(rawValueWebhookEndpoint, unwrapPlainSingletonList(attrValueToPlain(state.WebhookEndpoint))), unwrapPlainSingletonList(attrValueToPlain(state.WebhookEndpoint)))
+				if valueWebhookEndpoint, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceWebhookEndpoint, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"signing_secret": types.StringType, "url": types.StringType}}}, "webhook_endpoint", "raw response"); err != nil {
 					return err
 				} else {
-					if typedWebhookEndpoint, ok := valueWebhookEndpoint.(types.Object); ok {
+					if typedWebhookEndpoint, ok := valueWebhookEndpoint.(types.List); ok {
 						state.WebhookEndpoint = typedWebhookEndpoint
 						assignedWebhookEndpoint = true
 					}
@@ -1637,16 +1660,16 @@ func flattenV2CoreEventDestination(obj *stripe.V2CoreEventDestination, state *V2
 		if !assignedWebhookEndpoint {
 			if !hasRaw {
 				if responseValueWebhookEndpoint, ok := plainFromResponseField(obj, "WebhookEndpoint"); ok {
-					sourceWebhookEndpoint := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(responseValueWebhookEndpoint, attrValueToPlain(state.WebhookEndpoint)), attrValueToPlain(state.WebhookEndpoint))
+					sourceWebhookEndpoint := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(responseValueWebhookEndpoint, unwrapPlainSingletonList(attrValueToPlain(state.WebhookEndpoint))), unwrapPlainSingletonList(attrValueToPlain(state.WebhookEndpoint)))
 					if valueWebhookEndpoint, err := flattenPlainValue(
-						sourceWebhookEndpoint,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"signing_secret": types.StringType, "url": types.StringType}},
+						applyPlainSingletonListShapePaths(sourceWebhookEndpoint, [][]string{[]string{}}),
+						types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"signing_secret": types.StringType, "url": types.StringType}}},
 						"webhook_endpoint",
 						"response struct",
 					); err != nil {
 						return err
 					} else {
-						if typedWebhookEndpoint, ok := valueWebhookEndpoint.(types.Object); ok {
+						if typedWebhookEndpoint, ok := valueWebhookEndpoint.(types.List); ok {
 							state.WebhookEndpoint = typedWebhookEndpoint
 							assignedWebhookEndpoint = true
 						}

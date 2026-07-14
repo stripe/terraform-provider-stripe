@@ -165,7 +165,13 @@ type shippingRateExpectations struct {
 	ExpectedMaximumValue        int64
 	ExpectedTaxBehavior         string
 	ExpectedTaxCode             string
+	StateStrings                []stateStringExpectation
 	ExpectedMetadata            map[string]string
+}
+
+type stateStringExpectation struct {
+	Attribute string
+	Expected  string
 }
 
 type taxRateExpectations struct {
@@ -1419,6 +1425,16 @@ func verifyShippingRate(expect shippingRateExpectations) runner.StateVerifier {
 				shippingRate.Active,
 			)
 		}
+		for _, stateString := range expect.StateStrings {
+			if err := expectStateString(
+				state,
+				expect.Address,
+				stateString.Attribute,
+				stateString.Expected,
+			); err != nil {
+				return err
+			}
+		}
 		if shippingRate.FixedAmount == nil {
 			return fmt.Errorf("remote %s.fixed_amount missing", expect.Address)
 		}
@@ -1516,6 +1532,29 @@ func verifyShippingRateDestroyInactive(
 	}
 	if shippingRate.Active {
 		return fmt.Errorf("expected stripe_shipping_rate.test to be inactive after destroy")
+	}
+
+	return nil
+}
+
+func expectStateString(
+	state *terraform.State,
+	address string,
+	attribute string,
+	expected string,
+) error {
+	actual, err := runner.ResourceAttribute(state, address, attribute)
+	if err != nil {
+		return err
+	}
+	if actual != expected {
+		return fmt.Errorf(
+			"state %s.%s mismatch: expected %q, got %q",
+			address,
+			attribute,
+			expected,
+			actual,
+		)
 	}
 
 	return nil

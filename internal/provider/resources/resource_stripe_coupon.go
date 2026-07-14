@@ -49,7 +49,7 @@ type CouponResource struct {
 type CouponResourceModel struct {
 	Object           types.String  `tfsdk:"object"`
 	AmountOff        types.Int64   `tfsdk:"amount_off"`
-	AppliesTo        types.Object  `tfsdk:"applies_to"`
+	AppliesTo        types.List    `tfsdk:"applies_to"`
 	Created          types.Int64   `tfsdk:"created"`
 	Currency         types.String  `tfsdk:"currency"`
 	CurrencyOptions  types.List    `tfsdk:"currency_options"`
@@ -88,7 +88,7 @@ var _ resource.ResourceWithUpgradeState = &CouponResource{}
 
 func (r *CouponResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		0: {
+		1: {
 			PriorSchema: couponResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
 				var prior CouponResourceV0Model
@@ -97,7 +97,7 @@ func (r *CouponResource) UpgradeState(ctx context.Context) map[int64]resource.St
 					return
 				}
 
-				upgraded, diags := upgradeCouponStateV0(ctx, prior)
+				upgraded, diags := upgradeCouponStateV1(ctx, prior)
 				resp.Diagnostics.Append(diags...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -125,6 +125,20 @@ func couponResourceV0Schema() *schema.Schema {
 				Description:   "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer.",
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
 			},
+			"applies_to": schema.SingleNestedAttribute{
+				Optional: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"products": schema.ListAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "A list of product IDs this coupon applies to",
+						PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
+						ElementType:   types.StringType,
+					},
+				},
+			},
 			"created": schema.Int64Attribute{
 				Computed:      true,
 				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
@@ -135,6 +149,22 @@ func couponResourceV0Schema() *schema.Schema {
 				Computed:      true,
 				Description:   "If `amount_off` has been set, the three-letter [ISO code for the currency](https://stripe.com/docs/currencies) of the amount to take off.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"currency_options": schema.ListNestedAttribute{
+				Optional:    true,
+				Description: "Coupons defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"key": schema.StringAttribute{
+							Required:    true,
+							Description: "Key for this entry.",
+						},
+						"amount_off": schema.Int64Attribute{
+							Required:    true,
+							Description: "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer.",
+						},
+					},
+				},
 			},
 			"duration": schema.StringAttribute{
 				Optional:      true,
@@ -201,44 +231,13 @@ func couponResourceV0Schema() *schema.Schema {
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 		},
-		Blocks: map[string]schema.Block{
-			"applies_to": schema.ListNestedBlock{
-				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"products": schema.ListAttribute{
-							Optional:      true,
-							Computed:      true,
-							Description:   "A list of product IDs this coupon applies to",
-							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
-							ElementType:   types.StringType,
-						},
-					},
-				},
-			},
-			"currency_options": schema.ListNestedBlock{
-				Description: "Coupons defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
-				NestedObject: schema.NestedBlockObject{
-					Attributes: map[string]schema.Attribute{
-						"key": schema.StringAttribute{
-							Required:    true,
-							Description: "Key for this entry.",
-						},
-						"amount_off": schema.Int64Attribute{
-							Required:    true,
-							Description: "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer.",
-						},
-					},
-				},
-			},
-		},
 	}
 }
 
 type CouponResourceV0Model struct {
 	Object           types.String  `tfsdk:"object"`
 	AmountOff        types.Int64   `tfsdk:"amount_off"`
-	AppliesTo        types.List    `tfsdk:"applies_to"`
+	AppliesTo        types.Object  `tfsdk:"applies_to"`
 	Created          types.Int64   `tfsdk:"created"`
 	Currency         types.String  `tfsdk:"currency"`
 	CurrencyOptions  types.List    `tfsdk:"currency_options"`
@@ -263,9 +262,11 @@ type couponStateUpgradeAttrMeta struct {
 	Nested                  map[string]couponStateUpgradeAttrMeta
 }
 
-var couponStateUpgradeRootMeta = map[string]couponStateUpgradeAttrMeta{"object": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "amount_off": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "applies_to": couponStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", PreserveConfiguredValue: true, Nested: map[string]couponStateUpgradeAttrMeta{"products": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "created": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "currency": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "currency_options": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "amount_off": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]couponStateUpgradeAttrMeta{"key": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "amount_off": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "required", LegacyBehavior: "required"}}}, "duration": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "duration_in_months": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": couponStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "max_redemptions": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "metadata": couponStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "name": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "percent_off": couponStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "redeem_by": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "times_redeemed": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "valid": couponStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}}
+var couponStateUpgradeRootMeta = map[string]couponStateUpgradeAttrMeta{"object": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "amount_off": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "applies_to": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}}, Behavior: "optional", LegacyBehavior: "optional", PreserveConfiguredValue: true, Nested: map[string]couponStateUpgradeAttrMeta{"products": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "created": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "currency": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "currency_options": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "amount_off": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]couponStateUpgradeAttrMeta{"key": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "amount_off": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "required", LegacyBehavior: "required"}}}, "duration": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "duration_in_months": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": couponStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "max_redemptions": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "metadata": couponStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "name": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "percent_off": couponStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "redeem_by": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "times_redeemed": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "valid": couponStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}}
 
-var couponStateUpgradeSingletonPaths = map[string]struct{}{"applies_to": struct{}{}}
+var couponStateUpgradeSingletonPaths = map[string]struct{}{}
+
+var couponStateUpgradeLegacyObjectPaths = map[string]struct{}{"applies_to": struct{}{}}
 
 func couponAttrMapFromModel(model interface{}) map[string]attr.Value {
 	value := reflect.ValueOf(model)
@@ -546,6 +547,31 @@ func couponUpgradeSingletonListToObject(path []string, meta couponStateUpgradeAt
 	return types.ObjectValueMust(objectType.AttrTypes, upgradedAttrs)
 }
 
+func couponUpgradeObjectValueToSingletonList(path []string, meta couponStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	objectValue, ok := priorValue.(types.Object)
+	if !ok {
+		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
+			objectValue = types.Object(baseObject)
+		} else {
+			return couponNullValueForType(meta.AttrType)
+		}
+	}
+	if objectValue.IsNull() {
+		return types.ListNull(listType.ElemType)
+	}
+	if objectValue.IsUnknown() {
+		return types.ListUnknown(listType.ElemType)
+	}
+
+	elementObjectType, ok := listType.ElemType.(basetypes.ObjectType)
+	if !ok {
+		return couponNullValueForType(meta.AttrType)
+	}
+
+	upgradedObject := couponUpgradeObjectValue(path, meta, elementObjectType, objectValue)
+	return types.ListValueMust(listType.ElemType, []attr.Value{upgradedObject})
+}
+
 func couponUpgradeListValue(path []string, meta couponStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
 	listValue, ok := priorValue.(types.List)
 	if !ok {
@@ -606,13 +632,16 @@ func couponUpgradeValue(path []string, meta couponStateUpgradeAttrMeta, priorVal
 		}
 		return couponUpgradeObjectValue(path, meta, attrType, objectValue)
 	case basetypes.ListType:
+		if _, ok := couponStateUpgradeLegacyObjectPaths[pathKey]; ok {
+			return couponUpgradeObjectValueToSingletonList(path, meta, attrType, priorValue)
+		}
 		return couponUpgradeListValue(path, meta, attrType, priorValue)
 	default:
 		return priorValue
 	}
 }
 
-func upgradeCouponStateV0(ctx context.Context, prior CouponResourceV0Model) (CouponResourceModel, diag.Diagnostics) {
+func upgradeCouponStateV1(ctx context.Context, prior CouponResourceV0Model) (CouponResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := couponUpgradeAttrs(nil, couponStateUpgradeRootMeta, couponAttrMapFromModel(prior))
 	var upgraded CouponResourceModel
@@ -622,7 +651,7 @@ func upgradeCouponStateV0(ctx context.Context, prior CouponResourceV0Model) (Cou
 
 func (r *CouponResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Version:     1,
+		Version:     2,
 		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://api.stripe.com#subscriptions), [invoices](https://api.stripe.com#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://api.stripe.com#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
@@ -714,15 +743,17 @@ func (r *CouponResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 			},
 		},
 		Blocks: map[string]schema.Block{
-			"applies_to": schema.SingleNestedBlock{
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
-				Attributes: map[string]schema.Attribute{
-					"products": schema.ListAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "A list of product IDs this coupon applies to",
-						PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
-						ElementType:   types.StringType,
+			"applies_to": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"products": schema.ListAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "A list of product IDs this coupon applies to",
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
+							ElementType:   types.StringType,
+						},
 					},
 				},
 			},
@@ -1008,12 +1039,12 @@ func flattenCoupon(obj *stripe.Coupon, state *CouponResourceModel) error {
 		assignedAppliesTo := false
 		if rawValueAppliesTo, rawOk := plainValueAtPath(raw, "applies_to"); rawOk {
 			if rawValueAppliesTo != nil {
-				sourceAppliesTo := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(rawValueAppliesTo, attrValueToPlain(state.AppliesTo)), attrValueToPlain(state.AppliesTo))
+				sourceAppliesTo := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(rawValueAppliesTo, unwrapPlainSingletonList(attrValueToPlain(state.AppliesTo))), unwrapPlainSingletonList(attrValueToPlain(state.AppliesTo)))
 				if !state.AppliesTo.IsNull() && !state.AppliesTo.IsUnknown() {
-					if valueAppliesTo, err := flattenPlainValue(sourceAppliesTo, types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}, "applies_to", "raw response"); err != nil {
+					if valueAppliesTo, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceAppliesTo, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}}, "applies_to", "raw response"); err != nil {
 						return err
 					} else {
-						if typedAppliesTo, ok := valueAppliesTo.(types.Object); ok {
+						if typedAppliesTo, ok := valueAppliesTo.(types.List); ok {
 							state.AppliesTo = typedAppliesTo
 							assignedAppliesTo = true
 						}
@@ -1024,17 +1055,17 @@ func flattenCoupon(obj *stripe.Coupon, state *CouponResourceModel) error {
 		if !assignedAppliesTo {
 			if !hasRaw {
 				if responseValueAppliesTo, ok := plainFromResponseField(obj, "AppliesTo"); ok {
-					sourceAppliesTo := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(responseValueAppliesTo, attrValueToPlain(state.AppliesTo)), attrValueToPlain(state.AppliesTo))
+					sourceAppliesTo := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(responseValueAppliesTo, unwrapPlainSingletonList(attrValueToPlain(state.AppliesTo))), unwrapPlainSingletonList(attrValueToPlain(state.AppliesTo)))
 					if !state.AppliesTo.IsNull() && !state.AppliesTo.IsUnknown() {
 						if valueAppliesTo, err := flattenPlainValue(
-							sourceAppliesTo,
-							types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}},
+							applyPlainSingletonListShapePaths(sourceAppliesTo, [][]string{[]string{}}),
+							types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}},
 							"applies_to",
 							"response struct",
 						); err != nil {
 							return err
 						} else {
-							if typedAppliesTo, ok := valueAppliesTo.(types.Object); ok {
+							if typedAppliesTo, ok := valueAppliesTo.(types.List); ok {
 								state.AppliesTo = typedAppliesTo
 								assignedAppliesTo = true
 							}

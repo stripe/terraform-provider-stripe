@@ -155,6 +155,7 @@ type customerExpectations struct {
 	Address           string
 	CompareStateAttrs []string
 	CompareMetadata   bool
+	StateStrings      []stateStringExpectation
 }
 
 type promotionCodeRestrictionsExpectation struct {
@@ -198,6 +199,16 @@ func verifyCustomer(expect customerExpectations) runner.StateVerifier {
 				state,
 				expect.Address,
 				customer.Metadata,
+			); err != nil {
+				return err
+			}
+		}
+		for _, stateString := range expect.StateStrings {
+			if err := expectStateString(
+				state,
+				expect.Address,
+				stateString.Attribute,
+				stateString.Expected,
 			); err != nil {
 				return err
 			}
@@ -993,7 +1004,7 @@ func verifyCoupon(expect couponExpectations) runner.StateVerifier {
 			expectedProductID, err := runner.ResourceAttribute(
 				state,
 				expect.Address,
-				"applies_to.products.0",
+				"applies_to.0.products.0",
 			)
 			if err != nil {
 				return err
@@ -1001,7 +1012,7 @@ func verifyCoupon(expect couponExpectations) runner.StateVerifier {
 			if err := expectRemoteStateString(
 				state,
 				expect.Address,
-				"applies_to.products.0",
+				"applies_to.0.products.0",
 				expectedProductID,
 			); err != nil {
 				return err
@@ -1629,6 +1640,11 @@ func remotePriceString(price *stripe.Price, attribute string) (string, error) {
 		return price.LookupKey, nil
 	case "nickname":
 		return price.Nickname, nil
+	case "recurring.0.interval":
+		if price.Recurring == nil {
+			return "", nil
+		}
+		return string(price.Recurring.Interval), nil
 	case "tax_behavior":
 		return string(price.TaxBehavior), nil
 	default:
@@ -1742,22 +1758,22 @@ func remoteBillingMeterString(
 		return billingMeter.DisplayName, nil
 	case "event_name":
 		return billingMeter.EventName, nil
-	case "customer_mapping.event_payload_key":
+	case "customer_mapping.0.event_payload_key":
 		if billingMeter.CustomerMapping == nil {
 			return "", nil
 		}
 		return billingMeter.CustomerMapping.EventPayloadKey, nil
-	case "customer_mapping.type":
+	case "customer_mapping.0.type":
 		if billingMeter.CustomerMapping == nil {
 			return "", nil
 		}
 		return string(billingMeter.CustomerMapping.Type), nil
-	case "default_aggregation.formula":
+	case "default_aggregation.0.formula":
 		if billingMeter.DefaultAggregation == nil {
 			return "", nil
 		}
 		return string(billingMeter.DefaultAggregation.Formula), nil
-	case "value_settings.event_payload_key":
+	case "value_settings.0.event_payload_key":
 		if billingMeter.ValueSettings == nil {
 			return "", nil
 		}
@@ -1806,11 +1822,16 @@ func remotePromotionCodeString(
 			return "", nil
 		}
 		return promotionCode.Customer.ID, nil
-	case "promotion.coupon":
+	case "promotion.0.coupon":
 		if promotionCode.Promotion == nil || promotionCode.Promotion.Coupon == nil {
 			return "", nil
 		}
 		return promotionCode.Promotion.Coupon.ID, nil
+	case "restrictions.0.minimum_amount_currency":
+		if promotionCode.Restrictions == nil {
+			return "", nil
+		}
+		return string(promotionCode.Restrictions.MinimumAmountCurrency), nil
 	default:
 		return "", fmt.Errorf("unsupported promotion code attribute %q", attribute)
 	}

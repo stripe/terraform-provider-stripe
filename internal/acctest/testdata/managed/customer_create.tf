@@ -5,6 +5,31 @@ resource "stripe_customer" "test" {
   email = "sdk-codegen+{{RAND}}@example.com"
   description = "sdk-codegen acceptance customer"
 
+  address {
+    line1       = "100 Market St"
+    city        = "San Francisco"
+    state       = "CA"
+    postal_code = "94105"
+    country     = "US"
+  }
+
+  invoice_settings {
+    footer = "sdk-codegen customer footer"
+  }
+
+  shipping {
+    name  = "SDK Codegen Customer"
+    phone = "+15555550101"
+
+    address {
+      line1       = "100 Market St"
+      city        = "San Francisco"
+      state       = "CA"
+      postal_code = "94105"
+      country     = "US"
+    }
+  }
+
   metadata = {
     suite = "sdk-codegen"
     case  = "customer_basic"

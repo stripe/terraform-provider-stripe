@@ -210,12 +210,52 @@ seed_issuing_dispute_transaction() {
       "$@"
   }
 
+  create_seed_card() {
+    local target_financial_account="$1"
+    local now
+    now="$(date +%s)"
+
+    local cardholder_id
+    cardholder_id="$(
+      api POST "/v1/issuing/cardholders" \
+        -d "type=individual" \
+        -d "name=SDK Dispute Seeder" \
+        -d "email=sdk-dispute-seeder@example.com" \
+        -d "phone_number=+15555550199" \
+        -d "status=active" \
+        -d "billing[address][line1]=100 Main St" \
+        -d "billing[address][city]=San Francisco" \
+        -d "billing[address][postal_code]=94105" \
+        -d "billing[address][country]=US" \
+        -d "billing[address][state]=CA" \
+        -d "individual[first_name]=Grace" \
+        -d "individual[last_name]=Hopper" \
+        -d "individual[dob][day]=9" \
+        -d "individual[dob][month]=12" \
+        -d "individual[dob][year]=1985" \
+        -d "individual[card_issuing][user_terms_acceptance][ip]=127.0.0.1" \
+        -d "individual[card_issuing][user_terms_acceptance][date]=${now}" \
+        | jq -r '.id'
+    )"
+    if [[ -z "$cardholder_id" || "$cardholder_id" == "null" ]]; then
+      return 1
+    fi
+
+    api POST "/v1/issuing/cards" \
+      -d "cardholder=${cardholder_id}" \
+      -d "financial_account=${target_financial_account}" \
+      -d "currency=usd" \
+      -d "type=virtual" \
+      -d "status=active" \
+      | jq -r '.id'
+  }
+
   local card_id="${STRIPE_ISSUING_CARD:-}"
   local financial_account="${STRIPE_ISSUING_FINANCIAL_ACCOUNT:-}"
 
   if [[ -z "$card_id" || -z "$financial_account" ]]; then
-    local card_row
-    card_row="$(
+    local active_card_row
+    active_card_row="$(
       api GET "/v1/issuing/cards?limit=100" \
         | jq -r '
             .data[]
@@ -225,14 +265,33 @@ seed_issuing_dispute_transaction() {
           ' \
         | head -n 1
     )"
-    if [[ -z "$card_row" ]]; then
-      return 1
+
+    if [[ -n "$active_card_row" ]]; then
+      if [[ -z "$card_id" ]]; then
+        card_id="$(printf '%s\n' "$active_card_row" | cut -f1)"
+      fi
+      if [[ -z "$financial_account" ]]; then
+        financial_account="$(printf '%s\n' "$active_card_row" | cut -f2)"
+      fi
     fi
-    if [[ -z "$card_id" ]]; then
-      card_id="$(printf '%s\n' "$card_row" | cut -f1)"
-    fi
+
     if [[ -z "$financial_account" ]]; then
-      financial_account="$(printf '%s\n' "$card_row" | cut -f2)"
+      financial_account="$(
+        api GET "/v1/issuing/cards?limit=100" \
+          | jq -r '
+              .data[]
+              | select(.currency == "usd" and (.financial_account // "") != "")
+              | .financial_account
+            ' \
+          | head -n 1
+      )"
+    fi
+
+    if [[ -z "$card_id" ]]; then
+      if [[ -z "$financial_account" || "$financial_account" == "null" ]]; then
+        return 1
+      fi
+      card_id="$(create_seed_card "$financial_account")"
     fi
   fi
 
