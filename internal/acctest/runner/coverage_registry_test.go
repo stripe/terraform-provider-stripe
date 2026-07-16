@@ -19,5 +19,11 @@ func TestCoverageRegistryEntriesAreWellFormed(t *testing.T) {
 		if entry.Status == "skipped" && entry.Reason == "" {
 			t.Fatalf("coverage registry entry %s must declare a reason when skipped", key)
 		}
+		if entry.RequiresLegacyModuleUpgrade && len(entry.LegacyModuleUpgradeCaseNames) == 0 {
+			t.Fatalf(
+				"coverage registry entry %s requires legacy module upgrade coverage but has no module cases",
+				key,
+			)
+		}
 	}
 }

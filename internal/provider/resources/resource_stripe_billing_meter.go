@@ -82,10 +82,28 @@ var _ resource.ResourceWithUpgradeState = &BillingMeterResource{}
 
 func (r *BillingMeterResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		1: {
+		0: {
 			PriorSchema: billingMeterResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
-				var prior BillingMeterResourceV0Model
+				var prior BillingMeterResourceModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				upgraded, diags := upgradeBillingMeterStateV1(ctx, prior)
+				resp.Diagnostics.Append(diags...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				resp.Diagnostics.Append(resp.State.Set(ctx, &upgraded)...)
+			},
+		},
+		1: {
+			PriorSchema: billingMeterResourceV1Schema(),
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var prior BillingMeterResourceV1Model
 				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -103,7 +121,7 @@ func (r *BillingMeterResource) UpgradeState(ctx context.Context) map[int64]resou
 	}
 }
 
-func billingMeterResourceV0Schema() *schema.Schema {
+func billingMeterResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
 		Description: "Meters specify how to aggregate meter events over a billing period. Meter events represent the actions that customers take in your system. Meters attach to prices and form the basis of the bill.\n\nRelated guide: [Usage based billing](https://docs.stripe.com/billing/subscriptions/usage-based)",
 		Attributes: map[string]schema.Attribute{
@@ -214,7 +232,120 @@ func billingMeterResourceV0Schema() *schema.Schema {
 	}
 }
 
-type BillingMeterResourceV0Model struct {
+func billingMeterResourceV0Schema() *schema.Schema {
+	return &schema.Schema{
+		Description: "Meters specify how to aggregate meter events over a billing period. Meter events represent the actions that customers take in your system. Meters attach to prices and form the basis of the bill.\n\nRelated guide: [Usage based billing](https://docs.stripe.com/billing/subscriptions/usage-based)",
+		Attributes: map[string]schema.Attribute{
+			"object": schema.StringAttribute{
+				Computed:      true,
+				Description:   "String representing the object's type. Objects of the same type share the same value.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("billing.meter")},
+			},
+			"created": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"display_name": schema.StringAttribute{
+				Required:    true,
+				Description: "The meter's name.",
+			},
+			"event_name": schema.StringAttribute{
+				Required:      true,
+				Description:   "The name of the meter event to record usage for. Corresponds with the `event_name` field on meter events.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"event_time_window": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The time window which meter events have been pre-aggregated for, if any.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				Validators:    []validator.String{stringvalidator.OneOf("day", "hour")},
+			},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Unique identifier for the object.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"livemode": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"status": schema.StringAttribute{
+				Computed:      true,
+				Description:   "The meter's status.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("active", "inactive")},
+			},
+			"status_transitions": schema.SingleNestedAttribute{
+				Computed: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Attributes: map[string]schema.Attribute{
+					"deactivated_at": schema.Int64Attribute{
+						Computed:      true,
+						Description:   "The time the meter was deactivated, if any. Measured in seconds since Unix epoch.",
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+					},
+				},
+			},
+			"updated": schema.Int64Attribute{
+				Computed:    true,
+				Description: "Time at which the object was last updated. Measured in seconds since the Unix epoch.",
+			},
+		},
+		Blocks: map[string]schema.Block{
+			"customer_mapping": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"event_payload_key": schema.StringAttribute{
+							Required:      true,
+							Description:   "The key in the meter event payload to use for mapping the event to a customer.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"type": schema.StringAttribute{
+							Required:      true,
+							Description:   "The method for mapping a meter event to a customer.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+							Validators:    []validator.String{stringvalidator.OneOf("by_id")},
+						},
+					},
+				},
+			},
+			"default_aggregation": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"formula": schema.StringAttribute{
+							Required:      true,
+							Description:   "Specifies how events are aggregated.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+							Validators:    []validator.String{stringvalidator.OneOf("count", "last", "sum")},
+						},
+					},
+				},
+			},
+			"value_settings": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"event_payload_key": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "The key in the meter event payload to use as the value for this meter.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+type BillingMeterResourceV1Model struct {
 	Object             types.String `tfsdk:"object"`
 	Created            types.Int64  `tfsdk:"created"`
 	CustomerMapping    types.Object `tfsdk:"customer_mapping"`
@@ -524,6 +655,13 @@ func billingmeterUpgradeSingletonListToObject(path []string, meta billingmeterSt
 }
 
 func billingmeterUpgradeObjectValueToSingletonList(path []string, meta billingmeterStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return billingmeterUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return billingmeterUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -617,7 +755,7 @@ func billingmeterUpgradeValue(path []string, meta billingmeterStateUpgradeAttrMe
 	}
 }
 
-func upgradeBillingMeterStateV1(ctx context.Context, prior BillingMeterResourceV0Model) (BillingMeterResourceModel, diag.Diagnostics) {
+func upgradeBillingMeterStateV1(ctx context.Context, prior interface{}) (BillingMeterResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := billingmeterUpgradeAttrs(nil, billingmeterStateUpgradeRootMeta, billingmeterAttrMapFromModel(prior))
 	var upgraded BillingMeterResourceModel

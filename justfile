@@ -11,6 +11,9 @@ testacc *args:
 testacc-nightly *args:
     bash ./scripts/testacc-nightly.sh {{ args }}
 
+testacc-upgrade *args:
+    bash ./scripts/testacc-upgrade.sh {{ args }}
+
 terraform-acceptance *args:
     bash ./scripts/testacc.sh --require-env {{ args }}
 

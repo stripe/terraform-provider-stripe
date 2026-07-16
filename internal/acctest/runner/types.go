@@ -27,6 +27,7 @@ type CaseDefinition struct {
 type ManagedCase struct {
 	Definition              CaseDefinition
 	ResourceAddress         string
+	StateAddresses          []string
 	CreateTemplate          string
 	UpdateTemplate          string
 	ImportStable            bool

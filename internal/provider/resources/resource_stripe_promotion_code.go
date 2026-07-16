@@ -84,10 +84,28 @@ var _ resource.ResourceWithUpgradeState = &PromotionCodeResource{}
 
 func (r *PromotionCodeResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		1: {
+		0: {
 			PriorSchema: promotionCodeResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
-				var prior PromotionCodeResourceV0Model
+				var prior PromotionCodeResourceModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				upgraded, diags := upgradePromotionCodeStateV1(ctx, prior)
+				resp.Diagnostics.Append(diags...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				resp.Diagnostics.Append(resp.State.Set(ctx, &upgraded)...)
+			},
+		},
+		1: {
+			PriorSchema: promotionCodeResourceV1Schema(),
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var prior PromotionCodeResourceV1Model
 				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -105,7 +123,7 @@ func (r *PromotionCodeResource) UpgradeState(ctx context.Context) map[int64]reso
 	}
 }
 
-func promotionCodeResourceV0Schema() *schema.Schema {
+func promotionCodeResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
 		Description: "A Promotion Code represents a customer-redeemable code for an underlying promotion.\nYou can create multiple codes for a single promotion.\n\nIf you enable promotion codes in your [customer portal configuration](https://docs.stripe.com/customer-management/configure-portal), then customers can redeem a code themselves when updating a subscription in the portal.\nCustomers can also view the currently active promotion codes and coupons on each of their subscriptions in the portal.",
 		Attributes: map[string]schema.Attribute{
@@ -243,7 +261,148 @@ func promotionCodeResourceV0Schema() *schema.Schema {
 	}
 }
 
-type PromotionCodeResourceV0Model struct {
+func promotionCodeResourceV0Schema() *schema.Schema {
+	return &schema.Schema{
+		Description: "A Promotion Code represents a customer-redeemable code for an underlying promotion.\nYou can create multiple codes for a single promotion.\n\nIf you enable promotion codes in your [customer portal configuration](https://docs.stripe.com/customer-management/configure-portal), then customers can redeem a code themselves when updating a subscription in the portal.\nCustomers can also view the currently active promotion codes and coupons on each of their subscriptions in the portal.",
+		Attributes: map[string]schema.Attribute{
+			"object": schema.StringAttribute{
+				Computed:      true,
+				Description:   "String representing the object's type. Objects of the same type share the same value.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("promotion_code")},
+			},
+			"active": schema.BoolAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Whether the promotion code is currently active. A promotion code is only active if the coupon is also valid.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"code": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The customer-facing code. Regardless of case, this code must be unique across all active promotion codes for each customer. Valid characters are lower case letters (a-z), upper case letters (A-Z), digits (0-9), and dashes (-).",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"created": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"customer": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The customer who can use this promotion code.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"customer_account": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The account representing the customer who can use this promotion code.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"expires_at": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Date at which the promotion code can no longer be redeemed.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+			},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Unique identifier for the object.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"livemode": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"max_redemptions": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Maximum number of times this promotion code can be redeemed.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+			},
+			"metadata": schema.MapAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.",
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+				ElementType:   types.StringType,
+			},
+			"times_redeemed": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Number of times this promotion code has been used.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+		},
+		Blocks: map[string]schema.Block{
+			"promotion": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"coupon": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "If promotion `type` is `coupon`, the coupon for this promotion.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+						},
+						"type": schema.StringAttribute{
+							Required:      true,
+							Description:   "The type of promotion.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+							Validators:    []validator.String{stringvalidator.OneOf("coupon")},
+						},
+					},
+				},
+			},
+			"restrictions": schema.ListNestedBlock{
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"first_time_transaction": schema.BoolAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "A Boolean indicating if the Promotion Code should only be redeemed for Customers without any successful payments or invoices",
+							PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown(), boolplanmodifier.RequiresReplace()},
+						},
+						"minimum_amount": schema.Int64Attribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+						},
+						"minimum_amount_currency": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Three-letter [ISO code](https://stripe.com/docs/currencies) for minimum_amount",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"currency_options": schema.ListNestedBlock{
+							Description: "Promotion code restrictions defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"key": schema.StringAttribute{
+										Required:    true,
+										Description: "Key for this entry.",
+									},
+									"minimum_amount": schema.Int64Attribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "Minimum amount required to redeem this Promotion Code into a Coupon (e.g., a purchase must be $100 or more to work).",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+type PromotionCodeResourceV1Model struct {
 	Object          types.String `tfsdk:"object"`
 	Active          types.Bool   `tfsdk:"active"`
 	Code            types.String `tfsdk:"code"`
@@ -554,6 +713,13 @@ func promotioncodeUpgradeSingletonListToObject(path []string, meta promotioncode
 }
 
 func promotioncodeUpgradeObjectValueToSingletonList(path []string, meta promotioncodeStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return promotioncodeUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return promotioncodeUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -647,7 +813,7 @@ func promotioncodeUpgradeValue(path []string, meta promotioncodeStateUpgradeAttr
 	}
 }
 
-func upgradePromotionCodeStateV1(ctx context.Context, prior PromotionCodeResourceV0Model) (PromotionCodeResourceModel, diag.Diagnostics) {
+func upgradePromotionCodeStateV1(ctx context.Context, prior interface{}) (PromotionCodeResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := promotioncodeUpgradeAttrs(nil, promotioncodeStateUpgradeRootMeta, promotioncodeAttrMapFromModel(prior))
 	var upgraded PromotionCodeResourceModel

@@ -18,6 +18,77 @@ import (
 
 const legacyStripeProviderSource = "stripe/stripe"
 
+func stripeRequiredProvidersConfig(versionConstraint string) string {
+	if versionConstraint == "" {
+		return fmt.Sprintf(
+			`terraform {
+  required_providers {
+    stripe = {
+      source = %q
+    }
+  }
+}
+
+`,
+			legacyStripeProviderSource,
+		)
+	}
+
+	return fmt.Sprintf(
+		`terraform {
+  required_providers {
+    stripe = {
+      source = %q
+      version = %q
+    }
+  }
+}
+
+`,
+		legacyStripeProviderSource,
+		versionConstraint,
+	)
+}
+
+func legacyStripeRequiredProvidersConfig(version string) string {
+	return stripeRequiredProvidersConfig(fmt.Sprintf("= %s", version))
+}
+
+func currentStripeRequiredProvidersConfig() string {
+	return stripeRequiredProvidersConfig("")
+}
+
+func managedCaseStateAddresses(tc ManagedCase) []string {
+	if len(tc.StateAddresses) > 0 {
+		return tc.StateAddresses
+	}
+
+	return []string{tc.ResourceAddress}
+}
+
+func managedCaseStateChecks(tc ManagedCase) []statecheck.StateCheck {
+	addresses := managedCaseStateAddresses(tc)
+	checkList := make([]statecheck.StateCheck, 0, len(addresses))
+	for _, address := range addresses {
+		checkList = append(checkList, checks.ResourceIDIsSet(address))
+	}
+
+	return checkList
+}
+
+func managedCaseNoopPlanChecks(tc ManagedCase) []plancheck.PlanCheck {
+	addresses := managedCaseStateAddresses(tc)
+	checkList := make([]plancheck.PlanCheck, 0, len(addresses))
+	for _, address := range addresses {
+		checkList = append(
+			checkList,
+			plancheck.ExpectResourceAction(address, plancheck.ResourceActionNoop),
+		)
+	}
+
+	return checkList
+}
+
 func RunManagedCase(t *testing.T, tc ManagedCase) {
 	t.Helper()
 
@@ -30,6 +101,7 @@ func RunManagedCase(t *testing.T, tc ManagedCase) {
 
 	env := ResolveTestEnv(t, tc.Definition.Group, tc.Definition.RequiredEnv)
 	ApplyResolvedAccountEnv(t, env)
+	t.Setenv(resource.EnvTfAccProviderNamespace, "stripe")
 	client := NewStripeClient(env)
 	caseReplacements := map[string]string{
 		"{{RAND}}": fmt.Sprintf("%d", time.Now().UnixNano()),
@@ -38,30 +110,23 @@ func RunManagedCase(t *testing.T, tc ManagedCase) {
 
 	steps := []resource.TestStep{
 		{
-			Config: createConfig,
-			Check:  stateVerifierCheck(env, client, tc.VerifyCreate),
-			ConfigStateChecks: []statecheck.StateCheck{
-				checks.ResourceIDIsSet(tc.ResourceAddress),
-			},
+			Config:            createConfig,
+			Check:             stateVerifierCheck(env, client, tc.VerifyCreate),
+			ConfigStateChecks: managedCaseStateChecks(tc),
 			ConfigPlanChecks: resource.ConfigPlanChecks{
-				PostApplyPostRefresh: []plancheck.PlanCheck{
-					plancheck.ExpectResourceAction(tc.ResourceAddress, plancheck.ResourceActionNoop),
-				},
+				PostApplyPostRefresh: managedCaseNoopPlanChecks(tc),
 			},
 		},
 	}
 
 	if tc.UpdateTemplate != "" {
+		updateConfig := RenderManagedConfig(env, tc.UpdateTemplate, caseReplacements)
 		steps = append(steps, resource.TestStep{
-			Config: RenderManagedConfig(env, tc.UpdateTemplate, caseReplacements),
-			Check:  stateVerifierCheck(env, client, tc.VerifyUpdate),
-			ConfigStateChecks: []statecheck.StateCheck{
-				checks.ResourceIDIsSet(tc.ResourceAddress),
-			},
+			Config:            updateConfig,
+			Check:             stateVerifierCheck(env, client, tc.VerifyUpdate),
+			ConfigStateChecks: managedCaseStateChecks(tc),
 			ConfigPlanChecks: resource.ConfigPlanChecks{
-				PostApplyPostRefresh: []plancheck.PlanCheck{
-					plancheck.ExpectResourceAction(tc.ResourceAddress, plancheck.ResourceActionNoop),
-				},
+				PostApplyPostRefresh: managedCaseNoopPlanChecks(tc),
 			},
 		})
 	}
@@ -94,6 +159,7 @@ func RunManagedLegacyUpgradeCase(t *testing.T, tc ManagedCase, legacyProviderVer
 
 	env := ResolveTestEnv(t, tc.Definition.Group, tc.Definition.RequiredEnv)
 	ApplyResolvedAccountEnv(t, env)
+	t.Setenv(resource.EnvTfAccProviderNamespace, "stripe")
 	client := NewStripeClient(env)
 	caseReplacements := map[string]string{
 		"{{RAND}}": fmt.Sprintf("%d", time.Now().UnixNano()),
@@ -106,24 +172,16 @@ func RunManagedLegacyUpgradeCase(t *testing.T, tc ManagedCase, legacyProviderVer
 			{
 				Config:            createConfig,
 				ExternalProviders: legacyStripeExternalProviders(legacyProviderVersion),
-				ConfigStateChecks: []statecheck.StateCheck{
-					checks.ResourceIDIsSet(tc.ResourceAddress),
-				},
+				ConfigStateChecks: managedCaseStateChecks(tc),
 			},
 			{
 				Config:                   createConfig,
 				ProtoV6ProviderFactories: NewProtoV6ProviderFactories(),
 				Check:                    stateVerifierCheck(env, client, tc.VerifyCreate),
-				ConfigStateChecks: []statecheck.StateCheck{
-					checks.ResourceIDIsSet(tc.ResourceAddress),
-				},
+				ConfigStateChecks:        managedCaseStateChecks(tc),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction(tc.ResourceAddress, plancheck.ResourceActionNoop),
-					},
-					PostApplyPostRefresh: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction(tc.ResourceAddress, plancheck.ResourceActionNoop),
-					},
+					PreApply:             managedCaseNoopPlanChecks(tc),
+					PostApplyPostRefresh: managedCaseNoopPlanChecks(tc),
 				},
 			},
 		},

@@ -82,10 +82,28 @@ var _ resource.ResourceWithUpgradeState = &ShippingRateResource{}
 
 func (r *ShippingRateResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		1: {
+		0: {
 			PriorSchema: shippingRateResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
-				var prior ShippingRateResourceV0Model
+				var prior ShippingRateResourceModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				upgraded, diags := upgradeShippingRateStateV1(ctx, prior)
+				resp.Diagnostics.Append(diags...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				resp.Diagnostics.Append(resp.State.Set(ctx, &upgraded)...)
+			},
+		},
+		1: {
+			PriorSchema: shippingRateResourceV1Schema(),
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var prior ShippingRateResourceV1Model
 				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -103,7 +121,7 @@ func (r *ShippingRateResource) UpgradeState(ctx context.Context) map[int64]resou
 	}
 }
 
-func shippingRateResourceV0Schema() *schema.Schema {
+func shippingRateResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
 		Description: "Shipping rates describe the price of shipping presented to your customers and\napplied to a purchase. For more information, see [Charge for shipping](https://docs.stripe.com/payments/during-payment/charge-shipping).",
 		Attributes: map[string]schema.Attribute{
@@ -254,7 +272,163 @@ func shippingRateResourceV0Schema() *schema.Schema {
 	}
 }
 
-type ShippingRateResourceV0Model struct {
+func shippingRateResourceV0Schema() *schema.Schema {
+	return &schema.Schema{
+		Description: "Shipping rates describe the price of shipping presented to your customers and\napplied to a purchase. For more information, see [Charge for shipping](https://docs.stripe.com/payments/during-payment/charge-shipping).",
+		Attributes: map[string]schema.Attribute{
+			"object": schema.StringAttribute{
+				Computed:      true,
+				Description:   "String representing the object's type. Objects of the same type share the same value.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("shipping_rate")},
+			},
+			"active": schema.BoolAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Whether the shipping rate can be used for new purchases. Defaults to `true`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"created": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"display_name": schema.StringAttribute{
+				Required:      true,
+				Description:   "The name of the shipping rate, meant to be displayable to the customer. This will appear on CheckoutSessions.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Unique identifier for the object.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"livemode": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"metadata": schema.MapAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.",
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+				ElementType:   types.StringType,
+			},
+			"tax_behavior": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Specifies whether the rate is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("exclusive", "inclusive", "unspecified")},
+			},
+			"tax_code": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "A [tax code](https://docs.stripe.com/tax/tax-categories) ID. The Shipping tax code is `txcd_92010001`.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"type": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The type of calculation to use on the shipping rate.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				Validators:    []validator.String{stringvalidator.OneOf("fixed_amount")},
+			},
+		},
+		Blocks: map[string]schema.Block{
+			"delivery_estimate": schema.ListNestedBlock{
+				Description:   "The estimated range for how long shipping will take, meant to be displayable to the customer. This will appear on CheckoutSessions.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{},
+					Blocks: map[string]schema.Block{
+						"maximum": schema.ListNestedBlock{
+							Description:   "The upper bound of the estimated range. If empty, represents no upper bound i.e., infinite.",
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"unit": schema.StringAttribute{
+										Required:      true,
+										Description:   "A unit of time.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+										Validators:    []validator.String{stringvalidator.OneOf("business_day", "day", "hour", "month", "week")},
+									},
+									"value": schema.Int64Attribute{
+										Required:      true,
+										Description:   "Must be greater than 0.",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+									},
+								},
+							},
+						},
+						"minimum": schema.ListNestedBlock{
+							Description:   "The lower bound of the estimated range. If empty, represents no lower bound.",
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"unit": schema.StringAttribute{
+										Required:      true,
+										Description:   "A unit of time.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+										Validators:    []validator.String{stringvalidator.OneOf("business_day", "day", "hour", "month", "week")},
+									},
+									"value": schema.Int64Attribute{
+										Required:      true,
+										Description:   "Must be greater than 0.",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"fixed_amount": schema.ListNestedBlock{
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"amount": schema.Int64Attribute{
+							Required:      true,
+							Description:   "A non-negative integer in cents representing how much to charge.",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+						},
+						"currency": schema.StringAttribute{
+							Required:      true,
+							Description:   "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"currency_options": schema.ListNestedBlock{
+							Description: "Shipping rates defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"key": schema.StringAttribute{
+										Required:    true,
+										Description: "Key for this entry.",
+									},
+									"amount": schema.Int64Attribute{
+										Required:    true,
+										Description: "A non-negative integer in cents representing how much to charge.",
+									},
+									"tax_behavior": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "Specifies whether the rate is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+										Validators:    []validator.String{stringvalidator.OneOf("exclusive", "inclusive", "unspecified")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+type ShippingRateResourceV1Model struct {
 	Object           types.String `tfsdk:"object"`
 	Active           types.Bool   `tfsdk:"active"`
 	Created          types.Int64  `tfsdk:"created"`
@@ -563,6 +737,13 @@ func shippingrateUpgradeSingletonListToObject(path []string, meta shippingrateSt
 }
 
 func shippingrateUpgradeObjectValueToSingletonList(path []string, meta shippingrateStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return shippingrateUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return shippingrateUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -656,7 +837,7 @@ func shippingrateUpgradeValue(path []string, meta shippingrateStateUpgradeAttrMe
 	}
 }
 
-func upgradeShippingRateStateV1(ctx context.Context, prior ShippingRateResourceV0Model) (ShippingRateResourceModel, diag.Diagnostics) {
+func upgradeShippingRateStateV1(ctx context.Context, prior interface{}) (ShippingRateResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := shippingrateUpgradeAttrs(nil, shippingrateStateUpgradeRootMeta, shippingrateAttrMapFromModel(prior))
 	var upgraded ShippingRateResourceModel

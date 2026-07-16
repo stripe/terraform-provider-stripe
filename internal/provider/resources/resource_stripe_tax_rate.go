@@ -545,6 +545,13 @@ func taxrateUpgradeSingletonListToObject(path []string, meta taxrateStateUpgrade
 }
 
 func taxrateUpgradeObjectValueToSingletonList(path []string, meta taxrateStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return taxrateUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return taxrateUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -638,7 +645,7 @@ func taxrateUpgradeValue(path []string, meta taxrateStateUpgradeAttrMeta, priorV
 	}
 }
 
-func upgradeTaxRateStateV0(ctx context.Context, prior TaxRateResourceV0Model) (TaxRateResourceModel, diag.Diagnostics) {
+func upgradeTaxRateStateV0(ctx context.Context, prior interface{}) (TaxRateResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := taxrateUpgradeAttrs(nil, taxrateStateUpgradeRootMeta, taxrateAttrMapFromModel(prior))
 	var upgraded TaxRateResourceModel

@@ -45,6 +45,12 @@ type decimalStringExpectation struct {
 	Expected  string
 }
 
+type outputExpectation struct {
+	Name            string
+	Expected        string
+	ResourceAddress string
+}
+
 type productExpectations struct {
 	Address                   string
 	CompareStateAttrs         []string
@@ -223,18 +229,11 @@ func verifyCustomerDestroyDeleted(
 	client *stripe.Client,
 	state *terraform.State,
 ) error {
-	customer, err := retrieveCustomer(client, state, "stripe_customer.test")
-	if err != nil {
-		return err
-	}
-	if !customer.Deleted {
-		return fmt.Errorf(
-			"expected stripe_customer.test (%s) to be deleted remotely",
-			customer.ID,
-		)
-	}
-
-	return nil
+	return verifyCustomerDestroyDeletedAt("stripe_customer.test")(
+		runner.TestEnv{},
+		client,
+		state,
+	)
 }
 
 func verifyProduct(expect productExpectations) runner.StateVerifier {
@@ -433,15 +432,11 @@ func verifyProductDestroyInactive(
 	client *stripe.Client,
 	state *terraform.State,
 ) error {
-	product, err := retrieveProduct(client, state, "stripe_product.test")
-	if err != nil {
-		return err
-	}
-	if product.Active {
-		return fmt.Errorf("expected stripe_product.test to be inactive after destroy")
-	}
-
-	return nil
+	return verifyProductDestroyInactiveAt("stripe_product.test")(
+		runner.TestEnv{},
+		client,
+		state,
+	)
 }
 
 func verifyPrice(expect priceExpectations) runner.StateVerifier {
@@ -627,15 +622,11 @@ func verifyPriceDestroyInactive(
 	client *stripe.Client,
 	state *terraform.State,
 ) error {
-	price, err := retrievePrice(client, state, "stripe_price.test")
-	if err != nil {
-		return err
-	}
-	if price.Active {
-		return fmt.Errorf("expected stripe_price.test to be inactive after destroy")
-	}
-
-	return nil
+	return verifyPriceDestroyInactiveAt("stripe_price.test")(
+		runner.TestEnv{},
+		client,
+		state,
+	)
 }
 
 func verifyWebhookEndpoint(
@@ -793,31 +784,10 @@ func verifyEventDestinationDestroyMissing(
 	client *stripe.Client,
 	state *terraform.State,
 ) error {
-	for _, address := range []string{
+	return verifyEventDestinationDestroyMissingAt(
 		"stripe_v2_core_event_destination.eventbridge",
 		"stripe_v2_core_event_destination.webhook",
-	} {
-		id, err := runner.ResourcePrimaryID(state, address)
-		if err != nil {
-			return err
-		}
-
-		_, err = client.V2CoreEventDestinations.Retrieve(context.Background(), id, nil)
-		if err == nil {
-			return fmt.Errorf("expected %s (%s) to be missing remotely", address, id)
-		}
-		if !strings.Contains(err.Error(), "\"status\":404") &&
-			!strings.Contains(err.Error(), "\"code\":\"not_found\"") {
-			return fmt.Errorf(
-				"expected %s (%s) missing error, got: %w",
-				address,
-				id,
-				err,
-			)
-		}
-	}
-
-	return nil
+	)(runner.TestEnv{}, client, state)
 }
 
 func verifyBillingMeter(
@@ -860,23 +830,11 @@ func verifyBillingMeterDestroyInactive(
 	client *stripe.Client,
 	state *terraform.State,
 ) error {
-	billingMeter, err := retrieveBillingMeter(client, state, "stripe_billing_meter.test")
-	if err != nil {
-		return err
-	}
-	if string(billingMeter.Status) != "inactive" {
-		return fmt.Errorf(
-			"expected stripe_billing_meter.test to be inactive after destroy, got %q",
-			string(billingMeter.Status),
-		)
-	}
-	if billingMeter.StatusTransitions == nil || billingMeter.StatusTransitions.DeactivatedAt == 0 {
-		return fmt.Errorf(
-			"expected stripe_billing_meter.test to have deactivated_at after destroy",
-		)
-	}
-
-	return nil
+	return verifyBillingMeterDestroyInactiveAt("stripe_billing_meter.test")(
+		runner.TestEnv{},
+		client,
+		state,
+	)
 }
 
 func verifyEntitlementsFeature(
@@ -1117,21 +1075,190 @@ func verifyPromotionCodeDestroyInactive(
 	client *stripe.Client,
 	state *terraform.State,
 ) error {
-	promotionCode, err := retrievePromotionCode(
+	return verifyPromotionCodeDestroyInactiveAt("stripe_promotion_code.test")(
+		runner.TestEnv{},
 		client,
 		state,
-		"stripe_promotion_code.test",
 	)
-	if err != nil {
-		return err
-	}
-	if promotionCode.Active {
-		return fmt.Errorf(
-			"expected stripe_promotion_code.test to be inactive after destroy",
-		)
-	}
+}
 
-	return nil
+func verifyOutputExpectations(
+	expectations []outputExpectation,
+) runner.StateVerifier {
+	return func(
+		_ runner.TestEnv,
+		_ *stripe.Client,
+		state *terraform.State,
+	) error {
+		for _, expectation := range expectations {
+			expected := expectation.Expected
+			if expectation.ResourceAddress != "" {
+				resourceID, err := runner.ResourcePrimaryID(
+					state,
+					expectation.ResourceAddress,
+				)
+				if err != nil {
+					return err
+				}
+				expected = resourceID
+			}
+
+			actual, err := runner.OutputValue(state, expectation.Name)
+			if err != nil {
+				return err
+			}
+			if actual != expected {
+				return fmt.Errorf(
+					"output %s mismatch: expected %q, got %q",
+					expectation.Name,
+					expected,
+					actual,
+				)
+			}
+		}
+
+		return nil
+	}
+}
+
+func verifyCustomerDestroyDeletedAt(address string) runner.StateVerifier {
+	return func(
+		_ runner.TestEnv,
+		client *stripe.Client,
+		state *terraform.State,
+	) error {
+		customer, err := retrieveCustomer(client, state, address)
+		if err != nil {
+			return err
+		}
+		if !customer.Deleted {
+			return fmt.Errorf(
+				"expected %s (%s) to be deleted remotely",
+				address,
+				customer.ID,
+			)
+		}
+
+		return nil
+	}
+}
+
+func verifyProductDestroyInactiveAt(address string) runner.StateVerifier {
+	return func(
+		_ runner.TestEnv,
+		client *stripe.Client,
+		state *terraform.State,
+	) error {
+		product, err := retrieveProduct(client, state, address)
+		if err != nil {
+			return err
+		}
+		if product.Active {
+			return fmt.Errorf("expected %s to be inactive after destroy", address)
+		}
+
+		return nil
+	}
+}
+
+func verifyPriceDestroyInactiveAt(address string) runner.StateVerifier {
+	return func(
+		_ runner.TestEnv,
+		client *stripe.Client,
+		state *terraform.State,
+	) error {
+		price, err := retrievePrice(client, state, address)
+		if err != nil {
+			return err
+		}
+		if price.Active {
+			return fmt.Errorf("expected %s to be inactive after destroy", address)
+		}
+
+		return nil
+	}
+}
+
+func verifyEventDestinationDestroyMissingAt(
+	addresses ...string,
+) runner.StateVerifier {
+	return func(
+		_ runner.TestEnv,
+		client *stripe.Client,
+		state *terraform.State,
+	) error {
+		for _, address := range addresses {
+			id, err := runner.ResourcePrimaryID(state, address)
+			if err != nil {
+				return err
+			}
+
+			_, err = client.V2CoreEventDestinations.Retrieve(context.Background(), id, nil)
+			if err == nil {
+				return fmt.Errorf("expected %s (%s) to be missing remotely", address, id)
+			}
+			if !strings.Contains(err.Error(), "\"status\":404") &&
+				!strings.Contains(err.Error(), "\"code\":\"not_found\"") {
+				return fmt.Errorf(
+					"expected %s (%s) missing error, got: %w",
+					address,
+					id,
+					err,
+				)
+			}
+		}
+
+		return nil
+	}
+}
+
+func verifyBillingMeterDestroyInactiveAt(address string) runner.StateVerifier {
+	return func(
+		_ runner.TestEnv,
+		client *stripe.Client,
+		state *terraform.State,
+	) error {
+		billingMeter, err := retrieveBillingMeter(client, state, address)
+		if err != nil {
+			return err
+		}
+		if string(billingMeter.Status) != "inactive" {
+			return fmt.Errorf(
+				"expected %s to be inactive after destroy, got %q",
+				address,
+				string(billingMeter.Status),
+			)
+		}
+		if billingMeter.StatusTransitions == nil || billingMeter.StatusTransitions.DeactivatedAt == 0 {
+			return fmt.Errorf(
+				"expected %s to have deactivated_at after destroy",
+				address,
+			)
+		}
+
+		return nil
+	}
+}
+
+func verifyPromotionCodeDestroyInactiveAt(address string) runner.StateVerifier {
+	return func(
+		_ runner.TestEnv,
+		client *stripe.Client,
+		state *terraform.State,
+	) error {
+		promotionCode, err := retrievePromotionCode(client, state, address)
+		if err != nil {
+			return err
+		}
+		if promotionCode.Active {
+			return fmt.Errorf(
+				"expected %s to be inactive after destroy",
+				address,
+			)
+		}
+
+		return nil
+	}
 }
 
 func retrieveCustomer(

@@ -102,10 +102,28 @@ var _ resource.ResourceWithUpgradeState = &CustomerResource{}
 
 func (r *CustomerResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		1: {
+		0: {
 			PriorSchema: customerResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
-				var prior CustomerResourceV0Model
+				var prior CustomerResourceModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				upgraded, diags := upgradeCustomerStateV1(ctx, prior)
+				resp.Diagnostics.Append(diags...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				resp.Diagnostics.Append(resp.State.Set(ctx, &upgraded)...)
+			},
+		},
+		1: {
+			PriorSchema: customerResourceV1Schema(),
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var prior CustomerResourceV1Model
 				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -123,7 +141,7 @@ func (r *CustomerResource) UpgradeState(ctx context.Context) map[int64]resource.
 	}
 }
 
-func customerResourceV0Schema() *schema.Schema {
+func customerResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
 		Description: "This object represents a customer of your business. Use it to [create recurring charges](https://docs.stripe.com/invoicing/customer), [save payment](https://docs.stripe.com/payments/save-during-payment) and contact information,\nand track payments that belong to the same customer.",
 		Attributes: map[string]schema.Attribute{
@@ -580,7 +598,471 @@ func customerResourceV0Schema() *schema.Schema {
 	}
 }
 
-type CustomerResourceV0Model struct {
+func customerResourceV0Schema() *schema.Schema {
+	return &schema.Schema{
+		Description: "This object represents a customer of your business. Use it to [create recurring charges](https://docs.stripe.com/invoicing/customer), [save payment](https://docs.stripe.com/payments/save-during-payment) and contact information,\nand track payments that belong to the same customer.",
+		Attributes: map[string]schema.Attribute{
+			"object": schema.StringAttribute{
+				Computed:      true,
+				Description:   "String representing the object's type. Objects of the same type share the same value.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("customer")},
+			},
+			"balance": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The current balance, if any, that's stored on the customer in their default currency. If negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that's added to their next invoice. The balance only considers amounts that Stripe hasn't successfully applied to any invoice. It doesn't reflect unpaid invoices. This balance is only taken into account after invoices finalize. For multi-currency balances, see [invoice_credit_balance](https://docs.stripe.com/api/customers/object#customer_object-invoice_credit_balance).",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"business_name": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The customer's business name.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"created": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"currency": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Three-letter [ISO code for the currency](https://stripe.com/docs/currencies) the customer can be charged in for recurring billing purposes.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"customer_account": schema.StringAttribute{
+				Computed:      true,
+				Description:   "The ID of an Account representing a customer. You can use this ID with any v1 API that accepts a customer_account parameter.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"default_source": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "ID of the default payment source for the customer.\n\nIf you use payment methods created through the PaymentMethods API, see the [invoice_settings.default_payment_method](https://docs.stripe.com/api/customers/object#customer_object-invoice_settings-default_payment_method) field instead.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"delinquent": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "Tracks the most recent state change on any invoice belonging to the customer. Paying an invoice or marking it uncollectible via the API will set this field to false. An automatic payment failure or passing the `invoice.due_date` will set this field to `true`.\n\nIf an invoice becomes uncollectible by [dunning](https://docs.stripe.com/billing/automatic-collection), `delinquent` doesn't reset to `false`.\n\nIf you care whether the customer has paid their most recent subscription invoice, use `subscription.status` instead. Paying or marking uncollectible any customer invoice regardless of whether it is the latest invoice for a subscription will always set this field to `false`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"description": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "An arbitrary string attached to the object. Often useful for displaying to users.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"discount": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Describes the current discount active on the customer, if there is one.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"email": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The customer's email address.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Unique identifier for the object.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"individual_name": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The customer's individual name.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"invoice_credit_balance": schema.MapAttribute{
+				Computed:      true,
+				Description:   "The current multi-currency balances, if any, that's stored on the customer. If positive in a currency, the customer has a credit to apply to their next invoice denominated in that currency. If negative, the customer has an amount owed that's added to their next invoice denominated in that currency. These balances don't apply to unpaid invoices. They solely track amounts that Stripe hasn't successfully applied to any invoice. Stripe only applies a balance in a specific currency to an invoice after that invoice (which is in the same currency) finalizes.",
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+				ElementType:   types.Int64Type,
+			},
+			"invoice_prefix": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The prefix for the customer used to generate unique invoice numbers.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"livemode": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"metadata": schema.MapAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.",
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+				ElementType:   types.StringType,
+			},
+			"name": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The customer's full name or business name.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"next_invoice_sequence": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The suffix of the customer's next invoice number (for example, 0001). When the account uses account level sequencing, this parameter is ignored in API requests and the field omitted in API responses.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"phone": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The customer's phone number.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"preferred_locales": schema.ListAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The customer's preferred locales (languages), ordered by preference.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				ElementType:   types.StringType,
+			},
+			"tax_exempt": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Describes the customer's tax exemption status, which is `none`, `exempt`, or `reverse`. When set to `reverse`, invoice and receipt PDFs include the following text: **\"Reverse charge\"**.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("exempt", "none", "reverse")},
+			},
+			"test_clock": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "ID of the test clock that this customer belongs to.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"payment_method": schema.StringAttribute{
+				Optional: true,
+
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"source": schema.StringAttribute{
+				Optional: true,
+
+				WriteOnly: true,
+			},
+			"validate": schema.BoolAttribute{
+				Optional: true,
+
+				WriteOnly: true,
+			},
+		},
+		Blocks: map[string]schema.Block{
+			"address": schema.ListNestedBlock{
+				Description:   "The customer's address.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"city": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "City, district, suburb, town, or village.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"country": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Two-letter country code ([ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)).",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"line1": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Address line 1, such as the street, PO Box, or company name.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"line2": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Address line 2, such as the apartment, suite, unit, or building.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"postal_code": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "ZIP or postal code.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"state": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "State, county, province, or region ([ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2)).",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+					},
+				},
+			},
+			"cash_balance": schema.ListNestedBlock{
+				Description:   "The current funds being held by Stripe on behalf of the customer. You can apply these funds towards payment intents when the source is \"cash_balance\". The `settings[reconciliation_mode]` field describes if these funds apply to these payment intents manually or automatically.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"object": schema.StringAttribute{
+							Computed:      true,
+							Description:   "String representing the object's type. Objects of the same type share the same value.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							Validators:    []validator.String{stringvalidator.OneOf("cash_balance")},
+						},
+						"available": schema.MapAttribute{
+							Computed:      true,
+							Description:   "A hash of all cash balances available to this customer. You cannot delete a customer with any cash balances, even if the balance is 0. Amounts are represented in the [smallest currency unit](https://docs.stripe.com/currencies#zero-decimal).",
+							PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+							ElementType:   types.Int64Type,
+						},
+						"customer": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The ID of the customer whose cash balance this object represents.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"customer_account": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The ID of an Account representing a customer whose cash balance this object represents.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"livemode": schema.BoolAttribute{
+							Computed:      true,
+							Description:   "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
+							PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"settings": schema.ListNestedBlock{
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"reconciliation_mode": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "The configuration for how funds that land in the customer cash balance are reconciled.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+										Validators:    []validator.String{stringvalidator.OneOf("automatic", "manual")},
+									},
+									"using_merchant_default": schema.BoolAttribute{
+										Computed:      true,
+										Description:   "A flag to indicate if reconciliation mode returned is the user's default or is specific to this customer cash balance",
+										PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"invoice_settings": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"custom_fields": schema.ListNestedAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Default custom fields to be displayed on invoices for this customer.",
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"name": schema.StringAttribute{
+										Required:    true,
+										Description: "The name of the custom field.",
+									},
+									"value": schema.StringAttribute{
+										Required:    true,
+										Description: "The value of the custom field.",
+									},
+								},
+							},
+						},
+						"default_payment_method": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "ID of a payment method that's attached to the customer, to be used as the customer's default payment method for subscriptions and invoices.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"footer": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Default footer to be displayed on invoices for this customer.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"rendering_options": schema.ListNestedBlock{
+							Description:   "Default options for invoice PDF rendering for this customer.",
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"amount_tax_display": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "How line-item prices and amounts will be displayed with respect to tax on invoice PDFs.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+									"template": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "ID of the invoice rendering template to be used for this customer's invoices. If set, the template will be used on all invoices for this customer unless a template is set directly on the invoice.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"shipping": schema.ListNestedBlock{
+				Description:   "Mailing and shipping address for the customer. Appears on invoices emailed to this customer.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"carrier": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The delivery service that shipped a physical product, such as Fedex, UPS, USPS, etc.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"name": schema.StringAttribute{
+							Required:    true,
+							Description: "Recipient name.",
+						},
+						"phone": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Recipient phone (including extension).",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"tracking_number": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The tracking number for a physical product, obtained from the delivery service. If multiple tracking numbers were generated for this purchase, please separate them with commas.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"address": schema.ListNestedBlock{
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"city": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "City, district, suburb, town, or village.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+									"country": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "Two-letter country code ([ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)).",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+									"line1": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "Address line 1, such as the street, PO Box, or company name.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+									"line2": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "Address line 2, such as the apartment, suite, unit, or building.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+									"postal_code": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "ZIP or postal code.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+									"state": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "State, county, province, or region ([ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2)).",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"tax": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"automatic_tax": schema.StringAttribute{
+							Computed:      true,
+							Description:   "Surfaces if automatic tax computation is possible given the current customer location information.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							Validators:    []validator.String{stringvalidator.OneOf("failed", "not_collecting", "supported", "unrecognized_location")},
+						},
+						"ip_address": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "A recent IP address of the customer used for tax reporting and tax location inference.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"provider": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The tax calculation provider used for location resolution. Defaults to `stripe` when not using a [third-party provider](/tax/third-party-apps).",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							Validators:    []validator.String{stringvalidator.OneOf("anrok", "avalara", "sphere", "stripe")},
+						},
+						"validate_location": schema.StringAttribute{
+							Optional:    true,
+							Description: "A flag that indicates when Stripe should validate the customer tax location. Defaults to `deferred`.",
+							Validators:  []validator.String{stringvalidator.OneOf("deferred", "immediately")},
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"location": schema.ListNestedBlock{
+							Description:   "The identified tax location of the customer.",
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"country": schema.StringAttribute{
+										Computed:      true,
+										Description:   "The identified tax country of the customer.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+									"source": schema.StringAttribute{
+										Computed:      true,
+										Description:   "The data source used to infer the customer's location.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+										Validators:    []validator.String{stringvalidator.OneOf("billing_address", "ip_address", "payment_method", "shipping_destination")},
+									},
+									"state": schema.StringAttribute{
+										Computed:      true,
+										Description:   "The identified tax state, county, province, or region of the customer.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"tax_id_data": schema.ListNestedBlock{
+				Description:   "The customer's tax IDs.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"type": schema.StringAttribute{
+							Required:      true,
+							Description:   "Type of the tax ID, one of `ad_nrt`, `ae_trn`, `al_tin`, `am_tin`, `ao_tin`, `ar_cuit`, `au_abn`, `au_arn`, `aw_tin`, `az_tin`, `ba_tin`, `bb_tin`, `bd_bin`, `bf_ifu`, `bg_uic`, `bh_vat`, `bj_ifu`, `bo_tin`, `br_cnpj`, `br_cpf`, `bs_tin`, `by_tin`, `ca_bn`, `ca_gst_hst`, `ca_pst_bc`, `ca_pst_mb`, `ca_pst_sk`, `ca_qst`, `cd_nif`, `ch_uid`, `ch_vat`, `cl_tin`, `cm_niu`, `cn_tin`, `co_nit`, `cr_tin`, `cv_nif`, `de_stn`, `do_rcn`, `ec_ruc`, `eg_tin`, `es_cif`, `et_tin`, `eu_oss_vat`, `eu_vat`, `fo_vat`, `gb_vat`, `ge_vat`, `gi_tin`, `gn_nif`, `hk_br`, `hr_oib`, `hu_tin`, `id_npwp`, `il_vat`, `in_gst`, `is_vat`, `it_cf`, `jp_cn`, `jp_rn`, `jp_trn`, `ke_pin`, `kg_tin`, `kh_tin`, `kr_brn`, `kz_bin`, `la_tin`, `li_uid`, `li_vat`, `lk_vat`, `ma_vat`, `md_vat`, `me_pib`, `mk_vat`, `mr_nif`, `mx_rfc`, `my_frp`, `my_itn`, `my_sst`, `ng_tin`, `no_vat`, `no_voec`, `np_pan`, `nz_gst`, `om_vat`, `pe_ruc`, `ph_tin`, `pl_nip`, `py_ruc`, `ro_tin`, `rs_pib`, `ru_inn`, `ru_kpp`, `sa_vat`, `sg_gst`, `sg_uen`, `si_tin`, `sn_ninea`, `sr_fin`, `sv_nit`, `th_vat`, `tj_tin`, `tr_tin`, `tw_vat`, `tz_vat`, `ua_vat`, `ug_tin`, `us_ein`, `uy_ruc`, `uz_tin`, `uz_vat`, `ve_rif`, `vn_tin`, `za_vat`, `zm_tin`, or `zw_tin`",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"value": schema.StringAttribute{
+							Required:      true,
+							Description:   "Value of the tax ID.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+type CustomerResourceV1Model struct {
 	Object               types.String `tfsdk:"object"`
 	Address              types.Object `tfsdk:"address"`
 	Balance              types.Int64  `tfsdk:"balance"`
@@ -909,6 +1391,13 @@ func customerUpgradeSingletonListToObject(path []string, meta customerStateUpgra
 }
 
 func customerUpgradeObjectValueToSingletonList(path []string, meta customerStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return customerUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return customerUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -1002,7 +1491,7 @@ func customerUpgradeValue(path []string, meta customerStateUpgradeAttrMeta, prio
 	}
 }
 
-func upgradeCustomerStateV1(ctx context.Context, prior CustomerResourceV0Model) (CustomerResourceModel, diag.Diagnostics) {
+func upgradeCustomerStateV1(ctx context.Context, prior interface{}) (CustomerResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := customerUpgradeAttrs(nil, customerStateUpgradeRootMeta, customerAttrMapFromModel(prior))
 	var upgraded CustomerResourceModel

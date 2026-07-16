@@ -90,10 +90,28 @@ var _ resource.ResourceWithUpgradeState = &ProductResource{}
 
 func (r *ProductResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		1: {
+		0: {
 			PriorSchema: productResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
-				var prior ProductResourceV0Model
+				var prior ProductResourceModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				upgraded, diags := upgradeProductStateV1(ctx, prior)
+				resp.Diagnostics.Append(diags...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				resp.Diagnostics.Append(resp.State.Set(ctx, &upgraded)...)
+			},
+		},
+		1: {
+			PriorSchema: productResourceV1Schema(),
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var prior ProductResourceV1Model
 				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -111,7 +129,7 @@ func (r *ProductResource) UpgradeState(ctx context.Context) map[int64]resource.S
 	}
 }
 
-func productResourceV0Schema() *schema.Schema {
+func productResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
 		Description: "Products describe the specific goods or services you offer to your customers.\nFor example, you might offer a Standard and Premium version of your goods or service; each version would be a separate Product.\nThey can be used in conjunction with [Prices](https://api.stripe.com#prices) to configure pricing in Payment Links, Checkout, and Subscriptions.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription),\n[share a Payment Link](https://docs.stripe.com/payment-links),\n[accept payments with Checkout](https://docs.stripe.com/payments/accept-a-payment#create-product-prices-upfront),\nand more about [Products and Prices](https://docs.stripe.com/products-prices/overview)",
 		Attributes: map[string]schema.Attribute{
@@ -414,7 +432,319 @@ func productResourceV0Schema() *schema.Schema {
 	}
 }
 
-type ProductResourceV0Model struct {
+func productResourceV0Schema() *schema.Schema {
+	return &schema.Schema{
+		Description: "Products describe the specific goods or services you offer to your customers.\nFor example, you might offer a Standard and Premium version of your goods or service; each version would be a separate Product.\nThey can be used in conjunction with [Prices](https://api.stripe.com#prices) to configure pricing in Payment Links, Checkout, and Subscriptions.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription),\n[share a Payment Link](https://docs.stripe.com/payment-links),\n[accept payments with Checkout](https://docs.stripe.com/payments/accept-a-payment#create-product-prices-upfront),\nand more about [Products and Prices](https://docs.stripe.com/products-prices/overview)",
+		Attributes: map[string]schema.Attribute{
+			"object": schema.StringAttribute{
+				Computed:      true,
+				Description:   "String representing the object's type. Objects of the same type share the same value.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("product")},
+			},
+			"active": schema.BoolAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Whether the product is currently available for purchase.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"created": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"default_price": schema.StringAttribute{
+				Computed:      true,
+				Description:   "The ID of the [Price](https://docs.stripe.com/api/prices) object that is the default price for this product.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"description": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The product's description, meant to be displayable to the customer. Use this field to optionally store a long form explanation of the product being sold for your own rendering purposes.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Unique identifier for the object.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"images": schema.ListAttribute{
+				Optional:    true,
+				Description: "A list of up to 8 URLs of images for this product, meant to be displayable to the customer.",
+				ElementType: types.StringType,
+			},
+			"livemode": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"metadata": schema.MapAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.",
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+				ElementType:   types.StringType,
+			},
+			"name": schema.StringAttribute{
+				Required:    true,
+				Description: "The product's name, meant to be displayable to the customer.",
+			},
+			"shippable": schema.BoolAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Whether this product is shipped (i.e., physical goods).",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"statement_descriptor": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Extra information about a product which will appear on your customer's credit card statement. In the case that multiple products are billed at once, the first statement descriptor will be used. Only used for subscription payments.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"tax_code": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"type": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The type of the product. The product is either of type `good`, which is eligible for use with Orders and SKUs, or `service`, which is eligible for use with Subscriptions and Plans.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				Validators:    []validator.String{stringvalidator.OneOf("good", "service")},
+			},
+			"unit_label": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "A label that represents units of this product. When set, this will be included in customers' receipts, invoices, Checkout, and the customer portal.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"updated": schema.Int64Attribute{
+				Computed:    true,
+				Description: "Time at which the object was last updated. Measured in seconds since the Unix epoch.",
+			},
+			"url": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "A URL of a publicly-accessible webpage for this product.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+		},
+		Blocks: map[string]schema.Block{
+			"marketing_features": schema.ListNestedBlock{
+				Description: "A list of up to 15 marketing features for this product. These are displayed in [pricing tables](https://docs.stripe.com/payments/checkout/pricing-table).",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							Required:    true,
+							Description: "The marketing feature name. Up to 80 characters long.",
+						},
+					},
+				},
+			},
+			"package_dimensions": schema.ListNestedBlock{
+				Description: "The dimensions of this product for shipping purposes.",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"height": schema.Float64Attribute{
+							Required:    true,
+							Description: "Height, in inches.",
+						},
+						"length": schema.Float64Attribute{
+							Required:    true,
+							Description: "Length, in inches.",
+						},
+						"weight": schema.Float64Attribute{
+							Required:    true,
+							Description: "Weight, in ounces.",
+						},
+						"width": schema.Float64Attribute{
+							Required:    true,
+							Description: "Width, in inches.",
+						},
+					},
+				},
+			},
+			"default_price_data": schema.ListNestedBlock{
+				Description:   "Data used to generate a new [Price](https://docs.stripe.com/api/prices) object. This Price will be set as the default price for this product.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"currency": schema.StringAttribute{
+							Required:      true,
+							Description:   "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"metadata": schema.MapAttribute{
+							Optional:      true,
+							Description:   "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.",
+							PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
+							ElementType:   types.StringType,
+						},
+						"tax_behavior": schema.StringAttribute{
+							Optional:      true,
+							Description:   "Only required if a [default tax behavior](https://docs.stripe.com/tax/products-prices-tax-categories-tax-behavior#setting-a-default-tax-behavior-(recommended)) was not provided in the Stripe Tax settings. Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`. Once specified as either `inclusive` or `exclusive`, it cannot be changed.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"unit_amount": schema.Int64Attribute{
+							Optional:      true,
+							Description:   "A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge. One of `unit_amount`, `unit_amount_decimal`, or `custom_unit_amount` is required.",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+						},
+						"unit_amount_decimal": schema.StringAttribute{
+							Optional:      true,
+							Description:   "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+							PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier(), stringplanmodifier.RequiresReplace()},
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"currency_options": schema.ListNestedBlock{
+							Description:   "Prices defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
+							PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"key": schema.StringAttribute{
+										Required:    true,
+										Description: "Key for this entry.",
+									},
+									"tax_behavior": schema.StringAttribute{
+										Optional:      true,
+										Description:   "Only required if a [default tax behavior](https://docs.stripe.com/tax/products-prices-tax-categories-tax-behavior#setting-a-default-tax-behavior-(recommended)) was not provided in the Stripe Tax settings. Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`. Once specified as either `inclusive` or `exclusive`, it cannot be changed.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+									},
+									"tiers": schema.ListNestedAttribute{
+										Optional:      true,
+										Description:   "Each element represents a pricing tier. This parameter requires `billing_scheme` to be set to `tiered`. See also the documentation for `billing_scheme`.",
+										PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+										NestedObject: schema.NestedAttributeObject{
+											Attributes: map[string]schema.Attribute{
+												"flat_amount": schema.Int64Attribute{
+													Optional:      true,
+													Description:   "The flat billing amount for an entire tier, regardless of the number of units in the tier.",
+													PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+												},
+												"flat_amount_decimal": schema.StringAttribute{
+													Optional:      true,
+													Description:   "Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.",
+													PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier(), stringplanmodifier.RequiresReplace()},
+												},
+												"unit_amount": schema.Int64Attribute{
+													Optional:      true,
+													Description:   "The per unit billing amount for each individual unit for which this tier applies.",
+													PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+												},
+												"unit_amount_decimal": schema.StringAttribute{
+													Optional:      true,
+													Description:   "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+													PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier(), stringplanmodifier.RequiresReplace()},
+												},
+												"up_to": schema.Int64Attribute{
+													Required:      true,
+													Description:   "Specifies the upper bound of this tier. The lower bound of a tier is the upper bound of the previous tier adding one. Use `inf` to define a fallback tier.",
+													PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+												},
+											},
+										},
+									},
+									"unit_amount": schema.Int64Attribute{
+										Optional:      true,
+										Description:   "A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge.",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+									},
+									"unit_amount_decimal": schema.StringAttribute{
+										Optional:      true,
+										Description:   "Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.",
+										PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier(), stringplanmodifier.RequiresReplace()},
+									},
+								},
+								Blocks: map[string]schema.Block{
+									"custom_unit_amount": schema.ListNestedBlock{
+										Description:   "When set, provides configuration for the amount to be adjusted by the customer during Checkout Sessions and Payment Links.",
+										PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+										NestedObject: schema.NestedBlockObject{
+											Attributes: map[string]schema.Attribute{
+												"enabled": schema.BoolAttribute{
+													Required:      true,
+													Description:   "Pass in `true` to enable `custom_unit_amount`, otherwise omit `custom_unit_amount`.",
+													PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
+												},
+												"maximum": schema.Int64Attribute{
+													Optional:      true,
+													Description:   "The maximum unit amount the customer can specify for this item.",
+													PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+												},
+												"minimum": schema.Int64Attribute{
+													Optional:      true,
+													Description:   "The minimum unit amount the customer can specify for this item. Must be at least the minimum charge amount.",
+													PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+												},
+												"preset": schema.Int64Attribute{
+													Optional:      true,
+													Description:   "The starting unit amount which can be updated by the customer.",
+													PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"custom_unit_amount": schema.ListNestedBlock{
+							Description:   "When set, provides configuration for the amount to be adjusted by the customer during Checkout Sessions and Payment Links.",
+							PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"enabled": schema.BoolAttribute{
+										Required:      true,
+										Description:   "Pass in `true` to enable `custom_unit_amount`, otherwise omit `custom_unit_amount`.",
+										PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
+									},
+									"maximum": schema.Int64Attribute{
+										Optional:      true,
+										Description:   "The maximum unit amount the customer can specify for this item.",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+									},
+									"minimum": schema.Int64Attribute{
+										Optional:      true,
+										Description:   "The minimum unit amount the customer can specify for this item. Must be at least the minimum charge amount.",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+									},
+									"preset": schema.Int64Attribute{
+										Optional:      true,
+										Description:   "The starting unit amount which can be updated by the customer.",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+									},
+								},
+							},
+						},
+						"recurring": schema.ListNestedBlock{
+							Description:   "The recurring components of a price such as `interval` and `interval_count`.",
+							PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"interval": schema.StringAttribute{
+										Required:      true,
+										Description:   "Specifies billing frequency. Either `day`, `week`, `month` or `year`.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+									},
+									"interval_count": schema.Int64Attribute{
+										Optional:      true,
+										Description:   "The number of intervals between subscription billings. For example, `interval=month` and `interval_count=3` bills every 3 months. Maximum of three years interval allowed (3 years, 36 months, or 156 weeks).",
+										PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+type ProductResourceV1Model struct {
 	Object              types.String `tfsdk:"object"`
 	Active              types.Bool   `tfsdk:"active"`
 	Created             types.Int64  `tfsdk:"created"`
@@ -731,6 +1061,13 @@ func productUpgradeSingletonListToObject(path []string, meta productStateUpgrade
 }
 
 func productUpgradeObjectValueToSingletonList(path []string, meta productStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return productUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return productUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -824,7 +1161,7 @@ func productUpgradeValue(path []string, meta productStateUpgradeAttrMeta, priorV
 	}
 }
 
-func upgradeProductStateV1(ctx context.Context, prior ProductResourceV0Model) (ProductResourceModel, diag.Diagnostics) {
+func upgradeProductStateV1(ctx context.Context, prior interface{}) (ProductResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := productUpgradeAttrs(nil, productStateUpgradeRootMeta, productAttrMapFromModel(prior))
 	var upgraded ProductResourceModel

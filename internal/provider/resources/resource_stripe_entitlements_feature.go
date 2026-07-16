@@ -444,6 +444,13 @@ func entitlementsfeatureUpgradeSingletonListToObject(path []string, meta entitle
 }
 
 func entitlementsfeatureUpgradeObjectValueToSingletonList(path []string, meta entitlementsfeatureStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return entitlementsfeatureUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return entitlementsfeatureUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -537,7 +544,7 @@ func entitlementsfeatureUpgradeValue(path []string, meta entitlementsfeatureStat
 	}
 }
 
-func upgradeEntitlementsFeatureStateV0(ctx context.Context, prior EntitlementsFeatureResourceV0Model) (EntitlementsFeatureResourceModel, diag.Diagnostics) {
+func upgradeEntitlementsFeatureStateV0(ctx context.Context, prior interface{}) (EntitlementsFeatureResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := entitlementsfeatureUpgradeAttrs(nil, entitlementsfeatureStateUpgradeRootMeta, entitlementsfeatureAttrMapFromModel(prior))
 	var upgraded EntitlementsFeatureResourceModel

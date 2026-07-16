@@ -88,10 +88,28 @@ var _ resource.ResourceWithUpgradeState = &CouponResource{}
 
 func (r *CouponResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		1: {
+		0: {
 			PriorSchema: couponResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
-				var prior CouponResourceV0Model
+				var prior CouponResourceModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				upgraded, diags := upgradeCouponStateV1(ctx, prior)
+				resp.Diagnostics.Append(diags...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				resp.Diagnostics.Append(resp.State.Set(ctx, &upgraded)...)
+			},
+		},
+		1: {
+			PriorSchema: couponResourceV1Schema(),
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var prior CouponResourceV1Model
 				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -109,7 +127,7 @@ func (r *CouponResource) UpgradeState(ctx context.Context) map[int64]resource.St
 	}
 }
 
-func couponResourceV0Schema() *schema.Schema {
+func couponResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
 		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://api.stripe.com#subscriptions), [invoices](https://api.stripe.com#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://api.stripe.com#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
 		Attributes: map[string]schema.Attribute{
@@ -234,7 +252,133 @@ func couponResourceV0Schema() *schema.Schema {
 	}
 }
 
-type CouponResourceV0Model struct {
+func couponResourceV0Schema() *schema.Schema {
+	return &schema.Schema{
+		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://api.stripe.com#subscriptions), [invoices](https://api.stripe.com#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://api.stripe.com#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
+		Attributes: map[string]schema.Attribute{
+			"object": schema.StringAttribute{
+				Computed:      true,
+				Description:   "String representing the object's type. Objects of the same type share the same value.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("coupon")},
+			},
+			"amount_off": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+			},
+			"created": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"currency": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "If `amount_off` has been set, the three-letter [ISO code for the currency](https://stripe.com/docs/currencies) of the amount to take off.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"duration": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "One of `forever`, `once`, or `repeating`. Describes how long a customer who applies this coupon will get the discount.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				Validators:    []validator.String{stringvalidator.OneOf("forever", "once", "repeating")},
+			},
+			"duration_in_months": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "If `duration` is `repeating`, the number of months the coupon applies. Null if coupon `duration` is `forever` or `once`.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+			},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Unique identifier for the object.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"livemode": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"max_redemptions": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Maximum number of times this coupon can be redeemed, in total, across all customers, before it is no longer valid.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+			},
+			"metadata": schema.MapAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.",
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+				ElementType:   types.StringType,
+			},
+			"name": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Name of the coupon displayed to customers on for instance invoices or receipts.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"percent_off": schema.Float64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Percent that will be taken off the subtotal of any invoices for this customer for the duration of the coupon. For example, a coupon with percent_off of 50 will make a $ (or local equivalent)100 invoice $ (or local equivalent)50 instead.",
+				PlanModifiers: []planmodifier.Float64{float64planmodifier.UseStateForUnknown(), float64planmodifier.RequiresReplace()},
+			},
+			"redeem_by": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Date after which the coupon can no longer be redeemed.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+			},
+			"times_redeemed": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Number of times this coupon has been applied to a customer.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"valid": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "Taking account of the above properties, whether this coupon can still be applied to a customer.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+		},
+		Blocks: map[string]schema.Block{
+			"applies_to": schema.ListNestedBlock{
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"products": schema.ListAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "A list of product IDs this coupon applies to",
+							PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
+							ElementType:   types.StringType,
+						},
+					},
+				},
+			},
+			"currency_options": schema.ListNestedBlock{
+				Description: "Coupons defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"key": schema.StringAttribute{
+							Required:    true,
+							Description: "Key for this entry.",
+						},
+						"amount_off": schema.Int64Attribute{
+							Required:    true,
+							Description: "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer.",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+type CouponResourceV1Model struct {
 	Object           types.String  `tfsdk:"object"`
 	AmountOff        types.Int64   `tfsdk:"amount_off"`
 	AppliesTo        types.Object  `tfsdk:"applies_to"`
@@ -548,6 +692,13 @@ func couponUpgradeSingletonListToObject(path []string, meta couponStateUpgradeAt
 }
 
 func couponUpgradeObjectValueToSingletonList(path []string, meta couponStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return couponUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return couponUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -641,7 +792,7 @@ func couponUpgradeValue(path []string, meta couponStateUpgradeAttrMeta, priorVal
 	}
 }
 
-func upgradeCouponStateV1(ctx context.Context, prior CouponResourceV0Model) (CouponResourceModel, diag.Diagnostics) {
+func upgradeCouponStateV1(ctx context.Context, prior interface{}) (CouponResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := couponUpgradeAttrs(nil, couponStateUpgradeRootMeta, couponAttrMapFromModel(prior))
 	var upgraded CouponResourceModel

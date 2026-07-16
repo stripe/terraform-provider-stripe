@@ -88,10 +88,28 @@ var _ resource.ResourceWithUpgradeState = &V2CoreEventDestinationResource{}
 
 func (r *V2CoreEventDestinationResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		1: {
+		0: {
 			PriorSchema: v2CoreEventDestinationResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
-				var prior V2CoreEventDestinationResourceV0Model
+				var prior V2CoreEventDestinationResourceModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				upgraded, diags := upgradeV2CoreEventDestinationStateV1(ctx, prior)
+				resp.Diagnostics.Append(diags...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				resp.Diagnostics.Append(resp.State.Set(ctx, &upgraded)...)
+			},
+		},
+		1: {
+			PriorSchema: v2CoreEventDestinationResourceV1Schema(),
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var prior V2CoreEventDestinationResourceV1Model
 				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -109,7 +127,7 @@ func (r *V2CoreEventDestinationResource) UpgradeState(ctx context.Context) map[i
 	}
 }
 
-func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
+func v2CoreEventDestinationResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
 		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks) and [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
 		Attributes: map[string]schema.Attribute{
@@ -301,7 +319,201 @@ func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 	}
 }
 
-type V2CoreEventDestinationResourceV0Model struct {
+func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
+	return &schema.Schema{
+		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks) and [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
+		Attributes: map[string]schema.Attribute{
+			"object": schema.StringAttribute{
+				Computed:      true,
+				Description:   "String representing the object's type. Objects of the same type share the same value of the object field.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("v2.core.event_destination")},
+			},
+			"azure_event_grid": schema.SingleNestedAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Azure Event Grid configuration.",
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"azure_partner_topic_name": schema.StringAttribute{
+						Computed:      true,
+						Description:   "The name of the Azure partner topic.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
+					"azure_partner_topic_status": schema.StringAttribute{
+						Computed:      true,
+						Description:   "The status of the Azure partner topic.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Validators:    []validator.String{stringvalidator.OneOf("activated", "deleted", "never_activated", "unknown")},
+					},
+					"azure_region": schema.StringAttribute{
+						Required:      true,
+						Description:   "The Azure region.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+					},
+					"azure_resource_group_name": schema.StringAttribute{
+						Required:      true,
+						Description:   "The name of the Azure resource group.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+					},
+					"azure_subscription_id": schema.StringAttribute{
+						Required:      true,
+						Description:   "The Azure subscription ID.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+					},
+				},
+			},
+			"created": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Time at which the object was created.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"description": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "An optional description of what the event destination is used for.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"enabled_events": schema.ListAttribute{
+				Required:    true,
+				Description: "The list of events to enable for this endpoint.",
+				ElementType: types.StringType,
+			},
+			"event_payload": schema.StringAttribute{
+				Required:      true,
+				Description:   "Payload type of events being subscribed to.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Validators:    []validator.String{stringvalidator.OneOf("snapshot", "thin")},
+			},
+			"events_from": schema.ListAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Specifies which accounts' events route to this destination.\n`@self`: Receive events from the account that owns the event destination.\n`@accounts`: Receive events emitted from other accounts you manage which includes your v1 and v2 accounts.\n`@organization_members`: Receive events from accounts directly linked to the organization.\n`@organization_members/@accounts`: Receive events from all accounts connected to any platform accounts in the organization.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
+				ElementType:   types.StringType,
+			},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Unique identifier for the object.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"livemode": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "Has the value `true` if the object exists in live mode or the value `false` if the object exists in test mode.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"metadata": schema.MapAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Metadata.",
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+				ElementType:   types.StringType,
+			},
+			"name": schema.StringAttribute{
+				Required:    true,
+				Description: "Event destination name.",
+			},
+			"snapshot_api_version": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "If using the snapshot event payload, the API version events are rendered as.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"status": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Status. It can be set to either enabled or disabled.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("disabled", "enabled")},
+			},
+			"status_details": schema.SingleNestedAttribute{
+				Computed:      true,
+				Description:   "Additional information about event destination status.",
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Attributes: map[string]schema.Attribute{
+					"disabled": schema.SingleNestedAttribute{
+						Computed:      true,
+						Description:   "Details about why the event destination has been disabled.",
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+						Attributes: map[string]schema.Attribute{
+							"reason": schema.StringAttribute{
+								Computed:      true,
+								Description:   "Reason event destination has been disabled.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("no_aws_event_source_exists", "no_azure_partner_topic_exists", "user")},
+							},
+						},
+					},
+				},
+			},
+			"type": schema.StringAttribute{
+				Required:      true,
+				Description:   "Event destination type.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				Validators:    []validator.String{stringvalidator.OneOf("amazon_eventbridge", "azure_event_grid", "webhook_endpoint")},
+			},
+			"updated": schema.StringAttribute{
+				Computed:    true,
+				Description: "Time at which the object was last updated.",
+			},
+			"include": schema.ListAttribute{
+				Optional:    true,
+				Description: "Additional fields to include in the response.",
+				WriteOnly:   true,
+				ElementType: types.StringType,
+			},
+		},
+		Blocks: map[string]schema.Block{
+			"amazon_eventbridge": schema.ListNestedBlock{
+				Description:   "Amazon EventBridge configuration.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"aws_account_id": schema.StringAttribute{
+							Required:      true,
+							Description:   "The AWS account ID.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"aws_event_source_arn": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The ARN of the AWS event source.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"aws_event_source_status": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The state of the AWS event source.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							Validators:    []validator.String{stringvalidator.OneOf("active", "deleted", "pending", "unknown")},
+						},
+						"aws_region": schema.StringAttribute{
+							Required:      true,
+							Description:   "The region of the AWS event source.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+					},
+				},
+			},
+			"webhook_endpoint": schema.ListNestedBlock{
+				Description:   "Webhook endpoint configuration.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"signing_secret": schema.StringAttribute{
+							Computed:      true,
+							Description:   "The signing secret of the webhook endpoint, only includable on creation.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"url": schema.StringAttribute{
+							Required:    true,
+							Description: "The URL of the webhook endpoint, includable.",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+type V2CoreEventDestinationResourceV1Model struct {
 	Object             types.String `tfsdk:"object"`
 	AmazonEventbridge  types.Object `tfsdk:"amazon_eventbridge"`
 	AzureEventGrid     types.Object `tfsdk:"azure_event_grid"`
@@ -617,6 +829,13 @@ func v2coreeventdestinationUpgradeSingletonListToObject(path []string, meta v2co
 }
 
 func v2coreeventdestinationUpgradeObjectValueToSingletonList(path []string, meta v2coreeventdestinationStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return v2coreeventdestinationUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return v2coreeventdestinationUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -710,7 +929,7 @@ func v2coreeventdestinationUpgradeValue(path []string, meta v2coreeventdestinati
 	}
 }
 
-func upgradeV2CoreEventDestinationStateV1(ctx context.Context, prior V2CoreEventDestinationResourceV0Model) (V2CoreEventDestinationResourceModel, diag.Diagnostics) {
+func upgradeV2CoreEventDestinationStateV1(ctx context.Context, prior interface{}) (V2CoreEventDestinationResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := v2coreeventdestinationUpgradeAttrs(nil, v2coreeventdestinationStateUpgradeRootMeta, v2coreeventdestinationAttrMapFromModel(prior))
 	var upgraded V2CoreEventDestinationResourceModel

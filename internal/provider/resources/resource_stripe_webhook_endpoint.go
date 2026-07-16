@@ -490,6 +490,13 @@ func webhookendpointUpgradeSingletonListToObject(path []string, meta webhookendp
 }
 
 func webhookendpointUpgradeObjectValueToSingletonList(path []string, meta webhookendpointStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return webhookendpointUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return webhookendpointUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -583,7 +590,7 @@ func webhookendpointUpgradeValue(path []string, meta webhookendpointStateUpgrade
 	}
 }
 
-func upgradeWebhookEndpointStateV0(ctx context.Context, prior WebhookEndpointResourceV0Model) (WebhookEndpointResourceModel, diag.Diagnostics) {
+func upgradeWebhookEndpointStateV0(ctx context.Context, prior interface{}) (WebhookEndpointResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := webhookendpointUpgradeAttrs(nil, webhookendpointStateUpgradeRootMeta, webhookendpointAttrMapFromModel(prior))
 	var upgraded WebhookEndpointResourceModel

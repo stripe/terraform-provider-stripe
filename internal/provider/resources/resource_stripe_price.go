@@ -93,10 +93,28 @@ var _ resource.ResourceWithUpgradeState = &PriceResource{}
 
 func (r *PriceResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		1: {
+		0: {
 			PriorSchema: priceResourceV0Schema(),
 			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
-				var prior PriceResourceV0Model
+				var prior PriceResourceModel
+				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				upgraded, diags := upgradePriceStateV1(ctx, prior)
+				resp.Diagnostics.Append(diags...)
+				if resp.Diagnostics.HasError() {
+					return
+				}
+
+				resp.Diagnostics.Append(resp.State.Set(ctx, &upgraded)...)
+			},
+		},
+		1: {
+			PriorSchema: priceResourceV1Schema(),
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				var prior PriceResourceV1Model
 				resp.Diagnostics.Append(req.State.Get(ctx, &prior)...)
 				if resp.Diagnostics.HasError() {
 					return
@@ -114,7 +132,7 @@ func (r *PriceResource) UpgradeState(ctx context.Context) map[int64]resource.Sta
 	}
 }
 
-func priceResourceV0Schema() *schema.Schema {
+func priceResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
 		Description: "Prices define the unit cost, currency, and (optional) billing cycle for both recurring and one-time purchases of products.\n[Products](https://api.stripe.com#products) help you track inventory or provisioning, and prices help you track payment terms. Different physical goods or levels of service should be represented by products, and pricing options should be represented by prices. This approach lets you change prices without having to change your provisioning scheme.\n\nFor example, you might have a single \"gold\" product that has prices for $10/month, $100/year, and €9 once.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription), [create an invoice](https://docs.stripe.com/billing/invoices/create), and more about [products and prices](https://docs.stripe.com/products-prices/overview).",
 		Attributes: map[string]schema.Attribute{
@@ -465,7 +483,364 @@ func priceResourceV0Schema() *schema.Schema {
 	}
 }
 
-type PriceResourceV0Model struct {
+func priceResourceV0Schema() *schema.Schema {
+	return &schema.Schema{
+		Description: "Prices define the unit cost, currency, and (optional) billing cycle for both recurring and one-time purchases of products.\n[Products](https://api.stripe.com#products) help you track inventory or provisioning, and prices help you track payment terms. Different physical goods or levels of service should be represented by products, and pricing options should be represented by prices. This approach lets you change prices without having to change your provisioning scheme.\n\nFor example, you might have a single \"gold\" product that has prices for $10/month, $100/year, and €9 once.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription), [create an invoice](https://docs.stripe.com/billing/invoices/create), and more about [products and prices](https://docs.stripe.com/products-prices/overview).",
+		Attributes: map[string]schema.Attribute{
+			"object": schema.StringAttribute{
+				Computed:      true,
+				Description:   "String representing the object's type. Objects of the same type share the same value.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("price")},
+			},
+			"active": schema.BoolAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Whether the price can be used for new purchases.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"billing_scheme": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Describes how to compute the price per period. Either `per_unit` or `tiered`. `per_unit` indicates that the fixed amount (specified in `unit_amount` or `unit_amount_decimal`) will be charged per unit in `quantity` (for prices with `usage_type=licensed`), or per unit of total usage (for prices with `usage_type=metered`). `tiered` indicates that the unit pricing will be computed using a tiering strategy as defined using the `tiers` and `tiers_mode` attributes.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				Validators:    []validator.String{stringvalidator.OneOf("per_unit", "tiered")},
+			},
+			"created": schema.Int64Attribute{
+				Computed:      true,
+				Description:   "Time at which the object was created. Measured in seconds since the Unix epoch.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+			},
+			"currency": schema.StringAttribute{
+				Required:      true,
+				Description:   "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"id": schema.StringAttribute{
+				Computed:      true,
+				Description:   "Unique identifier for the object.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"livemode": schema.BoolAttribute{
+				Computed:      true,
+				Description:   "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
+				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"lookup_key": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "A lookup key used to retrieve prices dynamically from a static string. This may be up to 200 characters.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"metadata": schema.MapAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.",
+				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
+				ElementType:   types.StringType,
+			},
+			"nickname": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "A brief description of the price, hidden from customers.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"product": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The ID of the product this price is associated with.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+			},
+			"tax_behavior": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Only required if a [default tax behavior](https://docs.stripe.com/tax/products-prices-tax-categories-tax-behavior#setting-a-default-tax-behavior-(recommended)) was not provided in the Stripe Tax settings. Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`. Once specified as either `inclusive` or `exclusive`, it cannot be changed.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("exclusive", "inclusive", "unspecified")},
+			},
+			"tiers_mode": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Defines if the tiering price should be `graduated` or `volume` based. In `volume`-based tiering, the maximum quantity within a period determines the per unit price. In `graduated` tiering, pricing can change as the quantity grows.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				Validators:    []validator.String{stringvalidator.OneOf("graduated", "volume")},
+			},
+			"transform_quantity": schema.SingleNestedAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "Apply a transformation to the reported usage or set quantity before computing the amount billed. Cannot be combined with `tiers`.",
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"divide_by": schema.Int64Attribute{
+						Required:      true,
+						Description:   "Divide usage by this number.",
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+					},
+					"round": schema.StringAttribute{
+						Required:      true,
+						Description:   "After division, either round the result `up` or `down`.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						Validators:    []validator.String{stringvalidator.OneOf("down", "up")},
+					},
+				},
+			},
+			"type": schema.StringAttribute{
+				Computed:      true,
+				Description:   "One of `one_time` or `recurring` depending on whether the price is for a one-time purchase or a recurring (subscription) purchase.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Validators:    []validator.String{stringvalidator.OneOf("one_time", "recurring")},
+			},
+			"unit_amount": schema.Int64Attribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The unit amount in cents (or local equivalent) to be charged, represented as a whole integer if possible. Only set if `billing_scheme=per_unit`.",
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+			},
+			"unit_amount_decimal": schema.StringAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The unit amount in cents (or local equivalent) to be charged, represented as a decimal string with at most 12 decimal places. Only set if `billing_scheme=per_unit`.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), equivalentDecimalStringPlanModifier(), stringplanmodifier.RequiresReplace()},
+			},
+			"transfer_lookup_key": schema.BoolAttribute{
+				Optional:    true,
+				Description: "If set to true, will atomically remove the lookup key from the existing price, and assign it to this price.",
+				WriteOnly:   true,
+			},
+		},
+		Blocks: map[string]schema.Block{
+			"currency_options": schema.ListNestedBlock{
+				Description: "Prices defined in each available currency option. Each key must be a three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html) and a [supported currency](https://stripe.com/docs/currencies).",
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"key": schema.StringAttribute{
+							Required:    true,
+							Description: "Key for this entry.",
+						},
+						"tax_behavior": schema.StringAttribute{
+							Optional:    true,
+							Description: "Only required if a [default tax behavior](https://docs.stripe.com/tax/products-prices-tax-categories-tax-behavior#setting-a-default-tax-behavior-(recommended)) was not provided in the Stripe Tax settings. Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of `inclusive`, `exclusive`, or `unspecified`. Once specified as either `inclusive` or `exclusive`, it cannot be changed.",
+							Validators:  []validator.String{stringvalidator.OneOf("exclusive", "inclusive", "unspecified")},
+						},
+						"tiers": schema.ListNestedAttribute{
+							Optional:    true,
+							Description: "Each element represents a pricing tier. This parameter requires `billing_scheme` to be set to `tiered`. See also the documentation for `billing_scheme`.",
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"flat_amount": schema.Int64Attribute{
+										Optional:    true,
+										Description: "Price for the entire tier.",
+									},
+									"flat_amount_decimal": schema.StringAttribute{
+										Optional:      true,
+										Description:   "Same as `flat_amount`, but contains a decimal value with at most 12 decimal places.",
+										PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier()},
+									},
+									"unit_amount": schema.Int64Attribute{
+										Optional:    true,
+										Description: "Per unit price for units relevant to the tier.",
+									},
+									"unit_amount_decimal": schema.StringAttribute{
+										Optional:      true,
+										Description:   "Same as `unit_amount`, but contains a decimal value with at most 12 decimal places.",
+										PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier()},
+									},
+									"up_to": schema.StringAttribute{
+										Required:    true,
+										Description: "Up to and including to this quantity will be contained in the tier.",
+									},
+								},
+							},
+						},
+						"unit_amount": schema.Int64Attribute{
+							Optional:    true,
+							Description: "The unit amount in cents (or local equivalent) to be charged, represented as a whole integer if possible. Only set if `billing_scheme=per_unit`.",
+						},
+						"unit_amount_decimal": schema.StringAttribute{
+							Optional:      true,
+							Description:   "The unit amount in cents (or local equivalent) to be charged, represented as a decimal string with at most 12 decimal places. Only set if `billing_scheme=per_unit`.",
+							PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier()},
+						},
+					},
+					Blocks: map[string]schema.Block{
+						"custom_unit_amount": schema.ListNestedBlock{
+							Description: "When set, provides configuration for the amount to be adjusted by the customer during Checkout Sessions and Payment Links.",
+							NestedObject: schema.NestedBlockObject{
+								Attributes: map[string]schema.Attribute{
+									"maximum": schema.Int64Attribute{
+										Optional:    true,
+										Description: "The maximum unit amount the customer can specify for this item.",
+									},
+									"minimum": schema.Int64Attribute{
+										Optional:    true,
+										Description: "The minimum unit amount the customer can specify for this item. Must be at least the minimum charge amount.",
+									},
+									"preset": schema.Int64Attribute{
+										Optional:    true,
+										Description: "The starting unit amount which can be updated by the customer.",
+									},
+									"enabled": schema.BoolAttribute{
+										Required:    true,
+										Description: "Pass in `true` to enable `custom_unit_amount`, otherwise omit `custom_unit_amount`.",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"custom_unit_amount": schema.ListNestedBlock{
+				Description:   "When set, provides configuration for the amount to be adjusted by the customer during Checkout Sessions and Payment Links.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"maximum": schema.Int64Attribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "The maximum unit amount the customer can specify for this item.",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+						},
+						"minimum": schema.Int64Attribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "The minimum unit amount the customer can specify for this item. Must be at least the minimum charge amount.",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+						},
+						"preset": schema.Int64Attribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "The starting unit amount which can be updated by the customer.",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+						},
+						"enabled": schema.BoolAttribute{
+							Required:      true,
+							Description:   "Pass in `true` to enable `custom_unit_amount`, otherwise omit `custom_unit_amount`.",
+							PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
+						},
+					},
+				},
+			},
+			"recurring": schema.ListNestedBlock{
+				Description:   "The recurring components of a price such as `interval` and `usage_type`.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"interval": schema.StringAttribute{
+							Required:      true,
+							Description:   "The frequency at which a subscription is billed. One of `day`, `week`, `month` or `year`.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+							Validators:    []validator.String{stringvalidator.OneOf("day", "month", "week", "year")},
+						},
+						"interval_count": schema.Int64Attribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "The number of intervals (specified in the `interval` attribute) between subscription billings. For example, `interval=month` and `interval_count=3` bills every 3 months.",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+						},
+						"meter": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "The meter tracking the usage of a metered price",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+						},
+						"trial_period_days": schema.Int64Attribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Default number of trial days when subscribing a customer to this price using [`trial_from_plan=true`](https://docs.stripe.com/api#create_subscription-trial_from_plan).",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
+						},
+						"usage_type": schema.StringAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "Configures how the quantity per period should be determined. Can be either `metered` or `licensed`. `licensed` automatically bills the `quantity` set when adding it to a subscription. `metered` aggregates the total usage based on usage records. Defaults to `licensed`.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+							Validators:    []validator.String{stringvalidator.OneOf("licensed", "metered")},
+						},
+					},
+				},
+			},
+			"tiers": schema.ListNestedBlock{
+				Description:   "Each element represents a pricing tier. This parameter requires `billing_scheme` to be set to `tiered`. See also the documentation for `billing_scheme`.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"flat_amount": schema.Int64Attribute{
+							Optional:      true,
+							Description:   "Price for the entire tier.",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+						},
+						"flat_amount_decimal": schema.StringAttribute{
+							Optional:      true,
+							Description:   "Same as `flat_amount`, but contains a decimal value with at most 12 decimal places.",
+							PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier(), stringplanmodifier.RequiresReplace()},
+						},
+						"unit_amount": schema.Int64Attribute{
+							Optional:      true,
+							Description:   "Per unit price for units relevant to the tier.",
+							PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
+						},
+						"unit_amount_decimal": schema.StringAttribute{
+							Optional:      true,
+							Description:   "Same as `unit_amount`, but contains a decimal value with at most 12 decimal places.",
+							PlanModifiers: []planmodifier.String{equivalentDecimalStringPlanModifier(), stringplanmodifier.RequiresReplace()},
+						},
+						"up_to": schema.StringAttribute{
+							Required:      true,
+							Description:   "Up to and including to this quantity will be contained in the tier.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+					},
+				},
+			},
+			"product_data": schema.ListNestedBlock{
+				Description:   "These fields can be used to create a new product that this price will belong to.",
+				PlanModifiers: []planmodifier.List{listplanmodifier.RequiresReplace()},
+				NestedObject: schema.NestedBlockObject{
+					Attributes: map[string]schema.Attribute{
+						"active": schema.BoolAttribute{
+							Optional:      true,
+							Description:   "Whether the product is currently available for purchase. Defaults to `true`.",
+							PlanModifiers: []planmodifier.Bool{boolplanmodifier.RequiresReplace()},
+						},
+						"id": schema.StringAttribute{
+							Optional:      true,
+							Description:   "The identifier for the product. Must be unique. If not provided, an identifier will be randomly generated.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"metadata": schema.MapAttribute{
+							Optional:      true,
+							Description:   "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.",
+							PlanModifiers: []planmodifier.Map{mapplanmodifier.RequiresReplace()},
+							ElementType:   types.StringType,
+						},
+						"name": schema.StringAttribute{
+							Required:      true,
+							Description:   "The product's name, meant to be displayable to the customer.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"statement_descriptor": schema.StringAttribute{
+							Optional:      true,
+							Description:   "An arbitrary string to be displayed on your customer's credit card or bank statement. While most banks display this information consistently, some may display it incorrectly or not at all.\n\nThis may be up to 22 characters. The statement description may not include `<`, `>`, `\\`, `\"`, `'` characters, and will appear on your customer's statement in capital letters. Non-ASCII characters are automatically stripped.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"tax_code": schema.StringAttribute{
+							Optional:      true,
+							Description:   "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+						"unit_label": schema.StringAttribute{
+							Optional:      true,
+							Description:   "A label that represents units of this product. When set, this will be included in customers' receipts, invoices, Checkout, and the customer portal.",
+							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+type PriceResourceV1Model struct {
 	Object            types.String `tfsdk:"object"`
 	Active            types.Bool   `tfsdk:"active"`
 	BillingScheme     types.String `tfsdk:"billing_scheme"`
@@ -785,6 +1160,13 @@ func priceUpgradeSingletonListToObject(path []string, meta priceStateUpgradeAttr
 }
 
 func priceUpgradeObjectValueToSingletonList(path []string, meta priceStateUpgradeAttrMeta, listType basetypes.ListType, priorValue attr.Value) attr.Value {
+	if listValue, ok := priorValue.(types.List); ok {
+		return priceUpgradeListValue(path, meta, listType, listValue)
+	}
+	if baseList, ok := priorValue.(basetypes.ListValue); ok {
+		return priceUpgradeListValue(path, meta, listType, types.List(baseList))
+	}
+
 	objectValue, ok := priorValue.(types.Object)
 	if !ok {
 		if baseObject, baseOk := priorValue.(basetypes.ObjectValue); baseOk {
@@ -878,7 +1260,7 @@ func priceUpgradeValue(path []string, meta priceStateUpgradeAttrMeta, priorValue
 	}
 }
 
-func upgradePriceStateV1(ctx context.Context, prior PriceResourceV0Model) (PriceResourceModel, diag.Diagnostics) {
+func upgradePriceStateV1(ctx context.Context, prior interface{}) (PriceResourceModel, diag.Diagnostics) {
 	_ = ctx
 	upgradedAttrs := priceUpgradeAttrs(nil, priceStateUpgradeRootMeta, priceAttrMapFromModel(prior))
 	var upgraded PriceResourceModel

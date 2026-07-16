@@ -6,11 +6,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"slices"
 	"strings"
 	"time"
 )
+
+var modulePathPattern = regexp.MustCompile(`\{\{MODULE_PATH:([^}]+)\}\}`)
 
 func RenderManagedConfig(env TestEnv, templateName string, extras map[string]string) string {
 	return renderConfig(env, templateName, extras)
@@ -62,6 +65,7 @@ func renderConfig(env TestEnv, templateName string, extras map[string]string) st
 	for key, value := range replacements {
 		rendered = strings.ReplaceAll(rendered, key, value)
 	}
+	rendered = renderModulePathTokens(rendered)
 
 	return providerConfig(env) + "\n" + rendered
 }
@@ -136,6 +140,43 @@ func resolveTemplatePath(templateName string) (string, error) {
 
 	slices.Sort(matches)
 	return matches[0], nil
+}
+
+func renderModulePathTokens(template string) string {
+	return modulePathPattern.ReplaceAllStringFunc(template, func(token string) string {
+		matches := modulePathPattern.FindStringSubmatch(token)
+		if len(matches) != 2 {
+			panic(fmt.Errorf("invalid module path token %q", token))
+		}
+
+		return mustResolveTestdataDirectory(matches[1])
+	})
+}
+
+func mustResolveTestdataDirectory(relativePath string) string {
+	testdataRoot := testdataPath("")
+	resolvedPath := filepath.Clean(
+		filepath.Join(testdataRoot, filepath.FromSlash(relativePath)),
+	)
+
+	relativeResolvedPath, err := filepath.Rel(testdataRoot, resolvedPath)
+	if err != nil {
+		panic(err)
+	}
+	if relativeResolvedPath == ".." ||
+		strings.HasPrefix(relativeResolvedPath, ".."+string(filepath.Separator)) {
+		panic(fmt.Errorf("module testdata path %q escapes testdata root", relativePath))
+	}
+
+	info, err := os.Stat(resolvedPath)
+	if err != nil {
+		panic(err)
+	}
+	if !info.IsDir() {
+		panic(fmt.Errorf("module testdata path %q is not a directory", relativePath))
+	}
+
+	return resolvedPath
 }
 
 func mustResolveTemplatePath(templateName string) string {

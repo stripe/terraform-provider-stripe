@@ -69,6 +69,85 @@ func runBaseManagedLegacyUpgradeCase(
 	}, legacyUpgradeProviderVersion)
 }
 
+func runBaseManagedModuleLegacyUpgradeCase(
+	t *testing.T,
+	name string,
+	surface string,
+	resourceAddress string,
+	createTemplate string,
+	verifyCreate runner.StateVerifier,
+	verifyDestroy runner.StateVerifier,
+) {
+	t.Helper()
+
+	runner.RunManagedModuleLegacyUpgradeCase(t, runner.ManagedCase{
+		Definition: runner.CaseDefinition{
+			Name:    name,
+			Surface: surface,
+			Group:   "base",
+			Kind:    "resource",
+		},
+		ResourceAddress: resourceAddress,
+		CreateTemplate:  createTemplate,
+		VerifyCreate:    verifyCreate,
+		VerifyDestroy:   verifyDestroy,
+	}, legacyUpgradeProviderVersion)
+}
+
+func runBaseManagedLegacyUpgradeCaseWithStateAddresses(
+	t *testing.T,
+	name string,
+	surface string,
+	resourceAddress string,
+	stateAddresses []string,
+	createTemplate string,
+	verifyCreate runner.StateVerifier,
+	verifyDestroy runner.StateVerifier,
+) {
+	t.Helper()
+
+	runner.RunManagedLegacyUpgradeCase(t, runner.ManagedCase{
+		Definition: runner.CaseDefinition{
+			Name:    name,
+			Surface: surface,
+			Group:   "base",
+			Kind:    "resource",
+		},
+		ResourceAddress: resourceAddress,
+		StateAddresses:  stateAddresses,
+		CreateTemplate:  createTemplate,
+		VerifyCreate:    verifyCreate,
+		VerifyDestroy:   verifyDestroy,
+	}, legacyUpgradeProviderVersion)
+}
+
+func runBaseManagedModuleLegacyUpgradeCaseWithStateAddresses(
+	t *testing.T,
+	name string,
+	surface string,
+	resourceAddress string,
+	stateAddresses []string,
+	createTemplate string,
+	verifyCreate runner.StateVerifier,
+	verifyDestroy runner.StateVerifier,
+) {
+	t.Helper()
+
+	runner.RunManagedModuleLegacyUpgradeCase(t, runner.ManagedCase{
+		Definition: runner.CaseDefinition{
+			Name:    name,
+			Surface: surface,
+			Group:   "base",
+			Kind:    "resource",
+		},
+		ResourceAddress: resourceAddress,
+		StateAddresses:  stateAddresses,
+		CreateTemplate:  createTemplate,
+		VerifyCreate:    verifyCreate,
+		VerifyDestroy:   verifyDestroy,
+	}, legacyUpgradeProviderVersion)
+}
+
 func runBaseManagedCaseWithImportIgnore(
 	t *testing.T,
 	name string,
@@ -379,6 +458,45 @@ func TestAccManagedProductDefaultPriceDataLegacyUpgrade(t *testing.T) {
 			},
 		}),
 		verifyProductDestroyInactive,
+	)
+}
+
+func TestAccManagedProductModuleLegacyUpgrade(t *testing.T) {
+	runBaseManagedModuleLegacyUpgradeCase(
+		t,
+		"product_module_legacy_upgrade",
+		"stripe_product",
+		"module.test.stripe_product.test",
+		"product_module_legacy_upgrade.tf",
+		func(env runner.TestEnv, client *stripe.Client, state *terraform.State) error {
+			if err := verifyProduct(productExpectations{
+				Address:           "module.test.stripe_product.test",
+				CompareStateAttrs: []string{"name", "description"},
+				CompareMetadata:   true,
+				CheckActive:       true,
+				ExpectedActive:    true,
+				StateStrings: []stateStringExpectation{
+					{Attribute: "default_price_data.0.currency", Expected: "usd"},
+					{Attribute: "default_price_data.0.recurring.0.interval", Expected: "month"},
+				},
+				CheckDefaultPrice: true,
+				ExpectedDefaultPrice: productDefaultPriceExpectation{
+					Currency:      "usd",
+					UnitAmount:    1500,
+					Recurring:     true,
+					Interval:      "month",
+					IntervalCount: 1,
+				},
+			})(env, client, state); err != nil {
+				return err
+			}
+
+			return verifyOutputExpectations([]outputExpectation{
+				{Name: "default_price_currency", Expected: "usd"},
+				{Name: "default_price_interval", Expected: "month"},
+			})(env, client, state)
+		},
+		verifyProductDestroyInactiveAt("module.test.stripe_product.test"),
 	)
 }
 
@@ -844,6 +962,50 @@ func TestAccManagedPriceTieredLegacyUpgrade(t *testing.T) {
 			},
 		}),
 		verifyPriceDestroyInactive,
+	)
+}
+
+func TestAccManagedPriceModuleLegacyUpgrade(t *testing.T) {
+	runBaseManagedModuleLegacyUpgradeCaseWithStateAddresses(
+		t,
+		"price_module_legacy_upgrade",
+		"stripe_price",
+		"module.test.stripe_price.test",
+		[]string{
+			"module.test.stripe_price.test",
+			"module.test.stripe_product.product",
+		},
+		"price_module_legacy_upgrade.tf",
+		func(env runner.TestEnv, client *stripe.Client, state *terraform.State) error {
+			if err := verifyPrice(priceExpectations{
+				Address:               "module.test.stripe_price.test",
+				CompareStateAttrs:     []string{"currency", "product", "recurring.0.interval"},
+				CompareMetadata:       true,
+				CheckActive:           true,
+				ExpectedActive:        true,
+				CheckType:             true,
+				ExpectedType:          "recurring",
+				CheckBillingScheme:    true,
+				ExpectedBillingScheme: "tiered",
+				CheckRecurring:        true,
+				ExpectedRecurring: priceRecurringExpectation{
+					Interval:  "month",
+					UsageType: "licensed",
+				},
+				DecimalStrings: []decimalStringExpectation{
+					{Attribute: "tiers.0.unit_amount_decimal", Expected: "900.0"},
+				},
+			})(env, client, state); err != nil {
+				return err
+			}
+
+			return verifyOutputExpectations([]outputExpectation{
+				{Name: "price_product_id", ResourceAddress: "module.test.stripe_product.product"},
+				{Name: "price_recurring_interval", Expected: "month"},
+				{Name: "price_tier_unit_amount", Expected: "900"},
+			})(env, client, state)
+		},
+		verifyPriceDestroyInactiveAt("module.test.stripe_price.test"),
 	)
 }
 
@@ -1331,6 +1493,74 @@ func TestAccManagedV2CoreEventDestinationLegacyUpgrade(t *testing.T) {
 	)
 }
 
+func TestAccManagedV2CoreEventDestinationModuleLegacyUpgrade(t *testing.T) {
+	runBaseManagedModuleLegacyUpgradeCaseWithStateAddresses(
+		t,
+		"v2_core_event_destination_module_legacy_upgrade",
+		"stripe_v2_core_event_destination",
+		"module.test.stripe_v2_core_event_destination.eventbridge",
+		[]string{
+			"module.test.stripe_v2_core_event_destination.eventbridge",
+			"module.test.stripe_v2_core_event_destination.webhook",
+		},
+		"v2_core_event_destination_module_legacy_upgrade.tf",
+		func(env runner.TestEnv, client *stripe.Client, state *terraform.State) error {
+			if err := verifyEventDestination(eventDestinationExpectations{
+				Address: "module.test.stripe_v2_core_event_destination.eventbridge",
+				CompareStateAttrs: []string{
+					"name",
+					"description",
+					"type",
+					"event_payload",
+					"amazon_eventbridge.0.aws_account_id",
+				},
+				CompareMetadata:    true,
+				CheckEnabledEvents: true,
+				ExpectedEnabledEvents: []string{
+					"v1.billing.meter.error_report_triggered",
+				},
+				CheckAmazonEventbridge: true,
+				ExpectedAWSAccountID:   "111122223333",
+			})(env, client, state); err != nil {
+				return err
+			}
+			if err := verifyEventDestination(eventDestinationExpectations{
+				Address: "module.test.stripe_v2_core_event_destination.webhook",
+				CompareStateAttrs: []string{
+					"name",
+					"description",
+					"type",
+					"event_payload",
+					"webhook_endpoint.0.url",
+				},
+				CompareMetadata:    true,
+				CheckEnabledEvents: true,
+				ExpectedEnabledEvents: []string{
+					"v1.billing.meter.error_report_triggered",
+				},
+				CheckWebhookEndpointURL: true,
+				ExpectedWebhookURLParts: []string{
+					"https://example.com/sdk-codegen/module-event-destination",
+				},
+			})(env, client, state); err != nil {
+				return err
+			}
+
+			return verifyOutputExpectations([]outputExpectation{
+				{Name: "eventbridge_aws_account_id", Expected: "111122223333"},
+				{
+					Name:     "webhook_url",
+					Expected: "https://example.com/sdk-codegen/module-event-destination",
+				},
+			})(env, client, state)
+		},
+		verifyEventDestinationDestroyMissingAt(
+			"module.test.stripe_v2_core_event_destination.eventbridge",
+			"module.test.stripe_v2_core_event_destination.webhook",
+		),
+	)
+}
+
 func TestAccManagedBillingMeterBasic(t *testing.T) {
 	runBaseManagedCase(
 		t,
@@ -1391,6 +1621,40 @@ func TestAccManagedBillingMeterLegacyUpgrade(t *testing.T) {
 			ExpectedStatus: "active",
 		}),
 		verifyBillingMeterDestroyInactive,
+	)
+}
+
+func TestAccManagedBillingMeterModuleLegacyUpgrade(t *testing.T) {
+	runBaseManagedModuleLegacyUpgradeCase(
+		t,
+		"billing_meter_module_legacy_upgrade",
+		"stripe_billing_meter",
+		"module.test.stripe_billing_meter.test",
+		"billing_meter_module_legacy_upgrade.tf",
+		func(env runner.TestEnv, client *stripe.Client, state *terraform.State) error {
+			if err := verifyBillingMeter(billingMeterExpectations{
+				Address: "module.test.stripe_billing_meter.test",
+				CompareStateAttrs: []string{
+					"display_name",
+					"event_name",
+					"customer_mapping.0.event_payload_key",
+					"customer_mapping.0.type",
+					"default_aggregation.0.formula",
+					"value_settings.0.event_payload_key",
+				},
+				CheckStatus:    true,
+				ExpectedStatus: "active",
+			})(env, client, state); err != nil {
+				return err
+			}
+
+			return verifyOutputExpectations([]outputExpectation{
+				{Name: "customer_mapping_event_payload_key", Expected: "stripe_customer_id"},
+				{Name: "default_aggregation_formula", Expected: "sum"},
+				{Name: "value_settings_event_payload_key", Expected: "usage_total"},
+			})(env, client, state)
+		},
+		verifyBillingMeterDestroyInactiveAt("module.test.stripe_billing_meter.test"),
 	)
 }
 
@@ -1850,6 +2114,37 @@ func TestAccManagedCustomerLegacyUpgrade(t *testing.T) {
 	)
 }
 
+func TestAccManagedCustomerModuleLegacyUpgrade(t *testing.T) {
+	runBaseManagedModuleLegacyUpgradeCase(
+		t,
+		"customer_module_legacy_upgrade",
+		"stripe_customer",
+		"module.test.stripe_customer.test",
+		"customer_module_legacy_upgrade.tf",
+		func(env runner.TestEnv, client *stripe.Client, state *terraform.State) error {
+			if err := verifyCustomer(customerExpectations{
+				Address:           "module.test.stripe_customer.test",
+				CompareStateAttrs: []string{"name", "email", "description"},
+				CompareMetadata:   true,
+				StateStrings: []stateStringExpectation{
+					{Attribute: "address.0.city", Expected: "San Francisco"},
+					{Attribute: "invoice_settings.0.footer", Expected: "sdk-codegen customer footer"},
+					{Attribute: "shipping.0.address.0.city", Expected: "San Francisco"},
+				},
+			})(env, client, state); err != nil {
+				return err
+			}
+
+			return verifyOutputExpectations([]outputExpectation{
+				{Name: "address_city", Expected: "San Francisco"},
+				{Name: "invoice_footer", Expected: "sdk-codegen customer footer"},
+				{Name: "shipping_address_city", Expected: "San Francisco"},
+			})(env, client, state)
+		},
+		verifyCustomerDestroyDeletedAt("module.test.stripe_customer.test"),
+	)
+}
+
 func TestAccManagedCustomerInvoiceTaxLegacyUpgrade(t *testing.T) {
 	runBaseManagedLegacyUpgradeCase(
 		t,
@@ -1927,6 +2222,43 @@ func TestAccManagedPromotionCodeLegacyUpgrade(t *testing.T) {
 			},
 		}),
 		verifyPromotionCodeDestroyInactive,
+	)
+}
+
+func TestAccManagedPromotionCodeModuleLegacyUpgrade(t *testing.T) {
+	runBaseManagedModuleLegacyUpgradeCaseWithStateAddresses(
+		t,
+		"promotion_code_module_legacy_upgrade",
+		"stripe_promotion_code",
+		"module.test.stripe_promotion_code.test",
+		[]string{
+			"module.test.stripe_promotion_code.test",
+			"module.test.stripe_coupon.coupon",
+		},
+		"promotion_code_module_legacy_upgrade.tf",
+		func(env runner.TestEnv, client *stripe.Client, state *terraform.State) error {
+			if err := verifyPromotionCode(promotionCodeExpectations{
+				Address:           "module.test.stripe_promotion_code.test",
+				CompareStateAttrs: []string{"code", "promotion.0.coupon", "restrictions.0.minimum_amount_currency"},
+				CompareMetadata:   true,
+				CheckActive:       true,
+				ExpectedActive:    true,
+				CheckRestrictions: true,
+				ExpectedRestrictions: promotionCodeRestrictionsExpectation{
+					MinimumAmount:         2000,
+					MinimumAmountCurrency: "usd",
+					FirstTimeTransaction:  true,
+				},
+			})(env, client, state); err != nil {
+				return err
+			}
+
+			return verifyOutputExpectations([]outputExpectation{
+				{Name: "promotion_coupon_id", ResourceAddress: "module.test.stripe_coupon.coupon"},
+				{Name: "minimum_amount_currency", Expected: "usd"},
+			})(env, client, state)
+		},
+		verifyPromotionCodeDestroyInactiveAt("module.test.stripe_promotion_code.test"),
 	)
 }
 
