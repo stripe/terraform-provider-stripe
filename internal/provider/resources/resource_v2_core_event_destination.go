@@ -136,6 +136,7 @@ func ResourceV2CoreEventDestination() *schema.Resource {
 							Type:        schema.TypeString,
 							Description: "The signing secret of the webhook endpoint, only includable on creation.",
 							Computed:    true,
+							Sensitive:   true,
 						},
 					},
 				},
