@@ -295,6 +295,7 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Computed:      true,
 						Description:   "The client_secret of the payment that Stripe creates for the invoice after finalization.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Sensitive:     true,
 					},
 					"type": schema.StringAttribute{
 						Computed:      true,

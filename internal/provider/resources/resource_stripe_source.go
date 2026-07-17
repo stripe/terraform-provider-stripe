@@ -580,6 +580,7 @@ func (r *SourceResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				Computed:      true,
 				Description:   "The client secret of the source. Used for client-side retrieval using a publishable key.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Sensitive:     true,
 			},
 			"code_verification": schema.SingleNestedAttribute{
 				Computed: true,

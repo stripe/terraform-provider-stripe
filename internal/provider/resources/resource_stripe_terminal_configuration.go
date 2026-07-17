@@ -893,6 +893,7 @@ func (r *TerminalConfigurationResource) Schema(_ context.Context, _ resource.Sch
 							"password": schema.StringAttribute{
 								Required:    true,
 								Description: "Password for connecting to the WiFi network",
+								Sensitive:   true,
 							},
 							"ssid": schema.StringAttribute{
 								Required:    true,
@@ -929,6 +930,7 @@ func (r *TerminalConfigurationResource) Schema(_ context.Context, _ resource.Sch
 								Computed:      true,
 								Description:   "Password for the private key file",
 								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Sensitive:     true,
 							},
 							"ssid": schema.StringAttribute{
 								Required:    true,
@@ -945,6 +947,7 @@ func (r *TerminalConfigurationResource) Schema(_ context.Context, _ resource.Sch
 							"password": schema.StringAttribute{
 								Required:    true,
 								Description: "Password for connecting to the WiFi network",
+								Sensitive:   true,
 							},
 							"ssid": schema.StringAttribute{
 								Required:    true,

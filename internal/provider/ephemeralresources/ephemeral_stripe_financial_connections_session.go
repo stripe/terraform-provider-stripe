@@ -82,6 +82,7 @@ func (r *FinancialConnectionsSessionEphemeralResource) Schema(_ context.Context,
 			"client_secret": ephemeralSchema.StringAttribute{
 				Computed:    true,
 				Description: "A value that will be passed to the client to launch the authentication flow.",
+				Sensitive:   true,
 			},
 			"filters": ephemeralSchema.SingleNestedAttribute{
 				Optional: true,

@@ -148,6 +148,7 @@ func (r *SetupIntentResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Computed:      true,
 				Description:   "The client secret of this SetupIntent. Used for client-side retrieval using a publishable key.\n\nThe client secret can be used to complete payment setup from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Sensitive:     true,
 			},
 			"created": schema.Int64Attribute{
 				Computed:      true,

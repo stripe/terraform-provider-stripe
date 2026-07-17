@@ -302,6 +302,7 @@ func v2CoreEventDestinationResourceV1Schema() *schema.Schema {
 						Computed:      true,
 						Description:   "The signing secret of the webhook endpoint, only includable on creation.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Sensitive:     true,
 					},
 					"url": schema.StringAttribute{
 						Required:    true,
@@ -501,6 +502,7 @@ func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 							Computed:      true,
 							Description:   "The signing secret of the webhook endpoint, only includable on creation.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							Sensitive:     true,
 						},
 						"url": schema.StringAttribute{
 							Required:    true,
@@ -1120,6 +1122,7 @@ func (r *V2CoreEventDestinationResource) Schema(_ context.Context, _ resource.Sc
 							Computed:      true,
 							Description:   "The signing secret of the webhook endpoint, only includable on creation.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							Sensitive:     true,
 						},
 						"url": schema.StringAttribute{
 							Required:    true,

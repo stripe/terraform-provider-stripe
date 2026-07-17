@@ -74,6 +74,7 @@ func (r *IdentityVerificationSessionEphemeralResource) Schema(_ context.Context,
 			"client_secret": ephemeralSchema.StringAttribute{
 				Computed:    true,
 				Description: "The short-lived client secret used by Stripe.js to [show a verification modal](https://docs.stripe.com/js/identity/modal) inside your app. This client secret expires after 24 hours and can only be used once. Don’t store it, log it, embed it in a URL, or expose it to anyone other than the user. Make sure that you have TLS enabled on any page that includes the client secret. Refer to our docs on [passing the client secret to the frontend](https://docs.stripe.com/identity/verification-sessions#client-secret) to learn more.",
+				Sensitive:   true,
 			},
 			"created": ephemeralSchema.Int64Attribute{
 				Computed:    true,

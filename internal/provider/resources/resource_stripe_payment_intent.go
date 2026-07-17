@@ -190,6 +190,7 @@ func (r *PaymentIntentResource) Schema(_ context.Context, _ resource.SchemaReque
 				Computed:      true,
 				Description:   "The client secret of this PaymentIntent. Used for client-side retrieval using a publishable key. \n\nThe client secret can be used to complete a payment from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.\n\nRefer to our docs to [accept a payment](https://docs.stripe.com/payments/accept-a-payment?ui=elements) and learn about how `client_secret` should be handled.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				Sensitive:     true,
 			},
 			"confirmation_method": schema.StringAttribute{
 				Optional:      true,

@@ -308,6 +308,7 @@ func (r *CheckoutSessionEphemeralResource) Schema(_ context.Context, _ ephemeral
 			"client_secret": ephemeralSchema.StringAttribute{
 				Computed:    true,
 				Description: "The client secret of your Checkout Session. Applies to Checkout Sessions with `ui_mode: embedded_page` or `ui_mode: elements`. For `ui_mode: embedded_page`, the client secret is to be used when initializing Stripe.js embedded checkout.\n For `ui_mode: elements`, use the client secret with [initCheckout](https://docs.stripe.com/js/custom_checkout/init) on your front end.",
+				Sensitive:   true,
 			},
 			"collected_information": ephemeralSchema.SingleNestedAttribute{
 				Optional:    true,
