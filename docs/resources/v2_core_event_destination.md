@@ -59,4 +59,4 @@ Required:
 
 Read-Only:
 
-- `signing_secret` (String) The signing secret of the webhook endpoint, only includable on creation.
+- `signing_secret` (String, Sensitive) The signing secret of the webhook endpoint, only includable on creation.
