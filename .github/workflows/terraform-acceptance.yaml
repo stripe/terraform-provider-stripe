@@ -1,0 +1,85 @@
+name: Terraform Acceptance
+
+on:
+  schedule:
+    # GitHub Actions cron uses UTC. Adjust if you want a different local midnight.
+    # 0 0 * * *  = midnight UTC
+    # 0 4 * * *  = midnight US Eastern (EDT, UTC-4)
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: "Optional testacc kind filter"
+        required: false
+        default: all
+        type: choice
+        options:
+          - all
+          - managed
+          - action
+          - ephemeral
+      group:
+        description: "Optional group filter (connect, issuing, treasury, ...)"
+        required: false
+        type: string
+      surface:
+        description: "Optional surface filter (e.g. stripe_customer)"
+        required: false
+        type: string
+      case:
+        description: "Optional case filter (e.g. customer_basic)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  terraform-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    env:
+      STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+      STRIPE_ACCOUNT: ${{ secrets.STRIPE_ACCOUNT }}
+      STRIPE_ISSUING_ACCOUNT: ${{ secrets.STRIPE_ISSUING_ACCOUNT }}
+      STRIPE_TREASURY_ACCOUNT: ${{ secrets.STRIPE_TREASURY_ACCOUNT }}
+      STRIPE_ISSUING_FINANCIAL_ACCOUNT: ${{ secrets.STRIPE_ISSUING_FINANCIAL_ACCOUNT }}
+      STRIPE_ISSUING_PHYSICAL_BUNDLE: ${{ secrets.STRIPE_ISSUING_PHYSICAL_BUNDLE }}
+      STRIPE_ISSUING_CARD_LOGO: ${{ secrets.STRIPE_ISSUING_CARD_LOGO }}
+      STRIPE_CREDIT_NOTE_INVOICE: ${{ secrets.STRIPE_CREDIT_NOTE_INVOICE }}
+      STRIPE_APPLE_PAY_DOMAIN: ${{ secrets.STRIPE_APPLE_PAY_DOMAIN }}
+      STRIPE_PAYMENT_METHOD_DOMAIN: ${{ secrets.STRIPE_PAYMENT_METHOD_DOMAIN }}
+      STRIPE_TERMINAL_LOCATION: ${{ secrets.STRIPE_TERMINAL_LOCATION }}
+      STRIPE_TERMINAL_READER_REGISTRATION_CODE: ${{ secrets.STRIPE_TERMINAL_READER_REGISTRATION_CODE }}
+      STRIPE_TERMINAL_READER_REGISTRATION_CODE_UPDATE: ${{ secrets.STRIPE_TERMINAL_READER_REGISTRATION_CODE_UPDATE }}
+      STRIPE_TERMINAL_READER_REGISTRATION_CODE_REGRESSION: ${{ secrets.STRIPE_TERMINAL_READER_REGISTRATION_CODE_REGRESSION }}
+
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3b3a9e8792a3efafc4a794363f4 # v3.1.2
+        with:
+          terraform_version: "1.11.0"
+
+      - name: Run terraform-acceptance
+        run: |
+          args=(--require-env)
+          if [[ -n "${{ github.event.inputs.kind }}" && "${{ github.event.inputs.kind }}" != "all" ]]; then
+            args+=(--kind "${{ github.event.inputs.kind }}")
+          fi
+          if [[ -n "${{ github.event.inputs.group }}" ]]; then
+            args+=(--group "${{ github.event.inputs.group }}")
+          fi
+          if [[ -n "${{ github.event.inputs.surface }}" ]]; then
+            args+=(--surface "${{ github.event.inputs.surface }}")
+          fi
+          if [[ -n "${{ github.event.inputs.case }}" ]]; then
+            args+=(--case "${{ github.event.inputs.case }}")
+          fi
+          bash ./scripts/testacc.sh "${args[@]}"
