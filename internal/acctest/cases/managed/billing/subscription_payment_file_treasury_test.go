@@ -822,6 +822,41 @@ func TestAccManagedShippingRateTaxBehavior(t *testing.T) {
 	)
 }
 
+func TestAccManagedShippingRateCurrencyOptions(t *testing.T) {
+	runBaseManagedCase(
+		t,
+		"shipping_rate_currency_options",
+		"stripe_shipping_rate",
+		"stripe_shipping_rate.test",
+		"shipping_rate_currency_options_create.tf",
+		"",
+		false,
+		verifyShippingRate(shippingRateExpectations{
+			Address:                     "stripe_shipping_rate.test",
+			ExpectedDisplayName:         "SDK Codegen Shipping Currency Options",
+			ExpectedActive:              true,
+			ExpectedFixedAmount:         500,
+			ExpectedFixedAmountCurrency: "usd",
+			ExpectedMinimumUnit:         "business_day",
+			ExpectedMinimumValue:        1,
+			ExpectedMaximumUnit:         "business_day",
+			ExpectedMaximumValue:        3,
+			StateStrings: []stateStringExpectation{
+				{Attribute: "fixed_amount.0.currency_options.0.key", Expected: "eur"},
+				{Attribute: "fixed_amount.0.currency_options.0.amount", Expected: "450"},
+				{Attribute: "fixed_amount.0.currency_options.0.tax_behavior", Expected: "inclusive"},
+			},
+			ExpectedMetadata: map[string]string{
+				"suite": "sdk-codegen",
+				"case":  "shipping_rate_currency_options",
+				"phase": "create",
+			},
+		}),
+		nil,
+		verifyShippingRateDestroyInactive,
+	)
+}
+
 func TestAccManagedShippingRateLegacyUpgrade(t *testing.T) {
 	// Legacy provider v0.2.2 does not accept the current schema shape for this case.
 	// Use a legacy-only create fixture so the upgrade path exercises state migration.

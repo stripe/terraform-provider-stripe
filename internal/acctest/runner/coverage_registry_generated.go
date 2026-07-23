@@ -604,7 +604,7 @@ var CoverageRegistry = []CoverageEntry{
 		Kind:                         "resource",
 		Group:                        "base",
 		Status:                       "limited",
-		CaseNames:                    []string{"shipping_rate_basic", "shipping_rate_tax_behavior", "shipping_rate_legacy_upgrade"},
+		CaseNames:                    []string{"shipping_rate_basic", "shipping_rate_currency_options", "shipping_rate_tax_behavior", "shipping_rate_legacy_upgrade"},
 		LegacyUpgradeCaseNames:       []string{"shipping_rate_legacy_upgrade"},
 		RequiresLegacyModuleUpgrade:  false,
 		LegacyModuleUpgradeCaseNames: nil,
