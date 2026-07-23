@@ -1,6 +1,9 @@
 name: Terraform Acceptance
 
 on:
+  push:
+    branches:
+      - minor-version-upgrade-0.3.0
   schedule:
     # GitHub Actions cron uses UTC. Adjust if you want a different local midnight.
     # 0 0 * * *  = midnight UTC
