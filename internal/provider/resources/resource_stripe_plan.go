@@ -128,9 +128,10 @@ func (r *PlanResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 			"id": schema.StringAttribute{
+				Optional:      true,
 				Computed:      true,
 				Description:   "Unique identifier for the object.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"interval": schema.StringAttribute{
 				Required:      true,
@@ -413,6 +414,11 @@ func expandPlanCreate(plan PlanResourceModel) (*stripe.PlanCreateParams, error) 
 	if !plan.Currency.IsNull() && !plan.Currency.IsUnknown() {
 		if !assignStringToNamedFieldOrMethod(params, "Currency", "Currency", plan.Currency.ValueString()) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "currency", params)
+		}
+	}
+	if !plan.ID.IsNull() && !plan.ID.IsUnknown() {
+		if !assignStringToNamedFieldOrMethod(params, "ID", "ID", plan.ID.ValueString()) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "id", params)
 		}
 	}
 	if !plan.Interval.IsNull() && !plan.Interval.IsUnknown() {

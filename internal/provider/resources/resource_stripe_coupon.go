@@ -198,9 +198,10 @@ func couponResourceV1Schema() *schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
 			},
 			"id": schema.StringAttribute{
+				Optional:      true,
 				Computed:      true,
 				Description:   "Unique identifier for the object.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"livemode": schema.BoolAttribute{
 				Computed:      true,
@@ -293,9 +294,10 @@ func couponResourceV0Schema() *schema.Schema {
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
 			},
 			"id": schema.StringAttribute{
+				Optional:      true,
 				Computed:      true,
 				Description:   "Unique identifier for the object.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"livemode": schema.BoolAttribute{
 				Computed:      true,
@@ -406,7 +408,7 @@ type couponStateUpgradeAttrMeta struct {
 	Nested                  map[string]couponStateUpgradeAttrMeta
 }
 
-var couponStateUpgradeRootMeta = map[string]couponStateUpgradeAttrMeta{"object": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "amount_off": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "applies_to": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}}, Behavior: "optional", LegacyBehavior: "optional", PreserveConfiguredValue: true, Nested: map[string]couponStateUpgradeAttrMeta{"products": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "created": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "currency": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "currency_options": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "amount_off": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]couponStateUpgradeAttrMeta{"key": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "amount_off": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "required", LegacyBehavior: "required"}}}, "duration": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "duration_in_months": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "livemode": couponStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "max_redemptions": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "metadata": couponStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "name": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "percent_off": couponStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "redeem_by": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "times_redeemed": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "valid": couponStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}}
+var couponStateUpgradeRootMeta = map[string]couponStateUpgradeAttrMeta{"object": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "amount_off": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "applies_to": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}}, Behavior: "optional", LegacyBehavior: "optional", PreserveConfiguredValue: true, Nested: map[string]couponStateUpgradeAttrMeta{"products": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "created": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "currency": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "currency_options": couponStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "amount_off": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]couponStateUpgradeAttrMeta{"key": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "amount_off": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "required", LegacyBehavior: "required"}}}, "duration": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "duration_in_months": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "livemode": couponStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "max_redemptions": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "metadata": couponStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "name": couponStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "percent_off": couponStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "redeem_by": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "times_redeemed": couponStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "valid": couponStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}}
 
 var couponStateUpgradeSingletonPaths = map[string]struct{}{}
 
@@ -842,9 +844,10 @@ func (r *CouponResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
 			},
 			"id": schema.StringAttribute{
+				Optional:      true,
 				Computed:      true,
 				Description:   "Unique identifier for the object.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"livemode": schema.BoolAttribute{
 				Computed:      true,
@@ -1099,6 +1102,11 @@ func expandCouponCreate(plan CouponResourceModel) (*stripe.CouponCreateParams, e
 	}
 	if !plan.DurationInMonths.IsNull() && !plan.DurationInMonths.IsUnknown() {
 		params.DurationInMonths = stripe.Int64(plan.DurationInMonths.ValueInt64())
+	}
+	if !plan.ID.IsNull() && !plan.ID.IsUnknown() {
+		if !assignStringToNamedFieldOrMethod(params, "ID", "ID", plan.ID.ValueString()) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "id", params)
+		}
 	}
 	if !plan.MaxRedemptions.IsNull() && !plan.MaxRedemptions.IsUnknown() {
 		params.MaxRedemptions = stripe.Int64(plan.MaxRedemptions.ValueInt64())
