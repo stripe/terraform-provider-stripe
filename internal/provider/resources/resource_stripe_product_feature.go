@@ -19,7 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"strings"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &ProductFeatureResource{}
@@ -88,8 +88,8 @@ func (r *ProductFeatureResource) Schema(_ context.Context, _ resource.SchemaRequ
 				PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 			"product": schema.StringAttribute{
-				Required: true,
-
+				Required:      true,
+				Description:   "Unique identifier for the object.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 		},

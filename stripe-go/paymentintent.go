@@ -8,6 +8,112 @@ package stripe
 
 import "encoding/json"
 
+// The list of payment method types allowed for use with this payment. Stripe automatically returns compatible payment methods from this list in the `payment_method_types` field of the response, based on the other PaymentIntent parameters, such as `currency`, `amount`, and `customer`.
+type PaymentIntentAllowedPaymentMethodType string
+
+// List of values that PaymentIntentAllowedPaymentMethodType can take
+const (
+	PaymentIntentAllowedPaymentMethodTypeACSSDebit            PaymentIntentAllowedPaymentMethodType = "acss_debit"
+	PaymentIntentAllowedPaymentMethodTypeAffirm               PaymentIntentAllowedPaymentMethodType = "affirm"
+	PaymentIntentAllowedPaymentMethodTypeAfterpayClearpay     PaymentIntentAllowedPaymentMethodType = "afterpay_clearpay"
+	PaymentIntentAllowedPaymentMethodTypeAlipay               PaymentIntentAllowedPaymentMethodType = "alipay"
+	PaymentIntentAllowedPaymentMethodTypeAlma                 PaymentIntentAllowedPaymentMethodType = "alma"
+	PaymentIntentAllowedPaymentMethodTypeAmazonPay            PaymentIntentAllowedPaymentMethodType = "amazon_pay"
+	PaymentIntentAllowedPaymentMethodTypeAUBECSDebit          PaymentIntentAllowedPaymentMethodType = "au_becs_debit"
+	PaymentIntentAllowedPaymentMethodTypeBACSDebit            PaymentIntentAllowedPaymentMethodType = "bacs_debit"
+	PaymentIntentAllowedPaymentMethodTypeBancontact           PaymentIntentAllowedPaymentMethodType = "bancontact"
+	PaymentIntentAllowedPaymentMethodTypeBillie               PaymentIntentAllowedPaymentMethodType = "billie"
+	PaymentIntentAllowedPaymentMethodTypeBizum                PaymentIntentAllowedPaymentMethodType = "bizum"
+	PaymentIntentAllowedPaymentMethodTypeBLIK                 PaymentIntentAllowedPaymentMethodType = "blik"
+	PaymentIntentAllowedPaymentMethodTypeBokuPromptPay        PaymentIntentAllowedPaymentMethodType = "boku_promptpay"
+	PaymentIntentAllowedPaymentMethodTypeBoleto               PaymentIntentAllowedPaymentMethodType = "boleto"
+	PaymentIntentAllowedPaymentMethodTypeCapchasePay          PaymentIntentAllowedPaymentMethodType = "capchase_pay"
+	PaymentIntentAllowedPaymentMethodTypeCard                 PaymentIntentAllowedPaymentMethodType = "card"
+	PaymentIntentAllowedPaymentMethodTypeCardPresent          PaymentIntentAllowedPaymentMethodType = "card_present"
+	PaymentIntentAllowedPaymentMethodTypeCashApp              PaymentIntentAllowedPaymentMethodType = "cashapp"
+	PaymentIntentAllowedPaymentMethodTypeCheckScan            PaymentIntentAllowedPaymentMethodType = "check_scan"
+	PaymentIntentAllowedPaymentMethodTypeClickToPay           PaymentIntentAllowedPaymentMethodType = "click_to_pay"
+	PaymentIntentAllowedPaymentMethodTypeCrypto               PaymentIntentAllowedPaymentMethodType = "crypto"
+	PaymentIntentAllowedPaymentMethodTypeCustomerBalance      PaymentIntentAllowedPaymentMethodType = "customer_balance"
+	PaymentIntentAllowedPaymentMethodTypeDemoPay              PaymentIntentAllowedPaymentMethodType = "demo_pay"
+	PaymentIntentAllowedPaymentMethodTypeDuitnow              PaymentIntentAllowedPaymentMethodType = "duitnow"
+	PaymentIntentAllowedPaymentMethodTypeDummyAuthPush        PaymentIntentAllowedPaymentMethodType = "dummy_auth_push"
+	PaymentIntentAllowedPaymentMethodTypeDummyPassthroughCard PaymentIntentAllowedPaymentMethodType = "dummy_passthrough_card"
+	PaymentIntentAllowedPaymentMethodTypeEdenred              PaymentIntentAllowedPaymentMethodType = "edenred"
+	PaymentIntentAllowedPaymentMethodTypeEPS                  PaymentIntentAllowedPaymentMethodType = "eps"
+	PaymentIntentAllowedPaymentMethodTypeFPX                  PaymentIntentAllowedPaymentMethodType = "fpx"
+	PaymentIntentAllowedPaymentMethodTypeGcash                PaymentIntentAllowedPaymentMethodType = "gcash"
+	PaymentIntentAllowedPaymentMethodTypeGetbalance           PaymentIntentAllowedPaymentMethodType = "getbalance"
+	PaymentIntentAllowedPaymentMethodTypeGiftCard             PaymentIntentAllowedPaymentMethodType = "gift_card"
+	PaymentIntentAllowedPaymentMethodTypeGiropay              PaymentIntentAllowedPaymentMethodType = "giropay"
+	PaymentIntentAllowedPaymentMethodTypeGopay                PaymentIntentAllowedPaymentMethodType = "gopay"
+	PaymentIntentAllowedPaymentMethodTypeGrabpay              PaymentIntentAllowedPaymentMethodType = "grabpay"
+	PaymentIntentAllowedPaymentMethodTypeIDBankTransfer       PaymentIntentAllowedPaymentMethodType = "id_bank_transfer"
+	PaymentIntentAllowedPaymentMethodTypeIDEAL                PaymentIntentAllowedPaymentMethodType = "ideal"
+	PaymentIntentAllowedPaymentMethodTypeInteracPresent       PaymentIntentAllowedPaymentMethodType = "interac_present"
+	PaymentIntentAllowedPaymentMethodTypeKakaoPay             PaymentIntentAllowedPaymentMethodType = "kakao_pay"
+	PaymentIntentAllowedPaymentMethodTypeKlarna               PaymentIntentAllowedPaymentMethodType = "klarna"
+	PaymentIntentAllowedPaymentMethodTypeKnet                 PaymentIntentAllowedPaymentMethodType = "knet"
+	PaymentIntentAllowedPaymentMethodTypeKonbini              PaymentIntentAllowedPaymentMethodType = "konbini"
+	PaymentIntentAllowedPaymentMethodTypeKrCard               PaymentIntentAllowedPaymentMethodType = "kr_card"
+	PaymentIntentAllowedPaymentMethodTypeKrMarket             PaymentIntentAllowedPaymentMethodType = "kr_market"
+	PaymentIntentAllowedPaymentMethodTypeKriya                PaymentIntentAllowedPaymentMethodType = "kriya"
+	PaymentIntentAllowedPaymentMethodTypeLink                 PaymentIntentAllowedPaymentMethodType = "link"
+	PaymentIntentAllowedPaymentMethodTypeMbWay                PaymentIntentAllowedPaymentMethodType = "mb_way"
+	PaymentIntentAllowedPaymentMethodTypeMobilepay            PaymentIntentAllowedPaymentMethodType = "mobilepay"
+	PaymentIntentAllowedPaymentMethodTypeMomo                 PaymentIntentAllowedPaymentMethodType = "momo"
+	PaymentIntentAllowedPaymentMethodTypeMondu                PaymentIntentAllowedPaymentMethodType = "mondu"
+	PaymentIntentAllowedPaymentMethodTypeMultibanco           PaymentIntentAllowedPaymentMethodType = "multibanco"
+	PaymentIntentAllowedPaymentMethodTypeNaverPay             PaymentIntentAllowedPaymentMethodType = "naver_pay"
+	PaymentIntentAllowedPaymentMethodTypeNetbanking           PaymentIntentAllowedPaymentMethodType = "netbanking"
+	PaymentIntentAllowedPaymentMethodTypeNgBank               PaymentIntentAllowedPaymentMethodType = "ng_bank"
+	PaymentIntentAllowedPaymentMethodTypeNgBankTransfer       PaymentIntentAllowedPaymentMethodType = "ng_bank_transfer"
+	PaymentIntentAllowedPaymentMethodTypeNgCard               PaymentIntentAllowedPaymentMethodType = "ng_card"
+	PaymentIntentAllowedPaymentMethodTypeNgMarket             PaymentIntentAllowedPaymentMethodType = "ng_market"
+	PaymentIntentAllowedPaymentMethodTypeNgUssd               PaymentIntentAllowedPaymentMethodType = "ng_ussd"
+	PaymentIntentAllowedPaymentMethodTypeNgWallet             PaymentIntentAllowedPaymentMethodType = "ng_wallet"
+	PaymentIntentAllowedPaymentMethodTypeNzBankAccount        PaymentIntentAllowedPaymentMethodType = "nz_bank_account"
+	PaymentIntentAllowedPaymentMethodTypeOctopus              PaymentIntentAllowedPaymentMethodType = "octopus"
+	PaymentIntentAllowedPaymentMethodTypeOXXO                 PaymentIntentAllowedPaymentMethodType = "oxxo"
+	PaymentIntentAllowedPaymentMethodTypeP24                  PaymentIntentAllowedPaymentMethodType = "p24"
+	PaymentIntentAllowedPaymentMethodTypePaperCheck           PaymentIntentAllowedPaymentMethodType = "paper_check"
+	PaymentIntentAllowedPaymentMethodTypePayByBank            PaymentIntentAllowedPaymentMethodType = "pay_by_bank"
+	PaymentIntentAllowedPaymentMethodTypePayco                PaymentIntentAllowedPaymentMethodType = "payco"
+	PaymentIntentAllowedPaymentMethodTypePayNow               PaymentIntentAllowedPaymentMethodType = "paynow"
+	PaymentIntentAllowedPaymentMethodTypePaypal               PaymentIntentAllowedPaymentMethodType = "paypal"
+	PaymentIntentAllowedPaymentMethodTypePaypay               PaymentIntentAllowedPaymentMethodType = "paypay"
+	PaymentIntentAllowedPaymentMethodTypePayto                PaymentIntentAllowedPaymentMethodType = "payto"
+	PaymentIntentAllowedPaymentMethodTypePix                  PaymentIntentAllowedPaymentMethodType = "pix"
+	PaymentIntentAllowedPaymentMethodTypePromptPay            PaymentIntentAllowedPaymentMethodType = "promptpay"
+	PaymentIntentAllowedPaymentMethodTypeQris                 PaymentIntentAllowedPaymentMethodType = "qris"
+	PaymentIntentAllowedPaymentMethodTypeRechnung             PaymentIntentAllowedPaymentMethodType = "rechnung"
+	PaymentIntentAllowedPaymentMethodTypeRevolutPay           PaymentIntentAllowedPaymentMethodType = "revolut_pay"
+	PaymentIntentAllowedPaymentMethodTypeSamsungPay           PaymentIntentAllowedPaymentMethodType = "samsung_pay"
+	PaymentIntentAllowedPaymentMethodTypeSatispay             PaymentIntentAllowedPaymentMethodType = "satispay"
+	PaymentIntentAllowedPaymentMethodTypeScalapay             PaymentIntentAllowedPaymentMethodType = "scalapay"
+	PaymentIntentAllowedPaymentMethodTypeSEPADebit            PaymentIntentAllowedPaymentMethodType = "sepa_debit"
+	PaymentIntentAllowedPaymentMethodTypeSequra               PaymentIntentAllowedPaymentMethodType = "sequra"
+	PaymentIntentAllowedPaymentMethodTypeShopPay              PaymentIntentAllowedPaymentMethodType = "shop_pay"
+	PaymentIntentAllowedPaymentMethodTypeShopeepay            PaymentIntentAllowedPaymentMethodType = "shopeepay"
+	PaymentIntentAllowedPaymentMethodTypeSofort               PaymentIntentAllowedPaymentMethodType = "sofort"
+	PaymentIntentAllowedPaymentMethodTypeSouthKoreaMarket     PaymentIntentAllowedPaymentMethodType = "south_korea_market"
+	PaymentIntentAllowedPaymentMethodTypeStripeBalance        PaymentIntentAllowedPaymentMethodType = "stripe_balance"
+	PaymentIntentAllowedPaymentMethodTypeSunbit               PaymentIntentAllowedPaymentMethodType = "sunbit"
+	PaymentIntentAllowedPaymentMethodTypeSwish                PaymentIntentAllowedPaymentMethodType = "swish"
+	PaymentIntentAllowedPaymentMethodTypeTamara               PaymentIntentAllowedPaymentMethodType = "tamara"
+	PaymentIntentAllowedPaymentMethodTypeTestPay              PaymentIntentAllowedPaymentMethodType = "test_pay"
+	PaymentIntentAllowedPaymentMethodTypeTouchNGo             PaymentIntentAllowedPaymentMethodType = "touch_n_go"
+	PaymentIntentAllowedPaymentMethodTypeTruemoney            PaymentIntentAllowedPaymentMethodType = "truemoney"
+	PaymentIntentAllowedPaymentMethodTypeTWINT                PaymentIntentAllowedPaymentMethodType = "twint"
+	PaymentIntentAllowedPaymentMethodTypeUpi                  PaymentIntentAllowedPaymentMethodType = "upi"
+	PaymentIntentAllowedPaymentMethodTypeUSBankAccount        PaymentIntentAllowedPaymentMethodType = "us_bank_account"
+	PaymentIntentAllowedPaymentMethodTypeUSCashVoucher        PaymentIntentAllowedPaymentMethodType = "us_cash_voucher"
+	PaymentIntentAllowedPaymentMethodTypeVipps                PaymentIntentAllowedPaymentMethodType = "vipps"
+	PaymentIntentAllowedPaymentMethodTypeWeChatPay            PaymentIntentAllowedPaymentMethodType = "wechat_pay"
+	PaymentIntentAllowedPaymentMethodTypeWero                 PaymentIntentAllowedPaymentMethodType = "wero"
+	PaymentIntentAllowedPaymentMethodTypeZip                  PaymentIntentAllowedPaymentMethodType = "zip"
+)
+
 // The code of the error that occurred when validating the current amount details.
 type PaymentIntentAmountDetailsErrorCode string
 
@@ -104,6 +210,7 @@ const (
 	PaymentIntentExcludedPaymentMethodTypePayco            PaymentIntentExcludedPaymentMethodType = "payco"
 	PaymentIntentExcludedPaymentMethodTypePayNow           PaymentIntentExcludedPaymentMethodType = "paynow"
 	PaymentIntentExcludedPaymentMethodTypePaypal           PaymentIntentExcludedPaymentMethodType = "paypal"
+	PaymentIntentExcludedPaymentMethodTypePaypay           PaymentIntentExcludedPaymentMethodType = "paypay"
 	PaymentIntentExcludedPaymentMethodTypePayto            PaymentIntentExcludedPaymentMethodType = "payto"
 	PaymentIntentExcludedPaymentMethodTypePix              PaymentIntentExcludedPaymentMethodType = "pix"
 	PaymentIntentExcludedPaymentMethodTypePromptPay        PaymentIntentExcludedPaymentMethodType = "promptpay"
@@ -112,6 +219,7 @@ const (
 	PaymentIntentExcludedPaymentMethodTypeSatispay         PaymentIntentExcludedPaymentMethodType = "satispay"
 	PaymentIntentExcludedPaymentMethodTypeScalapay         PaymentIntentExcludedPaymentMethodType = "scalapay"
 	PaymentIntentExcludedPaymentMethodTypeSEPADebit        PaymentIntentExcludedPaymentMethodType = "sepa_debit"
+	PaymentIntentExcludedPaymentMethodTypeSequra           PaymentIntentExcludedPaymentMethodType = "sequra"
 	PaymentIntentExcludedPaymentMethodTypeSofort           PaymentIntentExcludedPaymentMethodType = "sofort"
 	PaymentIntentExcludedPaymentMethodTypeSunbit           PaymentIntentExcludedPaymentMethodType = "sunbit"
 	PaymentIntentExcludedPaymentMethodTypeSwish            PaymentIntentExcludedPaymentMethodType = "swish"
@@ -129,6 +237,7 @@ type PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSuppo
 const (
 	PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetworkACH            PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetwork = "ach"
 	PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetworkBACS           PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetwork = "bacs"
+	PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetworkChaps          PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetwork = "chaps"
 	PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetworkDomesticWireUS PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetwork = "domestic_wire_us"
 	PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetworkFPS            PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetwork = "fps"
 	PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetworkSEPA           PaymentIntentNextActionDisplayBankTransferInstructionsFinancialAddressSupportedNetwork = "sepa"
@@ -373,6 +482,35 @@ const (
 	PaymentIntentPaymentMethodOptionsBillieCaptureMethodManual PaymentIntentPaymentMethodOptionsBillieCaptureMethod = "manual"
 )
 
+// Type of registration the company or entity holds in their registered country.
+type PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType string
+
+// List of values that PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType can take
+const (
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeChEin       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "ch_ein"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeDEHrb       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "de_hrb"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeDkCvr       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "dk_cvr"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeESCIF       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "es_cif"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeFITunnus    PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "fi_tunnus"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeFRSiren     PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "fr_siren"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeFRSiret     PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "fr_siret"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeITRea       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "it_rea"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeNLKvk       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "nl_kvk"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeNoOrgNumber PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "no_org_number"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeNoPno       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "no_pno"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeSeOrgNumber PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "se_org_number"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeSePno       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "se_pno"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationTypeUkCrn       PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType = "uk_crn"
+)
+
+// Type of the mandate.
+type PaymentIntentPaymentMethodOptionsBLIKMandateOptionsType string
+
+// List of values that PaymentIntentPaymentMethodOptionsBLIKMandateOptionsType can take
+const (
+	PaymentIntentPaymentMethodOptionsBLIKMandateOptionsTypeOffSession PaymentIntentPaymentMethodOptionsBLIKMandateOptionsType = "off_session"
+)
+
 // Indicates that you intend to make future payments with this PaymentIntent's payment method.
 //
 // If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -384,7 +522,8 @@ type PaymentIntentPaymentMethodOptionsBLIKSetupFutureUsage string
 
 // List of values that PaymentIntentPaymentMethodOptionsBLIKSetupFutureUsage can take
 const (
-	PaymentIntentPaymentMethodOptionsBLIKSetupFutureUsageNone PaymentIntentPaymentMethodOptionsBLIKSetupFutureUsage = "none"
+	PaymentIntentPaymentMethodOptionsBLIKSetupFutureUsageNone       PaymentIntentPaymentMethodOptionsBLIKSetupFutureUsage = "none"
+	PaymentIntentPaymentMethodOptionsBLIKSetupFutureUsageOffSession PaymentIntentPaymentMethodOptionsBLIKSetupFutureUsage = "off_session"
 )
 
 // Indicates that you intend to make future payments with this PaymentIntent's payment method.
@@ -525,6 +664,16 @@ const (
 	PaymentIntentPaymentMethodOptionsCardRequestThreeDSecureChallenge PaymentIntentPaymentMethodOptionsCardRequestThreeDSecure = "challenge"
 )
 
+// Set to indicate the future transaction type usage for the card being set up.
+type PaymentIntentPaymentMethodOptionsCardSetupCredentialUsage string
+
+// List of values that PaymentIntentPaymentMethodOptionsCardSetupCredentialUsage can take
+const (
+	PaymentIntentPaymentMethodOptionsCardSetupCredentialUsageInstallment PaymentIntentPaymentMethodOptionsCardSetupCredentialUsage = "installment"
+	PaymentIntentPaymentMethodOptionsCardSetupCredentialUsageRecurring   PaymentIntentPaymentMethodOptionsCardSetupCredentialUsage = "recurring"
+	PaymentIntentPaymentMethodOptionsCardSetupCredentialUsageUnscheduled PaymentIntentPaymentMethodOptionsCardSetupCredentialUsage = "unscheduled"
+)
+
 // Indicates that you intend to make future payments with this PaymentIntent's payment method.
 //
 // If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -539,6 +688,16 @@ const (
 	PaymentIntentPaymentMethodOptionsCardSetupFutureUsageNone       PaymentIntentPaymentMethodOptionsCardSetupFutureUsage = "none"
 	PaymentIntentPaymentMethodOptionsCardSetupFutureUsageOffSession PaymentIntentPaymentMethodOptionsCardSetupFutureUsage = "off_session"
 	PaymentIntentPaymentMethodOptionsCardSetupFutureUsageOnSession  PaymentIntentPaymentMethodOptionsCardSetupFutureUsage = "on_session"
+)
+
+// Selected usage to indicate the transaction type of the off-session payment.
+type PaymentIntentPaymentMethodOptionsCardStoredCredentialUsage string
+
+// List of values that PaymentIntentPaymentMethodOptionsCardStoredCredentialUsage can take
+const (
+	PaymentIntentPaymentMethodOptionsCardStoredCredentialUsageInstallment PaymentIntentPaymentMethodOptionsCardStoredCredentialUsage = "installment"
+	PaymentIntentPaymentMethodOptionsCardStoredCredentialUsageRecurring   PaymentIntentPaymentMethodOptionsCardStoredCredentialUsage = "recurring"
+	PaymentIntentPaymentMethodOptionsCardStoredCredentialUsageUnscheduled PaymentIntentPaymentMethodOptionsCardStoredCredentialUsage = "unscheduled"
 )
 
 // Controls when the funds will be captured from the customer's account.
@@ -957,6 +1116,20 @@ const (
 // If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
 //
 // When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+type PaymentIntentPaymentMethodOptionsPaycoSetupFutureUsage string
+
+// List of values that PaymentIntentPaymentMethodOptionsPaycoSetupFutureUsage can take
+const (
+	PaymentIntentPaymentMethodOptionsPaycoSetupFutureUsageNone PaymentIntentPaymentMethodOptionsPaycoSetupFutureUsage = "none"
+)
+
+// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+//
+// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+//
+// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+//
+// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
 type PaymentIntentPaymentMethodOptionsPayNowSetupFutureUsage string
 
 // List of values that PaymentIntentPaymentMethodOptionsPayNowSetupFutureUsage can take
@@ -1143,12 +1316,42 @@ const (
 	PaymentIntentPaymentMethodOptionsSamsungPayCaptureMethodManual PaymentIntentPaymentMethodOptionsSamsungPayCaptureMethod = "manual"
 )
 
+// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+//
+// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+//
+// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+//
+// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+type PaymentIntentPaymentMethodOptionsSamsungPaySetupFutureUsage string
+
+// List of values that PaymentIntentPaymentMethodOptionsSamsungPaySetupFutureUsage can take
+const (
+	PaymentIntentPaymentMethodOptionsSamsungPaySetupFutureUsageNone PaymentIntentPaymentMethodOptionsSamsungPaySetupFutureUsage = "none"
+)
+
 // Controls when the funds will be captured from the customer's account.
 type PaymentIntentPaymentMethodOptionsSatispayCaptureMethod string
 
 // List of values that PaymentIntentPaymentMethodOptionsSatispayCaptureMethod can take
 const (
 	PaymentIntentPaymentMethodOptionsSatispayCaptureMethodManual PaymentIntentPaymentMethodOptionsSatispayCaptureMethod = "manual"
+)
+
+// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+//
+// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+//
+// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+//
+// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+type PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsage string
+
+// List of values that PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsage can take
+const (
+	PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsageNone       PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsage = "none"
+	PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsageOffSession PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsage = "off_session"
+	PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsageOnSession  PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsage = "on_session"
 )
 
 // Controls when the funds will be captured from the customer's account.
@@ -1175,6 +1378,28 @@ const (
 	PaymentIntentPaymentMethodOptionsSEPADebitSetupFutureUsageOnSession  PaymentIntentPaymentMethodOptionsSEPADebitSetupFutureUsage = "on_session"
 )
 
+// Controls when the funds will be captured from the customer's account.
+type PaymentIntentPaymentMethodOptionsSequraCaptureMethod string
+
+// List of values that PaymentIntentPaymentMethodOptionsSequraCaptureMethod can take
+const (
+	PaymentIntentPaymentMethodOptionsSequraCaptureMethodManual PaymentIntentPaymentMethodOptionsSequraCaptureMethod = "manual"
+)
+
+// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+//
+// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+//
+// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+//
+// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+type PaymentIntentPaymentMethodOptionsSequraSetupFutureUsage string
+
+// List of values that PaymentIntentPaymentMethodOptionsSequraSetupFutureUsage can take
+const (
+	PaymentIntentPaymentMethodOptionsSequraSetupFutureUsageNone PaymentIntentPaymentMethodOptionsSequraSetupFutureUsage = "none"
+)
+
 // Indicates that you intend to make future payments with this PaymentIntent's payment method.
 //
 // If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -1188,6 +1413,28 @@ type PaymentIntentPaymentMethodOptionsSofortSetupFutureUsage string
 const (
 	PaymentIntentPaymentMethodOptionsSofortSetupFutureUsageNone       PaymentIntentPaymentMethodOptionsSofortSetupFutureUsage = "none"
 	PaymentIntentPaymentMethodOptionsSofortSetupFutureUsageOffSession PaymentIntentPaymentMethodOptionsSofortSetupFutureUsage = "off_session"
+)
+
+// Controls when the funds will be captured from the customer's account.
+type PaymentIntentPaymentMethodOptionsSunbitCaptureMethod string
+
+// List of values that PaymentIntentPaymentMethodOptionsSunbitCaptureMethod can take
+const (
+	PaymentIntentPaymentMethodOptionsSunbitCaptureMethodManual PaymentIntentPaymentMethodOptionsSunbitCaptureMethod = "manual"
+)
+
+// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+//
+// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+//
+// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+//
+// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+type PaymentIntentPaymentMethodOptionsSunbitSetupFutureUsage string
+
+// List of values that PaymentIntentPaymentMethodOptionsSunbitSetupFutureUsage can take
+const (
+	PaymentIntentPaymentMethodOptionsSunbitSetupFutureUsageNone PaymentIntentPaymentMethodOptionsSunbitSetupFutureUsage = "none"
 )
 
 // Indicates that you intend to make future payments with this PaymentIntent's payment method.
@@ -1683,6 +1930,9 @@ type PaymentIntentPaymentMethodDataRadarOptionsParams struct {
 	Session *string `form:"session" json:"session,omitempty"`
 }
 
+// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+type PaymentIntentPaymentMethodDataSequraParams struct{}
+
 // If provided, this hash will be used to create a PaymentMethod. The new PaymentMethod will appear
 // in the [payment_method](https://docs.stripe.com/api/payment_intents/object#payment_intent_object-payment_method)
 // property on the PaymentIntent.
@@ -1697,9 +1947,9 @@ type PaymentIntentPaymentMethodDataParams struct {
 	Alipay *PaymentMethodAlipayParams `form:"alipay" json:"alipay,omitempty"`
 	// This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to `unspecified`.
 	AllowRedisplay *string `form:"allow_redisplay" json:"allow_redisplay,omitempty"`
-	// If this is a Alma PaymentMethod, this hash contains details about the Alma payment method.
+	// If this is an Alma PaymentMethod, this hash contains details about the Alma payment method.
 	Alma *PaymentMethodAlmaParams `form:"alma" json:"alma,omitempty"`
-	// If this is a AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
+	// If this is an AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
 	AmazonPay *PaymentMethodAmazonPayParams `form:"amazon_pay" json:"amazon_pay,omitempty"`
 	// If this is an `au_becs_debit` PaymentMethod, this hash contains details about the bank account.
 	AUBECSDebit *PaymentMethodAUBECSDebitParams `form:"au_becs_debit" json:"au_becs_debit,omitempty"`
@@ -1769,6 +2019,8 @@ type PaymentIntentPaymentMethodDataParams struct {
 	PayNow *PaymentMethodPayNowParams `form:"paynow" json:"paynow,omitempty"`
 	// If this is a `paypal` PaymentMethod, this hash contains details about the PayPal payment method.
 	Paypal *PaymentMethodPaypalParams `form:"paypal" json:"paypal,omitempty"`
+	// If this is a `paypay` PaymentMethod, this hash contains details about the PayPay payment method.
+	Paypay *PaymentMethodPaypayParams `form:"paypay" json:"paypay,omitempty"`
 	// If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
 	Payto *PaymentMethodPaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is a `pix` PaymentMethod, this hash contains details about the Pix payment method.
@@ -1787,9 +2039,11 @@ type PaymentIntentPaymentMethodDataParams struct {
 	Scalapay *PaymentMethodScalapayParams `form:"scalapay" json:"scalapay,omitempty"`
 	// If this is a `sepa_debit` PaymentMethod, this hash contains details about the SEPA debit bank account.
 	SEPADebit *PaymentMethodSEPADebitParams `form:"sepa_debit" json:"sepa_debit,omitempty"`
+	// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+	Sequra *PaymentIntentPaymentMethodDataSequraParams `form:"sequra" json:"sequra,omitempty"`
 	// If this is a `sofort` PaymentMethod, this hash contains details about the SOFORT payment method.
 	Sofort *PaymentMethodSofortParams `form:"sofort" json:"sofort,omitempty"`
-	// If this is a Sunbit PaymentMethod, this hash contains details about the Sunbit payment method.
+	// If this is a `sunbit` PaymentMethod, this hash contains details about the Sunbit payment method.
 	Sunbit *PaymentMethodSunbitParams `form:"sunbit" json:"sunbit,omitempty"`
 	// If this is a `swish` PaymentMethod, this hash contains details about the Swish payment method.
 	Swish *PaymentMethodSwishParams `form:"swish" json:"swish,omitempty"`
@@ -2137,6 +2391,34 @@ func (p *PaymentIntentPaymentMethodOptionsBancontactParams) AddUnsetField(field 
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
+// Registration details about the buyer's organization.
+type PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParams struct {
+	// The address the company or entity is registered with.
+	RegisteredAddress *AddressParams `form:"registered_address" json:"registered_address,omitempty"`
+	// Company or entity name.
+	RegisteredName *string `form:"registered_name" json:"registered_name,omitempty"`
+	// The official registration number for the given registration type.
+	RegistrationNumber *string `form:"registration_number" json:"registration_number,omitempty"`
+	// Type of registration the company or entity holds in their registered country.
+	RegistrationType *string `form:"registration_type" json:"registration_type,omitempty"`
+	// VAT id number
+	VAT         *string                                                                 `form:"vat" json:"vat,omitempty"`
+	UnsetFields []PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParams.
+type PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParamsUnsetField string
+
+const (
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParamsUnsetFieldRegisteredAddress PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParamsUnsetField = "registered_address"
+	PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParamsUnsetFieldRegistrationType  PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParamsUnsetField = "registration_type"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParams) AddUnsetField(field PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
 // If this is a `billie` PaymentMethod, this sub-hash contains details about the Billie payment method options.
 type PaymentIntentPaymentMethodOptionsBillieParams struct {
 	// Controls when the funds are captured from the customer's account.
@@ -2144,15 +2426,20 @@ type PaymentIntentPaymentMethodOptionsBillieParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                   `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentPaymentMethodOptionsBillieParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Registration details about the buyer's organization.
+	CompanyDetails *PaymentIntentPaymentMethodOptionsBillieCompanyDetailsParams `form:"company_details" json:"company_details,omitempty"`
+	// An identifier or reference that this payment corresponds to.
+	Reference   *string                                                   `form:"reference" json:"reference,omitempty"`
+	UnsetFields []PaymentIntentPaymentMethodOptionsBillieParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentPaymentMethodOptionsBillieParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentPaymentMethodOptionsBillieParams.
 type PaymentIntentPaymentMethodOptionsBillieParamsUnsetField string
 
 const (
-	PaymentIntentPaymentMethodOptionsBillieParamsUnsetFieldCaptureMethod PaymentIntentPaymentMethodOptionsBillieParamsUnsetField = "capture_method"
+	PaymentIntentPaymentMethodOptionsBillieParamsUnsetFieldCaptureMethod  PaymentIntentPaymentMethodOptionsBillieParamsUnsetField = "capture_method"
+	PaymentIntentPaymentMethodOptionsBillieParamsUnsetFieldCompanyDetails PaymentIntentPaymentMethodOptionsBillieParamsUnsetField = "company_details"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -2163,10 +2450,18 @@ func (p *PaymentIntentPaymentMethodOptionsBillieParams) AddUnsetField(field Paym
 // If this is a `bizum` PaymentMethod, this sub-hash contains details about the Bizum payment method options.
 type PaymentIntentPaymentMethodOptionsBizumParams struct{}
 
+// Details of the BLIK mandate
+type PaymentIntentPaymentMethodOptionsBLIKMandateOptionsParams struct {
+	// Expiry date of the mandate.
+	ExpiresAt *int64 `form:"expires_at" json:"expires_at,omitempty"`
+}
+
 // If this is a `blik` PaymentMethod, this sub-hash contains details about the BLIK payment method options.
 type PaymentIntentPaymentMethodOptionsBLIKParams struct {
 	// The 6-digit BLIK code that a customer has generated using their banking application. Can only be set on confirmation.
 	Code *string `form:"code" json:"code,omitempty"`
+	// Details of the BLIK mandate
+	MandateOptions *PaymentIntentPaymentMethodOptionsBLIKMandateOptionsParams `form:"mandate_options" json:"mandate_options,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
 	//
 	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -2368,6 +2663,8 @@ type PaymentIntentPaymentMethodOptionsCardParams struct {
 	RequestThreeDSecure *string `form:"request_three_d_secure" json:"request_three_d_secure,omitempty"`
 	// When enabled, using a card that is attached to a customer will require the CVC to be provided again (i.e. using the cvc_token parameter).
 	RequireCVCRecollection *bool `form:"require_cvc_recollection" json:"require_cvc_recollection,omitempty"`
+	// Set to indicate the future transaction type usage for the card being set up.
+	SetupCredentialUsage *string `form:"setup_credential_usage" json:"setup_credential_usage,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
 	//
 	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -2382,6 +2679,14 @@ type PaymentIntentPaymentMethodOptionsCardParams struct {
 	StatementDescriptorSuffixKana *string `form:"statement_descriptor_suffix_kana" json:"statement_descriptor_suffix_kana,omitempty"`
 	// Provides information about a card payment that customers see on their statements. Concatenated with the Kanji prefix (shortened Kanji descriptor) or Kanji statement descriptor that's set on the account to form the complete statement descriptor. Maximum 17 characters. On card statements, the *concatenation* of both prefix and suffix (including separators) will appear truncated to 17 characters.
 	StatementDescriptorSuffixKanji *string `form:"statement_descriptor_suffix_kanji" json:"statement_descriptor_suffix_kanji,omitempty"`
+	// Use this parameter in scenarios where you collect card details and [charge them later](https://stripe.com/docs/payments/cards/charging-saved-cards).
+	//
+	//  When making an off session payment with a previously saved card (that was saved with a SetupIntent or with a PaymentIntent with `setup_future_usage`), set this parameter to indicate the type of transaction.
+	//
+	//  You can set this parameter at any time before or during PaymentIntent confirmation, and confirm this PaymentIntent with `off_session=true`.
+	//
+	//  Note that this parameter is currently unsupported with the `setup_future_usage` parameter.
+	StoredCredentialUsage *string `form:"stored_credential_usage" json:"stored_credential_usage,omitempty"`
 	// If 3D Secure authentication was performed with a third-party provider,
 	// the authentication details to use for this payment.
 	ThreeDSecure *PaymentIntentPaymentMethodOptionsCardThreeDSecureParams `form:"three_d_secure" json:"three_d_secure,omitempty"`
@@ -2974,8 +3279,16 @@ type PaymentIntentPaymentMethodOptionsPaycoParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                  `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentPaymentMethodOptionsPaycoParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                  `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentPaymentMethodOptionsPaycoParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentPaymentMethodOptionsPaycoParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentPaymentMethodOptionsPaycoParams.
@@ -3039,6 +3352,9 @@ const (
 func (p *PaymentIntentPaymentMethodOptionsPaypalParams) AddUnsetField(field PaymentIntentPaymentMethodOptionsPaypalParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
 }
+
+// If this is a `paypay` PaymentMethod, this sub-hash contains details about the PayPay payment method options.
+type PaymentIntentPaymentMethodOptionsPaypayParams struct{}
 
 // Additional fields for Mandate creation. Only `purpose` field is configurable for PayTo PaymentIntent with `setup_future_usage=none`. Other fields are only applicable to PayTo PaymentIntent with `setup_future_usage=off_session`
 type PaymentIntentPaymentMethodOptionsPaytoMandateOptionsParams struct {
@@ -3127,9 +3443,9 @@ type PaymentIntentPaymentMethodOptionsPixMandateOptionsParams struct {
 type PaymentIntentPaymentMethodOptionsPixParams struct {
 	// Determines if the amount includes the IOF tax. Defaults to `never`.
 	AmountIncludesIof *string `form:"amount_includes_iof" json:"amount_includes_iof,omitempty"`
-	// The number of seconds (between 10 and 1209600) after which Pix payment will expire. Defaults to 86400 seconds.
+	// The number of seconds after PaymentIntent confirmation when the Pix expires (between 60 and 1209600, inclusive). If neither expiration option is supplied, defaults to 14400 seconds (4 hours). Mutually exclusive with `expires_at`.
 	ExpiresAfterSeconds *int64 `form:"expires_after_seconds" json:"expires_after_seconds,omitempty"`
-	// The timestamp at which the Pix expires (between 10 and 1209600 seconds in the future). Defaults to 1 day in the future.
+	// The absolute Unix timestamp at which the Pix expires, between 60 and 1209600 seconds from the current time. If neither expiration option is supplied, the Pix expires 14400 seconds (4 hours) after PaymentIntent confirmation. Mutually exclusive with `expires_after_seconds`.
 	ExpiresAt *int64 `form:"expires_at" json:"expires_at,omitempty"`
 	// Additional fields for mandate creation. Only applicable when `setup_future_usage=off_session`.
 	MandateOptions *PaymentIntentPaymentMethodOptionsPixMandateOptionsParams `form:"mandate_options" json:"mandate_options,omitempty"`
@@ -3196,8 +3512,16 @@ type PaymentIntentPaymentMethodOptionsSamsungPayParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                       `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentPaymentMethodOptionsSamsungPayParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                       `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentPaymentMethodOptionsSamsungPayParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentPaymentMethodOptionsSamsungPayParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentPaymentMethodOptionsSamsungPayParams.
@@ -3219,15 +3543,24 @@ type PaymentIntentPaymentMethodOptionsSatispayParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                     `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentPaymentMethodOptionsSatispayParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                     `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentPaymentMethodOptionsSatispayParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentPaymentMethodOptionsSatispayParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentPaymentMethodOptionsSatispayParams.
 type PaymentIntentPaymentMethodOptionsSatispayParamsUnsetField string
 
 const (
-	PaymentIntentPaymentMethodOptionsSatispayParamsUnsetFieldCaptureMethod PaymentIntentPaymentMethodOptionsSatispayParamsUnsetField = "capture_method"
+	PaymentIntentPaymentMethodOptionsSatispayParamsUnsetFieldCaptureMethod    PaymentIntentPaymentMethodOptionsSatispayParamsUnsetField = "capture_method"
+	PaymentIntentPaymentMethodOptionsSatispayParamsUnsetFieldSetupFutureUsage PaymentIntentPaymentMethodOptionsSatispayParamsUnsetField = "setup_future_usage"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -3308,6 +3641,39 @@ func (p *PaymentIntentPaymentMethodOptionsSEPADebitParams) AddUnsetField(field P
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
+// If this is a `sequra` PaymentMethod, this sub-hash contains details about the SeQura payment method options.
+type PaymentIntentPaymentMethodOptionsSequraParams struct {
+	// Controls when the funds are captured from the customer's account.
+	//
+	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
+	//
+	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	//
+	// If you've already set `setup_future_usage` and you're performing a request using a publishable key, you can only update the value from `on_session` to `off_session`.
+	SetupFutureUsage *string                                                   `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentPaymentMethodOptionsSequraParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentPaymentMethodOptionsSequraParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentPaymentMethodOptionsSequraParams.
+type PaymentIntentPaymentMethodOptionsSequraParamsUnsetField string
+
+const (
+	PaymentIntentPaymentMethodOptionsSequraParamsUnsetFieldCaptureMethod PaymentIntentPaymentMethodOptionsSequraParamsUnsetField = "capture_method"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentPaymentMethodOptionsSequraParams) AddUnsetField(field PaymentIntentPaymentMethodOptionsSequraParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
 // If this is a `sofort` PaymentMethod, this sub-hash contains details about the SOFORT payment method options.
 type PaymentIntentPaymentMethodOptionsSofortParams struct {
 	// Language shown to the payer on redirect.
@@ -3335,6 +3701,37 @@ const (
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
 func (p *PaymentIntentPaymentMethodOptionsSofortParams) AddUnsetField(field PaymentIntentPaymentMethodOptionsSofortParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// If this is a `sunbit` PaymentMethod, this sub-hash contains details about the Sunbit payment method options.
+type PaymentIntentPaymentMethodOptionsSunbitParams struct {
+	// Controls when the funds are captured from the customer's account.
+	//
+	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
+	//
+	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                   `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentPaymentMethodOptionsSunbitParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentPaymentMethodOptionsSunbitParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentPaymentMethodOptionsSunbitParams.
+type PaymentIntentPaymentMethodOptionsSunbitParamsUnsetField string
+
+const (
+	PaymentIntentPaymentMethodOptionsSunbitParamsUnsetFieldCaptureMethod PaymentIntentPaymentMethodOptionsSunbitParamsUnsetField = "capture_method"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentPaymentMethodOptionsSunbitParams) AddUnsetField(field PaymentIntentPaymentMethodOptionsSunbitParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
@@ -3498,7 +3895,7 @@ func (p *PaymentIntentPaymentMethodOptionsUSBankAccountParams) AddUnsetField(fie
 
 // If this is a `wechat_pay` PaymentMethod, this sub-hash contains details about the WeChat Pay payment method options.
 type PaymentIntentPaymentMethodOptionsWeChatPayParams struct {
-	// The app ID registered with WeChat Pay. Only required when client is ios or android.
+	// The app ID registered with WeChat Pay. Only required when client is ios, android, or mini_program.
 	AppID *string `form:"app_id" json:"app_id,omitempty"`
 	// The client type that the end customer will pay from
 	Client *string `form:"client" json:"client,omitempty"`
@@ -3610,6 +4007,8 @@ type PaymentIntentPaymentMethodOptionsParams struct {
 	PayNow *PaymentIntentPaymentMethodOptionsPayNowParams `form:"paynow" json:"paynow,omitempty"`
 	// If this is a `paypal` PaymentMethod, this sub-hash contains details about the PayPal payment method options.
 	Paypal *PaymentIntentPaymentMethodOptionsPaypalParams `form:"paypal" json:"paypal,omitempty"`
+	// If this is a `paypay` PaymentMethod, this sub-hash contains details about the PayPay payment method options.
+	Paypay *PaymentIntentPaymentMethodOptionsPaypayParams `form:"paypay" json:"paypay,omitempty"`
 	// If this is a `payto` PaymentMethod, this sub-hash contains details about the PayTo payment method options.
 	Payto *PaymentIntentPaymentMethodOptionsPaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is a `pix` PaymentMethod, this sub-hash contains details about the Pix payment method options.
@@ -3626,8 +4025,12 @@ type PaymentIntentPaymentMethodOptionsParams struct {
 	Scalapay *PaymentIntentPaymentMethodOptionsScalapayParams `form:"scalapay" json:"scalapay,omitempty"`
 	// If this is a `sepa_debit` PaymentIntent, this sub-hash contains details about the SEPA Debit payment method options.
 	SEPADebit *PaymentIntentPaymentMethodOptionsSEPADebitParams `form:"sepa_debit" json:"sepa_debit,omitempty"`
+	// If this is a `sequra` PaymentMethod, this sub-hash contains details about the SeQura payment method options.
+	Sequra *PaymentIntentPaymentMethodOptionsSequraParams `form:"sequra" json:"sequra,omitempty"`
 	// If this is a `sofort` PaymentMethod, this sub-hash contains details about the SOFORT payment method options.
 	Sofort *PaymentIntentPaymentMethodOptionsSofortParams `form:"sofort" json:"sofort,omitempty"`
+	// If this is a `sunbit` PaymentMethod, this sub-hash contains details about the Sunbit payment method options.
+	Sunbit *PaymentIntentPaymentMethodOptionsSunbitParams `form:"sunbit" json:"sunbit,omitempty"`
 	// If this is a `Swish` PaymentMethod, this sub-hash contains details about the Swish payment method options.
 	Swish *PaymentIntentPaymentMethodOptionsSwishParams `form:"swish" json:"swish,omitempty"`
 	// If this is a `twint` PaymentMethod, this sub-hash contains details about the TWINT payment method options.
@@ -3687,6 +4090,7 @@ const (
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldPayco            PaymentIntentPaymentMethodOptionsParamsUnsetField = "payco"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldPayNow           PaymentIntentPaymentMethodOptionsParamsUnsetField = "paynow"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldPaypal           PaymentIntentPaymentMethodOptionsParamsUnsetField = "paypal"
+	PaymentIntentPaymentMethodOptionsParamsUnsetFieldPaypay           PaymentIntentPaymentMethodOptionsParamsUnsetField = "paypay"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldPayto            PaymentIntentPaymentMethodOptionsParamsUnsetField = "payto"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldPix              PaymentIntentPaymentMethodOptionsParamsUnsetField = "pix"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldPromptPay        PaymentIntentPaymentMethodOptionsParamsUnsetField = "promptpay"
@@ -3695,7 +4099,9 @@ const (
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldSatispay         PaymentIntentPaymentMethodOptionsParamsUnsetField = "satispay"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldScalapay         PaymentIntentPaymentMethodOptionsParamsUnsetField = "scalapay"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldSEPADebit        PaymentIntentPaymentMethodOptionsParamsUnsetField = "sepa_debit"
+	PaymentIntentPaymentMethodOptionsParamsUnsetFieldSequra           PaymentIntentPaymentMethodOptionsParamsUnsetField = "sequra"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldSofort           PaymentIntentPaymentMethodOptionsParamsUnsetField = "sofort"
+	PaymentIntentPaymentMethodOptionsParamsUnsetFieldSunbit           PaymentIntentPaymentMethodOptionsParamsUnsetField = "sunbit"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldSwish            PaymentIntentPaymentMethodOptionsParamsUnsetField = "swish"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldTWINT            PaymentIntentPaymentMethodOptionsParamsUnsetField = "twint"
 	PaymentIntentPaymentMethodOptionsParamsUnsetFieldUpi              PaymentIntentPaymentMethodOptionsParamsUnsetField = "upi"
@@ -3711,8 +4117,23 @@ func (p *PaymentIntentPaymentMethodOptionsParams) AddUnsetField(field PaymentInt
 
 // Options to configure Radar. Learn more about [Radar Sessions](https://docs.stripe.com/radar/radar-session).
 type PaymentIntentRadarOptionsParams struct {
+	// The referrer URL of the current checkout session. You can use this to supply session-level referrer data when a Radar Session isn't available or doesn't contain a referrer.
+	Referrer *string `form:"referrer" json:"referrer,omitempty"`
 	// A [Radar Session](https://docs.stripe.com/radar/radar-session) is a snapshot of the browser metadata and device details that help Radar make more accurate predictions on your payments.
-	Session *string `form:"session" json:"session,omitempty"`
+	Session     *string                                     `form:"session" json:"session,omitempty"`
+	UnsetFields []PaymentIntentRadarOptionsParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentRadarOptionsParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentRadarOptionsParams.
+type PaymentIntentRadarOptionsParamsUnsetField string
+
+const (
+	PaymentIntentRadarOptionsParamsUnsetFieldReferrer PaymentIntentRadarOptionsParamsUnsetField = "referrer"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentRadarOptionsParams) AddUnsetField(field PaymentIntentRadarOptionsParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
 }
 
 // The data with which to populate the destination payment.
@@ -3803,6 +4224,8 @@ func (p *PaymentIntentTransferDataParams) AddMetadata(key string, value string) 
 // confirm=true.
 type PaymentIntentParams struct {
 	Params `form:"*"`
+	// The list of payment method types allowed for use with this payment. Stripe automatically returns compatible payment methods from this list in the `payment_method_types` field of the response, based on the other PaymentIntent parameters, such as `currency`, `amount`, and `customer`.
+	AllowedPaymentMethodTypes []*string `form:"allowed_payment_method_types" json:"allowed_payment_method_types,omitempty"`
 	// Amount intended to be collected by this PaymentIntent. A positive integer representing how much to charge in the [smallest currency unit](https://docs.stripe.com/currencies#zero-decimal) (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or [equivalent in charge currency](https://docs.stripe.com/currencies#minimum-and-maximum-charge-amounts). The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
 	Amount *int64 `form:"amount" json:"amount,omitempty"`
 	// Provides industry-specific information about the amount.
@@ -3829,13 +4252,13 @@ type PaymentIntentParams struct {
 	//
 	// Payment methods attached to other Customers cannot be used with this PaymentIntent.
 	//
-	// If [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Customer instead.
+	// If [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Customer instead.
 	Customer *string `form:"customer" json:"customer,omitempty"`
 	// ID of the Account representing the customer that this PaymentIntent belongs to, if one exists.
 	//
 	// Payment methods attached to other Accounts cannot be used with this PaymentIntent.
 	//
-	// If [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Account after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Account instead.
+	// If [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Account after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Account instead.
 	CustomerAccount *string `form:"customer_account" json:"customer_account,omitempty"`
 	// An arbitrary string attached to the object. Often useful for displaying to users.
 	Description *string `form:"description" json:"description,omitempty"`
@@ -3855,10 +4278,10 @@ type PaymentIntentParams struct {
 	OnBehalfOf *string `form:"on_behalf_of" json:"on_behalf_of,omitempty"`
 	// Provides industry-specific information about the charge.
 	PaymentDetails *PaymentIntentPaymentDetailsParams `form:"payment_details" json:"payment_details,omitempty"`
-	// ID of the payment method (a PaymentMethod, Card, or [compatible Source](https://docs.stripe.com/payments/payment-methods#compatibility) object) to attach to this PaymentIntent.
+	// The ID of a PaymentMethod to attach to this PaymentIntent.
 	//
 	// If you don't provide the `payment_method` parameter or the `source` parameter with `confirm=true`, `source` automatically populates with `customer.default_source` to improve migration for users of the Charges API. We recommend that you explicitly provide the `payment_method` moving forward.
-	// If the payment method is attached to a Customer, you must also provide the ID of that Customer as the [customer](https://api.stripe.com#create_payment_intent-customer) parameter of this PaymentIntent.
+	// If the payment method is attached to a Customer, you must also provide the ID of that Customer as the [customer](https://docs.stripe.com/api#create_payment_intent-customer) parameter of this PaymentIntent.
 	// end
 	PaymentMethod *string `form:"payment_method" json:"payment_method,omitempty"`
 	// The ID of the [payment method configuration](https://docs.stripe.com/api/payment_method_configurations) to use with this PaymentIntent.
@@ -3869,8 +4292,6 @@ type PaymentIntentParams struct {
 	PaymentMethodData *PaymentIntentPaymentMethodDataParams `form:"payment_method_data" json:"payment_method_data,omitempty"`
 	// Payment-method-specific configuration for this PaymentIntent.
 	PaymentMethodOptions *PaymentIntentPaymentMethodOptionsParams `form:"payment_method_options" json:"payment_method_options,omitempty"`
-	// The list of payment method types (for example, a card) that this PaymentIntent can use. If you don't provide this, Stripe will dynamically show relevant payment methods from your [payment method settings](https://dashboard.stripe.com/settings/payment_methods). A list of valid payment method types can be found [here](https://docs.stripe.com/api/payment_methods/object#payment_method_object-type).
-	PaymentMethodTypes []*string `form:"payment_method_types" json:"payment_method_types,omitempty"`
 	// Options to configure Radar. Learn more about [Radar Sessions](https://docs.stripe.com/radar/radar-session).
 	RadarOptions *PaymentIntentRadarOptionsParams `form:"radar_options" json:"radar_options,omitempty"`
 	// Email address that the receipt for the resulting payment will be sent to. If `receipt_email` is specified for a payment in live mode, a receipt will be sent regardless of your [email settings](https://dashboard.stripe.com/account/emails).
@@ -4470,8 +4891,23 @@ func (p *PaymentIntentConfirmPaymentDetailsParams) AddUnsetField(field PaymentIn
 
 // Options to configure Radar. Learn more about [Radar Sessions](https://docs.stripe.com/radar/radar-session).
 type PaymentIntentConfirmRadarOptionsParams struct {
+	// The referrer URL of the current checkout session. You can use this to supply session-level referrer data when a Radar Session isn't available or doesn't contain a referrer.
+	Referrer *string `form:"referrer" json:"referrer,omitempty"`
 	// A [Radar Session](https://docs.stripe.com/radar/radar-session) is a snapshot of the browser metadata and device details that help Radar make more accurate predictions on your payments.
-	Session *string `form:"session" json:"session,omitempty"`
+	Session     *string                                            `form:"session" json:"session,omitempty"`
+	UnsetFields []PaymentIntentConfirmRadarOptionsParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentConfirmRadarOptionsParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentConfirmRadarOptionsParams.
+type PaymentIntentConfirmRadarOptionsParamsUnsetField string
+
+const (
+	PaymentIntentConfirmRadarOptionsParamsUnsetFieldReferrer PaymentIntentConfirmRadarOptionsParamsUnsetField = "referrer"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentConfirmRadarOptionsParams) AddUnsetField(field PaymentIntentConfirmRadarOptionsParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
 }
 
 // Confirm that your customer intends to pay with current or provided
@@ -4506,6 +4942,8 @@ type PaymentIntentConfirmRadarOptionsParams struct {
 // transition the PaymentIntent to the canceled state.
 type PaymentIntentConfirmParams struct {
 	Params `form:"*"`
+	// The list of payment method types allowed for use with this payment. Stripe automatically returns compatible payment methods from this list in the `payment_method_types` field of the response, based on the other PaymentIntent parameters, such as `currency`, `amount`, and `customer`.
+	AllowedPaymentMethodTypes []*string `form:"allowed_payment_method_types" json:"allowed_payment_method_types,omitempty"`
 	// Provides industry-specific information about the amount.
 	AmountDetails *PaymentIntentConfirmAmountDetailsParams `form:"amount_details" json:"amount_details,omitempty"`
 	// Amount to confirm on the PaymentIntent. Defaults to `amount` if not provided.
@@ -4531,8 +4969,8 @@ type PaymentIntentConfirmParams struct {
 	OffSession *bool `form:"off_session" json:"off_session,omitempty"`
 	// Provides industry-specific information about the charge.
 	PaymentDetails *PaymentIntentConfirmPaymentDetailsParams `form:"payment_details" json:"payment_details,omitempty"`
-	// ID of the payment method (a PaymentMethod, Card, or [compatible Source](https://docs.stripe.com/payments/payment-methods/transitioning#compatibility) object) to attach to this PaymentIntent.
-	// If the payment method is attached to a Customer, it must match the [customer](https://api.stripe.com#create_payment_intent-customer) that is set on this PaymentIntent.
+	// The ID of a PaymentMethod to attach to this PaymentIntent.
+	// If the payment method is attached to a Customer, it must match the [customer](https://docs.stripe.com/api#create_payment_intent-customer) that is set on this PaymentIntent.
 	PaymentMethod *string `form:"payment_method" json:"payment_method,omitempty"`
 	// If provided, this hash will be used to create a PaymentMethod. The new PaymentMethod will appear
 	// in the [payment_method](https://docs.stripe.com/api/payment_intents/object#payment_intent_object-payment_method)
@@ -4540,8 +4978,6 @@ type PaymentIntentConfirmParams struct {
 	PaymentMethodData *PaymentIntentPaymentMethodDataParams `form:"payment_method_data" json:"payment_method_data,omitempty"`
 	// Payment method-specific configuration for this PaymentIntent.
 	PaymentMethodOptions *PaymentIntentPaymentMethodOptionsParams `form:"payment_method_options" json:"payment_method_options,omitempty"`
-	// The list of payment method types (for example, a card) that this PaymentIntent can use. Use `automatic_payment_methods` to manage payment methods from the [Stripe Dashboard](https://dashboard.stripe.com/settings/payment_methods). A list of valid payment method types can be found [here](https://docs.stripe.com/api/payment_methods/object#payment_method_object-type).
-	PaymentMethodTypes []*string `form:"payment_method_types" json:"payment_method_types,omitempty"`
 	// Options to configure Radar. Learn more about [Radar Sessions](https://docs.stripe.com/radar/radar-session).
 	RadarOptions *PaymentIntentConfirmRadarOptionsParams `form:"radar_options" json:"radar_options,omitempty"`
 	// Email address that the receipt for the resulting payment will be sent to. If `receipt_email` is specified for a payment in live mode, a receipt will be sent regardless of your [email settings](https://dashboard.stripe.com/account/emails).
@@ -5160,6 +5596,9 @@ type PaymentIntentCreatePaymentMethodDataRadarOptionsParams struct {
 	Session *string `form:"session" json:"session,omitempty"`
 }
 
+// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+type PaymentIntentCreatePaymentMethodDataSequraParams struct{}
+
 // If provided, this hash will be used to create a PaymentMethod. The new PaymentMethod will appear
 // in the [payment_method](https://docs.stripe.com/api/payment_intents/object#payment_intent_object-payment_method)
 // property on the PaymentIntent.
@@ -5174,9 +5613,9 @@ type PaymentIntentCreatePaymentMethodDataParams struct {
 	Alipay *PaymentMethodAlipayParams `form:"alipay" json:"alipay,omitempty"`
 	// This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to `unspecified`.
 	AllowRedisplay *string `form:"allow_redisplay" json:"allow_redisplay,omitempty"`
-	// If this is a Alma PaymentMethod, this hash contains details about the Alma payment method.
+	// If this is an Alma PaymentMethod, this hash contains details about the Alma payment method.
 	Alma *PaymentMethodAlmaParams `form:"alma" json:"alma,omitempty"`
-	// If this is a AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
+	// If this is an AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
 	AmazonPay *PaymentMethodAmazonPayParams `form:"amazon_pay" json:"amazon_pay,omitempty"`
 	// If this is an `au_becs_debit` PaymentMethod, this hash contains details about the bank account.
 	AUBECSDebit *PaymentMethodAUBECSDebitParams `form:"au_becs_debit" json:"au_becs_debit,omitempty"`
@@ -5246,6 +5685,8 @@ type PaymentIntentCreatePaymentMethodDataParams struct {
 	PayNow *PaymentMethodPayNowParams `form:"paynow" json:"paynow,omitempty"`
 	// If this is a `paypal` PaymentMethod, this hash contains details about the PayPal payment method.
 	Paypal *PaymentMethodPaypalParams `form:"paypal" json:"paypal,omitempty"`
+	// If this is a `paypay` PaymentMethod, this hash contains details about the PayPay payment method.
+	Paypay *PaymentMethodPaypayParams `form:"paypay" json:"paypay,omitempty"`
 	// If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
 	Payto *PaymentMethodPaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is a `pix` PaymentMethod, this hash contains details about the Pix payment method.
@@ -5264,9 +5705,11 @@ type PaymentIntentCreatePaymentMethodDataParams struct {
 	Scalapay *PaymentMethodScalapayParams `form:"scalapay" json:"scalapay,omitempty"`
 	// If this is a `sepa_debit` PaymentMethod, this hash contains details about the SEPA debit bank account.
 	SEPADebit *PaymentMethodSEPADebitParams `form:"sepa_debit" json:"sepa_debit,omitempty"`
+	// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+	Sequra *PaymentIntentCreatePaymentMethodDataSequraParams `form:"sequra" json:"sequra,omitempty"`
 	// If this is a `sofort` PaymentMethod, this hash contains details about the SOFORT payment method.
 	Sofort *PaymentMethodSofortParams `form:"sofort" json:"sofort,omitempty"`
-	// If this is a Sunbit PaymentMethod, this hash contains details about the Sunbit payment method.
+	// If this is a `sunbit` PaymentMethod, this hash contains details about the Sunbit payment method.
 	Sunbit *PaymentMethodSunbitParams `form:"sunbit" json:"sunbit,omitempty"`
 	// If this is a `swish` PaymentMethod, this hash contains details about the Swish payment method.
 	Swish *PaymentMethodSwishParams `form:"swish" json:"swish,omitempty"`
@@ -5614,6 +6057,34 @@ func (p *PaymentIntentCreatePaymentMethodOptionsBancontactParams) AddUnsetField(
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
+// Registration details about the buyer's organization.
+type PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParams struct {
+	// The address the company or entity is registered with.
+	RegisteredAddress *AddressParams `form:"registered_address" json:"registered_address,omitempty"`
+	// Company or entity name.
+	RegisteredName *string `form:"registered_name" json:"registered_name,omitempty"`
+	// The official registration number for the given registration type.
+	RegistrationNumber *string `form:"registration_number" json:"registration_number,omitempty"`
+	// Type of registration the company or entity holds in their registered country.
+	RegistrationType *string `form:"registration_type" json:"registration_type,omitempty"`
+	// VAT id number
+	VAT         *string                                                                       `form:"vat" json:"vat,omitempty"`
+	UnsetFields []PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParams.
+type PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField string
+
+const (
+	PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetFieldRegisteredAddress PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField = "registered_address"
+	PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetFieldRegistrationType  PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField = "registration_type"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParams) AddUnsetField(field PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
 // If this is a `billie` PaymentMethod, this sub-hash contains details about the Billie payment method options.
 type PaymentIntentCreatePaymentMethodOptionsBillieParams struct {
 	// Controls when the funds are captured from the customer's account.
@@ -5621,15 +6092,20 @@ type PaymentIntentCreatePaymentMethodOptionsBillieParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                         `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Registration details about the buyer's organization.
+	CompanyDetails *PaymentIntentCreatePaymentMethodOptionsBillieCompanyDetailsParams `form:"company_details" json:"company_details,omitempty"`
+	// An identifier or reference that this payment corresponds to.
+	Reference   *string                                                         `form:"reference" json:"reference,omitempty"`
+	UnsetFields []PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentCreatePaymentMethodOptionsBillieParams.
 type PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetField string
 
 const (
-	PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetFieldCaptureMethod PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetField = "capture_method"
+	PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetFieldCaptureMethod  PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetField = "capture_method"
+	PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetFieldCompanyDetails PaymentIntentCreatePaymentMethodOptionsBillieParamsUnsetField = "company_details"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -5640,10 +6116,18 @@ func (p *PaymentIntentCreatePaymentMethodOptionsBillieParams) AddUnsetField(fiel
 // If this is a `bizum` PaymentMethod, this sub-hash contains details about the Bizum payment method options.
 type PaymentIntentCreatePaymentMethodOptionsBizumParams struct{}
 
+// Details of the BLIK mandate
+type PaymentIntentCreatePaymentMethodOptionsBLIKMandateOptionsParams struct {
+	// Expiry date of the mandate.
+	ExpiresAt *int64 `form:"expires_at" json:"expires_at,omitempty"`
+}
+
 // If this is a `blik` PaymentMethod, this sub-hash contains details about the BLIK payment method options.
 type PaymentIntentCreatePaymentMethodOptionsBLIKParams struct {
 	// The 6-digit BLIK code that a customer has generated using their banking application. Can only be set on confirmation.
 	Code *string `form:"code" json:"code,omitempty"`
+	// Details of the BLIK mandate
+	MandateOptions *PaymentIntentCreatePaymentMethodOptionsBLIKMandateOptionsParams `form:"mandate_options" json:"mandate_options,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
 	//
 	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -5845,6 +6329,8 @@ type PaymentIntentCreatePaymentMethodOptionsCardParams struct {
 	RequestThreeDSecure *string `form:"request_three_d_secure" json:"request_three_d_secure,omitempty"`
 	// When enabled, using a card that is attached to a customer will require the CVC to be provided again (i.e. using the cvc_token parameter).
 	RequireCVCRecollection *bool `form:"require_cvc_recollection" json:"require_cvc_recollection,omitempty"`
+	// Set to indicate the future transaction type usage for the card being set up.
+	SetupCredentialUsage *string `form:"setup_credential_usage" json:"setup_credential_usage,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
 	//
 	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -5859,6 +6345,14 @@ type PaymentIntentCreatePaymentMethodOptionsCardParams struct {
 	StatementDescriptorSuffixKana *string `form:"statement_descriptor_suffix_kana" json:"statement_descriptor_suffix_kana,omitempty"`
 	// Provides information about a card payment that customers see on their statements. Concatenated with the Kanji prefix (shortened Kanji descriptor) or Kanji statement descriptor that's set on the account to form the complete statement descriptor. Maximum 17 characters. On card statements, the *concatenation* of both prefix and suffix (including separators) will appear truncated to 17 characters.
 	StatementDescriptorSuffixKanji *string `form:"statement_descriptor_suffix_kanji" json:"statement_descriptor_suffix_kanji,omitempty"`
+	// Use this parameter in scenarios where you collect card details and [charge them later](https://stripe.com/docs/payments/cards/charging-saved-cards).
+	//
+	//  When making an off session payment with a previously saved card (that was saved with a SetupIntent or with a PaymentIntent with `setup_future_usage`), set this parameter to indicate the type of transaction.
+	//
+	//  You can set this parameter at any time before or during PaymentIntent confirmation, and confirm this PaymentIntent with `off_session=true`.
+	//
+	//  Note that this parameter is currently unsupported with the `setup_future_usage` parameter.
+	StoredCredentialUsage *string `form:"stored_credential_usage" json:"stored_credential_usage,omitempty"`
 	// If 3D Secure authentication was performed with a third-party provider,
 	// the authentication details to use for this payment.
 	ThreeDSecure *PaymentIntentCreatePaymentMethodOptionsCardThreeDSecureParams `form:"three_d_secure" json:"three_d_secure,omitempty"`
@@ -6451,8 +6945,16 @@ type PaymentIntentCreatePaymentMethodOptionsPaycoParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                        `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentCreatePaymentMethodOptionsPaycoParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                        `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentCreatePaymentMethodOptionsPaycoParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentCreatePaymentMethodOptionsPaycoParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentCreatePaymentMethodOptionsPaycoParams.
@@ -6516,6 +7018,9 @@ const (
 func (p *PaymentIntentCreatePaymentMethodOptionsPaypalParams) AddUnsetField(field PaymentIntentCreatePaymentMethodOptionsPaypalParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
 }
+
+// If this is a `paypay` PaymentMethod, this sub-hash contains details about the PayPay payment method options.
+type PaymentIntentCreatePaymentMethodOptionsPaypayParams struct{}
 
 // Additional fields for Mandate creation. Only `purpose` field is configurable for PayTo PaymentIntent with `setup_future_usage=none`. Other fields are only applicable to PayTo PaymentIntent with `setup_future_usage=off_session`
 type PaymentIntentCreatePaymentMethodOptionsPaytoMandateOptionsParams struct {
@@ -6604,9 +7109,9 @@ type PaymentIntentCreatePaymentMethodOptionsPixMandateOptionsParams struct {
 type PaymentIntentCreatePaymentMethodOptionsPixParams struct {
 	// Determines if the amount includes the IOF tax. Defaults to `never`.
 	AmountIncludesIof *string `form:"amount_includes_iof" json:"amount_includes_iof,omitempty"`
-	// The number of seconds (between 10 and 1209600) after which Pix payment will expire. Defaults to 86400 seconds.
+	// The number of seconds after PaymentIntent confirmation when the Pix expires (between 60 and 1209600, inclusive). If neither expiration option is supplied, defaults to 14400 seconds (4 hours). Mutually exclusive with `expires_at`.
 	ExpiresAfterSeconds *int64 `form:"expires_after_seconds" json:"expires_after_seconds,omitempty"`
-	// The timestamp at which the Pix expires (between 10 and 1209600 seconds in the future). Defaults to 1 day in the future.
+	// The absolute Unix timestamp at which the Pix expires, between 60 and 1209600 seconds from the current time. If neither expiration option is supplied, the Pix expires 14400 seconds (4 hours) after PaymentIntent confirmation. Mutually exclusive with `expires_after_seconds`.
 	ExpiresAt *int64 `form:"expires_at" json:"expires_at,omitempty"`
 	// Additional fields for mandate creation. Only applicable when `setup_future_usage=off_session`.
 	MandateOptions *PaymentIntentCreatePaymentMethodOptionsPixMandateOptionsParams `form:"mandate_options" json:"mandate_options,omitempty"`
@@ -6673,8 +7178,16 @@ type PaymentIntentCreatePaymentMethodOptionsSamsungPayParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                             `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentCreatePaymentMethodOptionsSamsungPayParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                             `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentCreatePaymentMethodOptionsSamsungPayParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentCreatePaymentMethodOptionsSamsungPayParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentCreatePaymentMethodOptionsSamsungPayParams.
@@ -6696,15 +7209,24 @@ type PaymentIntentCreatePaymentMethodOptionsSatispayParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                           `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                           `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentCreatePaymentMethodOptionsSatispayParams.
 type PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetField string
 
 const (
-	PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetFieldCaptureMethod PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetField = "capture_method"
+	PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetFieldCaptureMethod    PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetField = "capture_method"
+	PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetFieldSetupFutureUsage PaymentIntentCreatePaymentMethodOptionsSatispayParamsUnsetField = "setup_future_usage"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -6785,6 +7307,39 @@ func (p *PaymentIntentCreatePaymentMethodOptionsSEPADebitParams) AddUnsetField(f
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
+// If this is a `sequra` PaymentMethod, this sub-hash contains details about the SeQura payment method options.
+type PaymentIntentCreatePaymentMethodOptionsSequraParams struct {
+	// Controls when the funds are captured from the customer's account.
+	//
+	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
+	//
+	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	//
+	// If you've already set `setup_future_usage` and you're performing a request using a publishable key, you can only update the value from `on_session` to `off_session`.
+	SetupFutureUsage *string                                                         `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentCreatePaymentMethodOptionsSequraParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentCreatePaymentMethodOptionsSequraParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentCreatePaymentMethodOptionsSequraParams.
+type PaymentIntentCreatePaymentMethodOptionsSequraParamsUnsetField string
+
+const (
+	PaymentIntentCreatePaymentMethodOptionsSequraParamsUnsetFieldCaptureMethod PaymentIntentCreatePaymentMethodOptionsSequraParamsUnsetField = "capture_method"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentCreatePaymentMethodOptionsSequraParams) AddUnsetField(field PaymentIntentCreatePaymentMethodOptionsSequraParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
 // If this is a `sofort` PaymentMethod, this sub-hash contains details about the SOFORT payment method options.
 type PaymentIntentCreatePaymentMethodOptionsSofortParams struct {
 	// Language shown to the payer on redirect.
@@ -6812,6 +7367,37 @@ const (
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
 func (p *PaymentIntentCreatePaymentMethodOptionsSofortParams) AddUnsetField(field PaymentIntentCreatePaymentMethodOptionsSofortParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// If this is a `sunbit` PaymentMethod, this sub-hash contains details about the Sunbit payment method options.
+type PaymentIntentCreatePaymentMethodOptionsSunbitParams struct {
+	// Controls when the funds are captured from the customer's account.
+	//
+	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
+	//
+	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                         `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentCreatePaymentMethodOptionsSunbitParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentCreatePaymentMethodOptionsSunbitParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentCreatePaymentMethodOptionsSunbitParams.
+type PaymentIntentCreatePaymentMethodOptionsSunbitParamsUnsetField string
+
+const (
+	PaymentIntentCreatePaymentMethodOptionsSunbitParamsUnsetFieldCaptureMethod PaymentIntentCreatePaymentMethodOptionsSunbitParamsUnsetField = "capture_method"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentCreatePaymentMethodOptionsSunbitParams) AddUnsetField(field PaymentIntentCreatePaymentMethodOptionsSunbitParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
@@ -6975,7 +7561,7 @@ func (p *PaymentIntentCreatePaymentMethodOptionsUSBankAccountParams) AddUnsetFie
 
 // If this is a `wechat_pay` PaymentMethod, this sub-hash contains details about the WeChat Pay payment method options.
 type PaymentIntentCreatePaymentMethodOptionsWeChatPayParams struct {
-	// The app ID registered with WeChat Pay. Only required when client is ios or android.
+	// The app ID registered with WeChat Pay. Only required when client is ios, android, or mini_program.
 	AppID *string `form:"app_id" json:"app_id,omitempty"`
 	// The client type that the end customer will pay from
 	Client *string `form:"client" json:"client,omitempty"`
@@ -7087,6 +7673,8 @@ type PaymentIntentCreatePaymentMethodOptionsParams struct {
 	PayNow *PaymentIntentCreatePaymentMethodOptionsPayNowParams `form:"paynow" json:"paynow,omitempty"`
 	// If this is a `paypal` PaymentMethod, this sub-hash contains details about the PayPal payment method options.
 	Paypal *PaymentIntentCreatePaymentMethodOptionsPaypalParams `form:"paypal" json:"paypal,omitempty"`
+	// If this is a `paypay` PaymentMethod, this sub-hash contains details about the PayPay payment method options.
+	Paypay *PaymentIntentCreatePaymentMethodOptionsPaypayParams `form:"paypay" json:"paypay,omitempty"`
 	// If this is a `payto` PaymentMethod, this sub-hash contains details about the PayTo payment method options.
 	Payto *PaymentIntentCreatePaymentMethodOptionsPaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is a `pix` PaymentMethod, this sub-hash contains details about the Pix payment method options.
@@ -7103,8 +7691,12 @@ type PaymentIntentCreatePaymentMethodOptionsParams struct {
 	Scalapay *PaymentIntentCreatePaymentMethodOptionsScalapayParams `form:"scalapay" json:"scalapay,omitempty"`
 	// If this is a `sepa_debit` PaymentIntent, this sub-hash contains details about the SEPA Debit payment method options.
 	SEPADebit *PaymentIntentCreatePaymentMethodOptionsSEPADebitParams `form:"sepa_debit" json:"sepa_debit,omitempty"`
+	// If this is a `sequra` PaymentMethod, this sub-hash contains details about the SeQura payment method options.
+	Sequra *PaymentIntentCreatePaymentMethodOptionsSequraParams `form:"sequra" json:"sequra,omitempty"`
 	// If this is a `sofort` PaymentMethod, this sub-hash contains details about the SOFORT payment method options.
 	Sofort *PaymentIntentCreatePaymentMethodOptionsSofortParams `form:"sofort" json:"sofort,omitempty"`
+	// If this is a `sunbit` PaymentMethod, this sub-hash contains details about the Sunbit payment method options.
+	Sunbit *PaymentIntentCreatePaymentMethodOptionsSunbitParams `form:"sunbit" json:"sunbit,omitempty"`
 	// If this is a `Swish` PaymentMethod, this sub-hash contains details about the Swish payment method options.
 	Swish *PaymentIntentCreatePaymentMethodOptionsSwishParams `form:"swish" json:"swish,omitempty"`
 	// If this is a `twint` PaymentMethod, this sub-hash contains details about the TWINT payment method options.
@@ -7164,6 +7756,7 @@ const (
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldPayco            PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "payco"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldPayNow           PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "paynow"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldPaypal           PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "paypal"
+	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldPaypay           PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "paypay"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldPayto            PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "payto"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldPix              PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "pix"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldPromptPay        PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "promptpay"
@@ -7172,7 +7765,9 @@ const (
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldSatispay         PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "satispay"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldScalapay         PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "scalapay"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldSEPADebit        PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "sepa_debit"
+	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldSequra           PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "sequra"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldSofort           PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "sofort"
+	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldSunbit           PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "sunbit"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldSwish            PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "swish"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldTWINT            PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "twint"
 	PaymentIntentCreatePaymentMethodOptionsParamsUnsetFieldUpi              PaymentIntentCreatePaymentMethodOptionsParamsUnsetField = "upi"
@@ -7188,8 +7783,23 @@ func (p *PaymentIntentCreatePaymentMethodOptionsParams) AddUnsetField(field Paym
 
 // Options to configure Radar. Learn more about [Radar Sessions](https://docs.stripe.com/radar/radar-session).
 type PaymentIntentCreateRadarOptionsParams struct {
+	// The referrer URL of the current checkout session. You can use this to supply session-level referrer data when a Radar Session isn't available or doesn't contain a referrer.
+	Referrer *string `form:"referrer" json:"referrer,omitempty"`
 	// A [Radar Session](https://docs.stripe.com/radar/radar-session) is a snapshot of the browser metadata and device details that help Radar make more accurate predictions on your payments.
-	Session *string `form:"session" json:"session,omitempty"`
+	Session     *string                                           `form:"session" json:"session,omitempty"`
+	UnsetFields []PaymentIntentCreateRadarOptionsParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentCreateRadarOptionsParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentCreateRadarOptionsParams.
+type PaymentIntentCreateRadarOptionsParamsUnsetField string
+
+const (
+	PaymentIntentCreateRadarOptionsParamsUnsetFieldReferrer PaymentIntentCreateRadarOptionsParamsUnsetField = "referrer"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentCreateRadarOptionsParams) AddUnsetField(field PaymentIntentCreateRadarOptionsParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
 }
 
 // The data with which to populate the destination payment.
@@ -7280,6 +7890,8 @@ func (p *PaymentIntentCreateTransferDataParams) AddMetadata(key string, value st
 // confirm=true.
 type PaymentIntentCreateParams struct {
 	Params `form:"*"`
+	// The list of payment method types allowed for use with this payment. Stripe automatically returns compatible payment methods from this list in the `payment_method_types` field of the response, based on the other PaymentIntent parameters, such as `currency`, `amount`, and `customer`.
+	AllowedPaymentMethodTypes []*string `form:"allowed_payment_method_types" json:"allowed_payment_method_types,omitempty"`
 	// Amount intended to be collected by this PaymentIntent. A positive integer representing how much to charge in the [smallest currency unit](https://docs.stripe.com/currencies#zero-decimal) (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or [equivalent in charge currency](https://docs.stripe.com/currencies#minimum-and-maximum-charge-amounts). The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
 	Amount *int64 `form:"amount" json:"amount"`
 	// Provides industry-specific information about the amount.
@@ -7304,13 +7916,13 @@ type PaymentIntentCreateParams struct {
 	//
 	// Payment methods attached to other Customers cannot be used with this PaymentIntent.
 	//
-	// If [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Customer instead.
+	// If [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Customer instead.
 	Customer *string `form:"customer" json:"customer,omitempty"`
 	// ID of the Account representing the customer that this PaymentIntent belongs to, if one exists.
 	//
 	// Payment methods attached to other Accounts cannot be used with this PaymentIntent.
 	//
-	// If [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Account after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Account instead.
+	// If [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Account after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Account instead.
 	CustomerAccount *string `form:"customer_account" json:"customer_account,omitempty"`
 	// An arbitrary string attached to the object. Often useful for displaying to users.
 	Description *string `form:"description" json:"description,omitempty"`
@@ -7334,10 +7946,10 @@ type PaymentIntentCreateParams struct {
 	OnBehalfOf *string `form:"on_behalf_of" json:"on_behalf_of,omitempty"`
 	// Provides industry-specific information about the charge.
 	PaymentDetails *PaymentIntentCreatePaymentDetailsParams `form:"payment_details" json:"payment_details,omitempty"`
-	// ID of the payment method (a PaymentMethod, Card, or [compatible Source](https://docs.stripe.com/payments/payment-methods#compatibility) object) to attach to this PaymentIntent.
+	// The ID of a PaymentMethod to attach to this PaymentIntent.
 	//
 	// If you don't provide the `payment_method` parameter or the `source` parameter with `confirm=true`, `source` automatically populates with `customer.default_source` to improve migration for users of the Charges API. We recommend that you explicitly provide the `payment_method` moving forward.
-	// If the payment method is attached to a Customer, you must also provide the ID of that Customer as the [customer](https://api.stripe.com#create_payment_intent-customer) parameter of this PaymentIntent.
+	// If the payment method is attached to a Customer, you must also provide the ID of that Customer as the [customer](https://docs.stripe.com/api#create_payment_intent-customer) parameter of this PaymentIntent.
 	// end
 	PaymentMethod *string `form:"payment_method" json:"payment_method,omitempty"`
 	// The ID of the [payment method configuration](https://docs.stripe.com/api/payment_method_configurations) to use with this PaymentIntent.
@@ -7348,8 +7960,6 @@ type PaymentIntentCreateParams struct {
 	PaymentMethodData *PaymentIntentCreatePaymentMethodDataParams `form:"payment_method_data" json:"payment_method_data,omitempty"`
 	// Payment method-specific configuration for this PaymentIntent.
 	PaymentMethodOptions *PaymentIntentCreatePaymentMethodOptionsParams `form:"payment_method_options" json:"payment_method_options,omitempty"`
-	// The list of payment method types (for example, a card) that this PaymentIntent can use. If you don't provide this, Stripe will dynamically show relevant payment methods from your [payment method settings](https://dashboard.stripe.com/settings/payment_methods). A list of valid payment method types can be found [here](https://docs.stripe.com/api/payment_methods/object#payment_method_object-type).
-	PaymentMethodTypes []*string `form:"payment_method_types" json:"payment_method_types,omitempty"`
 	// Options to configure Radar. Learn more about [Radar Sessions](https://docs.stripe.com/radar/radar-session).
 	RadarOptions *PaymentIntentCreateRadarOptionsParams `form:"radar_options" json:"radar_options,omitempty"`
 	// Email address to send the receipt to. If you specify `receipt_email` for a payment in live mode, you send a receipt regardless of your [email settings](https://dashboard.stripe.com/account/emails).
@@ -7412,7 +8022,7 @@ func (p *PaymentIntentCreateParams) AddMetadata(key string, value string) {
 //
 // You can retrieve a PaymentIntent client-side using a publishable key when the client_secret is in the query string.
 //
-// If you retrieve a PaymentIntent with a publishable key, it only returns a subset of properties. Refer to the [payment intent](https://docs.stripe.com/api#payment_intent_object) object reference for more details.
+// If you retrieve a PaymentIntent with a publishable key, it only returns a subset of properties. Refer to the [payment intent](https://docs.stripe.com/api/payment_intents/object) object reference for more details.
 type PaymentIntentRetrieveParams struct {
 	Params `form:"*"`
 	// The client secret of the PaymentIntent. We require it if you use a publishable key to retrieve the source.
@@ -7666,6 +8276,9 @@ type PaymentIntentUpdatePaymentMethodDataRadarOptionsParams struct {
 	Session *string `form:"session" json:"session,omitempty"`
 }
 
+// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+type PaymentIntentUpdatePaymentMethodDataSequraParams struct{}
+
 // If provided, this hash will be used to create a PaymentMethod. The new PaymentMethod will appear
 // in the [payment_method](https://docs.stripe.com/api/payment_intents/object#payment_intent_object-payment_method)
 // property on the PaymentIntent.
@@ -7680,9 +8293,9 @@ type PaymentIntentUpdatePaymentMethodDataParams struct {
 	Alipay *PaymentMethodAlipayParams `form:"alipay" json:"alipay,omitempty"`
 	// This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to `unspecified`.
 	AllowRedisplay *string `form:"allow_redisplay" json:"allow_redisplay,omitempty"`
-	// If this is a Alma PaymentMethod, this hash contains details about the Alma payment method.
+	// If this is an Alma PaymentMethod, this hash contains details about the Alma payment method.
 	Alma *PaymentMethodAlmaParams `form:"alma" json:"alma,omitempty"`
-	// If this is a AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
+	// If this is an AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
 	AmazonPay *PaymentMethodAmazonPayParams `form:"amazon_pay" json:"amazon_pay,omitempty"`
 	// If this is an `au_becs_debit` PaymentMethod, this hash contains details about the bank account.
 	AUBECSDebit *PaymentMethodAUBECSDebitParams `form:"au_becs_debit" json:"au_becs_debit,omitempty"`
@@ -7752,6 +8365,8 @@ type PaymentIntentUpdatePaymentMethodDataParams struct {
 	PayNow *PaymentMethodPayNowParams `form:"paynow" json:"paynow,omitempty"`
 	// If this is a `paypal` PaymentMethod, this hash contains details about the PayPal payment method.
 	Paypal *PaymentMethodPaypalParams `form:"paypal" json:"paypal,omitempty"`
+	// If this is a `paypay` PaymentMethod, this hash contains details about the PayPay payment method.
+	Paypay *PaymentMethodPaypayParams `form:"paypay" json:"paypay,omitempty"`
 	// If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
 	Payto *PaymentMethodPaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is a `pix` PaymentMethod, this hash contains details about the Pix payment method.
@@ -7770,9 +8385,11 @@ type PaymentIntentUpdatePaymentMethodDataParams struct {
 	Scalapay *PaymentMethodScalapayParams `form:"scalapay" json:"scalapay,omitempty"`
 	// If this is a `sepa_debit` PaymentMethod, this hash contains details about the SEPA debit bank account.
 	SEPADebit *PaymentMethodSEPADebitParams `form:"sepa_debit" json:"sepa_debit,omitempty"`
+	// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+	Sequra *PaymentIntentUpdatePaymentMethodDataSequraParams `form:"sequra" json:"sequra,omitempty"`
 	// If this is a `sofort` PaymentMethod, this hash contains details about the SOFORT payment method.
 	Sofort *PaymentMethodSofortParams `form:"sofort" json:"sofort,omitempty"`
-	// If this is a Sunbit PaymentMethod, this hash contains details about the Sunbit payment method.
+	// If this is a `sunbit` PaymentMethod, this hash contains details about the Sunbit payment method.
 	Sunbit *PaymentMethodSunbitParams `form:"sunbit" json:"sunbit,omitempty"`
 	// If this is a `swish` PaymentMethod, this hash contains details about the Swish payment method.
 	Swish *PaymentMethodSwishParams `form:"swish" json:"swish,omitempty"`
@@ -8120,6 +8737,34 @@ func (p *PaymentIntentUpdatePaymentMethodOptionsBancontactParams) AddUnsetField(
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
+// Registration details about the buyer's organization.
+type PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParams struct {
+	// The address the company or entity is registered with.
+	RegisteredAddress *AddressParams `form:"registered_address" json:"registered_address,omitempty"`
+	// Company or entity name.
+	RegisteredName *string `form:"registered_name" json:"registered_name,omitempty"`
+	// The official registration number for the given registration type.
+	RegistrationNumber *string `form:"registration_number" json:"registration_number,omitempty"`
+	// Type of registration the company or entity holds in their registered country.
+	RegistrationType *string `form:"registration_type" json:"registration_type,omitempty"`
+	// VAT id number
+	VAT         *string                                                                       `form:"vat" json:"vat,omitempty"`
+	UnsetFields []PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParams.
+type PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField string
+
+const (
+	PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetFieldRegisteredAddress PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField = "registered_address"
+	PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetFieldRegistrationType  PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField = "registration_type"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParams) AddUnsetField(field PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
 // If this is a `billie` PaymentMethod, this sub-hash contains details about the Billie payment method options.
 type PaymentIntentUpdatePaymentMethodOptionsBillieParams struct {
 	// Controls when the funds are captured from the customer's account.
@@ -8127,15 +8772,20 @@ type PaymentIntentUpdatePaymentMethodOptionsBillieParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                         `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Registration details about the buyer's organization.
+	CompanyDetails *PaymentIntentUpdatePaymentMethodOptionsBillieCompanyDetailsParams `form:"company_details" json:"company_details,omitempty"`
+	// An identifier or reference that this payment corresponds to.
+	Reference   *string                                                         `form:"reference" json:"reference,omitempty"`
+	UnsetFields []PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentUpdatePaymentMethodOptionsBillieParams.
 type PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetField string
 
 const (
-	PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetFieldCaptureMethod PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetField = "capture_method"
+	PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetFieldCaptureMethod  PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetField = "capture_method"
+	PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetFieldCompanyDetails PaymentIntentUpdatePaymentMethodOptionsBillieParamsUnsetField = "company_details"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -8146,10 +8796,18 @@ func (p *PaymentIntentUpdatePaymentMethodOptionsBillieParams) AddUnsetField(fiel
 // If this is a `bizum` PaymentMethod, this sub-hash contains details about the Bizum payment method options.
 type PaymentIntentUpdatePaymentMethodOptionsBizumParams struct{}
 
+// Details of the BLIK mandate
+type PaymentIntentUpdatePaymentMethodOptionsBLIKMandateOptionsParams struct {
+	// Expiry date of the mandate.
+	ExpiresAt *int64 `form:"expires_at" json:"expires_at,omitempty"`
+}
+
 // If this is a `blik` PaymentMethod, this sub-hash contains details about the BLIK payment method options.
 type PaymentIntentUpdatePaymentMethodOptionsBLIKParams struct {
 	// The 6-digit BLIK code that a customer has generated using their banking application. Can only be set on confirmation.
 	Code *string `form:"code" json:"code,omitempty"`
+	// Details of the BLIK mandate
+	MandateOptions *PaymentIntentUpdatePaymentMethodOptionsBLIKMandateOptionsParams `form:"mandate_options" json:"mandate_options,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
 	//
 	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -8351,6 +9009,8 @@ type PaymentIntentUpdatePaymentMethodOptionsCardParams struct {
 	RequestThreeDSecure *string `form:"request_three_d_secure" json:"request_three_d_secure,omitempty"`
 	// When enabled, using a card that is attached to a customer will require the CVC to be provided again (i.e. using the cvc_token parameter).
 	RequireCVCRecollection *bool `form:"require_cvc_recollection" json:"require_cvc_recollection,omitempty"`
+	// Set to indicate the future transaction type usage for the card being set up.
+	SetupCredentialUsage *string `form:"setup_credential_usage" json:"setup_credential_usage,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
 	//
 	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -8365,6 +9025,14 @@ type PaymentIntentUpdatePaymentMethodOptionsCardParams struct {
 	StatementDescriptorSuffixKana *string `form:"statement_descriptor_suffix_kana" json:"statement_descriptor_suffix_kana,omitempty"`
 	// Provides information about a card payment that customers see on their statements. Concatenated with the Kanji prefix (shortened Kanji descriptor) or Kanji statement descriptor that's set on the account to form the complete statement descriptor. Maximum 17 characters. On card statements, the *concatenation* of both prefix and suffix (including separators) will appear truncated to 17 characters.
 	StatementDescriptorSuffixKanji *string `form:"statement_descriptor_suffix_kanji" json:"statement_descriptor_suffix_kanji,omitempty"`
+	// Use this parameter in scenarios where you collect card details and [charge them later](https://stripe.com/docs/payments/cards/charging-saved-cards).
+	//
+	//  When making an off session payment with a previously saved card (that was saved with a SetupIntent or with a PaymentIntent with `setup_future_usage`), set this parameter to indicate the type of transaction.
+	//
+	//  You can set this parameter at any time before or during PaymentIntent confirmation, and confirm this PaymentIntent with `off_session=true`.
+	//
+	//  Note that this parameter is currently unsupported with the `setup_future_usage` parameter.
+	StoredCredentialUsage *string `form:"stored_credential_usage" json:"stored_credential_usage,omitempty"`
 	// If 3D Secure authentication was performed with a third-party provider,
 	// the authentication details to use for this payment.
 	ThreeDSecure *PaymentIntentUpdatePaymentMethodOptionsCardThreeDSecureParams `form:"three_d_secure" json:"three_d_secure,omitempty"`
@@ -8957,8 +9625,16 @@ type PaymentIntentUpdatePaymentMethodOptionsPaycoParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                        `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentUpdatePaymentMethodOptionsPaycoParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                        `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentUpdatePaymentMethodOptionsPaycoParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentUpdatePaymentMethodOptionsPaycoParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentUpdatePaymentMethodOptionsPaycoParams.
@@ -9022,6 +9698,9 @@ const (
 func (p *PaymentIntentUpdatePaymentMethodOptionsPaypalParams) AddUnsetField(field PaymentIntentUpdatePaymentMethodOptionsPaypalParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
 }
+
+// If this is a `paypay` PaymentMethod, this sub-hash contains details about the PayPay payment method options.
+type PaymentIntentUpdatePaymentMethodOptionsPaypayParams struct{}
 
 // Additional fields for Mandate creation. Only `purpose` field is configurable for PayTo PaymentIntent with `setup_future_usage=none`. Other fields are only applicable to PayTo PaymentIntent with `setup_future_usage=off_session`
 type PaymentIntentUpdatePaymentMethodOptionsPaytoMandateOptionsParams struct {
@@ -9110,9 +9789,9 @@ type PaymentIntentUpdatePaymentMethodOptionsPixMandateOptionsParams struct {
 type PaymentIntentUpdatePaymentMethodOptionsPixParams struct {
 	// Determines if the amount includes the IOF tax. Defaults to `never`.
 	AmountIncludesIof *string `form:"amount_includes_iof" json:"amount_includes_iof,omitempty"`
-	// The number of seconds (between 10 and 1209600) after which Pix payment will expire. Defaults to 86400 seconds.
+	// The number of seconds after PaymentIntent confirmation when the Pix expires (between 60 and 1209600, inclusive). If neither expiration option is supplied, defaults to 14400 seconds (4 hours). Mutually exclusive with `expires_at`.
 	ExpiresAfterSeconds *int64 `form:"expires_after_seconds" json:"expires_after_seconds,omitempty"`
-	// The timestamp at which the Pix expires (between 10 and 1209600 seconds in the future). Defaults to 1 day in the future.
+	// The absolute Unix timestamp at which the Pix expires, between 60 and 1209600 seconds from the current time. If neither expiration option is supplied, the Pix expires 14400 seconds (4 hours) after PaymentIntent confirmation. Mutually exclusive with `expires_after_seconds`.
 	ExpiresAt *int64 `form:"expires_at" json:"expires_at,omitempty"`
 	// Additional fields for mandate creation. Only applicable when `setup_future_usage=off_session`.
 	MandateOptions *PaymentIntentUpdatePaymentMethodOptionsPixMandateOptionsParams `form:"mandate_options" json:"mandate_options,omitempty"`
@@ -9179,8 +9858,16 @@ type PaymentIntentUpdatePaymentMethodOptionsSamsungPayParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                             `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentUpdatePaymentMethodOptionsSamsungPayParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                             `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentUpdatePaymentMethodOptionsSamsungPayParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentUpdatePaymentMethodOptionsSamsungPayParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentUpdatePaymentMethodOptionsSamsungPayParams.
@@ -9202,15 +9889,24 @@ type PaymentIntentUpdatePaymentMethodOptionsSatispayParams struct {
 	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
 	//
 	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
-	CaptureMethod *string                                                           `form:"capture_method" json:"capture_method,omitempty"`
-	UnsetFields   []PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetField `form:"-" json:"-"`
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                           `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetField `form:"-" json:"-"`
 }
 
 // PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentUpdatePaymentMethodOptionsSatispayParams.
 type PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetField string
 
 const (
-	PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetFieldCaptureMethod PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetField = "capture_method"
+	PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetFieldCaptureMethod    PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetField = "capture_method"
+	PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetFieldSetupFutureUsage PaymentIntentUpdatePaymentMethodOptionsSatispayParamsUnsetField = "setup_future_usage"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -9291,6 +9987,39 @@ func (p *PaymentIntentUpdatePaymentMethodOptionsSEPADebitParams) AddUnsetField(f
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
+// If this is a `sequra` PaymentMethod, this sub-hash contains details about the SeQura payment method options.
+type PaymentIntentUpdatePaymentMethodOptionsSequraParams struct {
+	// Controls when the funds are captured from the customer's account.
+	//
+	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
+	//
+	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	//
+	// If you've already set `setup_future_usage` and you're performing a request using a publishable key, you can only update the value from `on_session` to `off_session`.
+	SetupFutureUsage *string                                                         `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentUpdatePaymentMethodOptionsSequraParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentUpdatePaymentMethodOptionsSequraParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentUpdatePaymentMethodOptionsSequraParams.
+type PaymentIntentUpdatePaymentMethodOptionsSequraParamsUnsetField string
+
+const (
+	PaymentIntentUpdatePaymentMethodOptionsSequraParamsUnsetFieldCaptureMethod PaymentIntentUpdatePaymentMethodOptionsSequraParamsUnsetField = "capture_method"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentUpdatePaymentMethodOptionsSequraParams) AddUnsetField(field PaymentIntentUpdatePaymentMethodOptionsSequraParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
 // If this is a `sofort` PaymentMethod, this sub-hash contains details about the SOFORT payment method options.
 type PaymentIntentUpdatePaymentMethodOptionsSofortParams struct {
 	// Language shown to the payer on redirect.
@@ -9318,6 +10047,37 @@ const (
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
 func (p *PaymentIntentUpdatePaymentMethodOptionsSofortParams) AddUnsetField(field PaymentIntentUpdatePaymentMethodOptionsSofortParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// If this is a `sunbit` PaymentMethod, this sub-hash contains details about the Sunbit payment method options.
+type PaymentIntentUpdatePaymentMethodOptionsSunbitParams struct {
+	// Controls when the funds are captured from the customer's account.
+	//
+	// If provided, this parameter overrides the behavior of the top-level [capture_method](https://docs.stripe.com/api/payment_intents/update#update_payment_intent-capture_method) for this payment method type when finalizing the payment with this payment method type.
+	//
+	// If `capture_method` is already set on the PaymentIntent, providing an empty value for this parameter unsets the stored value for this payment method type.
+	CaptureMethod *string `form:"capture_method" json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage *string                                                         `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
+	UnsetFields      []PaymentIntentUpdatePaymentMethodOptionsSunbitParamsUnsetField `form:"-" json:"-"`
+}
+
+// PaymentIntentUpdatePaymentMethodOptionsSunbitParamsUnsetField is the list of fields that can be cleared/unset on PaymentIntentUpdatePaymentMethodOptionsSunbitParams.
+type PaymentIntentUpdatePaymentMethodOptionsSunbitParamsUnsetField string
+
+const (
+	PaymentIntentUpdatePaymentMethodOptionsSunbitParamsUnsetFieldCaptureMethod PaymentIntentUpdatePaymentMethodOptionsSunbitParamsUnsetField = "capture_method"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PaymentIntentUpdatePaymentMethodOptionsSunbitParams) AddUnsetField(field PaymentIntentUpdatePaymentMethodOptionsSunbitParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
@@ -9481,7 +10241,7 @@ func (p *PaymentIntentUpdatePaymentMethodOptionsUSBankAccountParams) AddUnsetFie
 
 // If this is a `wechat_pay` PaymentMethod, this sub-hash contains details about the WeChat Pay payment method options.
 type PaymentIntentUpdatePaymentMethodOptionsWeChatPayParams struct {
-	// The app ID registered with WeChat Pay. Only required when client is ios or android.
+	// The app ID registered with WeChat Pay. Only required when client is ios, android, or mini_program.
 	AppID *string `form:"app_id" json:"app_id,omitempty"`
 	// The client type that the end customer will pay from
 	Client *string `form:"client" json:"client,omitempty"`
@@ -9593,6 +10353,8 @@ type PaymentIntentUpdatePaymentMethodOptionsParams struct {
 	PayNow *PaymentIntentUpdatePaymentMethodOptionsPayNowParams `form:"paynow" json:"paynow,omitempty"`
 	// If this is a `paypal` PaymentMethod, this sub-hash contains details about the PayPal payment method options.
 	Paypal *PaymentIntentUpdatePaymentMethodOptionsPaypalParams `form:"paypal" json:"paypal,omitempty"`
+	// If this is a `paypay` PaymentMethod, this sub-hash contains details about the PayPay payment method options.
+	Paypay *PaymentIntentUpdatePaymentMethodOptionsPaypayParams `form:"paypay" json:"paypay,omitempty"`
 	// If this is a `payto` PaymentMethod, this sub-hash contains details about the PayTo payment method options.
 	Payto *PaymentIntentUpdatePaymentMethodOptionsPaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is a `pix` PaymentMethod, this sub-hash contains details about the Pix payment method options.
@@ -9609,8 +10371,12 @@ type PaymentIntentUpdatePaymentMethodOptionsParams struct {
 	Scalapay *PaymentIntentUpdatePaymentMethodOptionsScalapayParams `form:"scalapay" json:"scalapay,omitempty"`
 	// If this is a `sepa_debit` PaymentIntent, this sub-hash contains details about the SEPA Debit payment method options.
 	SEPADebit *PaymentIntentUpdatePaymentMethodOptionsSEPADebitParams `form:"sepa_debit" json:"sepa_debit,omitempty"`
+	// If this is a `sequra` PaymentMethod, this sub-hash contains details about the SeQura payment method options.
+	Sequra *PaymentIntentUpdatePaymentMethodOptionsSequraParams `form:"sequra" json:"sequra,omitempty"`
 	// If this is a `sofort` PaymentMethod, this sub-hash contains details about the SOFORT payment method options.
 	Sofort *PaymentIntentUpdatePaymentMethodOptionsSofortParams `form:"sofort" json:"sofort,omitempty"`
+	// If this is a `sunbit` PaymentMethod, this sub-hash contains details about the Sunbit payment method options.
+	Sunbit *PaymentIntentUpdatePaymentMethodOptionsSunbitParams `form:"sunbit" json:"sunbit,omitempty"`
 	// If this is a `Swish` PaymentMethod, this sub-hash contains details about the Swish payment method options.
 	Swish *PaymentIntentUpdatePaymentMethodOptionsSwishParams `form:"swish" json:"swish,omitempty"`
 	// If this is a `twint` PaymentMethod, this sub-hash contains details about the TWINT payment method options.
@@ -9670,6 +10436,7 @@ const (
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldPayco            PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "payco"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldPayNow           PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "paynow"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldPaypal           PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "paypal"
+	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldPaypay           PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "paypay"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldPayto            PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "payto"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldPix              PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "pix"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldPromptPay        PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "promptpay"
@@ -9678,7 +10445,9 @@ const (
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldSatispay         PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "satispay"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldScalapay         PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "scalapay"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldSEPADebit        PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "sepa_debit"
+	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldSequra           PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "sequra"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldSofort           PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "sofort"
+	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldSunbit           PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "sunbit"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldSwish            PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "swish"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldTWINT            PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "twint"
 	PaymentIntentUpdatePaymentMethodOptionsParamsUnsetFieldUpi              PaymentIntentUpdatePaymentMethodOptionsParamsUnsetField = "upi"
@@ -9765,6 +10534,8 @@ func (p *PaymentIntentUpdateTransferDataParams) AddMetadata(key string, value st
 // the [confirm API](https://docs.stripe.com/docs/api/payment_intents/confirm) instead.
 type PaymentIntentUpdateParams struct {
 	Params `form:"*"`
+	// The list of payment method types allowed for use with this payment. Stripe automatically returns compatible payment methods from this list in the `payment_method_types` field of the response, based on the other PaymentIntent parameters, such as `currency`, `amount`, and `customer`.
+	AllowedPaymentMethodTypes []*string `form:"allowed_payment_method_types" json:"allowed_payment_method_types,omitempty"`
 	// Amount intended to be collected by this PaymentIntent. A positive integer representing how much to charge in the [smallest currency unit](https://docs.stripe.com/currencies#zero-decimal) (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or [equivalent in charge currency](https://docs.stripe.com/currencies#minimum-and-maximum-charge-amounts). The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
 	Amount *int64 `form:"amount" json:"amount,omitempty"`
 	// Provides industry-specific information about the amount.
@@ -9779,13 +10550,13 @@ type PaymentIntentUpdateParams struct {
 	//
 	// Payment methods attached to other Customers cannot be used with this PaymentIntent.
 	//
-	// If [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Customer instead.
+	// If [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Customer instead.
 	Customer *string `form:"customer" json:"customer,omitempty"`
 	// ID of the Account representing the customer that this PaymentIntent belongs to, if one exists.
 	//
 	// Payment methods attached to other Accounts cannot be used with this PaymentIntent.
 	//
-	// If [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Account after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Account instead.
+	// If [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Account after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Account instead.
 	CustomerAccount *string `form:"customer_account" json:"customer_account,omitempty"`
 	// An arbitrary string attached to the object. Often useful for displaying to users.
 	Description *string `form:"description" json:"description,omitempty"`
@@ -9799,7 +10570,7 @@ type PaymentIntentUpdateParams struct {
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
 	// Provides industry-specific information about the charge.
 	PaymentDetails *PaymentIntentUpdatePaymentDetailsParams `form:"payment_details" json:"payment_details,omitempty"`
-	// ID of the payment method (a PaymentMethod, Card, or [compatible Source](https://docs.stripe.com/payments/payment-methods/transitioning#compatibility) object) to attach to this PaymentIntent. To unset this field to null, pass in an empty string.
+	// The ID of a PaymentMethod to attach to this PaymentIntent. To unset this field to null, pass in an empty string.
 	PaymentMethod *string `form:"payment_method" json:"payment_method,omitempty"`
 	// The ID of the [payment method configuration](https://docs.stripe.com/api/payment_method_configurations) to use with this PaymentIntent.
 	PaymentMethodConfiguration *string `form:"payment_method_configuration" json:"payment_method_configuration,omitempty"`
@@ -9809,8 +10580,6 @@ type PaymentIntentUpdateParams struct {
 	PaymentMethodData *PaymentIntentUpdatePaymentMethodDataParams `form:"payment_method_data" json:"payment_method_data,omitempty"`
 	// Payment-method-specific configuration for this PaymentIntent.
 	PaymentMethodOptions *PaymentIntentUpdatePaymentMethodOptionsParams `form:"payment_method_options" json:"payment_method_options,omitempty"`
-	// The list of payment method types (for example, card) that this PaymentIntent can use. Use `automatic_payment_methods` to manage payment methods from the [Stripe Dashboard](https://dashboard.stripe.com/settings/payment_methods). A list of valid payment method types can be found [here](https://docs.stripe.com/api/payment_methods/object#payment_method_object-type).
-	PaymentMethodTypes []*string `form:"payment_method_types" json:"payment_method_types,omitempty"`
 	// Email address that the receipt for the resulting payment will be sent to. If `receipt_email` is specified for a payment in live mode, a receipt will be sent regardless of your [email settings](https://dashboard.stripe.com/account/emails).
 	ReceiptEmail *string `form:"receipt_email" json:"receipt_email,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
@@ -10219,6 +10988,8 @@ type PaymentIntentNextActionRedirectToURL struct {
 type PaymentIntentNextActionSwishHandleRedirectOrDisplayQRCodeQRCode struct {
 	// The raw data string used to generate QR code, it should be used together with QR code library.
 	Data string `json:"data"`
+	// The timestamp at which the QR code expires.
+	ExpiresAt int64 `json:"expires_at"`
 	// The image_url_png string used to render QR code
 	ImageURLPNG string `json:"image_url_png"`
 	// The image_url_svg string used to render QR code
@@ -10244,9 +11015,6 @@ type PaymentIntentNextActionUpiHandleRedirectOrDisplayQRCode struct {
 	HostedInstructionsURL string                                                         `json:"hosted_instructions_url"`
 	QRCode                *PaymentIntentNextActionUpiHandleRedirectOrDisplayQRCodeQRCode `json:"qr_code"`
 }
-
-// When confirming a PaymentIntent with Stripe.js, Stripe.js depends on the contents of this dictionary to invoke authentication flows. The shape of the contents is subject to change and is only intended to be used by Stripe.js.
-type PaymentIntentNextActionUseStripeSDK struct{}
 type PaymentIntentNextActionVerifyWithMicrodeposits struct {
 	// The timestamp when the microdeposits are expected to land.
 	ArrivalDate int64 `json:"arrival_date"`
@@ -10309,7 +11077,7 @@ type PaymentIntentNextAction struct {
 	Type                             PaymentIntentNextActionType                              `json:"type"`
 	UpiHandleRedirectOrDisplayQRCode *PaymentIntentNextActionUpiHandleRedirectOrDisplayQRCode `json:"upi_handle_redirect_or_display_qr_code,omitempty"`
 	// When confirming a PaymentIntent with Stripe.js, Stripe.js depends on the contents of this dictionary to invoke authentication flows. The shape of the contents is subject to change and is only intended to be used by Stripe.js.
-	UseStripeSDK                  *PaymentIntentNextActionUseStripeSDK                  `json:"use_stripe_sdk,omitempty"`
+	UseStripeSDK                  map[string]any                                        `json:"use_stripe_sdk,omitempty"`
 	VerifyWithMicrodeposits       *PaymentIntentNextActionVerifyWithMicrodeposits       `json:"verify_with_microdeposits,omitempty"`
 	WeChatPayDisplayQRCode        *PaymentIntentNextActionWeChatPayDisplayQRCode        `json:"wechat_pay_display_qr_code,omitempty"`
 	WeChatPayRedirectToAndroidApp *PaymentIntentNextActionWeChatPayRedirectToAndroidApp `json:"wechat_pay_redirect_to_android_app,omitempty"`
@@ -10454,12 +11222,33 @@ type PaymentIntentPaymentMethodOptionsBancontact struct {
 	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
 	SetupFutureUsage PaymentIntentPaymentMethodOptionsBancontactSetupFutureUsage `json:"setup_future_usage,omitempty"`
 }
+type PaymentIntentPaymentMethodOptionsBillieCompanyDetails struct {
+	RegisteredAddress *Address `json:"registered_address,omitempty"`
+	// Company or entity name.
+	RegisteredName string `json:"registered_name"`
+	// The official registration number for the given registration type.
+	RegistrationNumber string `json:"registration_number"`
+	// Type of registration the company or entity holds in their registered country.
+	RegistrationType PaymentIntentPaymentMethodOptionsBillieCompanyDetailsRegistrationType `json:"registration_type,omitempty"`
+	// VAT id number
+	VAT string `json:"vat"`
+}
 type PaymentIntentPaymentMethodOptionsBillie struct {
 	// Controls when the funds will be captured from the customer's account.
-	CaptureMethod PaymentIntentPaymentMethodOptionsBillieCaptureMethod `json:"capture_method,omitempty"`
+	CaptureMethod  PaymentIntentPaymentMethodOptionsBillieCaptureMethod   `json:"capture_method,omitempty"`
+	CompanyDetails *PaymentIntentPaymentMethodOptionsBillieCompanyDetails `json:"company_details,omitempty"`
+	// An identifier or reference that this payment corresponds to.
+	Reference string `json:"reference,omitempty"`
 }
 type PaymentIntentPaymentMethodOptionsBizum struct{}
+type PaymentIntentPaymentMethodOptionsBLIKMandateOptions struct {
+	// Date at which the mandate expires.
+	ExpiresAt int64 `json:"expires_at"`
+	// Type of the mandate.
+	Type PaymentIntentPaymentMethodOptionsBLIKMandateOptionsType `json:"type"`
+}
 type PaymentIntentPaymentMethodOptionsBLIK struct {
+	MandateOptions *PaymentIntentPaymentMethodOptionsBLIKMandateOptions `json:"mandate_options,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
 	//
 	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -10549,6 +11338,8 @@ type PaymentIntentPaymentMethodOptionsCard struct {
 	RequestThreeDSecure PaymentIntentPaymentMethodOptionsCardRequestThreeDSecure `json:"request_three_d_secure"`
 	// When enabled, using a card that is attached to a customer will require the CVC to be provided again (i.e. using the cvc_token parameter).
 	RequireCVCRecollection bool `json:"require_cvc_recollection,omitempty"`
+	// Set to indicate the future transaction type usage for the card being set up.
+	SetupCredentialUsage PaymentIntentPaymentMethodOptionsCardSetupCredentialUsage `json:"setup_credential_usage,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
 	//
 	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
@@ -10561,6 +11352,8 @@ type PaymentIntentPaymentMethodOptionsCard struct {
 	StatementDescriptorSuffixKana string `json:"statement_descriptor_suffix_kana,omitempty"`
 	// Provides information about a card payment that customers see on their statements. Concatenated with the Kanji prefix (shortened Kanji descriptor) or Kanji statement descriptor that's set on the account to form the complete statement descriptor. Maximum 17 characters. On card statements, the *concatenation* of both prefix and suffix (including separators) will appear truncated to 17 characters.
 	StatementDescriptorSuffixKanji string `json:"statement_descriptor_suffix_kanji,omitempty"`
+	// Selected usage to indicate the transaction type of the off-session payment.
+	StoredCredentialUsage PaymentIntentPaymentMethodOptionsCardStoredCredentialUsage `json:"stored_credential_usage,omitempty"`
 }
 type PaymentIntentPaymentMethodOptionsCardPresentRouting struct {
 	// Requested routing priority
@@ -10827,6 +11620,14 @@ type PaymentIntentPaymentMethodOptionsPayByBank struct{}
 type PaymentIntentPaymentMethodOptionsPayco struct {
 	// Controls when the funds will be captured from the customer's account.
 	CaptureMethod PaymentIntentPaymentMethodOptionsPaycoCaptureMethod `json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage PaymentIntentPaymentMethodOptionsPaycoSetupFutureUsage `json:"setup_future_usage,omitempty"`
 }
 type PaymentIntentPaymentMethodOptionsPayNow struct {
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
@@ -10854,6 +11655,7 @@ type PaymentIntentPaymentMethodOptionsPaypal struct {
 	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
 	SetupFutureUsage PaymentIntentPaymentMethodOptionsPaypalSetupFutureUsage `json:"setup_future_usage,omitempty"`
 }
+type PaymentIntentPaymentMethodOptionsPaypay struct{}
 type PaymentIntentPaymentMethodOptionsPaytoMandateOptions struct {
 	// Amount that will be collected. It is required when `amount_type` is `fixed`.
 	Amount int64 `json:"amount"`
@@ -10900,9 +11702,9 @@ type PaymentIntentPaymentMethodOptionsPixMandateOptions struct {
 type PaymentIntentPaymentMethodOptionsPix struct {
 	// Determines if the amount includes the IOF tax.
 	AmountIncludesIof PaymentIntentPaymentMethodOptionsPixAmountIncludesIof `json:"amount_includes_iof,omitempty"`
-	// The number of seconds (between 10 and 1209600) after which Pix payment will expire.
+	// The number of seconds after PaymentIntent confirmation when the Pix expires (between 60 and 1209600, inclusive). If neither expiration option is supplied, defaults to 14400 seconds (4 hours). Mutually exclusive with `expires_at`.
 	ExpiresAfterSeconds int64 `json:"expires_after_seconds"`
-	// The timestamp at which the Pix expires.
+	// The absolute Unix timestamp at which the Pix expires. When supplied as an input, it must be between 60 and 1209600 seconds from the current time at validation, inclusive. If neither expiration option is supplied, the Pix expires 14400 seconds (4 hours) after PaymentIntent confirmation. Mutually exclusive with `expires_after_seconds`.
 	ExpiresAt      int64                                               `json:"expires_at"`
 	MandateOptions *PaymentIntentPaymentMethodOptionsPixMandateOptions `json:"mandate_options,omitempty"`
 	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
@@ -10939,10 +11741,26 @@ type PaymentIntentPaymentMethodOptionsRevolutPay struct {
 type PaymentIntentPaymentMethodOptionsSamsungPay struct {
 	// Controls when the funds will be captured from the customer's account.
 	CaptureMethod PaymentIntentPaymentMethodOptionsSamsungPayCaptureMethod `json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage PaymentIntentPaymentMethodOptionsSamsungPaySetupFutureUsage `json:"setup_future_usage,omitempty"`
 }
 type PaymentIntentPaymentMethodOptionsSatispay struct {
 	// Controls when the funds will be captured from the customer's account.
 	CaptureMethod PaymentIntentPaymentMethodOptionsSatispayCaptureMethod `json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage PaymentIntentPaymentMethodOptionsSatispaySetupFutureUsage `json:"setup_future_usage,omitempty"`
 }
 type PaymentIntentPaymentMethodOptionsScalapay struct {
 	// Controls when the funds will be captured from the customer's account.
@@ -10965,6 +11783,18 @@ type PaymentIntentPaymentMethodOptionsSEPADebit struct {
 	// Controls when Stripe will attempt to debit the funds from the customer's account. The date must be a string in YYYY-MM-DD format. The date must be in the future and between 3 and 15 calendar days from now.
 	TargetDate string `json:"target_date,omitempty"`
 }
+type PaymentIntentPaymentMethodOptionsSequra struct {
+	// Controls when the funds will be captured from the customer's account.
+	CaptureMethod PaymentIntentPaymentMethodOptionsSequraCaptureMethod `json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage PaymentIntentPaymentMethodOptionsSequraSetupFutureUsage `json:"setup_future_usage,omitempty"`
+}
 type PaymentIntentPaymentMethodOptionsSofort struct {
 	// Preferred language of the SOFORT authorization page that the customer is redirected to.
 	PreferredLanguage string `json:"preferred_language"`
@@ -10976,6 +11806,18 @@ type PaymentIntentPaymentMethodOptionsSofort struct {
 	//
 	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
 	SetupFutureUsage PaymentIntentPaymentMethodOptionsSofortSetupFutureUsage `json:"setup_future_usage,omitempty"`
+}
+type PaymentIntentPaymentMethodOptionsSunbit struct {
+	// Controls when the funds will be captured from the customer's account.
+	CaptureMethod PaymentIntentPaymentMethodOptionsSunbitCaptureMethod `json:"capture_method,omitempty"`
+	// Indicates that you intend to make future payments with this PaymentIntent's payment method.
+	//
+	// If you provide a Customer with the PaymentIntent, you can use this parameter to [attach the payment method](https://docs.stripe.com/payments/save-during-payment) to the Customer after the PaymentIntent is confirmed and the customer completes any required actions. If you don't provide a Customer, you can still [attach](https://docs.stripe.com/api/payment_methods/attach) the payment method to a Customer after the transaction completes.
+	//
+	// If the payment method is `card_present` and isn't a digital wallet, Stripe creates and attaches a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card to the Customer instead.
+	//
+	// When processing card payments, Stripe uses `setup_future_usage` to help you comply with regional legislation and network rules, such as [SCA](https://docs.stripe.com/strong-customer-authentication).
+	SetupFutureUsage PaymentIntentPaymentMethodOptionsSunbitSetupFutureUsage `json:"setup_future_usage,omitempty"`
 }
 type PaymentIntentPaymentMethodOptionsSwish struct {
 	// A reference for this payment to be displayed in the Swish app.
@@ -11045,7 +11887,7 @@ type PaymentIntentPaymentMethodOptionsUSBankAccount struct {
 	VerificationMethod PaymentIntentPaymentMethodOptionsUSBankAccountVerificationMethod `json:"verification_method,omitempty"`
 }
 type PaymentIntentPaymentMethodOptionsWeChatPay struct {
-	// The app ID registered with WeChat Pay. Only required when client is ios or android.
+	// The app ID registered with WeChat Pay. Only required when client is ios, android, or mini_program.
 	AppID string `json:"app_id"`
 	// The client type that the end customer will pay from
 	Client PaymentIntentPaymentMethodOptionsWeChatPayClient `json:"client"`
@@ -11111,6 +11953,7 @@ type PaymentIntentPaymentMethodOptions struct {
 	Payco            *PaymentIntentPaymentMethodOptionsPayco            `json:"payco,omitempty"`
 	PayNow           *PaymentIntentPaymentMethodOptionsPayNow           `json:"paynow,omitempty"`
 	Paypal           *PaymentIntentPaymentMethodOptionsPaypal           `json:"paypal,omitempty"`
+	Paypay           *PaymentIntentPaymentMethodOptionsPaypay           `json:"paypay,omitempty"`
 	Payto            *PaymentIntentPaymentMethodOptionsPayto            `json:"payto,omitempty"`
 	Pix              *PaymentIntentPaymentMethodOptionsPix              `json:"pix,omitempty"`
 	PromptPay        *PaymentIntentPaymentMethodOptionsPromptPay        `json:"promptpay,omitempty"`
@@ -11119,7 +11962,9 @@ type PaymentIntentPaymentMethodOptions struct {
 	Satispay         *PaymentIntentPaymentMethodOptionsSatispay         `json:"satispay,omitempty"`
 	Scalapay         *PaymentIntentPaymentMethodOptionsScalapay         `json:"scalapay,omitempty"`
 	SEPADebit        *PaymentIntentPaymentMethodOptionsSEPADebit        `json:"sepa_debit,omitempty"`
+	Sequra           *PaymentIntentPaymentMethodOptionsSequra           `json:"sequra,omitempty"`
 	Sofort           *PaymentIntentPaymentMethodOptionsSofort           `json:"sofort,omitempty"`
+	Sunbit           *PaymentIntentPaymentMethodOptionsSunbit           `json:"sunbit,omitempty"`
 	Swish            *PaymentIntentPaymentMethodOptionsSwish            `json:"swish,omitempty"`
 	TWINT            *PaymentIntentPaymentMethodOptionsTWINT            `json:"twint,omitempty"`
 	Upi              *PaymentIntentPaymentMethodOptionsUpi              `json:"upi,omitempty"`
@@ -11184,6 +12029,8 @@ type PaymentIntentTransferData struct {
 // Related guide: [Payment Intents API](https://docs.stripe.com/payments/payment-intents)
 type PaymentIntent struct {
 	APIResource
+	// The list of payment method types allowed for use with this payment. Stripe automatically returns compatible payment methods from this list in the `payment_method_types` field of the response, based on the other PaymentIntent parameters, such as `currency`, `amount`, and `customer`.
+	AllowedPaymentMethodTypes []PaymentIntentAllowedPaymentMethodType `json:"allowed_payment_method_types"`
 	// Amount intended to be collected by this PaymentIntent. A positive integer representing how much to charge in the [smallest currency unit](https://docs.stripe.com/currencies#zero-decimal) (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or [equivalent in charge currency](https://docs.stripe.com/currencies#minimum-and-maximum-charge-amounts). The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
 	Amount int64 `json:"amount"`
 	// Amount that can be captured from this PaymentIntent.
@@ -11219,13 +12066,13 @@ type PaymentIntent struct {
 	//
 	// Payment methods attached to other Customers cannot be used with this PaymentIntent.
 	//
-	// If [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Customer instead.
+	// If [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Customer instead.
 	Customer *Customer `json:"customer"`
 	// ID of the Account representing the customer that this PaymentIntent belongs to, if one exists.
 	//
 	// Payment methods attached to other Accounts cannot be used with this PaymentIntent.
 	//
-	// If [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Account after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Account instead.
+	// If [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) is set and this PaymentIntent's payment method is not `card_present`, then the payment method attaches to the Account after the PaymentIntent has been confirmed and any required actions from the user are complete. If the payment method is `card_present` and isn't a digital wallet, then a [generated_card](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-card_present-generated_card) payment method representing the card is created and attached to the Account instead.
 	CustomerAccount string `json:"customer_account"`
 	// An arbitrary string attached to the object. Often useful for displaying to users.
 	Description string `json:"description"`
@@ -11259,7 +12106,9 @@ type PaymentIntent struct {
 	// Payment-method-specific configuration for this PaymentIntent.
 	PaymentMethodOptions *PaymentIntentPaymentMethodOptions `json:"payment_method_options"`
 	// The list of payment method types (e.g. card) that this PaymentIntent is allowed to use. A comprehensive list of valid payment method types can be found [here](https://docs.stripe.com/api/payment_methods/object#payment_method_object-type).
-	PaymentMethodTypes []string                         `json:"payment_method_types"`
+	PaymentMethodTypes []string `json:"payment_method_types"`
+	// ID of the [Payment Record object](https://docs.stripe.com/api/payment-record) created by this PaymentIntent.
+	PaymentRecord      *PaymentRecord                   `json:"payment_record"`
 	PresentmentDetails *PaymentIntentPresentmentDetails `json:"presentment_details,omitempty"`
 	// If present, this property tells you about the processing state of the payment.
 	Processing *PaymentIntentProcessing `json:"processing"`

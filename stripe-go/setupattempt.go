@@ -49,6 +49,7 @@ type SetupAttemptPaymentMethodDetailsCardThreeDSecureResult string
 const (
 	SetupAttemptPaymentMethodDetailsCardThreeDSecureResultAttemptAcknowledged SetupAttemptPaymentMethodDetailsCardThreeDSecureResult = "attempt_acknowledged"
 	SetupAttemptPaymentMethodDetailsCardThreeDSecureResultAuthenticated       SetupAttemptPaymentMethodDetailsCardThreeDSecureResult = "authenticated"
+	SetupAttemptPaymentMethodDetailsCardThreeDSecureResultDataShareOnly       SetupAttemptPaymentMethodDetailsCardThreeDSecureResult = "data_share_only"
 	SetupAttemptPaymentMethodDetailsCardThreeDSecureResultExempted            SetupAttemptPaymentMethodDetailsCardThreeDSecureResult = "exempted"
 	SetupAttemptPaymentMethodDetailsCardThreeDSecureResultFailed              SetupAttemptPaymentMethodDetailsCardThreeDSecureResult = "failed"
 	SetupAttemptPaymentMethodDetailsCardThreeDSecureResultNotSupported        SetupAttemptPaymentMethodDetailsCardThreeDSecureResult = "not_supported"
@@ -164,6 +165,10 @@ type SetupAttemptPaymentMethodDetailsBancontact struct {
 	// Owner's verified full name. Values are verified or provided by Bancontact directly
 	// (if supported) at the time of authorization or settlement. They cannot be set or mutated.
 	VerifiedName string `json:"verified_name"`
+}
+type SetupAttemptPaymentMethodDetailsBLIK struct {
+	// A unique and immutable identifier assigned by BLIK to every buyer.
+	BuyerID string `json:"buyer_id,omitempty"`
 }
 type SetupAttemptPaymentMethodDetailsBoleto struct{}
 
@@ -281,8 +286,12 @@ type SetupAttemptPaymentMethodDetailsNaverPay struct {
 type SetupAttemptPaymentMethodDetailsNzBankAccount struct{}
 type SetupAttemptPaymentMethodDetailsPaypal struct{}
 type SetupAttemptPaymentMethodDetailsPayto struct{}
-type SetupAttemptPaymentMethodDetailsPix struct{}
+type SetupAttemptPaymentMethodDetailsPix struct {
+	// Uniquely identifies this particular Pix account. You can use this attribute to check whether two Pix accounts are the same.
+	Fingerprint string `json:"fingerprint,omitempty"`
+}
 type SetupAttemptPaymentMethodDetailsRevolutPay struct{}
+type SetupAttemptPaymentMethodDetailsSatispay struct{}
 type SetupAttemptPaymentMethodDetailsSEPADebit struct{}
 type SetupAttemptPaymentMethodDetailsSofort struct {
 	// Bank code of bank associated with the bank account.
@@ -313,6 +322,7 @@ type SetupAttemptPaymentMethodDetails struct {
 	AUBECSDebit   *SetupAttemptPaymentMethodDetailsAUBECSDebit   `json:"au_becs_debit,omitempty"`
 	BACSDebit     *SetupAttemptPaymentMethodDetailsBACSDebit     `json:"bacs_debit,omitempty"`
 	Bancontact    *SetupAttemptPaymentMethodDetailsBancontact    `json:"bancontact,omitempty"`
+	BLIK          *SetupAttemptPaymentMethodDetailsBLIK          `json:"blik,omitempty"`
 	Boleto        *SetupAttemptPaymentMethodDetailsBoleto        `json:"boleto,omitempty"`
 	Card          *SetupAttemptPaymentMethodDetailsCard          `json:"card,omitempty"`
 	CardPresent   *SetupAttemptPaymentMethodDetailsCardPresent   `json:"card_present,omitempty"`
@@ -328,6 +338,7 @@ type SetupAttemptPaymentMethodDetails struct {
 	Payto         *SetupAttemptPaymentMethodDetailsPayto         `json:"payto,omitempty"`
 	Pix           *SetupAttemptPaymentMethodDetailsPix           `json:"pix,omitempty"`
 	RevolutPay    *SetupAttemptPaymentMethodDetailsRevolutPay    `json:"revolut_pay,omitempty"`
+	Satispay      *SetupAttemptPaymentMethodDetailsSatispay      `json:"satispay,omitempty"`
 	SEPADebit     *SetupAttemptPaymentMethodDetailsSEPADebit     `json:"sepa_debit,omitempty"`
 	Sofort        *SetupAttemptPaymentMethodDetailsSofort        `json:"sofort,omitempty"`
 	TWINT         *SetupAttemptPaymentMethodDetailsTWINT         `json:"twint,omitempty"`

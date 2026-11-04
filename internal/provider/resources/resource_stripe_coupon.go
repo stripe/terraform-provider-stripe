@@ -29,7 +29,7 @@ import (
 	"strconv"
 	"strings"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &CouponResource{}
@@ -129,7 +129,7 @@ func (r *CouponResource) UpgradeState(ctx context.Context) map[int64]resource.St
 
 func couponResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
-		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://api.stripe.com#subscriptions), [invoices](https://api.stripe.com#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://api.stripe.com#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
+		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://docs.stripe.com/api#subscriptions), [invoices](https://docs.stripe.com/api#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://docs.stripe.com/api#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -254,7 +254,7 @@ func couponResourceV1Schema() *schema.Schema {
 
 func couponResourceV0Schema() *schema.Schema {
 	return &schema.Schema{
-		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://api.stripe.com#subscriptions), [invoices](https://api.stripe.com#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://api.stripe.com#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
+		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://docs.stripe.com/api#subscriptions), [invoices](https://docs.stripe.com/api#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://docs.stripe.com/api#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -803,7 +803,7 @@ func upgradeCouponStateV1(ctx context.Context, prior interface{}) (CouponResourc
 func (r *CouponResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Version:     2,
-		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://api.stripe.com#subscriptions), [invoices](https://api.stripe.com#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://api.stripe.com#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
+		Description: "A coupon contains information about a percent-off or amount-off discount you\nmight want to apply to a customer. Coupons may be applied to [subscriptions](https://docs.stripe.com/api#subscriptions), [invoices](https://docs.stripe.com/api#invoices),\n[checkout sessions](https://docs.stripe.com/api/checkout/sessions), [quotes](https://docs.stripe.com/api#quotes), and more. Coupons do not work with conventional one-off [charges](/api/charges/create) or [payment intents](https://docs.stripe.com/api/payment_intents).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -1105,7 +1105,9 @@ func expandCouponCreate(plan CouponResourceModel) (*stripe.CouponCreateParams, e
 		}
 	}
 	if !plan.PercentOff.IsNull() && !plan.PercentOff.IsUnknown() {
-		params.PercentOff = stripe.Float64(plan.PercentOff.ValueFloat64())
+		if !assignAttrValueToNamedField(params, "PercentOff", plan.PercentOff) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "percent_off", params)
+		}
 	}
 	if !plan.RedeemBy.IsNull() && !plan.RedeemBy.IsUnknown() {
 		params.RedeemBy = stripe.Int64(plan.RedeemBy.ValueInt64())

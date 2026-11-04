@@ -8,6 +8,23 @@ package stripe
 
 import "encoding/json"
 
+// Indicates whether the top-up was initiated by Stripe or by the user.
+type TopupInitiatedBy string
+
+// List of values that TopupInitiatedBy can take
+const (
+	TopupInitiatedByStripe TopupInitiatedBy = "stripe"
+	TopupInitiatedByUser   TopupInitiatedBy = "user"
+)
+
+// The US bank transfer network used for this top-up. The default is `ach`.
+type TopupPaymentMethodOptionsUSBankAccountNetwork string
+
+// List of values that TopupPaymentMethodOptionsUSBankAccountNetwork can take
+const (
+	TopupPaymentMethodOptionsUSBankAccountNetworkACH TopupPaymentMethodOptionsUSBankAccountNetwork = "ach"
+)
+
 // The status of the top-up is either `canceled`, `failed`, `pending`, `reversed`, or `succeeded`.
 type TopupStatus string
 
@@ -42,6 +59,15 @@ func (p *TopupListParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
 }
 
+type TopupPaymentMethodOptionsUSBankAccountParams struct {
+	Network *string `form:"network" json:"network"`
+}
+
+// Payment method-specific configuration for this top-up.
+type TopupPaymentMethodOptionsParams struct {
+	USBankAccount *TopupPaymentMethodOptionsUSBankAccountParams `form:"us_bank_account" json:"us_bank_account,omitempty"`
+}
+
 // Top up the balance of an account
 type TopupParams struct {
 	Params `form:"*"`
@@ -55,7 +81,11 @@ type TopupParams struct {
 	Expand []*string `form:"expand" json:"expand,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
-	// The ID of a source to transfer funds from. For most users, this should be left unspecified which will use the bank account that was set up in the dashboard for the specified currency. In test mode, this can be a test bank token (see [Testing Top-ups](https://docs.stripe.com/connect/testing#testing-top-ups)).
+	// The ID of a PaymentMethod representing the payment method to be used for the top-up. A PaymentMethod of type `us_bank_account` can be used.
+	PaymentMethod *string `form:"payment_method" json:"payment_method,omitempty"`
+	// Payment method-specific configuration for this top-up.
+	PaymentMethodOptions *TopupPaymentMethodOptionsParams `form:"payment_method_options" json:"payment_method_options,omitempty"`
+	// The ID of a source to transfer funds from. For most users, this should be left unspecified which will use the bank account that was set up in the dashboard for the specified currency. While testing, this can be a test bank token (see [Testing Top-ups](https://docs.stripe.com/connect/testing#testing-top-ups)).
 	Source *string `form:"source" json:"source,omitempty"`
 	// Extra information about a top-up for the source's bank statement. Limited to 15 ASCII characters.
 	StatementDescriptor *string `form:"statement_descriptor" json:"statement_descriptor,omitempty"`
@@ -90,6 +120,15 @@ func (p *TopupParams) AddMetadata(key string, value string) {
 	p.Metadata[key] = value
 }
 
+type TopupCreatePaymentMethodOptionsUSBankAccountParams struct {
+	Network *string `form:"network" json:"network"`
+}
+
+// Payment method-specific configuration for this top-up.
+type TopupCreatePaymentMethodOptionsParams struct {
+	USBankAccount *TopupCreatePaymentMethodOptionsUSBankAccountParams `form:"us_bank_account" json:"us_bank_account,omitempty"`
+}
+
 // Top up the balance of an account
 type TopupCreateParams struct {
 	Params `form:"*"`
@@ -103,7 +142,11 @@ type TopupCreateParams struct {
 	Expand []*string `form:"expand" json:"expand,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
-	// The ID of a source to transfer funds from. For most users, this should be left unspecified which will use the bank account that was set up in the dashboard for the specified currency. In test mode, this can be a test bank token (see [Testing Top-ups](https://docs.stripe.com/connect/testing#testing-top-ups)).
+	// The ID of a PaymentMethod representing the payment method to be used for the top-up. A PaymentMethod of type `us_bank_account` can be used.
+	PaymentMethod *string `form:"payment_method" json:"payment_method,omitempty"`
+	// Payment method-specific configuration for this top-up.
+	PaymentMethodOptions *TopupCreatePaymentMethodOptionsParams `form:"payment_method_options" json:"payment_method_options,omitempty"`
+	// The ID of a source to transfer funds from. For most users, this should be left unspecified which will use the bank account that was set up in the dashboard for the specified currency. While testing, this can be a test bank token (see [Testing Top-ups](https://docs.stripe.com/connect/testing#testing-top-ups)).
 	Source *string `form:"source" json:"source,omitempty"`
 	// Extra information about a top-up for the source's bank statement. Limited to 15 ASCII characters.
 	StatementDescriptor *string `form:"statement_descriptor" json:"statement_descriptor,omitempty"`
@@ -200,6 +243,18 @@ func (p *TopupUpdateParams) AddMetadata(key string, value string) {
 	p.Metadata[key] = value
 }
 
+// If this top-up is to be used with a `us_bank_account` payment method, this sub-hash contains configuration for it.
+type TopupPaymentMethodOptionsUSBankAccount struct {
+	// The US bank transfer network used for this top-up. The default is `ach`.
+	Network TopupPaymentMethodOptionsUSBankAccountNetwork `json:"network"`
+}
+
+// Payment-method-specific configuration for this top-up.
+type TopupPaymentMethodOptions struct {
+	// If this top-up is to be used with a `us_bank_account` payment method, this sub-hash contains configuration for it.
+	USBankAccount *TopupPaymentMethodOptionsUSBankAccount `json:"us_bank_account"`
+}
+
 // To top up your Stripe balance, you create a top-up object. You can retrieve
 // individual top-ups, as well as list all top-ups. Top-ups are identified by a
 // unique, random ID.
@@ -225,12 +280,18 @@ type Topup struct {
 	FailureMessage string `json:"failure_message"`
 	// Unique identifier for the object.
 	ID string `json:"id"`
+	// Indicates whether the top-up was initiated by Stripe or by the user.
+	InitiatedBy TopupInitiatedBy `json:"initiated_by"`
 	// If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.
 	Livemode bool `json:"livemode"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 	Metadata map[string]string `json:"metadata"`
 	// String representing the object's type. Objects of the same type share the same value.
 	Object string `json:"object"`
+	// The ID of a PaymentMethod representing the payment method used for the top-up. A PaymentMethod of type `us_bank_account` can be used.
+	PaymentMethod *PaymentMethod `json:"payment_method,omitempty"`
+	// Payment-method-specific configuration for this top-up.
+	PaymentMethodOptions *TopupPaymentMethodOptions `json:"payment_method_options,omitempty"`
 	// The source field is deprecated. It might not always be present in the API response.
 	Source *PaymentSource `json:"source"`
 	// Extra information about a top-up. This will appear on your source's bank statement. It must contain at least one letter.

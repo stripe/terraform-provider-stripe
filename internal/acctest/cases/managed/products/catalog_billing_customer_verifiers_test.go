@@ -15,7 +15,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 
 	"github.com/stripe/terraform-provider-stripe/internal/acctest/runner"
 )
@@ -1796,8 +1796,12 @@ func remotePriceString(price *stripe.Price, attribute string) (string, error) {
 	}
 }
 
-func formatDecimalFloat(value float64) string {
-	return strconv.FormatFloat(value, 'f', -1, 64)
+func formatDecimalFloat(value interface{}) string {
+	// SDK versions before decimal.Decimal represented these fields as float64.
+	if decimal, ok := value.(fmt.Stringer); ok {
+		return decimal.String()
+	}
+	return strconv.FormatFloat(value.(float64), 'f', -1, 64)
 }
 
 func remotePriceDecimalString(price *stripe.Price, attribute string) (string, error) {

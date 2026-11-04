@@ -9,7 +9,7 @@ package stripe
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stripe/stripe-go/v86/form"
+	"github.com/stripe/stripe-go/v87/form"
 	"strconv"
 )
 
@@ -39,8 +39,10 @@ const (
 	BankAccountFutureRequirementsErrorCodeExternalRequest                                        BankAccountFutureRequirementsErrorCode = "external_request"
 	BankAccountFutureRequirementsErrorCodeInformationMissing                                     BankAccountFutureRequirementsErrorCode = "information_missing"
 	BankAccountFutureRequirementsErrorCodeInvalidAddressCityStatePostalCode                      BankAccountFutureRequirementsErrorCode = "invalid_address_city_state_postal_code"
+	BankAccountFutureRequirementsErrorCodeInvalidAddressCmraAddress                              BankAccountFutureRequirementsErrorCode = "invalid_address_cmra_address"
 	BankAccountFutureRequirementsErrorCodeInvalidAddressHighwayContractBox                       BankAccountFutureRequirementsErrorCode = "invalid_address_highway_contract_box"
 	BankAccountFutureRequirementsErrorCodeInvalidAddressPrivateMailbox                           BankAccountFutureRequirementsErrorCode = "invalid_address_private_mailbox"
+	BankAccountFutureRequirementsErrorCodeInvalidAddressRegisteredAgentAddress                   BankAccountFutureRequirementsErrorCode = "invalid_address_registered_agent_address"
 	BankAccountFutureRequirementsErrorCodeInvalidBusinessProfileName                             BankAccountFutureRequirementsErrorCode = "invalid_business_profile_name"
 	BankAccountFutureRequirementsErrorCodeInvalidBusinessProfileNameDenylisted                   BankAccountFutureRequirementsErrorCode = "invalid_business_profile_name_denylisted"
 	BankAccountFutureRequirementsErrorCodeInvalidCompanyNameDenylisted                           BankAccountFutureRequirementsErrorCode = "invalid_company_name_denylisted"
@@ -143,8 +145,10 @@ const (
 	BankAccountRequirementsErrorCodeExternalRequest                                        BankAccountRequirementsErrorCode = "external_request"
 	BankAccountRequirementsErrorCodeInformationMissing                                     BankAccountRequirementsErrorCode = "information_missing"
 	BankAccountRequirementsErrorCodeInvalidAddressCityStatePostalCode                      BankAccountRequirementsErrorCode = "invalid_address_city_state_postal_code"
+	BankAccountRequirementsErrorCodeInvalidAddressCmraAddress                              BankAccountRequirementsErrorCode = "invalid_address_cmra_address"
 	BankAccountRequirementsErrorCodeInvalidAddressHighwayContractBox                       BankAccountRequirementsErrorCode = "invalid_address_highway_contract_box"
 	BankAccountRequirementsErrorCodeInvalidAddressPrivateMailbox                           BankAccountRequirementsErrorCode = "invalid_address_private_mailbox"
+	BankAccountRequirementsErrorCodeInvalidAddressRegisteredAgentAddress                   BankAccountRequirementsErrorCode = "invalid_address_registered_agent_address"
 	BankAccountRequirementsErrorCodeInvalidBusinessProfileName                             BankAccountRequirementsErrorCode = "invalid_business_profile_name"
 	BankAccountRequirementsErrorCodeInvalidBusinessProfileNameDenylisted                   BankAccountRequirementsErrorCode = "invalid_business_profile_name_denylisted"
 	BankAccountRequirementsErrorCodeInvalidCompanyNameDenylisted                           BankAccountRequirementsErrorCode = "invalid_company_name_denylisted"
@@ -408,7 +412,7 @@ func (p *BankAccountParams) AddMetadata(key string, value string) {
 
 // One or more documents that support the [Bank account ownership verification](https://support.stripe.com/questions/bank-account-ownership-verification) requirement. Must be a document associated with the bank account that displays the last 4 digits of the account number, either a statement or a check.
 type BankAccountDocumentsBankAccountOwnershipVerificationParams struct {
-	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
@@ -452,7 +456,7 @@ type BankAccountDeleteParams struct {
 
 // One or more documents that support the [Bank account ownership verification](https://support.stripe.com/questions/bank-account-ownership-verification) requirement. Must be a document associated with the bank account that displays the last 4 digits of the account number, either a statement or a check.
 type BankAccountUpdateDocumentsBankAccountOwnershipVerificationParams struct {
-	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
@@ -678,7 +682,7 @@ type BankAccountRetrieveParams struct {
 	Account  *string `form:"-"` // Included in URL
 }
 
-// Details about validation and verification failures for `due` requirements that must be resolved.
+// Fields that are `currently_due` and need to be collected again because validation or verification failed.
 type BankAccountFutureRequirementsError struct {
 	// The code for the type of error.
 	Code BankAccountFutureRequirementsErrorCode `json:"code"`
@@ -692,7 +696,7 @@ type BankAccountFutureRequirementsError struct {
 type BankAccountFutureRequirements struct {
 	// Fields that need to be resolved to keep the external account enabled. If not resolved by `current_deadline`, these fields will appear in `past_due` as well, and the account is disabled.
 	CurrentlyDue []string `json:"currently_due"`
-	// Details about validation and verification failures for `due` requirements that must be resolved.
+	// Fields that are `currently_due` and need to be collected again because validation or verification failed.
 	Errors []*BankAccountFutureRequirementsError `json:"errors"`
 	// Fields that haven't been resolved by `current_deadline`. These fields need to be resolved to enable the external account.
 	PastDue []string `json:"past_due"`
@@ -700,7 +704,7 @@ type BankAccountFutureRequirements struct {
 	PendingVerification []string `json:"pending_verification"`
 }
 
-// Details about validation and verification failures for `due` requirements that must be resolved.
+// Fields that are `currently_due` and need to be collected again because validation or verification failed.
 type BankAccountRequirementsError struct {
 	// The code for the type of error.
 	Code BankAccountRequirementsErrorCode `json:"code"`
@@ -714,7 +718,7 @@ type BankAccountRequirementsError struct {
 type BankAccountRequirements struct {
 	// Fields that need to be resolved to keep the external account enabled. If not resolved by `current_deadline`, these fields will appear in `past_due` as well, and the account is disabled.
 	CurrentlyDue []string `json:"currently_due"`
-	// Details about validation and verification failures for `due` requirements that must be resolved.
+	// Fields that are `currently_due` and need to be collected again because validation or verification failed.
 	Errors []*BankAccountRequirementsError `json:"errors"`
 	// Fields that haven't been resolved by `current_deadline`. These fields need to be resolved to enable the external account.
 	PastDue []string `json:"past_due"`

@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &TreasuryFinancialAccountResource{}
@@ -81,7 +81,7 @@ func (r *TreasuryFinancialAccountResource) Metadata(_ context.Context, req resou
 
 func (r *TreasuryFinancialAccountResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Stripe Treasury provides users with a container for money called a FinancialAccount that is separate from their Payments balance.\nFinancialAccounts serve as the source and destination of Treasury’s money movement APIs.",
+		Description: "Legacy FinancialAccounts are part of the v1 version of Treasury for platforms and do not support many of the features introduced in [Treasury for platforms v2](https://docs.stripe.com/treasury/connect). Use [Financial Accounts](https://docs.stripe.com/api/v2/money-management/financial-accounts) instead of building a new v1 integration.\n\nStripe Treasury for Platforms provides users with a container for money called a FinancialAccount that is separate from their Payments balance.\nFinancialAccounts serve as the source and destination of Treasury for Platform’s money movement APIs.",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,

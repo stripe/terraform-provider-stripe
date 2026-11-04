@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stripe/stripe-go/v86"
+	"github.com/stripe/stripe-go/v87"
 )
 
 var testPayload = []byte(fmt.Sprintf(`{
@@ -342,4 +342,70 @@ func TestConstructEvent_ErrorOnEventNotification(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "EventNotification")
+}
+
+// An empty secret must be rejected outright. HMAC accepts a zero-length key, so
+// without this an attacker could forge a payload signed with an empty secret and
+// have it verify successfully. Verification is delegated to the root stripe
+// package, so this also covers that the delegation is wired up.
+func TestValidatePayload_EmptySecret(t *testing.T) {
+	for name, secret := range map[string]string{
+		"empty":           "",
+		"space":           " ",
+		"tab":             "\t",
+		"carriage return": "\r",
+		"line feed":       "\n",
+		"form feed":       "\f",
+		"vertical tab":    "\v",
+		"mixed":           " \t\r\n\f\v",
+	} {
+		t.Run(name, func(t *testing.T) {
+			p := newSignedPayload(func(p *SignedPayload) {
+				p.Secret = secret
+			})
+			err := ValidatePayloadIgnoringTolerance(p.Payload, p.Header, p.Secret)
+			if err != ErrEmptySecret {
+				t.Errorf("expected ErrEmptySecret for blank secret, got: %v", err)
+			}
+		})
+	}
+}
+
+func TestConstructEvent_EmptySecret(t *testing.T) {
+	for name, secret := range map[string]string{
+		"empty":           "",
+		"space":           " ",
+		"tab":             "\t",
+		"carriage return": "\r",
+		"line feed":       "\n",
+		"form feed":       "\f",
+		"vertical tab":    "\v",
+		"mixed":           " \t\r\n\f\v",
+	} {
+		t.Run(name, func(t *testing.T) {
+			p := newSignedPayload(func(p *SignedPayload) {
+				p.Secret = secret
+			})
+			_, err := ConstructEventIgnoringTolerance(p.Payload, p.Header, p.Secret)
+			if err != ErrEmptySecret {
+				t.Errorf("expected ErrEmptySecret for blank secret, got: %v", err)
+			}
+		})
+	}
+}
+
+func TestValidatePayload_NonBlankSecret(t *testing.T) {
+	for name, secret := range map[string]string{
+		"surrounded by ASCII whitespace": " \tsecret\r\n",
+		"non-breaking space only":        "\u00a0",
+	} {
+		t.Run(name, func(t *testing.T) {
+			p := newSignedPayload(func(p *SignedPayload) {
+				p.Secret = secret
+			})
+			if err := ValidatePayloadIgnoringTolerance(p.Payload, p.Header, p.Secret); err != nil {
+				t.Errorf("expected exact non-blank secret to verify, got: %v", err)
+			}
+		})
+	}
 }

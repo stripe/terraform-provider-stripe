@@ -24,7 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"reflect"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &BillingPortalConfigurationResource{}
@@ -130,7 +130,7 @@ func (r *BillingPortalConfigurationResource) Schema(_ context.Context, _ resourc
 			"default_return_url": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.",
+				Description:   "The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overridden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"features": schema.SingleNestedAttribute{
@@ -202,6 +202,13 @@ func (r *BillingPortalConfigurationResource) Schema(_ context.Context, _ resourc
 										Required:    true,
 										Description: "Whether the feature is enabled.",
 									},
+									"feedback_options": schema.ListAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "The IDs of custom feedback options configured for this cancellation reason.",
+										PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+										ElementType:   types.StringType,
+									},
 									"options": schema.ListAttribute{
 										Required:    true,
 										Description: "Which cancellation reasons will be given as options to the customer.",
@@ -226,6 +233,54 @@ func (r *BillingPortalConfigurationResource) Schema(_ context.Context, _ resourc
 								Description:   "Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`.",
 								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 								Validators:    []validator.String{stringvalidator.OneOf("always_invoice", "create_prorations", "none")},
+							},
+						},
+					},
+					"subscription_pause": schema.SingleNestedAttribute{
+						Optional: true,
+						Computed: true,
+
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+						Attributes: map[string]schema.Attribute{
+							"duration": schema.SingleNestedAttribute{
+								Optional: true,
+								Computed: true,
+
+								PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+								Attributes: map[string]schema.Attribute{
+									"interval_options": schema.ListNestedAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "The preset pause durations customers can choose from.",
+										PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+										NestedObject: schema.NestedAttributeObject{
+											Attributes: map[string]schema.Attribute{
+												"interval": schema.StringAttribute{
+													Required:    true,
+													Description: "Specifies the pause duration unit. Either `day`, `week`, `month`, or `year`.",
+													Validators:  []validator.String{stringvalidator.OneOf("day", "month", "week", "year")},
+												},
+												"interval_count": schema.Int64Attribute{
+													Optional:      true,
+													Computed:      true,
+													Description:   "The number of intervals in the pause duration. The maximum duration is three years.",
+													PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+												},
+											},
+										},
+									},
+									"type": schema.StringAttribute{
+										Required:    true,
+										Description: "Whether subscriptions can be paused indefinitely or for a preset duration.",
+										Validators:  []validator.String{stringvalidator.OneOf("indefinite", "interval_options")},
+									},
+								},
+							},
+							"enabled": schema.BoolAttribute{
+								Optional:      true,
+								Computed:      true,
+								Description:   "Whether the feature is enabled. Customers can only pause subscriptions in the [redesigned customer portal](/customer-management).",
+								PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 							},
 						},
 					},
@@ -822,7 +877,7 @@ func flattenBillingPortalConfiguration(obj *stripe.BillingPortalConfiguration, s
 			hadRawFeatures = true
 			if rawValueFeatures != nil {
 				sourceFeatures := applyConfiguredKeyedListShapes(rawValueFeatures, attrValueToPlain(state.Features))
-				if valueFeatures, err := flattenPlainValue(sourceFeatures, types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}}, "features", "raw response"); err != nil {
+				if valueFeatures, err := flattenPlainValue(sourceFeatures, types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "feedback_options": types.ListType{ElemType: types.StringType}, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_pause": types.ObjectType{AttrTypes: map[string]attr.Type{"duration": types.ObjectType{AttrTypes: map[string]attr.Type{"interval_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, "type": types.StringType}}, "enabled": types.BoolType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}}, "features", "raw response"); err != nil {
 					return err
 				} else {
 					if typedFeatures, ok := valueFeatures.(types.Object); ok {
@@ -838,7 +893,7 @@ func flattenBillingPortalConfiguration(obj *stripe.BillingPortalConfiguration, s
 					sourceFeatures := applyConfiguredKeyedListShapes(responseValueFeatures, attrValueToPlain(state.Features))
 					if valueFeatures, err := flattenPlainValue(
 						sourceFeatures,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "feedback_options": types.ListType{ElemType: types.StringType}, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_pause": types.ObjectType{AttrTypes: map[string]attr.Type{"duration": types.ObjectType{AttrTypes: map[string]attr.Type{"interval_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, "type": types.StringType}}, "enabled": types.BoolType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}},
 						"features",
 						"response struct",
 					); err != nil {
@@ -853,7 +908,7 @@ func flattenBillingPortalConfiguration(obj *stripe.BillingPortalConfiguration, s
 			}
 		}
 		if !assignedFeatures && hadRawFeatures {
-			if nullFeatures, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}}); ok {
+			if nullFeatures, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "feedback_options": types.ListType{ElemType: types.StringType}, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_pause": types.ObjectType{AttrTypes: map[string]attr.Type{"duration": types.ObjectType{AttrTypes: map[string]attr.Type{"interval_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, "type": types.StringType}}, "enabled": types.BoolType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}}); ok {
 				if typedFeatures, ok := nullFeatures.(types.Object); ok {
 					state.Features = typedFeatures
 				}

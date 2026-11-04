@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &IssuingCardholderResource{}
@@ -175,7 +175,7 @@ func (r *IssuingCardholderResource) Schema(_ context.Context, _ resource.SchemaR
 							"user_terms_acceptance": schema.SingleNestedAttribute{
 								Optional:      true,
 								Computed:      true,
-								Description:   "Information about cardholder acceptance of Celtic [Authorized User Terms](https://stripe.com/docs/issuing/cards#accept-authorized-user-terms). Required for cards backed by a Celtic program.",
+								Description:   "Information about cardholder acceptance of Celtic [Authorized User Terms](https://docs.stripe.com/issuing/compliance-us#issuing-terms). Required for cards backed by a Celtic program.",
 								PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 								Attributes: map[string]schema.Attribute{
 									"date": schema.Int64Attribute{
@@ -247,13 +247,13 @@ func (r *IssuingCardholderResource) Schema(_ context.Context, _ resource.SchemaR
 									"back": schema.StringAttribute{
 										Optional:      true,
 										Computed:      true,
-										Description:   "The back of a document returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`.",
+										Description:   "The back of a document returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`.",
 										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 									},
 									"front": schema.StringAttribute{
 										Optional:      true,
 										Computed:      true,
-										Description:   "The front of a document returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`.",
+										Description:   "The front of a document returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`.",
 										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 									},
 								},
@@ -288,7 +288,7 @@ func (r *IssuingCardholderResource) Schema(_ context.Context, _ resource.SchemaR
 			"preferred_locales": schema.ListAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "The cardholder’s preferred locales (languages), ordered by preference. Locales can be `da`, `de`, `en`, `es`, `fr`, `it`, `pl`, or `sv`.\n This changes the language of the [3D Secure flow](https://docs.stripe.com/issuing/3d-secure) and one-time password messages sent to the cardholder.",
+				Description:   "The cardholder’s preferred locales (languages), ordered by preference. Locales can be `de`, `en`, `es`, `fr`, or `it`.\n This changes the language of the [3D Secure flow](https://docs.stripe.com/issuing/3d-secure) and one-time password messages sent to the cardholder.",
 				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 				ElementType:   types.StringType,
 			},
