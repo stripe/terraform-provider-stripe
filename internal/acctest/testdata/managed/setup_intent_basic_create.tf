@@ -8,7 +8,7 @@ resource "stripe_customer" "customer" {
 resource "stripe_setup_intent" "test" {
   customer             = stripe_customer.customer.id
   description          = "sdk-codegen setup intent basic"
-  payment_method_types = ["card"]
+  allowed_payment_method_types = ["card"]
   usage                = "off_session"
 
   metadata = {

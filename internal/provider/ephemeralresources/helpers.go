@@ -1334,6 +1334,14 @@ func assignStringToNamedField(target interface{}, primary string, fallback strin
 				field.Set(reflect.ValueOf(stripe.String(value)))
 				return true
 			}
+			parsed := reflect.New(field.Type().Elem())
+			if decoder, ok := parsed.Interface().(interface{ UnmarshalText([]byte) error }); ok {
+				if err := decoder.UnmarshalText([]byte(value)); err != nil {
+					return false
+				}
+				field.Set(parsed)
+				return true
+			}
 		}
 		if assignStringToStructIDField(field, value) {
 			return true
