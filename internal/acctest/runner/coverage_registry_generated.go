@@ -934,7 +934,7 @@ var CoverageRegistry = []CoverageEntry{
 		Kind:                         "resource",
 		Group:                        "base",
 		Status:                       "limited",
-		CaseNames:                    []string{"v2_core_event_destination_basic", "v2_core_event_destination_snapshot", "v2_core_event_destination_legacy_upgrade", "v2_core_event_destination_module_legacy_upgrade"},
+		CaseNames:                    []string{"v2_core_event_destination_basic", "v2_core_event_destination_url_import", "v2_core_event_destination_snapshot", "v2_core_event_destination_legacy_upgrade", "v2_core_event_destination_module_legacy_upgrade"},
 		LegacyUpgradeCaseNames:       []string{"v2_core_event_destination_legacy_upgrade"},
 		RequiresLegacyModuleUpgrade:  true,
 		LegacyModuleUpgradeCaseNames: []string{"v2_core_event_destination_module_legacy_upgrade"},

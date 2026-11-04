@@ -1172,6 +1172,19 @@ func (r *V2CoreEventDestinationResource) Create(ctx context.Context, req resourc
 		}
 	}
 
+	{
+		found := false
+		for _, include := range rawReadParams.Include {
+			if include != nil && *include == "webhook_endpoint.url" {
+				found = true
+				break
+			}
+		}
+		if !found {
+			rawReadParams.Include = append(rawReadParams.Include, stripe.String("webhook_endpoint.url"))
+		}
+	}
+
 	if err := ensureRawResponse(obj, r.client.V2CoreEventDestinations.B, r.client.V2CoreEventDestinations.Key, stripe.FormatURLPath("/v2/core/event_destinations/%s", obj.ID), rawReadParams); err != nil {
 		resp.Diagnostics.AddError("Error hydrating V2CoreEventDestination create raw response", err.Error())
 		return
@@ -1203,6 +1216,19 @@ func (r *V2CoreEventDestinationResource) Read(ctx context.Context, req resource.
 		if !assignAttrValueToNamedField(params, "Include", state.Include) {
 			resp.Diagnostics.AddError("Error building V2CoreEventDestination read params", fmt.Sprintf("failed to assign attribute %q on %T", "include", params))
 			return
+		}
+	}
+
+	{
+		found := false
+		for _, include := range params.Include {
+			if include != nil && *include == "webhook_endpoint.url" {
+				found = true
+				break
+			}
+		}
+		if !found {
+			params.Include = append(params.Include, stripe.String("webhook_endpoint.url"))
 		}
 	}
 
@@ -1276,6 +1302,19 @@ func (r *V2CoreEventDestinationResource) Update(ctx context.Context, req resourc
 		if !assignAttrValueToNamedField(rawReadParams, "Include", state.Include) {
 			resp.Diagnostics.AddError("Error building V2CoreEventDestination read params", fmt.Sprintf("failed to assign attribute %q on %T", "include", rawReadParams))
 			return
+		}
+	}
+
+	{
+		found := false
+		for _, include := range rawReadParams.Include {
+			if include != nil && *include == "webhook_endpoint.url" {
+				found = true
+				break
+			}
+		}
+		if !found {
+			rawReadParams.Include = append(rawReadParams.Include, stripe.String("webhook_endpoint.url"))
 		}
 	}
 
