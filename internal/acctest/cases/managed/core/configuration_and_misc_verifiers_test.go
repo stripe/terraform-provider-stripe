@@ -52,6 +52,7 @@ type taxIDExpectations struct {
 }
 
 type billingPortalConfigurationExpectations struct {
+	ExpectedSubscriptionPriceAddress            string
 	Address                                     string
 	ExpectedActive                              bool
 	ExpectedName                                string
@@ -454,6 +455,27 @@ func verifyBillingPortalConfiguration(
 		configuration, err := retrieveBillingPortalConfiguration(client, state, expect.Address)
 		if err != nil {
 			return err
+		}
+		if expect.ExpectedSubscriptionPriceAddress != "" {
+			if configuration.Features == nil || configuration.Features.SubscriptionUpdate == nil || len(configuration.Features.SubscriptionUpdate.Products) != 1 {
+				return fmt.Errorf("expected one subscription-update product for %s", expect.Address)
+			}
+			product := configuration.Features.SubscriptionUpdate.Products[0]
+			if err := expectRemoteStateString(state, "stripe_product.product", "id", product.Product); err != nil {
+				return err
+			}
+			if len(product.Prices) != 1 {
+				return fmt.Errorf("expected one subscription-update price for %s", expect.Address)
+			}
+			if err := expectRemoteStateString(state, expect.ExpectedSubscriptionPriceAddress, "id", product.Prices[0]); err != nil {
+				return err
+			}
+			if err := expectRemoteStateString(state, expect.Address, "features.subscription_update.products.0.product", product.Product); err != nil {
+				return err
+			}
+			if err := expectRemoteStateString(state, expect.Address, "features.subscription_update.products.0.prices.0", product.Prices[0]); err != nil {
+				return err
+			}
 		}
 		if configuration.Active != expect.ExpectedActive {
 			return fmt.Errorf(
@@ -1110,7 +1132,7 @@ func retrieveBillingPortalConfiguration(
 	configuration, err := client.V1BillingPortalConfigurations.Retrieve(
 		context.Background(),
 		id,
-		nil,
+		&stripe.BillingPortalConfigurationRetrieveParams{Expand: []*string{stripe.String("features.subscription_update.products")}},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("retrieve %s (%s): %w", address, id, err)
