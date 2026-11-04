@@ -301,6 +301,7 @@ const (
 	PaymentMethodTypePayco            PaymentMethodType = "payco"
 	PaymentMethodTypePayNow           PaymentMethodType = "paynow"
 	PaymentMethodTypePaypal           PaymentMethodType = "paypal"
+	PaymentMethodTypePaypay           PaymentMethodType = "paypay"
 	PaymentMethodTypePayto            PaymentMethodType = "payto"
 	PaymentMethodTypePix              PaymentMethodType = "pix"
 	PaymentMethodTypePromptPay        PaymentMethodType = "promptpay"
@@ -309,6 +310,7 @@ const (
 	PaymentMethodTypeSatispay         PaymentMethodType = "satispay"
 	PaymentMethodTypeScalapay         PaymentMethodType = "scalapay"
 	PaymentMethodTypeSEPADebit        PaymentMethodType = "sepa_debit"
+	PaymentMethodTypeSequra           PaymentMethodType = "sequra"
 	PaymentMethodTypeSofort           PaymentMethodType = "sofort"
 	PaymentMethodTypeSunbit           PaymentMethodType = "sunbit"
 	PaymentMethodTypeSwish            PaymentMethodType = "swish"
@@ -418,10 +420,10 @@ type PaymentMethodAfterpayClearpayParams struct{}
 // If this is an `Alipay` PaymentMethod, this hash contains details about the Alipay payment method.
 type PaymentMethodAlipayParams struct{}
 
-// If this is a Alma PaymentMethod, this hash contains details about the Alma payment method.
+// If this is an Alma PaymentMethod, this hash contains details about the Alma payment method.
 type PaymentMethodAlmaParams struct{}
 
-// If this is a AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
+// If this is an AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
 type PaymentMethodAmazonPayParams struct{}
 
 // If this is an `au_becs_debit` PaymentMethod, this hash contains details about the bank account.
@@ -646,6 +648,9 @@ type PaymentMethodPayNowParams struct{}
 // If this is a `paypal` PaymentMethod, this hash contains details about the PayPal payment method.
 type PaymentMethodPaypalParams struct{}
 
+// If this is a `paypay` PaymentMethod, this hash contains details about the PayPay payment method.
+type PaymentMethodPaypayParams struct{}
+
 // If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
 type PaymentMethodPaytoParams struct {
 	// The account number for the bank account.
@@ -686,13 +691,16 @@ type PaymentMethodSEPADebitParams struct {
 	IBAN *string `form:"iban" json:"iban"`
 }
 
+// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+type PaymentMethodSequraParams struct{}
+
 // If this is a `sofort` PaymentMethod, this hash contains details about the SOFORT payment method.
 type PaymentMethodSofortParams struct {
 	// Two-letter ISO code representing the country the bank account is located in.
 	Country *string `form:"country" json:"country"`
 }
 
-// If this is a Sunbit PaymentMethod, this hash contains details about the Sunbit payment method.
+// If this is a `sunbit` PaymentMethod, this hash contains details about the Sunbit payment method.
 type PaymentMethodSunbitParams struct{}
 
 // If this is a `swish` PaymentMethod, this hash contains details about the Swish payment method.
@@ -754,9 +762,9 @@ type PaymentMethodParams struct {
 	Alipay *PaymentMethodAlipayParams `form:"alipay" json:"alipay,omitempty"`
 	// This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to `unspecified`.
 	AllowRedisplay *string `form:"allow_redisplay" json:"allow_redisplay,omitempty"`
-	// If this is a Alma PaymentMethod, this hash contains details about the Alma payment method.
+	// If this is an Alma PaymentMethod, this hash contains details about the Alma payment method.
 	Alma *PaymentMethodAlmaParams `form:"alma" json:"alma,omitempty"`
-	// If this is a AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
+	// If this is an AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
 	AmazonPay *PaymentMethodAmazonPayParams `form:"amazon_pay" json:"amazon_pay,omitempty"`
 	// If this is an `au_becs_debit` PaymentMethod, this hash contains details about the bank account.
 	AUBECSDebit *PaymentMethodAUBECSDebitParams `form:"au_becs_debit" json:"au_becs_debit,omitempty"`
@@ -832,6 +840,8 @@ type PaymentMethodParams struct {
 	PayNow *PaymentMethodPayNowParams `form:"paynow" json:"paynow,omitempty"`
 	// If this is a `paypal` PaymentMethod, this hash contains details about the PayPal payment method.
 	Paypal *PaymentMethodPaypalParams `form:"paypal" json:"paypal,omitempty"`
+	// If this is a `paypay` PaymentMethod, this hash contains details about the PayPay payment method.
+	Paypay *PaymentMethodPaypayParams `form:"paypay" json:"paypay,omitempty"`
 	// If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
 	Payto *PaymentMethodPaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is a `pix` PaymentMethod, this hash contains details about the Pix payment method.
@@ -850,9 +860,11 @@ type PaymentMethodParams struct {
 	Scalapay *PaymentMethodScalapayParams `form:"scalapay" json:"scalapay,omitempty"`
 	// If this is a `sepa_debit` PaymentMethod, this hash contains details about the SEPA debit bank account.
 	SEPADebit *PaymentMethodSEPADebitParams `form:"sepa_debit" json:"sepa_debit,omitempty"`
+	// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+	Sequra *PaymentMethodSequraParams `form:"sequra" json:"sequra,omitempty"`
 	// If this is a `sofort` PaymentMethod, this hash contains details about the SOFORT payment method.
 	Sofort *PaymentMethodSofortParams `form:"sofort" json:"sofort,omitempty"`
-	// If this is a Sunbit PaymentMethod, this hash contains details about the Sunbit payment method.
+	// If this is a `sunbit` PaymentMethod, this hash contains details about the Sunbit payment method.
 	Sunbit *PaymentMethodSunbitParams `form:"sunbit" json:"sunbit,omitempty"`
 	// If this is a `swish` PaymentMethod, this hash contains details about the Swish payment method.
 	Swish *PaymentMethodSwishParams `form:"swish" json:"swish,omitempty"`
@@ -930,7 +942,7 @@ func (p *PaymentMethodAttachParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
 }
 
-// Detaches a PaymentMethod object from a Customer. After a PaymentMethod is detached, it can no longer be used for a payment or re-attached to a Customer.
+// Detaches a PaymentMethod object from a Customer. Detachment is permanent and irreversible — once detached, a PaymentMethod can no longer be used for payments or re-attached to a Customer.
 type PaymentMethodDetachParams struct {
 	Params `form:"*"`
 	// Specifies which fields in the response should be expanded.
@@ -961,10 +973,10 @@ type PaymentMethodCreateAfterpayClearpayParams struct{}
 // If this is an `Alipay` PaymentMethod, this hash contains details about the Alipay payment method.
 type PaymentMethodCreateAlipayParams struct{}
 
-// If this is a Alma PaymentMethod, this hash contains details about the Alma payment method.
+// If this is an Alma PaymentMethod, this hash contains details about the Alma payment method.
 type PaymentMethodCreateAlmaParams struct{}
 
-// If this is a AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
+// If this is an AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
 type PaymentMethodCreateAmazonPayParams struct{}
 
 // If this is an `au_becs_debit` PaymentMethod, this hash contains details about the bank account.
@@ -1176,6 +1188,9 @@ type PaymentMethodCreatePayNowParams struct{}
 // If this is a `paypal` PaymentMethod, this hash contains details about the PayPal payment method.
 type PaymentMethodCreatePaypalParams struct{}
 
+// If this is a `paypay` PaymentMethod, this hash contains details about the PayPay payment method.
+type PaymentMethodCreatePaypayParams struct{}
+
 // If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
 type PaymentMethodCreatePaytoParams struct {
 	// The account number for the bank account.
@@ -1216,13 +1231,16 @@ type PaymentMethodCreateSEPADebitParams struct {
 	IBAN *string `form:"iban" json:"iban"`
 }
 
+// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+type PaymentMethodCreateSequraParams struct{}
+
 // If this is a `sofort` PaymentMethod, this hash contains details about the SOFORT payment method.
 type PaymentMethodCreateSofortParams struct {
 	// Two-letter ISO code representing the country the bank account is located in.
 	Country *string `form:"country" json:"country"`
 }
 
-// If this is a Sunbit PaymentMethod, this hash contains details about the Sunbit payment method.
+// If this is a `sunbit` PaymentMethod, this hash contains details about the Sunbit payment method.
 type PaymentMethodCreateSunbitParams struct{}
 
 // If this is a `swish` PaymentMethod, this hash contains details about the Swish payment method.
@@ -1284,9 +1302,9 @@ type PaymentMethodCreateParams struct {
 	Alipay *PaymentMethodCreateAlipayParams `form:"alipay" json:"alipay,omitempty"`
 	// This field indicates whether this payment method can be shown again to its customer in a checkout flow. Stripe products such as Checkout and Elements use this field to determine whether a payment method can be shown as a saved payment method in a checkout flow. The field defaults to `unspecified`.
 	AllowRedisplay *string `form:"allow_redisplay" json:"allow_redisplay,omitempty"`
-	// If this is a Alma PaymentMethod, this hash contains details about the Alma payment method.
+	// If this is an Alma PaymentMethod, this hash contains details about the Alma payment method.
 	Alma *PaymentMethodCreateAlmaParams `form:"alma" json:"alma,omitempty"`
-	// If this is a AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
+	// If this is an AmazonPay PaymentMethod, this hash contains details about the AmazonPay payment method.
 	AmazonPay *PaymentMethodCreateAmazonPayParams `form:"amazon_pay" json:"amazon_pay,omitempty"`
 	// If this is an `au_becs_debit` PaymentMethod, this hash contains details about the bank account.
 	AUBECSDebit *PaymentMethodCreateAUBECSDebitParams `form:"au_becs_debit" json:"au_becs_debit,omitempty"`
@@ -1366,6 +1384,8 @@ type PaymentMethodCreateParams struct {
 	PayNow *PaymentMethodCreatePayNowParams `form:"paynow" json:"paynow,omitempty"`
 	// If this is a `paypal` PaymentMethod, this hash contains details about the PayPal payment method.
 	Paypal *PaymentMethodCreatePaypalParams `form:"paypal" json:"paypal,omitempty"`
+	// If this is a `paypay` PaymentMethod, this hash contains details about the PayPay payment method.
+	Paypay *PaymentMethodCreatePaypayParams `form:"paypay" json:"paypay,omitempty"`
 	// If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
 	Payto *PaymentMethodCreatePaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is a `pix` PaymentMethod, this hash contains details about the Pix payment method.
@@ -1384,9 +1404,11 @@ type PaymentMethodCreateParams struct {
 	Scalapay *PaymentMethodCreateScalapayParams `form:"scalapay" json:"scalapay,omitempty"`
 	// If this is a `sepa_debit` PaymentMethod, this hash contains details about the SEPA debit bank account.
 	SEPADebit *PaymentMethodCreateSEPADebitParams `form:"sepa_debit" json:"sepa_debit,omitempty"`
+	// If this is a SeQura PaymentMethod, this hash contains details about the SeQura payment method.
+	Sequra *PaymentMethodCreateSequraParams `form:"sequra" json:"sequra,omitempty"`
 	// If this is a `sofort` PaymentMethod, this hash contains details about the SOFORT payment method.
 	Sofort *PaymentMethodCreateSofortParams `form:"sofort" json:"sofort,omitempty"`
-	// If this is a Sunbit PaymentMethod, this hash contains details about the Sunbit payment method.
+	// If this is a `sunbit` PaymentMethod, this hash contains details about the Sunbit payment method.
 	Sunbit *PaymentMethodCreateSunbitParams `form:"sunbit" json:"sunbit,omitempty"`
 	// If this is a `swish` PaymentMethod, this hash contains details about the Swish payment method.
 	Swish *PaymentMethodCreateSwishParams `form:"swish" json:"swish,omitempty"`
@@ -1489,16 +1511,6 @@ type PaymentMethodUpdateCardParams struct {
 	Networks *PaymentMethodUpdateCardNetworksParams `form:"networks" json:"networks,omitempty"`
 }
 
-// If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
-type PaymentMethodUpdatePaytoParams struct {
-	// The account number for the bank account.
-	AccountNumber *string `form:"account_number" json:"account_number,omitempty"`
-	// Bank-State-Branch number of the bank account.
-	BSBNumber *string `form:"bsb_number" json:"bsb_number,omitempty"`
-	// The PayID alias for the bank account.
-	PayID *string `form:"pay_id" json:"pay_id,omitempty"`
-}
-
 // If this is an `us_bank_account` PaymentMethod, this hash contains details about the US bank account payment method.
 type PaymentMethodUpdateUSBankAccountParams struct {
 	// Bank account holder type.
@@ -1520,8 +1532,6 @@ type PaymentMethodUpdateParams struct {
 	Expand []*string `form:"expand" json:"expand,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
-	// If this is a `payto` PaymentMethod, this hash contains details about the PayTo payment method.
-	Payto *PaymentMethodUpdatePaytoParams `form:"payto" json:"payto,omitempty"`
 	// If this is an `us_bank_account` PaymentMethod, this hash contains details about the US bank account payment method.
 	USBankAccount *PaymentMethodUpdateUSBankAccountParams `form:"us_bank_account" json:"us_bank_account,omitempty"`
 	UnsetFields   []PaymentMethodUpdateParamsUnsetField   `form:"-" json:"-"`
@@ -1600,8 +1610,14 @@ type PaymentMethodBillingDetails struct {
 	// Taxpayer identification number. Used only for transactions between LATAM buyers and non-LATAM sellers.
 	TaxID string `json:"tax_id"`
 }
-type PaymentMethodBizum struct{}
-type PaymentMethodBLIK struct{}
+type PaymentMethodBizum struct {
+	// A unique identifier for the buyer as determined by the local payment processor.
+	BuyerID string `json:"buyer_id,omitempty"`
+}
+type PaymentMethodBLIK struct {
+	// A unique and immutable identifier assigned by BLIK to every buyer.
+	BuyerID string `json:"buyer_id,omitempty"`
+}
 type PaymentMethodBoleto struct {
 	// Uniquely identifies the customer tax id (CNPJ or CPF)
 	TaxID string `json:"tax_id"`
@@ -1906,7 +1922,7 @@ type PaymentMethodEPS struct {
 type PaymentMethodFPX struct {
 	// Account holder type, if provided. Can be one of `individual` or `company`.
 	AccountHolderType PaymentMethodFPXAccountHolderType `json:"account_holder_type"`
-	// The customer's bank, if provided. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bank_rakyat`, `bsn`, `cimb`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `pb_enterprise`, or `bank_of_china`.
+	// The customer's bank, if provided. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bnp_paribas`, `bank_rakyat`, `bsn`, `cimb`, `citibank`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `mbsb_bank`, `pb_enterprise`, or `bank_of_china`.
 	Bank string `json:"bank"`
 }
 type PaymentMethodGiropay struct{}
@@ -2026,6 +2042,7 @@ type PaymentMethodPaypal struct {
 	// PayPal account PayerID. This identifier uniquely identifies the PayPal customer.
 	PayerID string `json:"payer_id"`
 }
+type PaymentMethodPaypay struct{}
 type PaymentMethodPayto struct {
 	// Bank-State-Branch number of the bank account.
 	BSBNumber string `json:"bsb_number"`
@@ -2034,7 +2051,10 @@ type PaymentMethodPayto struct {
 	// The PayID alias for the bank account.
 	PayID string `json:"pay_id"`
 }
-type PaymentMethodPix struct{}
+type PaymentMethodPix struct {
+	// Uniquely identifies this particular Pix account. You can use this attribute to check whether two Pix accounts are the same.
+	Fingerprint string `json:"fingerprint,omitempty"`
+}
 type PaymentMethodPromptPay struct{}
 
 // Options to configure Radar. See [Radar Session](https://docs.stripe.com/radar/radar-session) for more information.
@@ -2068,6 +2088,7 @@ type PaymentMethodSEPADebit struct {
 	// Last four characters of the IBAN.
 	Last4 string `json:"last4"`
 }
+type PaymentMethodSequra struct{}
 type PaymentMethodSofort struct {
 	// Two-letter ISO code representing the country the bank account is located in.
 	Country string `json:"country"`
@@ -2185,6 +2206,7 @@ type PaymentMethod struct {
 	Payco     *PaymentMethodPayco     `json:"payco,omitempty"`
 	PayNow    *PaymentMethodPayNow    `json:"paynow,omitempty"`
 	Paypal    *PaymentMethodPaypal    `json:"paypal,omitempty"`
+	Paypay    *PaymentMethodPaypay    `json:"paypay,omitempty"`
 	Payto     *PaymentMethodPayto     `json:"payto,omitempty"`
 	Pix       *PaymentMethodPix       `json:"pix,omitempty"`
 	PromptPay *PaymentMethodPromptPay `json:"promptpay,omitempty"`
@@ -2195,6 +2217,7 @@ type PaymentMethod struct {
 	Satispay     *PaymentMethodSatispay     `json:"satispay,omitempty"`
 	Scalapay     *PaymentMethodScalapay     `json:"scalapay,omitempty"`
 	SEPADebit    *PaymentMethodSEPADebit    `json:"sepa_debit,omitempty"`
+	Sequra       *PaymentMethodSequra       `json:"sequra,omitempty"`
 	Sofort       *PaymentMethodSofort       `json:"sofort,omitempty"`
 	Sunbit       *PaymentMethodSunbit       `json:"sunbit,omitempty"`
 	Swish        *PaymentMethodSwish        `json:"swish,omitempty"`

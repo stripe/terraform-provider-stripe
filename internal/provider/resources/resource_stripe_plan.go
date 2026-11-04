@@ -24,7 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &PlanResource{}
@@ -84,7 +84,7 @@ func (r *PlanResource) Metadata(_ context.Context, req resource.MetadataRequest,
 
 func (r *PlanResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "You can now model subscriptions more flexibly using the [Prices API](https://api.stripe.com#prices). It replaces the Plans API and is backwards compatible to simplify your migration.\n\nPlans define the base price, currency, and billing cycle for recurring purchases of products.\n[Products](https://api.stripe.com#products) help you track inventory or provisioning, and plans help you track pricing. Different physical goods or levels of service should be represented by products, and pricing options should be represented by plans. This approach lets you change prices without having to change your provisioning scheme.\n\nFor example, you might have a single \"gold\" product that has plans for $10/month, $100/year, €9/month, and €90/year.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription) and more about [products and prices](https://docs.stripe.com/products-prices/overview).",
+		Description: "You can now model subscriptions more flexibly using the [Prices API](https://docs.stripe.com/api#prices). It replaces the Plans API and is backwards compatible to simplify your migration.\n\nPlans define the base price, currency, and billing cycle for recurring purchases of products.\n[Products](https://docs.stripe.com/api#products) help you track inventory or provisioning, and plans help you track pricing. Different physical goods or levels of service should be represented by products, and pricing options should be represented by plans. This approach lets you change prices without having to change your provisioning scheme.\n\nFor example, you might have a single \"gold\" product that has plans for $10/month, $100/year, €9/month, and €90/year.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription) and more about [products and prices](https://docs.stripe.com/products-prices/overview).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -401,7 +401,9 @@ func expandPlanCreate(plan PlanResourceModel) (*stripe.PlanCreateParams, error) 
 		params.Amount = stripe.Int64(plan.Amount.ValueInt64())
 	}
 	if !plan.AmountDecimal.IsNull() && !plan.AmountDecimal.IsUnknown() {
-		params.AmountDecimal = stripe.Float64(plan.AmountDecimal.ValueFloat64())
+		if !assignAttrValueToNamedField(params, "AmountDecimal", plan.AmountDecimal) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "amount_decimal", params)
+		}
 	}
 	if !plan.BillingScheme.IsNull() && !plan.BillingScheme.IsUnknown() {
 		if !assignStringToNamedFieldOrMethod(params, "BillingScheme", "BillingScheme", plan.BillingScheme.ValueString()) {

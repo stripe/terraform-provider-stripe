@@ -16,7 +16,7 @@ const (
 	PayoutDestinationTypeCard        PayoutDestinationType = "card"
 )
 
-// Error code that provides a reason for a payout failure, if available. View our [list of failure codes](https://docs.stripe.com/api#payout_failures).
+// Error code that provides a reason for a payout failure, if available.
 type PayoutFailureCode string
 
 // List of values that PayoutFailureCode can take
@@ -119,7 +119,7 @@ func (p *PayoutListParams) AddExpand(f string) {
 // If you create a manual payout on a Stripe account that uses multiple payment source types, you need to specify the source type balance that the payout draws from. The [balance object](https://docs.stripe.com/api/balances/object) details available and pending amounts by source type.
 type PayoutParams struct {
 	Params `form:"*"`
-	// A positive integer in cents representing how much to payout.
+	// A positive integer in cents representing how much to pay out.
 	Amount *int64 `form:"amount" json:"amount,omitempty"`
 	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
 	Currency *string `form:"currency" json:"currency,omitempty"`
@@ -200,7 +200,7 @@ func (p *PayoutReverseParams) AddMetadata(key string, value string) {
 // If you create a manual payout on a Stripe account that uses multiple payment source types, you need to specify the source type balance that the payout draws from. The [balance object](https://docs.stripe.com/api/balances/object) details available and pending amounts by source type.
 type PayoutCreateParams struct {
 	Params `form:"*"`
-	// A positive integer in cents representing how much to payout.
+	// A positive integer in cents representing how much to pay out.
 	Amount *int64 `form:"amount" json:"amount"`
 	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
 	Currency *string `form:"currency" json:"currency"`
@@ -336,7 +336,7 @@ type Payout struct {
 	Destination *PayoutDestination `json:"destination"`
 	// If the payout fails or cancels, this is the ID of the balance transaction that reverses the initial balance transaction and returns the funds from the failed payout back in your balance.
 	FailureBalanceTransaction *BalanceTransaction `json:"failure_balance_transaction"`
-	// Error code that provides a reason for a payout failure, if available. View our [list of failure codes](https://docs.stripe.com/api#payout_failures).
+	// Error code that provides a reason for a payout failure, if available.
 	FailureCode PayoutFailureCode `json:"failure_code"`
 	// Message that provides the reason for a payout failure, if available.
 	FailureMessage string `json:"failure_message"`

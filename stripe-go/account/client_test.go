@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	assert "github.com/stretchr/testify/require"
-	stripe "github.com/stripe/stripe-go/v86"
-	"github.com/stripe/stripe-go/v86/client"
-	. "github.com/stripe/stripe-go/v86/testing"
+	stripe "github.com/stripe/stripe-go/v87"
+	"github.com/stripe/stripe-go/v87/client"
+	. "github.com/stripe/stripe-go/v87/testing"
 )
 
 func TestAccountDel(t *testing.T) {
@@ -111,7 +111,7 @@ func TestAccountNew(t *testing.T) {
 func TestAccountReject(t *testing.T) {
 	sc := client.New(TestAPIKey, nil)
 	account, err := sc.Accounts.Reject("acct_123", &stripe.AccountRejectParams{
-		Reason: stripe.String("fraud"),
+		Reason: stripe.String("fraud_other"),
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, account)

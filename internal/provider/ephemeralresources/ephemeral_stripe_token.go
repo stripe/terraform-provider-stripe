@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ ephemeral.EphemeralResource = &TokenEphemeralResource{}
@@ -98,7 +98,7 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 			},
 			"card": ephemeralSchema.SingleNestedAttribute{
 				Optional:    true,
-				Description: "You can store multiple cards on a customer in order to charge the customer\nlater. You can also store multiple debit cards on a recipient in order to\ntransfer to those cards later.\n\nRelated guide: [Card payments with Sources](https://docs.stripe.com/sources/cards)",
+				Description: "You can store multiple cards on a customer in order to charge the customer\nlater. You can also store multiple debit cards on a recipient in order to\ntransfer to those cards later.\n\nThis API is deprecated. Use the [PaymentMethods API](https://docs.stripe.com/api/payment_methods) instead.\n\nRelated guide: [Card payments with Sources](https://docs.stripe.com/sources/cards)",
 				Attributes: map[string]ephemeralSchema.Attribute{
 					"number": ephemeralSchema.StringAttribute{
 						Required:    true,
@@ -252,6 +252,36 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 									},
 								},
 							},
+							"administrative_address": ephemeralSchema.SingleNestedAttribute{
+								Optional:    true,
+								Description: "The location where the business is administered.",
+								Attributes: map[string]ephemeralSchema.Attribute{
+									"city": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "City, district, suburb, town, or village.",
+									},
+									"country": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Two-letter country code ([ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)).",
+									},
+									"line1": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Address line 1, such as the street, PO Box, or company name.",
+									},
+									"line2": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Address line 2, such as the apartment, suite, unit, or building.",
+									},
+									"postal_code": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "ZIP or postal code.",
+									},
+									"state": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "State, county, province, or region ([ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2)).",
+									},
+								},
+							},
 							"directors_provided": ephemeralSchema.BoolAttribute{
 								Optional:    true,
 								Description: "Whether the company's directors have been provided. Set this Boolean to `true` after creating all the company's directors with [the Persons API](/api/persons) for accounts with a `relationship.director` requirement. This value is not automatically set to `true` after creating directors, so it needs to be updated to indicate all directors have been provided.",
@@ -332,6 +362,66 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 								Optional:    true,
 								Description: "The company's phone number (used for verification).",
 							},
+							"physical_address": ephemeralSchema.SingleNestedAttribute{
+								Optional:    true,
+								Description: "A location where the business has a meaningful physical operating presence.",
+								Attributes: map[string]ephemeralSchema.Attribute{
+									"city": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "City, district, suburb, town, or village.",
+									},
+									"country": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Two-letter country code ([ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)).",
+									},
+									"line1": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Address line 1, such as the street, PO Box, or company name.",
+									},
+									"line2": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Address line 2, such as the apartment, suite, unit, or building.",
+									},
+									"postal_code": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "ZIP or postal code.",
+									},
+									"state": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "State, county, province, or region ([ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2)).",
+									},
+								},
+							},
+							"principal_place_of_business": ephemeralSchema.SingleNestedAttribute{
+								Optional:    true,
+								Description: "The primary location where the business conducts operations.",
+								Attributes: map[string]ephemeralSchema.Attribute{
+									"city": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "City, district, suburb, town, or village.",
+									},
+									"country": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Two-letter country code ([ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)).",
+									},
+									"line1": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Address line 1, such as the street, PO Box, or company name.",
+									},
+									"line2": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "Address line 2, such as the apartment, suite, unit, or building.",
+									},
+									"postal_code": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "ZIP or postal code.",
+									},
+									"state": ephemeralSchema.StringAttribute{
+										Optional:    true,
+										Description: "State, county, province, or region ([ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166-2)).",
+									},
+								},
+							},
 							"registration_date": ephemeralSchema.SingleNestedAttribute{
 								Optional:    true,
 								Description: "When the business was incorporated or registered.",
@@ -378,7 +468,7 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 							},
 							"tax_id": ephemeralSchema.StringAttribute{
 								Optional:    true,
-								Description: "The business ID number of the company, as appropriate for the company’s country. (Examples are an Employer ID Number in the U.S., a Business Number in Canada, or a Company Number in the UK.)",
+								Description: "The business ID number of the company, as appropriate for the company’s country. (Examples are an Employer ID Number in the U.S., a Business Number in Canada, or a Company Number in the UK.)\n\nChanging this value requires that the account re-accept the [terms of service](/api/accounts/object#account_object-tos_acceptance).",
 							},
 							"tax_id_registrar": ephemeralSchema.StringAttribute{
 								Optional:    true,
@@ -398,11 +488,11 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 										Attributes: map[string]ephemeralSchema.Attribute{
 											"back": ephemeralSchema.StringAttribute{
 												Optional:    true,
-												Description: "The back of a document returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `additional_verification`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+												Description: "The back of a document returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `additional_verification`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 											},
 											"front": ephemeralSchema.StringAttribute{
 												Optional:    true,
-												Description: "The front of a document returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `additional_verification`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+												Description: "The front of a document returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `additional_verification`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 											},
 										},
 									},
@@ -662,11 +752,11 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 										Attributes: map[string]ephemeralSchema.Attribute{
 											"back": ephemeralSchema.StringAttribute{
 												Optional:    true,
-												Description: "The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+												Description: "The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 											},
 											"front": ephemeralSchema.StringAttribute{
 												Optional:    true,
-												Description: "The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+												Description: "The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 											},
 										},
 									},
@@ -676,11 +766,11 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 										Attributes: map[string]ephemeralSchema.Attribute{
 											"back": ephemeralSchema.StringAttribute{
 												Optional:    true,
-												Description: "The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+												Description: "The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 											},
 											"front": ephemeralSchema.StringAttribute{
 												Optional:    true,
-												Description: "The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+												Description: "The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 											},
 										},
 									},
@@ -862,7 +952,7 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 								Attributes: map[string]ephemeralSchema.Attribute{
 									"files": ephemeralSchema.ListAttribute{
 										Optional:    true,
-										Description: "One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.",
+										Description: "One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.",
 										ElementType: types.StringType,
 									},
 								},
@@ -873,7 +963,7 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 								Attributes: map[string]ephemeralSchema.Attribute{
 									"files": ephemeralSchema.ListAttribute{
 										Optional:    true,
-										Description: "One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.",
+										Description: "One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.",
 										ElementType: types.StringType,
 									},
 								},
@@ -884,7 +974,7 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 								Attributes: map[string]ephemeralSchema.Attribute{
 									"files": ephemeralSchema.ListAttribute{
 										Optional:    true,
-										Description: "One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.",
+										Description: "One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.",
 										ElementType: types.StringType,
 									},
 								},
@@ -918,11 +1008,11 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 					},
 					"id_number": ephemeralSchema.StringAttribute{
 						Optional:    true,
-						Description: "The person's ID number, as appropriate for their country. For example, a social security number in the U.S., social insurance number in Canada, etc. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).",
+						Description: "The person's ID number, as appropriate for their country. For example, a social security number in the U.S., social insurance number in Canada, etc. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).\n\nChanging this value for the account's representative requires that the account re-accept the [terms of service](/api/accounts/object#account_object-tos_acceptance).",
 					},
 					"id_number_secondary": ephemeralSchema.StringAttribute{
 						Optional:    true,
-						Description: "The person's secondary ID number, as appropriate for their country, will be used for enhanced verification checks. In Thailand, this would be the laser code found on the back of an ID card. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).",
+						Description: "The person's secondary ID number, as appropriate for their country, will be used for enhanced verification checks. In Thailand, this would be the laser code found on the back of an ID card. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).\n\nChanging this value for the account's representative requires that the account re-accept the [terms of service](/api/accounts/object#account_object-tos_acceptance).",
 					},
 					"last_name": ephemeralSchema.StringAttribute{
 						Optional:    true,
@@ -1027,7 +1117,7 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 					},
 					"ssn_last_4": ephemeralSchema.StringAttribute{
 						Optional:    true,
-						Description: "The last four digits of the person's Social Security number (U.S. only).",
+						Description: "The last four digits of the person's Social Security number (U.S. only).\n\nChanging this value for the account's representative requires that the account re-accept the [terms of service](/api/accounts/object#account_object-tos_acceptance).",
 					},
 					"us_cfpb_data": ephemeralSchema.SingleNestedAttribute{
 						Optional:    true,
@@ -1079,11 +1169,11 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 								Attributes: map[string]ephemeralSchema.Attribute{
 									"back": ephemeralSchema.StringAttribute{
 										Optional:    true,
-										Description: "The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+										Description: "The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 									},
 									"front": ephemeralSchema.StringAttribute{
 										Optional:    true,
-										Description: "The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+										Description: "The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 									},
 								},
 							},
@@ -1093,11 +1183,11 @@ func (r *TokenEphemeralResource) Schema(_ context.Context, _ ephemeral.SchemaReq
 								Attributes: map[string]ephemeralSchema.Attribute{
 									"back": ephemeralSchema.StringAttribute{
 										Optional:    true,
-										Description: "The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+										Description: "The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 									},
 									"front": ephemeralSchema.StringAttribute{
 										Optional:    true,
-										Description: "The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
+										Description: "The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.",
 									},
 								},
 							},

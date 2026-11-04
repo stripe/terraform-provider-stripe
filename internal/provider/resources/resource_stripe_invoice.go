@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &InvoiceResource{}
@@ -105,6 +105,7 @@ type InvoiceResourceModel struct {
 	StartingBalance              types.Int64  `tfsdk:"starting_balance"`
 	StatementDescriptor          types.String `tfsdk:"statement_descriptor"`
 	Status                       types.String `tfsdk:"status"`
+	StatusDetails                types.Object `tfsdk:"status_details"`
 	StatusTransitions            types.Object `tfsdk:"status_transitions"`
 	Subscription                 types.String `tfsdk:"subscription"`
 	Subtotal                     types.Int64  `tfsdk:"subtotal"`
@@ -143,7 +144,7 @@ func (r *InvoiceResource) Metadata(_ context.Context, req resource.MetadataReque
 
 func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Invoices are statements of amounts owed by a customer, and are either\ngenerated one-off, or generated periodically from a subscription.\n\nThey contain [invoice items](https://api.stripe.com#invoiceitems), and proration adjustments\nthat may be caused by subscription upgrades/downgrades (if necessary).\n\nIf your invoice is configured to be billed through automatic charges,\nStripe automatically finalizes your invoice and attempts payment. Note\nthat finalizing the invoice,\n[when automatic](https://docs.stripe.com/invoicing/integration/automatic-advancement-collection), does\nnot happen immediately as the invoice is created. Stripe waits\nuntil one hour after the last webhook was successfully sent (or the last\nwebhook timed out after failing). If you (and the platforms you may have\nconnected to) have no webhooks configured, Stripe waits one hour after\ncreation to finalize the invoice.\n\nIf your invoice is configured to be billed by sending an email, then based on your\n[email settings](https://dashboard.stripe.com/account/billing/automatic),\nStripe will email the invoice to your customer and await payment. These\nemails can contain a link to a hosted page to pay the invoice.\n\nStripe applies any customer credit on the account before determining the\namount due for the invoice (i.e., the amount that will be actually\ncharged). If the amount due for the invoice is less than Stripe's [minimum allowed charge\nper currency](/docs/currencies#minimum-and-maximum-charge-amounts), the\ninvoice is automatically marked paid, and we add the amount due to the\ncustomer's credit balance which is applied to the next invoice.\n\nMore details on the customer's credit balance are\n[here](https://docs.stripe.com/billing/customer/balance).\n\nRelated guide: [Send invoices to customers](https://docs.stripe.com/billing/invoices/sending)",
+		Description: "Invoices are statements of amounts owed by a customer, and are either\ngenerated one-off, or generated periodically from a subscription.\n\nThey contain [invoice items](https://docs.stripe.com/api#invoiceitems), and proration adjustments\nthat may be caused by subscription upgrades/downgrades (if necessary).\n\nIf your invoice is configured to be billed through automatic charges,\nStripe automatically finalizes your invoice and attempts payment. Note\nthat finalizing the invoice,\n[when automatic](https://docs.stripe.com/invoicing/integration/automatic-advancement-collection), does\nnot happen immediately as the invoice is created. Stripe waits\nuntil one hour after the last webhook was successfully sent (or the last\nwebhook timed out after failing). If you (and the platforms you may have\nconnected to) have no webhooks configured, Stripe waits one hour after\ncreation to finalize the invoice.\n\nIf your invoice is configured to be billed by sending an email, then based on your\n[email settings](https://dashboard.stripe.com/account/billing/automatic),\nStripe will email the invoice to your customer and await payment. These\nemails can contain a link to a hosted page to pay the invoice.\n\nStripe applies any customer credit on the account before determining the\namount due for the invoice (i.e., the amount that will be actually\ncharged). If the amount due for the invoice is less than Stripe's [minimum allowed charge\nper currency](/docs/currencies#minimum-and-maximum-charge-amounts), the\ninvoice is automatically marked paid, and we add the amount due to the\ncustomer's credit balance which is applied to the next invoice.\n\nMore details on the customer's credit balance are\n[here](https://docs.stripe.com/billing/customer/balance).\n\nRelated guide: [Send invoices to customers](https://docs.stripe.com/billing/invoices/sending)",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -469,9 +470,9 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					Attributes: map[string]schema.Attribute{
 						"type": schema.StringAttribute{
 							Computed:      true,
-							Description:   "The type of the tax ID, one of `ad_nrt`, `ar_cuit`, `eu_vat`, `bo_tin`, `br_cnpj`, `br_cpf`, `cn_tin`, `co_nit`, `cr_tin`, `do_rcn`, `ec_ruc`, `eu_oss_vat`, `hr_oib`, `pe_ruc`, `ro_tin`, `rs_pib`, `sv_nit`, `uy_ruc`, `ve_rif`, `vn_tin`, `gb_vat`, `nz_gst`, `au_abn`, `au_arn`, `in_gst`, `no_vat`, `no_voec`, `za_vat`, `ch_vat`, `mx_rfc`, `sg_uen`, `ru_inn`, `ru_kpp`, `ca_bn`, `hk_br`, `es_cif`, `pl_nip`, `it_cf`, `fo_vat`, `gi_tin`, `py_ruc`, `tw_vat`, `th_vat`, `jp_cn`, `jp_rn`, `jp_trn`, `li_uid`, `li_vat`, `lk_vat`, `my_itn`, `us_ein`, `kr_brn`, `ca_qst`, `ca_gst_hst`, `ca_pst_bc`, `ca_pst_mb`, `ca_pst_sk`, `my_sst`, `sg_gst`, `ae_trn`, `cl_tin`, `sa_vat`, `id_npwp`, `my_frp`, `il_vat`, `ge_vat`, `ua_vat`, `is_vat`, `bg_uic`, `hu_tin`, `si_tin`, `ke_pin`, `tr_tin`, `eg_tin`, `ph_tin`, `al_tin`, `bh_vat`, `kz_bin`, `ng_tin`, `om_vat`, `de_stn`, `ch_uid`, `tz_vat`, `uz_vat`, `uz_tin`, `md_vat`, `ma_vat`, `by_tin`, `ao_tin`, `bs_tin`, `bb_tin`, `cd_nif`, `mr_nif`, `me_pib`, `zw_tin`, `ba_tin`, `gn_nif`, `mk_vat`, `sr_fin`, `sn_ninea`, `am_tin`, `np_pan`, `tj_tin`, `ug_tin`, `zm_tin`, `kh_tin`, `aw_tin`, `az_tin`, `bd_bin`, `bj_ifu`, `et_tin`, `kg_tin`, `la_tin`, `cm_niu`, `cv_nif`, `bf_ifu`, or `unknown`",
+							Description:   "The type of the tax ID, one of `ad_nrt`, `ar_cuit`, `eu_vat`, `bo_tin`, `br_cnpj`, `br_cpf`, `cn_tin`, `co_nit`, `cr_tin`, `do_rcn`, `ec_ruc`, `eu_oss_vat`, `hr_oib`, `pe_ruc`, `ro_tin`, `rs_pib`, `sv_nit`, `uy_ruc`, `ve_rif`, `vn_tin`, `gb_vat`, `nz_gst`, `au_abn`, `au_arn`, `in_gst`, `no_vat`, `no_voec`, `za_vat`, `ch_vat`, `mx_rfc`, `sg_uen`, `ru_inn`, `ru_kpp`, `ca_bn`, `hk_br`, `es_cif`, `pl_nip`, `it_cf`, `fo_vat`, `gi_tin`, `py_ruc`, `tw_vat`, `th_vat`, `jp_cn`, `jp_rn`, `jp_trn`, `li_uid`, `li_vat`, `lk_vat`, `my_itn`, `us_ein`, `kr_brn`, `ca_qst`, `ca_gst_hst`, `ca_pst_bc`, `ca_pst_mb`, `ca_pst_sk`, `my_sst`, `sg_gst`, `ae_trn`, `cl_tin`, `sa_vat`, `id_npwp`, `my_frp`, `il_vat`, `ge_vat`, `ua_vat`, `is_vat`, `bg_uic`, `hu_tin`, `si_tin`, `ke_pin`, `tr_tin`, `eg_tin`, `ph_tin`, `al_tin`, `bh_vat`, `kz_bin`, `ng_tin`, `om_vat`, `de_stn`, `ch_uid`, `tz_vat`, `uz_vat`, `uz_tin`, `md_vat`, `ma_vat`, `by_tin`, `ao_tin`, `bs_tin`, `bb_tin`, `cd_nif`, `mr_nif`, `me_pib`, `zw_tin`, `ba_tin`, `gn_nif`, `mk_vat`, `sr_fin`, `sn_ninea`, `am_tin`, `np_pan`, `tj_tin`, `ug_tin`, `zm_tin`, `kh_tin`, `aw_tin`, `az_tin`, `bd_bin`, `au_acn`, `nz_bn`, `pt_nif`, `cz_dic`, `fr_siret`, `fr_siren`, `fr_spi`, `sm_coe`, `tt_vat`, `tt_bir`, `mu_vat`, `mz_nuit`, `au_wpn`, `md_cf`, `is_kt`, `bj_ifu`, `et_tin`, `kg_tin`, `la_tin`, `cm_niu`, `cv_nif`, `bf_ifu`, `ic_nif`, `gh_tin`, `bw_vat`, `ci_vat`, or `unknown`",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-							Validators:    []validator.String{stringvalidator.OneOf("ad_nrt", "ae_trn", "al_tin", "am_tin", "ao_tin", "ar_cuit", "au_abn", "au_arn", "aw_tin", "az_tin", "ba_tin", "bb_tin", "bd_bin", "bf_ifu", "bg_uic", "bh_vat", "bj_ifu", "bo_tin", "br_cnpj", "br_cpf", "bs_tin", "by_tin", "ca_bn", "ca_gst_hst", "ca_pst_bc", "ca_pst_mb", "ca_pst_sk", "ca_qst", "cd_nif", "ch_uid", "ch_vat", "cl_tin", "cm_niu", "cn_tin", "co_nit", "cr_tin", "cv_nif", "de_stn", "do_rcn", "ec_ruc", "eg_tin", "es_cif", "et_tin", "eu_oss_vat", "eu_vat", "fo_vat", "gb_vat", "ge_vat", "gi_tin", "gn_nif", "hk_br", "hr_oib", "hu_tin", "id_npwp", "il_vat", "in_gst", "is_vat", "it_cf", "jp_cn", "jp_rn", "jp_trn", "ke_pin", "kg_tin", "kh_tin", "kr_brn", "kz_bin", "la_tin", "li_uid", "li_vat", "lk_vat", "ma_vat", "md_vat", "me_pib", "mk_vat", "mr_nif", "mx_rfc", "my_frp", "my_itn", "my_sst", "ng_tin", "no_vat", "no_voec", "np_pan", "nz_gst", "om_vat", "pe_ruc", "ph_tin", "pl_nip", "py_ruc", "ro_tin", "rs_pib", "ru_inn", "ru_kpp", "sa_vat", "sg_gst", "sg_uen", "si_tin", "sn_ninea", "sr_fin", "sv_nit", "th_vat", "tj_tin", "tr_tin", "tw_vat", "tz_vat", "ua_vat", "ug_tin", "unknown", "us_ein", "uy_ruc", "uz_tin", "uz_vat", "ve_rif", "vn_tin", "za_vat", "zm_tin", "zw_tin")},
+							Validators:    []validator.String{stringvalidator.OneOf("ad_nrt", "ae_trn", "al_tin", "am_tin", "ao_tin", "ar_cuit", "au_abn", "au_acn", "au_arn", "au_wpn", "aw_tin", "az_tin", "ba_tin", "bb_tin", "bd_bin", "bf_ifu", "bg_uic", "bh_vat", "bj_ifu", "bo_tin", "br_cnpj", "br_cpf", "bs_tin", "bw_vat", "by_tin", "ca_bn", "ca_gst_hst", "ca_pst_bc", "ca_pst_mb", "ca_pst_sk", "ca_qst", "cd_nif", "ch_uid", "ch_vat", "ci_vat", "cl_tin", "cm_niu", "cn_tin", "co_nit", "cr_tin", "cv_nif", "cz_dic", "de_stn", "do_rcn", "ec_ruc", "eg_tin", "es_cif", "et_tin", "eu_oss_vat", "eu_vat", "fo_vat", "fr_siren", "fr_siret", "fr_spi", "gb_vat", "ge_vat", "gh_tin", "gi_tin", "gn_nif", "hk_br", "hr_oib", "hu_tin", "ic_nif", "id_npwp", "il_vat", "in_gst", "is_kt", "is_vat", "it_cf", "jp_cn", "jp_rn", "jp_trn", "ke_pin", "kg_tin", "kh_tin", "kr_brn", "kz_bin", "la_tin", "li_uid", "li_vat", "lk_vat", "ma_vat", "md_cf", "md_vat", "me_pib", "mk_vat", "mr_nif", "mu_vat", "mx_rfc", "my_frp", "my_itn", "my_sst", "mz_nuit", "ng_tin", "no_vat", "no_voec", "np_pan", "nz_bn", "nz_gst", "om_vat", "pe_ruc", "ph_tin", "pl_nip", "pt_nif", "py_ruc", "ro_tin", "rs_pib", "ru_inn", "ru_kpp", "sa_vat", "sg_gst", "sg_uen", "si_tin", "sm_coe", "sn_ninea", "sr_fin", "sv_nit", "th_vat", "tj_tin", "tr_tin", "tt_bir", "tt_vat", "tw_vat", "tz_vat", "ua_vat", "ug_tin", "unknown", "us_ein", "uy_ruc", "uz_tin", "uz_vat", "ve_rif", "vn_tin", "za_vat", "zm_tin", "zw_tin")},
 						},
 						"value": schema.StringAttribute{
 							Computed:      true,
@@ -610,7 +611,7 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				Attributes: map[string]schema.Attribute{
 					"advice_code": schema.StringAttribute{
 						Computed:      true,
-						Description:   "For card errors resulting from a card issuer decline, a short string indicating [how to proceed with an error](https://docs.stripe.com/declines#retrying-issuer-declines) if they provide one.",
+						Description:   "For card errors resulting from a card issuer decline, a short string indicating [how to proceed with an error](https://docs.stripe.com/declines/card#retrying-issuer-declines) if they provide one.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 					"charge": schema.StringAttribute{
@@ -622,7 +623,7 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Computed:      true,
 						Description:   "For some errors that could be handled programmatically, a short string indicating the [error code](https://docs.stripe.com/error-codes) reported.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Validators:    []validator.String{stringvalidator.OneOf("account_closed", "account_country_invalid_address", "account_error_country_change_requires_additional_steps", "account_information_mismatch", "account_invalid", "account_number_invalid", "account_token_required_for_v2_account", "acss_debit_session_incomplete", "action_blocked", "alipay_upgrade_required", "amount_too_large", "amount_too_small", "api_key_expired", "application_fees_not_allowed", "approval_required", "authentication_required", "balance_insufficient", "balance_invalid_parameter", "bank_account_bad_routing_numbers", "bank_account_declined", "bank_account_exists", "bank_account_restricted", "bank_account_unusable", "bank_account_unverified", "bank_account_verification_failed", "billing_invalid_mandate", "bitcoin_upgrade_required", "capture_charge_authorization_expired", "capture_unauthorized_payment", "card_decline_rate_limit_exceeded", "card_declined", "cardholder_phone_number_required", "charge_already_captured", "charge_already_refunded", "charge_disputed", "charge_exceeds_source_limit", "charge_exceeds_transaction_limit", "charge_expired_for_capture", "charge_invalid_parameter", "charge_not_refundable", "clearing_code_unsupported", "country_code_invalid", "country_unsupported", "coupon_expired", "customer_max_payment_methods", "customer_max_subscriptions", "customer_session_expired", "customer_tax_location_invalid", "debit_not_authorized", "email_invalid", "expired_card", "financial_connections_account_inactive", "financial_connections_account_pending_account_numbers", "financial_connections_account_unavailable_account_numbers", "financial_connections_no_successful_transaction_refresh", "forwarding_api_inactive", "forwarding_api_invalid_parameter", "forwarding_api_retryable_upstream_error", "forwarding_api_upstream_connection_error", "forwarding_api_upstream_connection_timeout", "forwarding_api_upstream_error", "idempotency_key_in_use", "incorrect_address", "incorrect_cvc", "incorrect_number", "incorrect_zip", "india_recurring_payment_mandate_canceled", "instant_payouts_config_disabled", "instant_payouts_currency_disabled", "instant_payouts_limit_exceeded", "instant_payouts_unsupported", "insufficient_funds", "intent_invalid_state", "intent_verification_method_missing", "invalid_card_type", "invalid_characters", "invalid_charge_amount", "invalid_cvc", "invalid_expiry_month", "invalid_expiry_year", "invalid_mandate_reference_prefix_format", "invalid_number", "invalid_source_usage", "invalid_tax_location", "invoice_no_customer_line_items", "invoice_no_payment_method_types", "invoice_no_subscription_line_items", "invoice_not_editable", "invoice_on_behalf_of_not_editable", "invoice_payment_intent_requires_action", "invoice_upcoming_none", "livemode_mismatch", "lock_timeout", "missing", "no_account", "not_allowed_on_standard_account", "out_of_inventory", "ownership_declaration_not_allowed", "parameter_invalid_empty", "parameter_invalid_integer", "parameter_invalid_string_blank", "parameter_invalid_string_empty", "parameter_missing", "parameter_unknown", "parameters_exclusive", "payment_intent_action_required", "payment_intent_authentication_failure", "payment_intent_incompatible_payment_method", "payment_intent_invalid_parameter", "payment_intent_konbini_rejected_confirmation_number", "payment_intent_mandate_invalid", "payment_intent_payment_attempt_expired", "payment_intent_payment_attempt_failed", "payment_intent_rate_limit_exceeded", "payment_intent_unexpected_state", "payment_method_bank_account_already_verified", "payment_method_bank_account_blocked", "payment_method_billing_details_address_missing", "payment_method_configuration_failures", "payment_method_currency_mismatch", "payment_method_customer_decline", "payment_method_invalid_parameter", "payment_method_invalid_parameter_testmode", "payment_method_microdeposit_failed", "payment_method_microdeposit_processing_error", "payment_method_microdeposit_verification_amounts_invalid", "payment_method_microdeposit_verification_amounts_mismatch", "payment_method_microdeposit_verification_attempts_exceeded", "payment_method_microdeposit_verification_descriptor_code_mismatch", "payment_method_microdeposit_verification_timeout", "payment_method_not_available", "payment_method_provider_decline", "payment_method_provider_timeout", "payment_method_unactivated", "payment_method_unexpected_state", "payment_method_unsupported_type", "payout_reconciliation_not_ready", "payouts_limit_exceeded", "payouts_not_allowed", "platform_account_required", "platform_api_key_expired", "postal_code_invalid", "processing_error", "product_inactive", "progressive_onboarding_limit_exceeded", "rate_limit", "refer_to_customer", "refund_disputed_payment", "request_blocked", "resource_already_exists", "resource_missing", "return_intent_already_processed", "routing_number_invalid", "secret_key_required", "sepa_unsupported_account", "service_period_coupon_with_metered_tiered_item_unsupported", "setup_attempt_failed", "setup_intent_authentication_failure", "setup_intent_invalid_parameter", "setup_intent_mandate_invalid", "setup_intent_mobile_wallet_unsupported", "setup_intent_setup_attempt_expired", "setup_intent_unexpected_state", "shipping_address_invalid", "shipping_calculation_failed", "siret_invalid", "sku_inactive", "state_unsupported", "status_transition_invalid", "storer_capability_missing", "storer_capability_not_active", "stripe_tax_inactive", "tax_id_invalid", "tax_id_prohibited", "taxes_calculation_failed", "terminal_location_country_unsupported", "terminal_reader_busy", "terminal_reader_hardware_fault", "terminal_reader_invalid_location_for_activation", "terminal_reader_invalid_location_for_payment", "terminal_reader_offline", "terminal_reader_timeout", "testmode_charges_only", "tls_version_unsupported", "token_already_used", "token_card_network_invalid", "token_in_use", "transfer_source_balance_parameters_mismatch", "transfers_not_allowed", "url_invalid")},
+						Validators:    []validator.String{stringvalidator.OneOf("account_closed", "account_country_invalid_address", "account_error_country_change_requires_additional_steps", "account_information_mismatch", "account_invalid", "account_number_invalid", "account_token_required_for_v2_account", "acss_debit_session_incomplete", "action_blocked", "alipay_upgrade_required", "amount_too_large", "amount_too_small", "anomalous_money_movement_request", "api_key_expired", "application_fees_not_allowed", "approval_required", "authentication_failure", "authentication_required", "balance_insufficient", "balance_invalid_parameter", "bank_account_bad_routing_numbers", "bank_account_declined", "bank_account_exists", "bank_account_restricted", "bank_account_unusable", "bank_account_unverified", "bank_account_verification_failed", "billing_invalid_mandate", "bitcoin_upgrade_required", "capability_not_active", "capture_charge_authorization_expired", "capture_unauthorized_payment", "card_decline_rate_limit_exceeded", "card_declined", "cardholder_phone_number_required", "charge_already_captured", "charge_already_refunded", "charge_disputed", "charge_exceeds_source_limit", "charge_exceeds_transaction_limit", "charge_expired_for_capture", "charge_invalid_parameter", "charge_not_refundable", "clearing_code_unsupported", "country_code_invalid", "country_unsupported", "coupon_expired", "customer_max_payment_methods", "customer_max_subscriptions", "customer_session_expired", "customer_tax_location_invalid", "debit_not_authorized", "dispute_evidence_page_limit_exceeded", "email_invalid", "expired_card", "expired_payment_method", "failed_tax_calculation", "financial_account_balance_does_not_support_currency", "financial_account_capability_not_enabled", "financial_account_capability_restricted", "financial_connections_account_inactive", "financial_connections_account_pending_account_numbers", "financial_connections_account_unavailable_account_numbers", "financial_connections_consent_locale_invalid", "financial_connections_consent_locale_unsupported", "financial_connections_no_successful_transaction_refresh", "forwarding_api_inactive", "forwarding_api_invalid_parameter", "forwarding_api_retryable_upstream_error", "forwarding_api_upstream_connection_error", "forwarding_api_upstream_connection_timeout", "forwarding_api_upstream_error", "idempotency_key_in_use", "incorrect_address", "incorrect_cvc", "incorrect_number", "incorrect_postal_code", "incorrect_zip", "india_recurring_payment_mandate_canceled", "instant_payouts_config_disabled", "instant_payouts_currency_disabled", "instant_payouts_limit_exceeded", "instant_payouts_unsupported", "insufficient_funds", "intent_invalid_state", "intent_verification_method_missing", "invalid_canceled_subscription_fields", "invalid_card_type", "invalid_characters", "invalid_charge_amount", "invalid_cvc", "invalid_expiry_month", "invalid_expiry_year", "invalid_mandate_reference_prefix_format", "invalid_number", "invalid_source_usage", "invalid_tax_location", "invoice_no_customer_line_items", "invoice_no_payment_method_types", "invoice_no_subscription_line_items", "invoice_not_editable", "invoice_on_behalf_of_not_editable", "invoice_payment_intent_requires_action", "invoice_upcoming_none", "livemode_mismatch", "lock_timeout", "missing", "no_account", "not_allowed_on_standard_account", "out_of_inventory", "ownership_declaration_not_allowed", "parameter_invalid_empty", "parameter_invalid_integer", "parameter_invalid_string_blank", "parameter_invalid_string_empty", "parameter_missing", "parameter_unknown", "parameters_exclusive", "payment_evaluation_on_api_version_not_supported", "payment_intent_action_required", "payment_intent_authentication_failure", "payment_intent_incompatible_payment_method", "payment_intent_invalid_parameter", "payment_intent_konbini_rejected_confirmation_number", "payment_intent_mandate_invalid", "payment_intent_payment_attempt_expired", "payment_intent_payment_attempt_failed", "payment_intent_rate_limit_exceeded", "payment_intent_unexpected_state", "payment_method_bank_account_already_verified", "payment_method_bank_account_blocked", "payment_method_billing_details_address_missing", "payment_method_configuration_failures", "payment_method_currency_mismatch", "payment_method_customer_decline", "payment_method_invalid_parameter", "payment_method_invalid_parameter_testmode", "payment_method_microdeposit_failed", "payment_method_microdeposit_processing_error", "payment_method_microdeposit_verification_amounts_invalid", "payment_method_microdeposit_verification_amounts_mismatch", "payment_method_microdeposit_verification_attempts_exceeded", "payment_method_microdeposit_verification_descriptor_code_mismatch", "payment_method_microdeposit_verification_timeout", "payment_method_not_available", "payment_method_provider_decline", "payment_method_provider_timeout", "payment_method_restricted", "payment_method_unactivated", "payment_method_unexpected_state", "payment_method_unsupported_type", "payout_reconciliation_not_ready", "payouts_limit_exceeded", "payouts_not_allowed", "platform_account_required", "platform_api_key_expired", "postal_code_invalid", "processing_error", "product_inactive", "progressive_onboarding_limit_exceeded", "rate_limit", "refer_to_customer", "refund_disputed_payment", "request_blocked", "resource_already_exists", "resource_missing", "return_intent_already_processed", "routing_number_invalid", "secret_key_required", "sepa_unsupported_account", "service_period_coupon_with_metered_tiered_item_unsupported", "setup_attempt_failed", "setup_intent_authentication_failure", "setup_intent_invalid_parameter", "setup_intent_mandate_invalid", "setup_intent_mobile_wallet_unsupported", "setup_intent_setup_attempt_expired", "setup_intent_unexpected_state", "shipping_address_invalid", "shipping_calculation_failed", "siret_invalid", "sku_inactive", "smart_disputes_not_available", "state_unsupported", "status_transition_invalid", "storer_capability_missing", "storer_capability_not_active", "stripe_tax_inactive", "subscription_update_trial_after_billing_cycle_anchor", "tax_id_invalid", "tax_id_prohibited", "taxes_calculation_failed", "terminal_location_country_unsupported", "terminal_reader_busy", "terminal_reader_hardware_fault", "terminal_reader_invalid_location_for_activation", "terminal_reader_invalid_location_for_payment", "terminal_reader_offline", "terminal_reader_timeout", "testmode_charges_only", "three_d_secure_authentication_not_supported", "three_d_secure_authentication_upstream_error", "tls_version_unsupported", "token_already_used", "token_card_network_invalid", "token_in_use", "transfer_source_balance_parameters_mismatch", "transfers_not_allowed", "url_invalid")},
 					},
 					"decline_code": schema.StringAttribute{
 						Computed:      true,
@@ -676,7 +677,7 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					},
 					"setup_intent": schema.StringAttribute{
 						Computed:      true,
-						Description:   "A SetupIntent guides you through the process of setting up and saving a customer's payment credentials for future payments.\nFor example, you can use a SetupIntent to set up and save your customer's card without immediately collecting a payment.\nLater, you can use [PaymentIntents](https://api.stripe.com#payment_intents) to drive the payment flow.\n\nCreate a SetupIntent when you're ready to collect your customer's payment credentials.\nDon't maintain long-lived, unconfirmed SetupIntents because they might not be valid.\nThe SetupIntent transitions through multiple [statuses](https://docs.stripe.com/payments/intents#intent-statuses) as it guides\nyou through the setup process.\n\nSuccessful SetupIntents result in payment credentials that are optimized for future payments.\nFor example, cardholders in [certain regions](https://stripe.com/guides/strong-customer-authentication) might need to be run through\n[Strong Customer Authentication](https://docs.stripe.com/strong-customer-authentication) during payment method collection\nto streamline later [off-session payments](https://docs.stripe.com/payments/setup-intents).\nIf you use the SetupIntent with a [Customer](https://api.stripe.com#setup_intent_object-customer),\nit automatically attaches the resulting payment method to that Customer after successful setup.\nWe recommend using SetupIntents or [setup_future_usage](https://api.stripe.com#payment_intent_object-setup_future_usage) on\nPaymentIntents to save payment methods to prevent saving invalid or unoptimized payment methods.\n\nBy using SetupIntents, you can reduce friction for your customers, even as regulations change over time.\n\nRelated guide: [Setup Intents API](https://docs.stripe.com/payments/setup-intents)",
+						Description:   "A SetupIntent guides you through the process of setting up and saving a customer's payment credentials for future payments.\nFor example, you can use a SetupIntent to set up and save your customer's card without immediately collecting a payment.\nLater, you can use [PaymentIntents](https://docs.stripe.com/api#payment_intents) to drive the payment flow.\n\nCreate a SetupIntent when you're ready to collect your customer's payment credentials.\nDon't maintain long-lived, unconfirmed SetupIntents because they might not be valid.\nThe SetupIntent transitions through multiple [statuses](https://docs.stripe.com/payments/intents#intent-statuses) as it guides\nyou through the setup process.\n\nSuccessful SetupIntents result in payment credentials that are optimized for future payments.\nFor example, cardholders in [certain regions](https://stripe.com/guides/strong-customer-authentication) might need to be run through\n[Strong Customer Authentication](https://docs.stripe.com/strong-customer-authentication) during payment method collection\nto streamline later [off-session payments](https://docs.stripe.com/payments/setup-intents).\nIf you use the SetupIntent with a [Customer](https://docs.stripe.com/api#setup_intent_object-customer),\nit automatically attaches the resulting payment method to that Customer after successful setup.\nWe recommend using SetupIntents or [setup_future_usage](https://docs.stripe.com/api#payment_intent_object-setup_future_usage) on\nPaymentIntents to save payment methods to prevent saving invalid or unoptimized payment methods.\n\nBy using SetupIntents, you can reduce friction for your customers, even as regulations change over time.\n\nRelated guide: [Setup Intents API](https://docs.stripe.com/payments/setup-intents)",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 					"source": schema.StringAttribute{
@@ -837,6 +838,97 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 									},
 								},
 							},
+							"billie": schema.SingleNestedAttribute{
+								Optional:      true,
+								Computed:      true,
+								Description:   "If paying by `billie`, this sub-hash contains details about the Billie payment method options to pass to the invoice’s PaymentIntent.",
+								PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+								Attributes: map[string]schema.Attribute{
+									"company_details": schema.SingleNestedAttribute{
+										Optional: true,
+										Computed: true,
+
+										PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+										Attributes: map[string]schema.Attribute{
+											"registered_address": schema.SingleNestedAttribute{
+												Optional: true,
+												Computed: true,
+
+												PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+												Attributes: map[string]schema.Attribute{
+													"city": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "City, district, suburb, town, or village.",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"country": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "Two-letter country code.",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"line1": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "Address line 1 (for example, street, PO Box, or company name).",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"line2": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "Address line 2 (for example, apartment, suite, unit, or building).",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"postal_code": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "ZIP or postal code.",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"state": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "State, county, province, or region.",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+												},
+											},
+											"registered_name": schema.StringAttribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "Company or entity name.",
+												PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+											},
+											"registration_number": schema.StringAttribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "The official registration number for the given registration type.",
+												PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+											},
+											"registration_type": schema.StringAttribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "Type of registration the company or entity holds in their registered country.",
+												PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+												Validators:    []validator.String{stringvalidator.OneOf("ch_ein", "de_hrb", "dk_cvr", "es_cif", "fi_tunnus", "fr_siren", "fr_siret", "it_rea", "nl_kvk", "no_org_number", "no_pno", "se_org_number", "se_pno", "uk_crn")},
+											},
+											"vat": schema.StringAttribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "VAT ID number.",
+												PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+											},
+										},
+									},
+									"reference": schema.StringAttribute{
+										Optional:      true,
+										Computed:      true,
+										Description:   "An identifier or reference that this payment corresponds to.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									},
+								},
+							},
 							"card": schema.SingleNestedAttribute{
 								Optional:      true,
 								Computed:      true,
@@ -977,7 +1069,7 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 									"expires_after_seconds": schema.Int64Attribute{
 										Optional:      true,
 										Computed:      true,
-										Description:   "The number of seconds (between 10 and 1209600) after which Pix payment will expire. Defaults to 86400 seconds.",
+										Description:   "The number of seconds after PaymentIntent confirmation when the Pix expires (between 60 and 1209600, inclusive). If unspecified, defaults to 14400 seconds (4 hours).",
 										PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 									},
 								},
@@ -1114,7 +1206,7 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 			"rendering": schema.SingleNestedAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "The rendering-related settings that control how the invoice is displayed on customer-facing surfaces such as PDF and Hosted Invoice Page.",
+				Description:   "The rendering-related settings that control how invoices render in customer-facing interfaces such as the PDF or hosted invoice page.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"amount_tax_display": schema.StringAttribute{
@@ -1388,6 +1480,26 @@ func (r *InvoiceResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				Description:   "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`. [Learn more](https://docs.stripe.com/billing/invoices/workflow#workflow-overview)",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators:    []validator.String{stringvalidator.OneOf("draft", "open", "paid", "uncollectible", "void")},
+			},
+			"status_details": schema.SingleNestedAttribute{
+				Computed: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Attributes: map[string]schema.Attribute{
+					"uncollectible": schema.SingleNestedAttribute{
+						Computed: true,
+
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+						Attributes: map[string]schema.Attribute{
+							"reason": schema.StringAttribute{
+								Computed:      true,
+								Description:   "The reason why the invoice is uncollectible.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("max_payment_attempts", "payment_not_received", "subscription_canceled", "subscription_paused", "user_forgiven")},
+							},
+						},
+					},
+				},
 			},
 			"status_transitions": schema.SingleNestedAttribute{
 				Computed: true,
@@ -3388,7 +3500,7 @@ func flattenInvoice(obj *stripe.Invoice, state *InvoiceResourceModel) error {
 			hadRawPaymentSettings = true
 			if rawValuePaymentSettings != nil {
 				sourcePaymentSettings := applyConfiguredKeyedListShapes(rawValuePaymentSettings, attrValueToPlain(state.PaymentSettings))
-				if valuePaymentSettings, err := flattenPlainValue(sourcePaymentSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"default_mandate": types.StringType, "payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"installments": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "plan": types.ObjectType{AttrTypes: map[string]attr.Type{"count": types.Int64Type, "interval": types.StringType, "type": types.StringType}}}}, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"amount_includes_iof": types.StringType, "expires_after_seconds": types.Int64Type}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}}}, "payment_settings", "raw response"); err != nil {
+				if valuePaymentSettings, err := flattenPlainValue(sourcePaymentSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"default_mandate": types.StringType, "payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "billie": types.ObjectType{AttrTypes: map[string]attr.Type{"company_details": types.ObjectType{AttrTypes: map[string]attr.Type{"registered_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "registered_name": types.StringType, "registration_number": types.StringType, "registration_type": types.StringType, "vat": types.StringType}}, "reference": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"installments": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "plan": types.ObjectType{AttrTypes: map[string]attr.Type{"count": types.Int64Type, "interval": types.StringType, "type": types.StringType}}}}, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"amount_includes_iof": types.StringType, "expires_after_seconds": types.Int64Type}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}}}, "payment_settings", "raw response"); err != nil {
 					return err
 				} else {
 					if typedPaymentSettings, ok := valuePaymentSettings.(types.Object); ok {
@@ -3404,7 +3516,7 @@ func flattenInvoice(obj *stripe.Invoice, state *InvoiceResourceModel) error {
 					sourcePaymentSettings := applyConfiguredKeyedListShapes(responseValuePaymentSettings, attrValueToPlain(state.PaymentSettings))
 					if valuePaymentSettings, err := flattenPlainValue(
 						sourcePaymentSettings,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"default_mandate": types.StringType, "payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"installments": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "plan": types.ObjectType{AttrTypes: map[string]attr.Type{"count": types.Int64Type, "interval": types.StringType, "type": types.StringType}}}}, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"amount_includes_iof": types.StringType, "expires_after_seconds": types.Int64Type}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"default_mandate": types.StringType, "payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "billie": types.ObjectType{AttrTypes: map[string]attr.Type{"company_details": types.ObjectType{AttrTypes: map[string]attr.Type{"registered_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "registered_name": types.StringType, "registration_number": types.StringType, "registration_type": types.StringType, "vat": types.StringType}}, "reference": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"installments": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "plan": types.ObjectType{AttrTypes: map[string]attr.Type{"count": types.Int64Type, "interval": types.StringType, "type": types.StringType}}}}, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"amount_includes_iof": types.StringType, "expires_after_seconds": types.Int64Type}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}}},
 						"payment_settings",
 						"response struct",
 					); err != nil {
@@ -3419,7 +3531,7 @@ func flattenInvoice(obj *stripe.Invoice, state *InvoiceResourceModel) error {
 			}
 		}
 		if !assignedPaymentSettings && hadRawPaymentSettings {
-			if nullPaymentSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"default_mandate": types.StringType, "payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"installments": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "plan": types.ObjectType{AttrTypes: map[string]attr.Type{"count": types.Int64Type, "interval": types.StringType, "type": types.StringType}}}}, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"amount_includes_iof": types.StringType, "expires_after_seconds": types.Int64Type}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}}}); ok {
+			if nullPaymentSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"default_mandate": types.StringType, "payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "billie": types.ObjectType{AttrTypes: map[string]attr.Type{"company_details": types.ObjectType{AttrTypes: map[string]attr.Type{"registered_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "registered_name": types.StringType, "registration_number": types.StringType, "registration_type": types.StringType, "vat": types.StringType}}, "reference": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"installments": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "plan": types.ObjectType{AttrTypes: map[string]attr.Type{"count": types.Int64Type, "interval": types.StringType, "type": types.StringType}}}}, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"amount_includes_iof": types.StringType, "expires_after_seconds": types.Int64Type}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}}}); ok {
 				if typedPaymentSettings, ok := nullPaymentSettings.(types.Object); ok {
 					state.PaymentSettings = typedPaymentSettings
 				}
@@ -3725,6 +3837,51 @@ func flattenInvoice(obj *stripe.Invoice, state *InvoiceResourceModel) error {
 					if typedStatus, ok := valueStatus.(types.String); ok {
 						state.Status = typedStatus
 					}
+				}
+			}
+		}
+	}
+	{
+		assignedStatusDetails := false
+		hadRawStatusDetails := false
+		if rawValueStatusDetails, rawOk := plainValueAtPath(raw, "status_details"); rawOk {
+			hadRawStatusDetails = true
+			if rawValueStatusDetails != nil {
+				sourceStatusDetails := applyConfiguredKeyedListShapes(rawValueStatusDetails, attrValueToPlain(state.StatusDetails))
+				if valueStatusDetails, err := flattenPlainValue(sourceStatusDetails, types.ObjectType{AttrTypes: map[string]attr.Type{"uncollectible": types.ObjectType{AttrTypes: map[string]attr.Type{"reason": types.StringType}}}}, "status_details", "raw response"); err != nil {
+					return err
+				} else {
+					if typedStatusDetails, ok := valueStatusDetails.(types.Object); ok {
+						state.StatusDetails = typedStatusDetails
+						assignedStatusDetails = true
+					}
+				}
+			}
+		}
+		if !assignedStatusDetails {
+			if !hasRaw {
+				if responseValueStatusDetails, ok := plainFromResponseField(obj, "StatusDetails"); ok {
+					sourceStatusDetails := applyConfiguredKeyedListShapes(responseValueStatusDetails, attrValueToPlain(state.StatusDetails))
+					if valueStatusDetails, err := flattenPlainValue(
+						sourceStatusDetails,
+						types.ObjectType{AttrTypes: map[string]attr.Type{"uncollectible": types.ObjectType{AttrTypes: map[string]attr.Type{"reason": types.StringType}}}},
+						"status_details",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedStatusDetails, ok := valueStatusDetails.(types.Object); ok {
+							state.StatusDetails = typedStatusDetails
+							assignedStatusDetails = true
+						}
+					}
+				}
+			}
+		}
+		if !assignedStatusDetails && hadRawStatusDetails {
+			if nullStatusDetails, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"uncollectible": types.ObjectType{AttrTypes: map[string]attr.Type{"reason": types.StringType}}}}); ok {
+				if typedStatusDetails, ok := nullStatusDetails.(types.Object); ok {
+					state.StatusDetails = typedStatusDetails
 				}
 			}
 		}

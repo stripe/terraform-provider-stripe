@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ ephemeral.EphemeralResource = &IdentityVerificationSessionEphemeralResource{}
@@ -200,7 +200,7 @@ func (r *IdentityVerificationSessionEphemeralResource) Schema(_ context.Context,
 					"status": ephemeralSchema.StringAttribute{
 						Computed:    true,
 						Description: "Indicates whether this object and its related objects have been redacted or not.",
-						Validators:  []validator.String{stringvalidator.OneOf("processing", "redacted")},
+						Validators:  []validator.String{stringvalidator.OneOf("processing", "redacted", "validated")},
 					},
 				},
 			},

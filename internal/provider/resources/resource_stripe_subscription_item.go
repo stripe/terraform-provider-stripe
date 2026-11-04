@@ -22,7 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &SubscriptionItemResource{}
@@ -46,6 +46,7 @@ type SubscriptionItemResourceModel struct {
 	Created            types.Int64  `tfsdk:"created"`
 	CurrentPeriodEnd   types.Int64  `tfsdk:"current_period_end"`
 	CurrentPeriodStart types.Int64  `tfsdk:"current_period_start"`
+	CurrentTrial       types.Object `tfsdk:"current_trial"`
 	Discounts          types.List   `tfsdk:"discounts"`
 	ID                 types.String `tfsdk:"id"`
 	Metadata           types.Map    `tfsdk:"metadata"`
@@ -120,6 +121,28 @@ func (r *SubscriptionItemResource) Schema(_ context.Context, _ resource.SchemaRe
 				Description:   "The start time of this subscription item's current billing period.",
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
+			"current_trial": schema.SingleNestedAttribute{
+				Optional:      true,
+				Computed:      true,
+				Description:   "The current trial that is applied to this subscription item.",
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Attributes: map[string]schema.Attribute{
+					"end_date": schema.Int64Attribute{
+						Computed:      true,
+						Description:   "The time the current trial ends.",
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+					},
+					"start_date": schema.Int64Attribute{
+						Computed:      true,
+						Description:   "The time the current trial started.",
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+					},
+					"trial_offer": schema.StringAttribute{
+						Required:    true,
+						Description: "The Trial Offer ID applied to the subscription item.",
+					},
+				},
+			},
 			"discounts": schema.ListNestedAttribute{
 				Optional:      true,
 				Computed:      true,
@@ -157,13 +180,13 @@ func (r *SubscriptionItemResource) Schema(_ context.Context, _ resource.SchemaRe
 			"plan": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "You can now model subscriptions more flexibly using the [Prices API](https://api.stripe.com#prices). It replaces the Plans API and is backwards compatible to simplify your migration.\n\nPlans define the base price, currency, and billing cycle for recurring purchases of products.\n[Products](https://api.stripe.com#products) help you track inventory or provisioning, and plans help you track pricing. Different physical goods or levels of service should be represented by products, and pricing options should be represented by plans. This approach lets you change prices without having to change your provisioning scheme.\n\nFor example, you might have a single \"gold\" product that has plans for $10/month, $100/year, €9/month, and €90/year.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription) and more about [products and prices](https://docs.stripe.com/products-prices/overview).",
+				Description:   "You can now model subscriptions more flexibly using the [Prices API](https://docs.stripe.com/api#prices). It replaces the Plans API and is backwards compatible to simplify your migration.\n\nPlans define the base price, currency, and billing cycle for recurring purchases of products.\n[Products](https://docs.stripe.com/api#products) help you track inventory or provisioning, and plans help you track pricing. Different physical goods or levels of service should be represented by products, and pricing options should be represented by plans. This approach lets you change prices without having to change your provisioning scheme.\n\nFor example, you might have a single \"gold\" product that has plans for $10/month, $100/year, €9/month, and €90/year.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription) and more about [products and prices](https://docs.stripe.com/products-prices/overview).",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"price": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "Prices define the unit cost, currency, and (optional) billing cycle for both recurring and one-time purchases of products.\n[Products](https://api.stripe.com#products) help you track inventory or provisioning, and prices help you track payment terms. Different physical goods or levels of service should be represented by products, and pricing options should be represented by prices. This approach lets you change prices without having to change your provisioning scheme.\n\nFor example, you might have a single \"gold\" product that has prices for $10/month, $100/year, and €9 once.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription), [create an invoice](https://docs.stripe.com/billing/invoices/create), and more about [products and prices](https://docs.stripe.com/products-prices/overview).",
+				Description:   "Prices define the unit cost, currency, and (optional) billing cycle for both recurring and one-time purchases of products.\n[Products](https://docs.stripe.com/api#products) help you track inventory or provisioning, and prices help you track payment terms. Different physical goods or levels of service should be represented by products, and pricing options should be represented by prices. This approach lets you change prices without having to change your provisioning scheme.\n\nFor example, you might have a single \"gold\" product that has prices for $10/month, $100/year, and €9 once.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription), [create an invoice](https://docs.stripe.com/billing/invoices/create), and more about [products and prices](https://docs.stripe.com/products-prices/overview).",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"quantity": schema.Int64Attribute{
@@ -421,6 +444,11 @@ func expandSubscriptionItemCreate(plan SubscriptionItemResourceModel) (*stripe.S
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "billing_thresholds", params)
 		}
 	}
+	if !plan.CurrentTrial.IsNull() && !plan.CurrentTrial.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "CurrentTrial", plan.CurrentTrial) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "current_trial", params)
+		}
+	}
 	if !plan.Discounts.IsNull() && !plan.Discounts.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "Discounts", plan.Discounts) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "discounts", params)
@@ -483,6 +511,13 @@ func expandSubscriptionItemUpdate(plan SubscriptionItemResourceModel, state Subs
 		if !assignAttrValueToNamedField(params, "BillingThresholds", plan.BillingThresholds) {
 			if !plan.BillingThresholds.Equal(state.BillingThresholds) {
 				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "billing_thresholds", params)
+			}
+		}
+	}
+	if !plan.CurrentTrial.Equal(state.CurrentTrial) && !plan.CurrentTrial.IsNull() && !plan.CurrentTrial.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "CurrentTrial", plan.CurrentTrial) {
+			if !plan.CurrentTrial.Equal(state.CurrentTrial) {
+				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "current_trial", params)
 			}
 		}
 	}
@@ -700,6 +735,51 @@ func flattenSubscriptionItem(obj *stripe.SubscriptionItem, state *SubscriptionIt
 					if typedCurrentPeriodStart, ok := valueCurrentPeriodStart.(types.Int64); ok {
 						state.CurrentPeriodStart = typedCurrentPeriodStart
 					}
+				}
+			}
+		}
+	}
+	{
+		assignedCurrentTrial := false
+		hadRawCurrentTrial := false
+		if rawValueCurrentTrial, rawOk := plainValueAtPath(raw, "current_trial"); rawOk {
+			hadRawCurrentTrial = true
+			if rawValueCurrentTrial != nil {
+				sourceCurrentTrial := applyConfiguredKeyedListShapes(rawValueCurrentTrial, attrValueToPlain(state.CurrentTrial))
+				if valueCurrentTrial, err := flattenPlainValue(sourceCurrentTrial, types.ObjectType{AttrTypes: map[string]attr.Type{"end_date": types.Int64Type, "start_date": types.Int64Type, "trial_offer": types.StringType}}, "current_trial", "raw response"); err != nil {
+					return err
+				} else {
+					if typedCurrentTrial, ok := valueCurrentTrial.(types.Object); ok {
+						state.CurrentTrial = typedCurrentTrial
+						assignedCurrentTrial = true
+					}
+				}
+			}
+		}
+		if !assignedCurrentTrial {
+			if !hasRaw {
+				if responseValueCurrentTrial, ok := plainFromResponseField(obj, "CurrentTrial"); ok {
+					sourceCurrentTrial := applyConfiguredKeyedListShapes(responseValueCurrentTrial, attrValueToPlain(state.CurrentTrial))
+					if valueCurrentTrial, err := flattenPlainValue(
+						sourceCurrentTrial,
+						types.ObjectType{AttrTypes: map[string]attr.Type{"end_date": types.Int64Type, "start_date": types.Int64Type, "trial_offer": types.StringType}},
+						"current_trial",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedCurrentTrial, ok := valueCurrentTrial.(types.Object); ok {
+							state.CurrentTrial = typedCurrentTrial
+							assignedCurrentTrial = true
+						}
+					}
+				}
+			}
+		}
+		if !assignedCurrentTrial && hadRawCurrentTrial {
+			if nullCurrentTrial, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"end_date": types.Int64Type, "start_date": types.Int64Type, "trial_offer": types.StringType}}); ok {
+				if typedCurrentTrial, ok := nullCurrentTrial.(types.Object); ok {
+					state.CurrentTrial = typedCurrentTrial
 				}
 			}
 		}
