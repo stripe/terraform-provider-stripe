@@ -340,8 +340,8 @@ func TestAccManagedPaymentMethodConfigurationWalletPreferences(t *testing.T) {
 		"stripe_payment_method_configuration",
 		"stripe_payment_method_configuration.test",
 		"payment_method_configuration_wallet_preferences_create.tf",
-		"",
-		false,
+		"payment_method_configuration_wallet_preferences_update.tf",
+		true,
 		verifyPaymentMethodConfiguration(paymentMethodConfigurationExpectations{
 			Address:                    "stripe_payment_method_configuration.test",
 			ExpectedActive:             true,
@@ -353,7 +353,17 @@ func TestAccManagedPaymentMethodConfigurationWalletPreferences(t *testing.T) {
 			ExpectedLinkPreference:     "off",
 			ExpectedLinkValue:          "off",
 		}),
-		nil,
+		verifyPaymentMethodConfiguration(paymentMethodConfigurationExpectations{
+			Address:                    "stripe_payment_method_configuration.test",
+			ExpectedActive:             true,
+			ExpectedName:               "SDK Codegen PM Configuration Wallets",
+			ExpectedCardPreference:     "on",
+			ExpectedCardValue:          "on",
+			ExpectedApplePayPreference: "on",
+			ExpectedApplePayValue:      "on",
+			ExpectedLinkPreference:     "on",
+			ExpectedLinkValue:          "on",
+		}),
 		verifyPaymentMethodConfigurationDestroyInactive,
 	)
 }

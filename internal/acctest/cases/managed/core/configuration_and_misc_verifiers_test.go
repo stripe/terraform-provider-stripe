@@ -726,6 +726,9 @@ func verifyPaymentMethodConfiguration(
 			if configuration.ApplePay == nil || configuration.ApplePay.DisplayPreference == nil {
 				return fmt.Errorf("remote %s.apple_pay.display_preference missing", expect.Address)
 			}
+			if err := verifyPaymentMethodComputedState(state, expect.Address, "apple_pay", configuration.ApplePay.Available, string(configuration.ApplePay.DisplayPreference.Value)); err != nil {
+				return err
+			}
 			if string(configuration.ApplePay.DisplayPreference.Preference) != expect.ExpectedApplePayPreference {
 				return fmt.Errorf(
 					"remote %s.apple_pay.display_preference.preference mismatch: expected %q, got %q",
@@ -747,6 +750,9 @@ func verifyPaymentMethodConfiguration(
 			if configuration.Link == nil || configuration.Link.DisplayPreference == nil {
 				return fmt.Errorf("remote %s.link.display_preference missing", expect.Address)
 			}
+			if err := verifyPaymentMethodComputedState(state, expect.Address, "link", configuration.Link.Available, string(configuration.Link.DisplayPreference.Value)); err != nil {
+				return err
+			}
 			if string(configuration.Link.DisplayPreference.Preference) != expect.ExpectedLinkPreference {
 				return fmt.Errorf(
 					"remote %s.link.display_preference.preference mismatch: expected %q, got %q",
@@ -767,6 +773,22 @@ func verifyPaymentMethodConfiguration(
 
 		return nil
 	}
+}
+
+func verifyPaymentMethodComputedState(state *terraform.State, address, method string, available bool, value string) error {
+	for field, expected := range map[string]string{
+		"available":                strconv.FormatBool(available),
+		"display_preference.value": value,
+	} {
+		actual, err := runner.ResourceAttribute(state, address, method+"."+field)
+		if err != nil {
+			return err
+		}
+		if actual != expected {
+			return fmt.Errorf("%s.%s.%s state mismatch: expected %q from API, got %q", address, method, field, expected, actual)
+		}
+	}
+	return nil
 }
 
 func verifyPaymentMethodConfigurationDestroyInactive(
