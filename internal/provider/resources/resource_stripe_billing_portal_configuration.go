@@ -455,13 +455,17 @@ func (r *BillingPortalConfigurationResource) Create(ctx context.Context, req res
 		return
 	}
 
+	params.AddExpand("features.subscription_update.products")
 	obj, err := r.client.V1BillingPortalConfigurations.Create(ctx, params)
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating BillingPortalConfiguration", err.Error())
 		return
 	}
 
-	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), nil); err != nil {
+	rawReadParams := &stripe.BillingPortalConfigurationRetrieveParams{}
+	rawReadParams.AddExpand("features.subscription_update.products")
+
+	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), rawReadParams); err != nil {
 		resp.Diagnostics.AddError("Error hydrating BillingPortalConfiguration create raw response", err.Error())
 		return
 	}
@@ -495,7 +499,10 @@ func (r *BillingPortalConfigurationResource) Create(ctx context.Context, req res
 			resp.Diagnostics.AddError("Error finalizing BillingPortalConfiguration after create", err.Error())
 			return
 		}
-		if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), nil); err != nil {
+		rawReadParams := &stripe.BillingPortalConfigurationRetrieveParams{}
+		rawReadParams.AddExpand("features.subscription_update.products")
+
+		if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), rawReadParams); err != nil {
 			resp.Diagnostics.AddError("Error hydrating BillingPortalConfiguration post-create update raw response", err.Error())
 			return
 		}
@@ -521,13 +528,16 @@ func (r *BillingPortalConfigurationResource) Read(ctx context.Context, req resou
 	var state BillingPortalConfigurationResourceModel
 	state = priorState
 
-	obj, err := r.client.V1BillingPortalConfigurations.Retrieve(ctx, state.ID.ValueString(), nil)
+	params := &stripe.BillingPortalConfigurationRetrieveParams{}
+	params.AddExpand("features.subscription_update.products")
+
+	obj, err := r.client.V1BillingPortalConfigurations.Retrieve(ctx, state.ID.ValueString(), params)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading BillingPortalConfiguration", err.Error())
 		return
 	}
 
-	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", state.ID.ValueString()), nil); err != nil {
+	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", state.ID.ValueString()), params); err != nil {
 		resp.Diagnostics.AddError("Error hydrating BillingPortalConfiguration raw response", err.Error())
 		return
 	}
@@ -549,6 +559,13 @@ func (r *BillingPortalConfigurationResource) Update(ctx context.Context, req res
 		return
 	}
 
+	var config BillingPortalConfigurationResourceModel
+	diags = req.Config.Get(ctx, &config)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	var state BillingPortalConfigurationResourceModel
 	diags = req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -559,7 +576,7 @@ func (r *BillingPortalConfigurationResource) Update(ctx context.Context, req res
 	diffPlan := plan
 	diffState := state
 
-	params, err := expandBillingPortalConfigurationUpdate(diffPlan, diffState)
+	params, err := expandBillingPortalConfigurationUpdate(diffPlan, diffState, config)
 	if err != nil {
 		resp.Diagnostics.AddError("Error building BillingPortalConfiguration update params", err.Error())
 		return
@@ -572,13 +589,17 @@ func (r *BillingPortalConfigurationResource) Update(ctx context.Context, req res
 			return
 		}
 	}
+	params.AddExpand("features.subscription_update.products")
 	obj, err := r.client.V1BillingPortalConfigurations.Update(ctx, state.ID.ValueString(), params)
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating BillingPortalConfiguration", err.Error())
 		return
 	}
 
-	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), nil); err != nil {
+	rawReadParams := &stripe.BillingPortalConfigurationRetrieveParams{}
+	rawReadParams.AddExpand("features.subscription_update.products")
+
+	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), rawReadParams); err != nil {
 		resp.Diagnostics.AddError("Error hydrating BillingPortalConfiguration update raw response", err.Error())
 		return
 	}
@@ -662,7 +683,7 @@ func expandBillingPortalConfigurationCreate(plan BillingPortalConfigurationResou
 	return params, nil
 }
 
-func expandBillingPortalConfigurationUpdate(plan BillingPortalConfigurationResourceModel, state BillingPortalConfigurationResourceModel) (*stripe.BillingPortalConfigurationUpdateParams, error) {
+func expandBillingPortalConfigurationUpdate(plan BillingPortalConfigurationResourceModel, state BillingPortalConfigurationResourceModel, config BillingPortalConfigurationResourceModel) (*stripe.BillingPortalConfigurationUpdateParams, error) {
 	params := &stripe.BillingPortalConfigurationUpdateParams{}
 
 	if !plan.Active.Equal(state.Active) && !plan.Active.IsNull() && !plan.Active.IsUnknown() {
@@ -682,9 +703,9 @@ func expandBillingPortalConfigurationUpdate(plan BillingPortalConfigurationResou
 			}
 		}
 	}
-	if !plan.Features.Equal(state.Features) && !plan.Features.IsNull() && !plan.Features.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "Features", plan.Features) {
-			if !plan.Features.Equal(state.Features) {
+	if !plan.Features.Equal(state.Features) && !config.Features.IsNull() && !config.Features.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "Features", config.Features) {
+			if !config.Features.Equal(state.Features) {
 				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "features", params)
 			}
 		}
