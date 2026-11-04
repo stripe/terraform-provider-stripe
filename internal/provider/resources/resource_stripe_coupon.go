@@ -947,7 +947,10 @@ func (r *CouponResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	if err := ensureRawResponse(obj, r.client.V1Coupons.B, r.client.V1Coupons.Key, stripe.FormatURLPath("/v1/coupons/%s", obj.ID), nil); err != nil {
+	rawReadParams := &stripe.CouponRetrieveParams{}
+	rawReadParams.AddExpand("applies_to")
+
+	if err := ensureRawResponse(obj, r.client.V1Coupons.B, r.client.V1Coupons.Key, stripe.FormatURLPath("/v1/coupons/%s", obj.ID), rawReadParams); err != nil {
 		resp.Diagnostics.AddError("Error hydrating Coupon create raw response", err.Error())
 		return
 	}
@@ -972,13 +975,16 @@ func (r *CouponResource) Read(ctx context.Context, req resource.ReadRequest, res
 	var state CouponResourceModel
 	state = priorState
 
-	obj, err := r.client.V1Coupons.Retrieve(ctx, state.ID.ValueString(), nil)
+	params := &stripe.CouponRetrieveParams{}
+	params.AddExpand("applies_to")
+
+	obj, err := r.client.V1Coupons.Retrieve(ctx, state.ID.ValueString(), params)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Coupon", err.Error())
 		return
 	}
 
-	if err := ensureRawResponse(obj, r.client.V1Coupons.B, r.client.V1Coupons.Key, stripe.FormatURLPath("/v1/coupons/%s", state.ID.ValueString()), nil); err != nil {
+	if err := ensureRawResponse(obj, r.client.V1Coupons.B, r.client.V1Coupons.Key, stripe.FormatURLPath("/v1/coupons/%s", state.ID.ValueString()), params); err != nil {
 		resp.Diagnostics.AddError("Error hydrating Coupon raw response", err.Error())
 		return
 	}
@@ -1029,7 +1035,10 @@ func (r *CouponResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	if err := ensureRawResponse(obj, r.client.V1Coupons.B, r.client.V1Coupons.Key, stripe.FormatURLPath("/v1/coupons/%s", obj.ID), nil); err != nil {
+	rawReadParams := &stripe.CouponRetrieveParams{}
+	rawReadParams.AddExpand("applies_to")
+
+	if err := ensureRawResponse(obj, r.client.V1Coupons.B, r.client.V1Coupons.Key, stripe.FormatURLPath("/v1/coupons/%s", obj.ID), rawReadParams); err != nil {
 		resp.Diagnostics.AddError("Error hydrating Coupon update raw response", err.Error())
 		return
 	}
@@ -1193,14 +1202,12 @@ func flattenCoupon(obj *stripe.Coupon, state *CouponResourceModel) error {
 		if rawValueAppliesTo, rawOk := plainValueAtPath(raw, "applies_to"); rawOk {
 			if rawValueAppliesTo != nil {
 				sourceAppliesTo := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(rawValueAppliesTo, unwrapPlainSingletonList(attrValueToPlain(state.AppliesTo))), unwrapPlainSingletonList(attrValueToPlain(state.AppliesTo)))
-				if !state.AppliesTo.IsNull() && !state.AppliesTo.IsUnknown() {
-					if valueAppliesTo, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceAppliesTo, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}}, "applies_to", "raw response"); err != nil {
-						return err
-					} else {
-						if typedAppliesTo, ok := valueAppliesTo.(types.List); ok {
-							state.AppliesTo = typedAppliesTo
-							assignedAppliesTo = true
-						}
+				if valueAppliesTo, err := flattenPlainValue(applyPlainSingletonListShapePaths(sourceAppliesTo, [][]string{[]string{}}), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}}, "applies_to", "raw response"); err != nil {
+					return err
+				} else {
+					if typedAppliesTo, ok := valueAppliesTo.(types.List); ok {
+						state.AppliesTo = typedAppliesTo
+						assignedAppliesTo = true
 					}
 				}
 			}
@@ -1209,19 +1216,17 @@ func flattenCoupon(obj *stripe.Coupon, state *CouponResourceModel) error {
 			if !hasRaw {
 				if responseValueAppliesTo, ok := plainFromResponseField(obj, "AppliesTo"); ok {
 					sourceAppliesTo := mergeMissingPlainLeaves(applyConfiguredKeyedListShapes(responseValueAppliesTo, unwrapPlainSingletonList(attrValueToPlain(state.AppliesTo))), unwrapPlainSingletonList(attrValueToPlain(state.AppliesTo)))
-					if !state.AppliesTo.IsNull() && !state.AppliesTo.IsUnknown() {
-						if valueAppliesTo, err := flattenPlainValue(
-							applyPlainSingletonListShapePaths(sourceAppliesTo, [][]string{[]string{}}),
-							types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}},
-							"applies_to",
-							"response struct",
-						); err != nil {
-							return err
-						} else {
-							if typedAppliesTo, ok := valueAppliesTo.(types.List); ok {
-								state.AppliesTo = typedAppliesTo
-								assignedAppliesTo = true
-							}
+					if valueAppliesTo, err := flattenPlainValue(
+						applyPlainSingletonListShapePaths(sourceAppliesTo, [][]string{[]string{}}),
+						types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"products": types.ListType{ElemType: types.StringType}}}},
+						"applies_to",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedAppliesTo, ok := valueAppliesTo.(types.List); ok {
+							state.AppliesTo = typedAppliesTo
+							assignedAppliesTo = true
 						}
 					}
 				}

@@ -1911,7 +1911,7 @@ func TestAccManagedCouponRepeating(t *testing.T) {
 }
 
 func TestAccManagedCouponAppliesTo(t *testing.T) {
-	runBaseManagedCaseWithImportIgnore(
+	runBaseManagedCase(
 		t,
 		"coupon_applies_to",
 		"stripe_coupon",
@@ -1919,19 +1919,13 @@ func TestAccManagedCouponAppliesTo(t *testing.T) {
 		"coupon_applies_to_create.tf",
 		"coupon_applies_to_update.tf",
 		true,
-		[]string{
-			"applies_to",
-			"applies_to.%", // sdkv2 import path retained in failure diff output
-			"applies_to.0.products",
-			"applies_to.0.products.#",
-			"applies_to.0.products.0",
-		},
 		verifyCoupon(couponExpectations{
 			Address:                 "stripe_coupon.test",
 			CompareStateStringAttrs: []string{"name", "duration"},
 			CompareMetadata:         true,
 			CheckPercentOff:         true,
 			ExpectedPercentOff:      10.0,
+			CheckAppliesToProduct:   true,
 		}),
 		verifyCoupon(couponExpectations{
 			Address:                 "stripe_coupon.test",
@@ -1939,13 +1933,14 @@ func TestAccManagedCouponAppliesTo(t *testing.T) {
 			CompareMetadata:         true,
 			CheckPercentOff:         true,
 			ExpectedPercentOff:      10.0,
+			CheckAppliesToProduct:   true,
 		}),
 		verifyCouponDestroyMissing,
 	)
 }
 
 func TestAccManagedCouponAppliesToProductUpdate(t *testing.T) {
-	runBaseManagedCaseWithImportIgnore(
+	runBaseManagedCase(
 		t,
 		"coupon_applies_to_product_update",
 		"stripe_coupon",
@@ -1953,13 +1948,6 @@ func TestAccManagedCouponAppliesToProductUpdate(t *testing.T) {
 		"coupon_applies_to_product_update_create.tf",
 		"coupon_applies_to_product_update_update.tf",
 		true,
-		[]string{
-			"applies_to",
-			"applies_to.%",
-			"applies_to.0.products",
-			"applies_to.0.products.#",
-			"applies_to.0.products.0",
-		},
 		verifyCoupon(couponExpectations{
 			Address:                 "stripe_coupon.test",
 			CompareStateStringAttrs: []string{"name", "duration"},
