@@ -153,7 +153,7 @@ var CoverageRegistry = []CoverageEntry{
 		Kind:                         "resource",
 		Group:                        "base",
 		Status:                       "limited",
-		CaseNames:                    []string{"coupon_percent_off", "coupon_amount_off", "coupon_repeating", "coupon_applies_to", "coupon_applies_to_product_update", "coupon_applies_to_legacy_upgrade"},
+		CaseNames:                    []string{"coupon_percent_off", "coupon_amount_off", "coupon_repeating", "coupon_applies_to", "coupon_applies_to_import", "coupon_applies_to_product_update", "coupon_applies_to_legacy_upgrade"},
 		LegacyUpgradeCaseNames:       []string{"coupon_applies_to_legacy_upgrade"},
 		RequiresLegacyModuleUpgrade:  false,
 		LegacyModuleUpgradeCaseNames: nil,
