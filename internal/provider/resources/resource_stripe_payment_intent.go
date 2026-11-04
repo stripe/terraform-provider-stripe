@@ -3559,10 +3559,9 @@ func (r *PaymentIntentResource) Schema(_ context.Context, _ resource.SchemaReque
 				},
 			},
 			"payment_method_types": schema.ListAttribute{
-				Computed:      true,
-				Description:   "The list of payment method types (e.g. card) that this PaymentIntent is allowed to use. A comprehensive list of valid payment method types can be found [here](https://docs.stripe.com/api/payment_methods/object#payment_method_object-type).",
-				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-				ElementType:   types.StringType,
+				Computed:    true,
+				Description: "The list of payment method types (e.g. card) that this PaymentIntent is allowed to use. A comprehensive list of valid payment method types can be found [here](https://docs.stripe.com/api/payment_methods/object#payment_method_object-type).",
+				ElementType: types.StringType,
 			},
 			"payment_record": schema.StringAttribute{
 				Computed:      true,

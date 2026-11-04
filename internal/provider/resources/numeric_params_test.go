@@ -67,3 +67,39 @@ func TestNumericParams(t *testing.T) {
 		})
 	}
 }
+
+func TestPriceDecimalParams(t *testing.T) {
+	for _, value := range []string{"0", "0.0015000000", "9007199254740993.123456789012"} {
+		t.Run(value, func(t *testing.T) {
+			params, err := expandPriceCreate(PriceResourceModel{UnitAmountDecimal: types.StringValue(value)})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if params.UnitAmountDecimal == nil {
+				t.Fatal("unit_amount_decimal was omitted")
+			}
+			values := &form.Values{}
+			form.AppendTo(values, params)
+			got := values.ToValues().Get("unit_amount_decimal")
+			want := params.UnitAmountDecimal.String()
+			if got != want {
+				t.Fatalf("encoded decimal = %q, want %q", got, want)
+			}
+			if value == "9007199254740993.123456789012" && got != value {
+				t.Fatalf("decimal lost precision: got %q, want %q", got, value)
+			}
+		})
+	}
+	if _, err := expandPriceCreate(PriceResourceModel{UnitAmountDecimal: types.StringValue("invalid")}); err == nil {
+		t.Fatal("invalid decimal was accepted")
+	}
+	for _, value := range []types.String{types.StringNull(), types.StringUnknown()} {
+		params, err := expandPriceCreate(PriceResourceModel{UnitAmountDecimal: value})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if params.UnitAmountDecimal != nil {
+			t.Fatal("null or unknown decimal was sent")
+		}
+	}
+}

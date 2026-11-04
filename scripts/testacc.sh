@@ -119,6 +119,9 @@ env_status() {
 print_env_summary() {
   echo "==> Acceptance environment"
   env_status STRIPE_API_KEY
+  if [[ -n "${STRIPE_TRANSFER_DESTINATION:-}" ]]; then
+    env_status STRIPE_TRANSFER_DESTINATION
+  fi
 
   if [[ -z "$GROUP" || "$GROUP" == "connect" ]]; then
     env_status STRIPE_ACCOUNT
