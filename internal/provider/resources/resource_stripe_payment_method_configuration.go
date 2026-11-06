@@ -2530,46 +2530,107 @@ func (r *PaymentMethodConfigurationResource) Schema(_ context.Context, _ resourc
 
 var _ resource.ResourceWithModifyPlan = &PaymentMethodConfigurationResource{}
 
-// ModifyPlan runs after the schema's UseStateForUnknown modifiers. The effective
-// preference and availability depend on the requested preference, so their old
-// values are only valid predictions when that preference is unchanged.
+// ModifyPlan invalidates computed dependencies after schema state-reuse modifiers.
 func (r *PaymentMethodConfigurationResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
 	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
 		return
 	}
-
-	var planned types.Object
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &planned)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	for name, value := range planned.Attributes() {
-		method, ok := value.(types.Object)
-		if !ok || method.IsNull() || method.IsUnknown() {
-			continue
-		}
-		display, ok := method.Attributes()["display_preference"].(types.Object)
-		if !ok || display.IsNull() {
-			continue
-		}
-		// Select the shared payment-method response shape, excluding write-only
-		// methods which do not expose these computed fields.
-		if _, ok := method.Attributes()["available"]; !ok {
-			continue
-		}
-		preferencePath := path.Root(name).AtName("display_preference").AtName("preference")
-		var prior types.String
-		resp.Diagnostics.Append(req.State.GetAttribute(ctx, preferencePath, &prior)...)
+	for _, name := range []string{
+		"acss_debit",
+		"affirm",
+		"afterpay_clearpay",
+		"alipay",
+		"alma",
+		"amazon_pay",
+		"apple_pay",
+		"au_becs_debit",
+		"bacs_debit",
+		"bancontact",
+		"billie",
+		"bizum",
+		"blik",
+		"boleto",
+		"cartes_bancaires",
+		"cashapp",
+		"crypto",
+		"customer_balance",
+		"eps",
+		"fpx",
+		"giropay",
+		"google_pay",
+		"grabpay",
+		"ideal",
+		"jcb",
+		"kakao_pay",
+		"klarna",
+		"konbini",
+		"kr_card",
+		"link",
+		"mb_way",
+		"mobilepay",
+		"multibanco",
+		"naver_pay",
+		"nz_bank_account",
+		"oxxo",
+		"p24",
+		"pay_by_bank",
+		"payco",
+		"paynow",
+		"paypal",
+		"paypay",
+		"payto",
+		"pix",
+		"promptpay",
+		"revolut_pay",
+		"samsung_pay",
+		"satispay",
+		"scalapay",
+		"sepa_debit",
+		"sequra",
+		"sofort",
+		"sunbit",
+		"swish",
+		"twint",
+		"upi",
+		"us_bank_account",
+		"wechat_pay",
+		"zip",
+	} {
+		var scope types.Object
+		resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root(name), &scope)...)
 		if resp.Diagnostics.HasError() {
 			return
 		}
-		preference := display.Attributes()["preference"]
-		if !display.IsUnknown() && !preference.IsUnknown() && preference.Equal(prior) {
+		if scope.IsNull() || scope.IsUnknown() {
+			continue
+		}
+		var sourceParent types.Object
+		resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root(name).AtName("display_preference"), &sourceParent)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		if sourceParent.IsNull() {
+			continue
+		}
+		var prior, planned types.String
+		resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root(name).AtName("display_preference").AtName("preference"), &prior)...)
+		resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root(name).AtName("display_preference").AtName("preference"), &planned)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		if !planned.IsUnknown() && planned.Equal(prior) {
 			continue
 		}
 		resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root(name).AtName("available"), types.BoolUnknown())...)
-		if !display.IsUnknown() {
-			resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root(name).AtName("display_preference").AtName("value"), types.StringUnknown())...)
+		{
+			var parent types.Object
+			resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root(name).AtName("display_preference"), &parent)...)
+			if resp.Diagnostics.HasError() {
+				return
+			}
+			if !parent.IsNull() && !parent.IsUnknown() {
+				resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root(name).AtName("display_preference").AtName("value"), types.StringUnknown())...)
+			}
 		}
 	}
 }
