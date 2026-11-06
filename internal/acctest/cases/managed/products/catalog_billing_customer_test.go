@@ -212,6 +212,29 @@ func TestAccManagedProductBasic(t *testing.T) {
 	)
 }
 
+func TestAccManagedProductTaxCodeMirrors(t *testing.T) {
+	runBaseManagedCase(t, "product_tax_code_mirrors", "stripe_product", "stripe_product.test",
+		"product_tax_code_mirrors_create.tf", "product_tax_code_mirrors_update.tf", true,
+		verifyProductTaxCodeMirrors("txcd_10000000"), verifyProductTaxCodeMirrors("txcd_20030000"), verifyProductDestroyInactive)
+}
+
+func TestAccManagedProductTaxCodeTopLevelMirrors(t *testing.T) {
+	runBaseManagedCase(t, "product_tax_code_top_level_mirrors", "stripe_product", "stripe_product.test",
+		"product_tax_code_top_level_mirrors_create.tf", "product_tax_code_top_level_mirrors_update.tf", true,
+		verifyProductTaxCodeMirrors("txcd_10000000"), verifyProductTaxCodeMirrors("txcd_20030000"), verifyProductDestroyInactive)
+}
+
+func verifyProductTaxCodeMirrors(expected string) runner.StateVerifier {
+	return func(env runner.TestEnv, client *stripe.Client, state *terraform.State) error {
+		for _, attribute := range []string{"tax_code", "tax_details.tax_code"} {
+			if err := expectStateString(state, "stripe_product.test", attribute, expected); err != nil {
+				return err
+			}
+		}
+		return verifyProduct(productExpectations{Address: "stripe_product.test", CompareStateAttrs: []string{"tax_code"}})(env, client, state)
+	}
+}
+
 func TestAccManagedProductActiveToggle(t *testing.T) {
 	runBaseManagedCase(
 		t,
