@@ -895,7 +895,9 @@ type SourceWeChat struct {
 // just like a `Card` object: once chargeable, they can be charged, or can be
 // attached to customers.
 //
-// This API is deprecated. Use the [PaymentMethods API](https://docs.stripe.com/api/payment_methods) instead.
+// Stripe doesn't recommend using the deprecated [Sources API](https://docs.stripe.com/api/sources).
+// We recommend that you adopt the [PaymentMethods API](https://docs.stripe.com/api/payment_methods).
+// This newer API provides access to our latest features and payment method types.
 //
 // Related guides: [Sources API](https://docs.stripe.com/sources) and [Sources & Customers](https://docs.stripe.com/sources/customers).
 type Source struct {

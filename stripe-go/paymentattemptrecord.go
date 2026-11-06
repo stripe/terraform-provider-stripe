@@ -148,7 +148,6 @@ type PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsage string
 
 // List of values that PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsage can take
 const (
-	PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsageInstallment PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsage = "installment"
 	PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsageRecurring   PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsage = "recurring"
 	PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsageUnscheduled PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsage = "unscheduled"
 )
@@ -192,7 +191,6 @@ type PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResult string
 const (
 	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResultAttemptAcknowledged PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResult = "attempt_acknowledged"
 	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResultAuthenticated       PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResult = "authenticated"
-	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResultDataShareOnly       PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResult = "data_share_only"
 	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResultExempted            PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResult = "exempted"
 	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResultFailed              PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResult = "failed"
 	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResultNotSupported        PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureResult = "not_supported"
@@ -221,8 +219,6 @@ const (
 	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion102 PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion = "1.0.2"
 	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion210 PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion = "2.1.0"
 	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion220 PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion = "2.2.0"
-	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion230 PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion = "2.3.0"
-	PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion231 PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureVersion = "2.3.1"
 )
 
 // The method used to process this payment method offline. Only deferred is allowed.
@@ -276,7 +272,6 @@ const (
 	PaymentAttemptRecordPaymentMethodDetailsCryptoNetworkEthereum PaymentAttemptRecordPaymentMethodDetailsCryptoNetwork = "ethereum"
 	PaymentAttemptRecordPaymentMethodDetailsCryptoNetworkPolygon  PaymentAttemptRecordPaymentMethodDetailsCryptoNetwork = "polygon"
 	PaymentAttemptRecordPaymentMethodDetailsCryptoNetworkSolana   PaymentAttemptRecordPaymentMethodDetailsCryptoNetwork = "solana"
-	PaymentAttemptRecordPaymentMethodDetailsCryptoNetworkSui      PaymentAttemptRecordPaymentMethodDetailsCryptoNetwork = "sui"
 	PaymentAttemptRecordPaymentMethodDetailsCryptoNetworkTempo    PaymentAttemptRecordPaymentMethodDetailsCryptoNetwork = "tempo"
 )
 
@@ -285,12 +280,10 @@ type PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency string
 
 // List of values that PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency can take
 const (
-	PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrencyOusd        PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency = "ousd"
 	PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrencyPhantomCash PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency = "phantom_cash"
 	PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrencyUsdc        PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency = "usdc"
 	PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrencyUsdg        PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency = "usdg"
 	PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrencyUsdp        PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency = "usdp"
-	PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrencyUsdsui      PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency = "usdsui"
 	PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrencyUsdt        PaymentAttemptRecordPaymentMethodDetailsCryptoTokenCurrency = "usdt"
 )
 
@@ -338,7 +331,7 @@ const (
 	PaymentAttemptRecordPaymentMethodDetailsFPXAccountHolderTypeIndividual PaymentAttemptRecordPaymentMethodDetailsFPXAccountHolderType = "individual"
 )
 
-// The customer's bank. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bnp_paribas`, `bank_rakyat`, `bsn`, `cimb`, `citibank`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `mbsb_bank`, `pb_enterprise`, or `bank_of_china`.
+// The customer's bank. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bank_rakyat`, `bsn`, `cimb`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `pb_enterprise`, or `bank_of_china`.
 type PaymentAttemptRecordPaymentMethodDetailsFPXBank string
 
 // List of values that PaymentAttemptRecordPaymentMethodDetailsFPXBank can take
@@ -351,17 +344,14 @@ const (
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankBankMuamalat      PaymentAttemptRecordPaymentMethodDetailsFPXBank = "bank_muamalat"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankBankOfChina       PaymentAttemptRecordPaymentMethodDetailsFPXBank = "bank_of_china"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankBankRakyat        PaymentAttemptRecordPaymentMethodDetailsFPXBank = "bank_rakyat"
-	PaymentAttemptRecordPaymentMethodDetailsFPXBankBnpParibas        PaymentAttemptRecordPaymentMethodDetailsFPXBank = "bnp_paribas"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankBsn               PaymentAttemptRecordPaymentMethodDetailsFPXBank = "bsn"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankCimb              PaymentAttemptRecordPaymentMethodDetailsFPXBank = "cimb"
-	PaymentAttemptRecordPaymentMethodDetailsFPXBankCitibank          PaymentAttemptRecordPaymentMethodDetailsFPXBank = "citibank"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankDeutscheBank      PaymentAttemptRecordPaymentMethodDetailsFPXBank = "deutsche_bank"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankHongLeongBank     PaymentAttemptRecordPaymentMethodDetailsFPXBank = "hong_leong_bank"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankHsbc              PaymentAttemptRecordPaymentMethodDetailsFPXBank = "hsbc"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankKfh               PaymentAttemptRecordPaymentMethodDetailsFPXBank = "kfh"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankMaybank2e         PaymentAttemptRecordPaymentMethodDetailsFPXBank = "maybank2e"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankMaybank2u         PaymentAttemptRecordPaymentMethodDetailsFPXBank = "maybank2u"
-	PaymentAttemptRecordPaymentMethodDetailsFPXBankMbsbBank          PaymentAttemptRecordPaymentMethodDetailsFPXBank = "mbsb_bank"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankOcbc              PaymentAttemptRecordPaymentMethodDetailsFPXBank = "ocbc"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankPbEnterprise      PaymentAttemptRecordPaymentMethodDetailsFPXBank = "pb_enterprise"
 	PaymentAttemptRecordPaymentMethodDetailsFPXBankPublicBank        PaymentAttemptRecordPaymentMethodDetailsFPXBank = "public_bank"
@@ -773,7 +763,7 @@ type PaymentAttemptRecordPaymentMethodDetailsAlma struct {
 	TransactionID string `json:"transaction_id"`
 }
 type PaymentAttemptRecordPaymentMethodDetailsAmazonPayFundingCard struct {
-	// Card brand. Can be `American Express`, `Cartes Bancaires`, `Diners Club`, `Discover`, `Eftpos Australia`, `Girocard`, `JCB`, `MasterCard`, `UnionPay`, `Visa`, or `Unknown`.
+	// Card brand. Can be `amex`, `cartes_bancaires`, `diners`, `discover`, `eftpos_au`, `jcb`, `link`, `mastercard`, `unionpay`, `visa` or `unknown`.
 	Brand string `json:"brand"`
 	// Two-letter ISO code representing the country of the card. You could use this attribute to get a sense of the international breakdown of cards you've collected.
 	Country string `json:"country"`
@@ -855,8 +845,6 @@ type PaymentAttemptRecordPaymentMethodDetailsBillingDetails struct {
 	Phone string `json:"phone"`
 }
 type PaymentAttemptRecordPaymentMethodDetailsBizum struct {
-	// A unique identifier for the buyer as determined by the local payment processor.
-	BuyerID string `json:"buyer_id"`
 	// The Bizum transaction ID associated with this payment.
 	TransactionID string `json:"transaction_id"`
 }
@@ -905,6 +893,8 @@ type PaymentAttemptRecordPaymentMethodDetailsCardNetworkToken struct {
 type PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecure struct {
 	// For authenticated transactions: Indicates how the issuing bank authenticated the customer.
 	AuthenticationFlow PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureAuthenticationFlow `json:"authentication_flow"`
+	// The 3D Secure cryptogram, also known as the "authentication value" (AAV, CAVV or AEVV).
+	Cryptogram string `json:"cryptogram"`
 	// The Electronic Commerce Indicator (ECI). A protocol-level field indicating what degree of authentication was performed.
 	ElectronicCommerceIndicator PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecureElectronicCommerceIndicator `json:"electronic_commerce_indicator"`
 	// The exemption requested via 3DS and accepted by the issuer at authentication time.
@@ -923,7 +913,6 @@ type PaymentAttemptRecordPaymentMethodDetailsCardWalletApplePay struct {
 	Type string `json:"type"`
 }
 type PaymentAttemptRecordPaymentMethodDetailsCardWalletGooglePay struct{}
-type PaymentAttemptRecordPaymentMethodDetailsCardWalletLink struct{}
 
 // If this Card is part of a card wallet, this contains the details of the card wallet.
 type PaymentAttemptRecordPaymentMethodDetailsCardWallet struct {
@@ -931,8 +920,7 @@ type PaymentAttemptRecordPaymentMethodDetailsCardWallet struct {
 	// (For tokenized numbers only.) The last four digits of the device account number.
 	DynamicLast4 string                                                       `json:"dynamic_last4,omitempty"`
 	GooglePay    *PaymentAttemptRecordPaymentMethodDetailsCardWalletGooglePay `json:"google_pay,omitempty"`
-	Link         *PaymentAttemptRecordPaymentMethodDetailsCardWalletLink      `json:"link,omitempty"`
-	// The type of the card wallet, one of `apple_pay`, `google_pay`, or `link`. An additional hash is included on the Wallet subhash with a name matching this value. It contains additional information specific to the card wallet type.
+	// The type of the card wallet, one of `apple_pay` or `google_pay`. An additional hash is included on the Wallet subhash with a name matching this value. It contains additional information specific to the card wallet type.
 	Type string `json:"type"`
 }
 
@@ -949,7 +937,7 @@ type PaymentAttemptRecordPaymentMethodDetailsCard struct {
 	// Two-letter ISO code representing the country of the card. You could use this attribute to get a sense of the international breakdown of cards you've collected.
 	Country string `json:"country"`
 	// A high-level description of the type of cards issued in this range.
-	Description string `json:"description,omitempty"`
+	Description string `json:"description"`
 	// Two-digit number representing the card's expiration month.
 	ExpMonth int64 `json:"exp_month"`
 	// Four-digit number representing the card's expiration year.
@@ -961,11 +949,11 @@ type PaymentAttemptRecordPaymentMethodDetailsCard struct {
 	// Card funding type. Can be `credit`, `debit`, `prepaid`, or `unknown`.
 	Funding PaymentAttemptRecordPaymentMethodDetailsCardFunding `json:"funding"`
 	// Issuer identification number of the card.
-	IIN string `json:"iin,omitempty"`
+	IIN string `json:"iin"`
 	// Installment details for this payment.
 	Installments *PaymentAttemptRecordPaymentMethodDetailsCardInstallments `json:"installments"`
 	// The name of the card's issuing bank.
-	Issuer string `json:"issuer,omitempty"`
+	Issuer string `json:"issuer"`
 	// The last four digits of the card.
 	Last4 string `json:"last4"`
 	// True if this payment was marked as MOTO and out of scope for SCA.
@@ -981,7 +969,7 @@ type PaymentAttemptRecordPaymentMethodDetailsCard struct {
 	// This is used by the financial networks to identify a transaction. Visa calls this the Transaction ID, Mastercard calls this the Trace ID, and American Express calls this the Acquirer Reference Data. This value will be present if it is returned by the financial network in the authorization response, and null otherwise.
 	NetworkTransactionID string `json:"network_transaction_id"`
 	// The transaction type that was passed for an off-session, Merchant-Initiated transaction, one of `recurring` or `unscheduled`.
-	StoredCredentialUsage PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsage `json:"stored_credential_usage,omitempty"`
+	StoredCredentialUsage PaymentAttemptRecordPaymentMethodDetailsCardStoredCredentialUsage `json:"stored_credential_usage"`
 	// Populated if this transaction used 3D Secure authentication.
 	ThreeDSecure *PaymentAttemptRecordPaymentMethodDetailsCardThreeDSecure `json:"three_d_secure"`
 	// If this Card is part of a card wallet, this contains the details of the card wallet.
@@ -1116,7 +1104,7 @@ type PaymentAttemptRecordPaymentMethodDetailsEPS struct {
 type PaymentAttemptRecordPaymentMethodDetailsFPX struct {
 	// Account holder type, if provided. Can be one of `individual` or `company`.
 	AccountHolderType PaymentAttemptRecordPaymentMethodDetailsFPXAccountHolderType `json:"account_holder_type"`
-	// The customer's bank. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bnp_paribas`, `bank_rakyat`, `bsn`, `cimb`, `citibank`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `mbsb_bank`, `pb_enterprise`, or `bank_of_china`.
+	// The customer's bank. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bank_rakyat`, `bsn`, `cimb`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `pb_enterprise`, or `bank_of_china`.
 	Bank PaymentAttemptRecordPaymentMethodDetailsFPXBank `json:"bank"`
 	// Unique transaction id generated by FPX for every request from the merchant
 	TransactionID string `json:"transaction_id"`
@@ -1270,8 +1258,6 @@ type PaymentAttemptRecordPaymentMethodDetailsKrCard struct {
 type PaymentAttemptRecordPaymentMethodDetailsLink struct {
 	// Two-letter ISO code representing the funding source country beneath the Link payment. You could use this attribute to get a sense of international fees.
 	Country string `json:"country"`
-	// The [funding source group code](https://docs.stripe.com/payments/link/link-payment-methods) applied to this Link payment at confirmation time.
-	FundingSourceGroup string `json:"funding_source_group,omitempty"`
 }
 type PaymentAttemptRecordPaymentMethodDetailsMbWay struct{}
 
@@ -1291,12 +1277,6 @@ type PaymentAttemptRecordPaymentMethodDetailsMobilepayCard struct {
 type PaymentAttemptRecordPaymentMethodDetailsMobilepay struct {
 	// Internal card details
 	Card *PaymentAttemptRecordPaymentMethodDetailsMobilepayCard `json:"card"`
-}
-type PaymentAttemptRecordPaymentMethodDetailsMomo struct {
-	// Uniquely identifies this particular MoMo account. You can use this attribute to check whether two MoMo accounts are the same.
-	Fingerprint string `json:"fingerprint"`
-	// ID of the multi-use Mandate created by, or used to make, this MoMo payment.
-	Mandate string `json:"mandate,omitempty"`
 }
 type PaymentAttemptRecordPaymentMethodDetailsMultibanco struct {
 	// Entity number associated with this Multibanco payment.
@@ -1377,7 +1357,6 @@ type PaymentAttemptRecordPaymentMethodDetailsPaypal struct {
 	// A unique ID generated by PayPal for this transaction.
 	TransactionID string `json:"transaction_id"`
 }
-type PaymentAttemptRecordPaymentMethodDetailsPaypay struct{}
 type PaymentAttemptRecordPaymentMethodDetailsPayto struct {
 	// Bank-State-Branch number of the bank account.
 	BSBNumber string `json:"bsb_number"`
@@ -1391,7 +1370,7 @@ type PaymentAttemptRecordPaymentMethodDetailsPayto struct {
 type PaymentAttemptRecordPaymentMethodDetailsPix struct {
 	// Unique transaction id generated by BCB
 	BankTransactionID string `json:"bank_transaction_id,omitempty"`
-	// ID of the multi use Mandate generated by the PaymentIntent or SetupIntent.
+	// ID of the multi use Mandate generated by the PaymentIntent
 	Mandate string `json:"mandate,omitempty"`
 }
 type PaymentAttemptRecordPaymentMethodDetailsPromptPay struct {
@@ -1460,10 +1439,6 @@ type PaymentAttemptRecordPaymentMethodDetailsSEPADebit struct {
 	// Find the ID of the mandate used for this payment under the [payment_method_details.sepa_debit.mandate](https://docs.stripe.com/api/charges/object#charge_object-payment_method_details-sepa_debit-mandate) property on the Charge. Use this mandate ID to [retrieve the Mandate](https://docs.stripe.com/api/mandates/retrieve).
 	Mandate string `json:"mandate"`
 }
-type PaymentAttemptRecordPaymentMethodDetailsSequra struct {
-	// The SeQura transaction ID associated with this payment.
-	TransactionID string `json:"transaction_id"`
-}
 type PaymentAttemptRecordPaymentMethodDetailsSofort struct {
 	// Bank code of bank associated with the bank account.
 	BankCode string `json:"bank_code"`
@@ -1498,7 +1473,7 @@ type PaymentAttemptRecordPaymentMethodDetailsSwish struct {
 	VerifiedPhoneLast4 string `json:"verified_phone_last4"`
 }
 type PaymentAttemptRecordPaymentMethodDetailsTWINT struct {
-	// ID of the multi use Mandate generated by the PaymentIntent or SetupIntent.
+	// ID of the multi use Mandate generated by the PaymentIntent
 	Mandate string `json:"mandate,omitempty"`
 }
 type PaymentAttemptRecordPaymentMethodDetailsUpi struct {
@@ -1580,7 +1555,6 @@ type PaymentAttemptRecordPaymentMethodDetails struct {
 	Link            *PaymentAttemptRecordPaymentMethodDetailsLink            `json:"link,omitempty"`
 	MbWay           *PaymentAttemptRecordPaymentMethodDetailsMbWay           `json:"mb_way,omitempty"`
 	Mobilepay       *PaymentAttemptRecordPaymentMethodDetailsMobilepay       `json:"mobilepay,omitempty"`
-	Momo            *PaymentAttemptRecordPaymentMethodDetailsMomo            `json:"momo,omitempty"`
 	Multibanco      *PaymentAttemptRecordPaymentMethodDetailsMultibanco      `json:"multibanco,omitempty"`
 	NaverPay        *PaymentAttemptRecordPaymentMethodDetailsNaverPay        `json:"naver_pay,omitempty"`
 	NzBankAccount   *PaymentAttemptRecordPaymentMethodDetailsNzBankAccount   `json:"nz_bank_account,omitempty"`
@@ -1592,7 +1566,6 @@ type PaymentAttemptRecordPaymentMethodDetails struct {
 	PaymentMethod      string                                                      `json:"payment_method"`
 	PayNow             *PaymentAttemptRecordPaymentMethodDetailsPayNow             `json:"paynow,omitempty"`
 	Paypal             *PaymentAttemptRecordPaymentMethodDetailsPaypal             `json:"paypal,omitempty"`
-	Paypay             *PaymentAttemptRecordPaymentMethodDetailsPaypay             `json:"paypay,omitempty"`
 	Payto              *PaymentAttemptRecordPaymentMethodDetailsPayto              `json:"payto,omitempty"`
 	Pix                *PaymentAttemptRecordPaymentMethodDetailsPix                `json:"pix,omitempty"`
 	PromptPay          *PaymentAttemptRecordPaymentMethodDetailsPromptPay          `json:"promptpay,omitempty"`
@@ -1602,7 +1575,6 @@ type PaymentAttemptRecordPaymentMethodDetails struct {
 	Scalapay           *PaymentAttemptRecordPaymentMethodDetailsScalapay           `json:"scalapay,omitempty"`
 	SEPACreditTransfer *PaymentAttemptRecordPaymentMethodDetailsSEPACreditTransfer `json:"sepa_credit_transfer,omitempty"`
 	SEPADebit          *PaymentAttemptRecordPaymentMethodDetailsSEPADebit          `json:"sepa_debit,omitempty"`
-	Sequra             *PaymentAttemptRecordPaymentMethodDetailsSequra             `json:"sequra,omitempty"`
 	Sofort             *PaymentAttemptRecordPaymentMethodDetailsSofort             `json:"sofort,omitempty"`
 	StripeAccount      *PaymentAttemptRecordPaymentMethodDetailsStripeAccount      `json:"stripe_account,omitempty"`
 	Sunbit             *PaymentAttemptRecordPaymentMethodDetailsSunbit             `json:"sunbit,omitempty"`

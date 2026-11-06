@@ -10,7 +10,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/stripe/stripe-go/v87/form"
+	"github.com/stripe/stripe-go/v86/form"
 )
 
 // v1PersonService is used to invoke /v1/accounts/{account}/persons APIs.
@@ -57,7 +57,7 @@ func (c v1PersonService) Update(ctx context.Context, id string, params *PersonUp
 	return person, err
 }
 
-// Deletes an existing person's relationship to the account's legal entity. Any person with a relationship for an account can be deleted through the API, except if the person is the representative. If your integration is using the executive parameter, you cannot delete the only verified executive on file.
+// Deletes an existing person's relationship to the account's legal entity. Any person with a relationship for an account can be deleted through the API, except if the person is the account_opener. If your integration is using the executive parameter, you cannot delete the only verified executive on file.
 func (c v1PersonService) Delete(ctx context.Context, id string, params *PersonDeleteParams) (*Person, error) {
 	if params == nil {
 		params = &PersonDeleteParams{}

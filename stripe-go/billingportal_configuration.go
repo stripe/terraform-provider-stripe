@@ -55,26 +55,6 @@ const (
 	BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehaviorNone             BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehavior = "none"
 )
 
-// Specifies the pause duration unit. Either `day`, `week`, `month`, or `year`.
-type BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionInterval string
-
-// List of values that BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionInterval can take
-const (
-	BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionIntervalDay   BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionInterval = "day"
-	BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionIntervalMonth BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionInterval = "month"
-	BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionIntervalWeek  BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionInterval = "week"
-	BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionIntervalYear  BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionInterval = "year"
-)
-
-// Whether subscriptions can be paused indefinitely or for a preset duration.
-type BillingPortalConfigurationFeaturesSubscriptionPauseDurationType string
-
-// List of values that BillingPortalConfigurationFeaturesSubscriptionPauseDurationType can take
-const (
-	BillingPortalConfigurationFeaturesSubscriptionPauseDurationTypeIndefinite      BillingPortalConfigurationFeaturesSubscriptionPauseDurationType = "indefinite"
-	BillingPortalConfigurationFeaturesSubscriptionPauseDurationTypeIntervalOptions BillingPortalConfigurationFeaturesSubscriptionPauseDurationType = "interval_options"
-)
-
 // Determines the value to use for the billing cycle anchor on subscription updates. Valid values are `now` or `unchanged`, and the default value is `unchanged`. Setting the value to `now` resets the subscription's billing cycle anchor to the current time (in UTC). For more information, see the billing cycle [documentation](https://docs.stripe.com/billing/subscriptions/billing-cycle).
 type BillingPortalConfigurationFeaturesSubscriptionUpdateBillingCycleAnchor string
 
@@ -215,8 +195,6 @@ func (p *BillingPortalConfigurationFeaturesPaymentMethodUpdateParams) AddUnsetFi
 type BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParams struct {
 	// Whether the feature is enabled.
 	Enabled *bool `form:"enabled" json:"enabled"`
-	// The IDs of custom feedback options to use for this cancellation reason.
-	FeedbackOptions []*string `form:"feedback_options" json:"feedback_options,omitempty"`
 	// Which cancellation reasons will be given as options to the customer.
 	Options     []*string                                                                                `form:"options" json:"options,omitempty"`
 	UnsetFields []BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField `form:"-" json:"-"`
@@ -226,8 +204,7 @@ type BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParam
 type BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField string
 
 const (
-	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldFeedbackOptions BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "feedback_options"
-	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions         BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
+	BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -245,43 +222,6 @@ type BillingPortalConfigurationFeaturesSubscriptionCancelParams struct {
 	Mode *string `form:"mode" json:"mode,omitempty"`
 	// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`, which is only compatible with `mode=immediately`. Passing `always_invoice` will result in an error. No prorations are generated when canceling a subscription at the end of its natural billing period.
 	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-}
-
-// The preset pause durations customers can choose from. Required when `type` is `interval_options`.
-type BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionParams struct {
-	// Specifies the pause duration unit. Either `day`, `week`, `month`, or `year`.
-	Interval *string `form:"interval" json:"interval"`
-	// The number of intervals in the pause duration. Defaults to 1. The maximum duration is three years.
-	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
-}
-
-// Controls how long a subscription can be paused. Defaults to `interval_options` with a single one-month option.
-type BillingPortalConfigurationFeaturesSubscriptionPauseDurationParams struct {
-	// The preset pause durations customers can choose from. Required when `type` is `interval_options`.
-	IntervalOptions []*BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionParams `form:"interval_options" json:"interval_options,omitempty"`
-	// Whether subscriptions can be paused indefinitely or for a preset duration.
-	Type        *string                                                                       `form:"type" json:"type"`
-	UnsetFields []BillingPortalConfigurationFeaturesSubscriptionPauseDurationParamsUnsetField `form:"-" json:"-"`
-}
-
-// BillingPortalConfigurationFeaturesSubscriptionPauseDurationParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationFeaturesSubscriptionPauseDurationParams.
-type BillingPortalConfigurationFeaturesSubscriptionPauseDurationParamsUnsetField string
-
-const (
-	BillingPortalConfigurationFeaturesSubscriptionPauseDurationParamsUnsetFieldIntervalOptions BillingPortalConfigurationFeaturesSubscriptionPauseDurationParamsUnsetField = "interval_options"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *BillingPortalConfigurationFeaturesSubscriptionPauseDurationParams) AddUnsetField(field BillingPortalConfigurationFeaturesSubscriptionPauseDurationParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
-}
-
-// Information about pausing subscriptions in the portal.
-type BillingPortalConfigurationFeaturesSubscriptionPauseParams struct {
-	// Controls how long a subscription can be paused. Defaults to `interval_options` with a single one-month option.
-	Duration *BillingPortalConfigurationFeaturesSubscriptionPauseDurationParams `form:"duration" json:"duration,omitempty"`
-	// Whether the feature is enabled. Customers can only pause subscriptions in the [redesigned customer portal](https://docs.stripe.com/customer-management).
-	Enabled *bool `form:"enabled" json:"enabled,omitempty"`
 }
 
 // Control whether the quantity of the product can be adjusted.
@@ -371,8 +311,6 @@ type BillingPortalConfigurationFeaturesParams struct {
 	PaymentMethodUpdate *BillingPortalConfigurationFeaturesPaymentMethodUpdateParams `form:"payment_method_update" json:"payment_method_update,omitempty"`
 	// Information about canceling subscriptions in the portal.
 	SubscriptionCancel *BillingPortalConfigurationFeaturesSubscriptionCancelParams `form:"subscription_cancel" json:"subscription_cancel,omitempty"`
-	// Information about pausing subscriptions in the portal.
-	SubscriptionPause *BillingPortalConfigurationFeaturesSubscriptionPauseParams `form:"subscription_pause" json:"subscription_pause,omitempty"`
 	// Information about updating subscriptions in the portal.
 	SubscriptionUpdate *BillingPortalConfigurationFeaturesSubscriptionUpdateParams `form:"subscription_update" json:"subscription_update,omitempty"`
 }
@@ -392,7 +330,7 @@ type BillingPortalConfigurationParams struct {
 	Active *bool `form:"active" json:"active,omitempty"`
 	// The business information shown to customers in the portal.
 	BusinessProfile *BillingPortalConfigurationBusinessProfileParams `form:"business_profile" json:"business_profile,omitempty"`
-	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overridden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
+	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
 	DefaultReturnURL *string `form:"default_return_url" json:"default_return_url,omitempty"`
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
@@ -510,8 +448,6 @@ func (p *BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParams) AddU
 type BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParams struct {
 	// Whether the feature is enabled.
 	Enabled *bool `form:"enabled" json:"enabled"`
-	// The IDs of custom feedback options to use for this cancellation reason.
-	FeedbackOptions []*string `form:"feedback_options" json:"feedback_options,omitempty"`
 	// Which cancellation reasons will be given as options to the customer.
 	Options     []*string                                                                                      `form:"options" json:"options"`
 	UnsetFields []BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField `form:"-" json:"-"`
@@ -521,8 +457,7 @@ type BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReaso
 type BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField string
 
 const (
-	BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldFeedbackOptions BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "feedback_options"
-	BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions         BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
+	BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions BillingPortalConfigurationCreateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -540,43 +475,6 @@ type BillingPortalConfigurationCreateFeaturesSubscriptionCancelParams struct {
 	Mode *string `form:"mode" json:"mode,omitempty"`
 	// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`, which is only compatible with `mode=immediately`. Passing `always_invoice` will result in an error. No prorations are generated when canceling a subscription at the end of its natural billing period.
 	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-}
-
-// The preset pause durations customers can choose from. Required when `type` is `interval_options`.
-type BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationIntervalOptionParams struct {
-	// Specifies the pause duration unit. Either `day`, `week`, `month`, or `year`.
-	Interval *string `form:"interval" json:"interval"`
-	// The number of intervals in the pause duration. Defaults to 1. The maximum duration is three years.
-	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
-}
-
-// Controls how long a subscription can be paused. Defaults to `interval_options` with a single one-month option.
-type BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParams struct {
-	// The preset pause durations customers can choose from. Required when `type` is `interval_options`.
-	IntervalOptions []*BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationIntervalOptionParams `form:"interval_options" json:"interval_options,omitempty"`
-	// Whether subscriptions can be paused indefinitely or for a preset duration.
-	Type        *string                                                                             `form:"type" json:"type"`
-	UnsetFields []BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParamsUnsetField `form:"-" json:"-"`
-}
-
-// BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParams.
-type BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParamsUnsetField string
-
-const (
-	BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParamsUnsetFieldIntervalOptions BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParamsUnsetField = "interval_options"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParams) AddUnsetField(field BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
-}
-
-// Information about pausing subscriptions in the portal.
-type BillingPortalConfigurationCreateFeaturesSubscriptionPauseParams struct {
-	// Controls how long a subscription can be paused. Defaults to `interval_options` with a single one-month option.
-	Duration *BillingPortalConfigurationCreateFeaturesSubscriptionPauseDurationParams `form:"duration" json:"duration,omitempty"`
-	// Whether the feature is enabled. Customers can only pause subscriptions in the [redesigned customer portal](https://docs.stripe.com/customer-management).
-	Enabled *bool `form:"enabled" json:"enabled,omitempty"`
 }
 
 // Control whether the quantity of the product can be adjusted.
@@ -653,8 +551,6 @@ type BillingPortalConfigurationCreateFeaturesParams struct {
 	PaymentMethodUpdate *BillingPortalConfigurationCreateFeaturesPaymentMethodUpdateParams `form:"payment_method_update" json:"payment_method_update,omitempty"`
 	// Information about canceling subscriptions in the portal.
 	SubscriptionCancel *BillingPortalConfigurationCreateFeaturesSubscriptionCancelParams `form:"subscription_cancel" json:"subscription_cancel,omitempty"`
-	// Information about pausing subscriptions in the portal.
-	SubscriptionPause *BillingPortalConfigurationCreateFeaturesSubscriptionPauseParams `form:"subscription_pause" json:"subscription_pause,omitempty"`
 	// Information about updating subscriptions in the portal.
 	SubscriptionUpdate *BillingPortalConfigurationCreateFeaturesSubscriptionUpdateParams `form:"subscription_update" json:"subscription_update,omitempty"`
 }
@@ -670,7 +566,7 @@ type BillingPortalConfigurationCreateParams struct {
 	Params `form:"*"`
 	// The business information shown to customers in the portal.
 	BusinessProfile *BillingPortalConfigurationCreateBusinessProfileParams `form:"business_profile" json:"business_profile,omitempty"`
-	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overridden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
+	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
 	DefaultReturnURL *string `form:"default_return_url" json:"default_return_url,omitempty"`
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
@@ -801,8 +697,6 @@ func (p *BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParams) AddU
 type BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParams struct {
 	// Whether the feature is enabled.
 	Enabled *bool `form:"enabled" json:"enabled"`
-	// The IDs of custom feedback options to use for this cancellation reason.
-	FeedbackOptions []*string `form:"feedback_options" json:"feedback_options,omitempty"`
 	// Which cancellation reasons will be given as options to the customer.
 	Options     []*string                                                                                      `form:"options" json:"options,omitempty"`
 	UnsetFields []BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField `form:"-" json:"-"`
@@ -812,8 +706,7 @@ type BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReaso
 type BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField string
 
 const (
-	BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldFeedbackOptions BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "feedback_options"
-	BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions         BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
+	BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetFieldOptions BillingPortalConfigurationUpdateFeaturesSubscriptionCancelCancellationReasonParamsUnsetField = "options"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -831,43 +724,6 @@ type BillingPortalConfigurationUpdateFeaturesSubscriptionCancelParams struct {
 	Mode *string `form:"mode" json:"mode,omitempty"`
 	// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`, which is only compatible with `mode=immediately`. Passing `always_invoice` will result in an error. No prorations are generated when canceling a subscription at the end of its natural billing period.
 	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-}
-
-// The preset pause durations customers can choose from. Required when `type` is `interval_options`.
-type BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationIntervalOptionParams struct {
-	// Specifies the pause duration unit. Either `day`, `week`, `month`, or `year`.
-	Interval *string `form:"interval" json:"interval"`
-	// The number of intervals in the pause duration. Defaults to 1. The maximum duration is three years.
-	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
-}
-
-// Controls how long a subscription can be paused. Defaults to `interval_options` with a single one-month option.
-type BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParams struct {
-	// The preset pause durations customers can choose from. Required when `type` is `interval_options`.
-	IntervalOptions []*BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationIntervalOptionParams `form:"interval_options" json:"interval_options,omitempty"`
-	// Whether subscriptions can be paused indefinitely or for a preset duration.
-	Type        *string                                                                             `form:"type" json:"type"`
-	UnsetFields []BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParamsUnsetField `form:"-" json:"-"`
-}
-
-// BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParamsUnsetField is the list of fields that can be cleared/unset on BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParams.
-type BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParamsUnsetField string
-
-const (
-	BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParamsUnsetFieldIntervalOptions BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParamsUnsetField = "interval_options"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParams) AddUnsetField(field BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
-}
-
-// Information about pausing subscriptions in the portal.
-type BillingPortalConfigurationUpdateFeaturesSubscriptionPauseParams struct {
-	// Controls how long a subscription can be paused. Defaults to `interval_options` with a single one-month option.
-	Duration *BillingPortalConfigurationUpdateFeaturesSubscriptionPauseDurationParams `form:"duration" json:"duration,omitempty"`
-	// Whether the feature is enabled. Customers can only pause subscriptions in the [redesigned customer portal](https://docs.stripe.com/customer-management).
-	Enabled *bool `form:"enabled" json:"enabled,omitempty"`
 }
 
 // Control whether the quantity of the product can be adjusted.
@@ -957,8 +813,6 @@ type BillingPortalConfigurationUpdateFeaturesParams struct {
 	PaymentMethodUpdate *BillingPortalConfigurationUpdateFeaturesPaymentMethodUpdateParams `form:"payment_method_update" json:"payment_method_update,omitempty"`
 	// Information about canceling subscriptions in the portal.
 	SubscriptionCancel *BillingPortalConfigurationUpdateFeaturesSubscriptionCancelParams `form:"subscription_cancel" json:"subscription_cancel,omitempty"`
-	// Information about pausing subscriptions in the portal.
-	SubscriptionPause *BillingPortalConfigurationUpdateFeaturesSubscriptionPauseParams `form:"subscription_pause" json:"subscription_pause,omitempty"`
 	// Information about updating subscriptions in the portal.
 	SubscriptionUpdate *BillingPortalConfigurationUpdateFeaturesSubscriptionUpdateParams `form:"subscription_update" json:"subscription_update,omitempty"`
 }
@@ -978,7 +832,7 @@ type BillingPortalConfigurationUpdateParams struct {
 	Active *bool `form:"active" json:"active,omitempty"`
 	// The business information shown to customers in the portal.
 	BusinessProfile *BillingPortalConfigurationUpdateBusinessProfileParams `form:"business_profile" json:"business_profile,omitempty"`
-	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overridden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
+	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
 	DefaultReturnURL *string `form:"default_return_url" json:"default_return_url,omitempty"`
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
@@ -1048,8 +902,6 @@ type BillingPortalConfigurationFeaturesPaymentMethodUpdate struct {
 type BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReason struct {
 	// Whether the feature is enabled.
 	Enabled bool `json:"enabled"`
-	// The IDs of custom feedback options configured for this cancellation reason.
-	FeedbackOptions []*BillingFeedbackOption `json:"feedback_options"`
 	// Which cancellation reasons will be given as options to the customer.
 	Options []BillingPortalConfigurationFeaturesSubscriptionCancelCancellationReasonOption `json:"options"`
 }
@@ -1061,25 +913,6 @@ type BillingPortalConfigurationFeaturesSubscriptionCancel struct {
 	Mode BillingPortalConfigurationFeaturesSubscriptionCancelMode `json:"mode"`
 	// Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`.
 	ProrationBehavior BillingPortalConfigurationFeaturesSubscriptionCancelProrationBehavior `json:"proration_behavior"`
-}
-
-// The preset pause durations customers can choose from.
-type BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOption struct {
-	// Specifies the pause duration unit. Either `day`, `week`, `month`, or `year`.
-	Interval BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOptionInterval `json:"interval"`
-	// The number of intervals in the pause duration. The maximum duration is three years.
-	IntervalCount int64 `json:"interval_count"`
-}
-type BillingPortalConfigurationFeaturesSubscriptionPauseDuration struct {
-	// The preset pause durations customers can choose from.
-	IntervalOptions []*BillingPortalConfigurationFeaturesSubscriptionPauseDurationIntervalOption `json:"interval_options"`
-	// Whether subscriptions can be paused indefinitely or for a preset duration.
-	Type BillingPortalConfigurationFeaturesSubscriptionPauseDurationType `json:"type"`
-}
-type BillingPortalConfigurationFeaturesSubscriptionPause struct {
-	Duration *BillingPortalConfigurationFeaturesSubscriptionPauseDuration `json:"duration"`
-	// Whether the feature is enabled. Customers can only pause subscriptions in the [redesigned customer portal](https://docs.stripe.com/customer-management).
-	Enabled bool `json:"enabled"`
 }
 type BillingPortalConfigurationFeaturesSubscriptionUpdateProductAdjustableQuantity struct {
 	// If true, the quantity can be adjusted to any non-negative integer.
@@ -1128,7 +961,6 @@ type BillingPortalConfigurationFeatures struct {
 	InvoiceHistory      *BillingPortalConfigurationFeaturesInvoiceHistory      `json:"invoice_history"`
 	PaymentMethodUpdate *BillingPortalConfigurationFeaturesPaymentMethodUpdate `json:"payment_method_update"`
 	SubscriptionCancel  *BillingPortalConfigurationFeaturesSubscriptionCancel  `json:"subscription_cancel"`
-	SubscriptionPause   *BillingPortalConfigurationFeaturesSubscriptionPause   `json:"subscription_pause"`
 	SubscriptionUpdate  *BillingPortalConfigurationFeaturesSubscriptionUpdate  `json:"subscription_update"`
 }
 type BillingPortalConfigurationLoginPage struct {
@@ -1150,7 +982,7 @@ type BillingPortalConfiguration struct {
 	BusinessProfile *BillingPortalConfigurationBusinessProfile `json:"business_profile"`
 	// Time at which the object was created. Measured in seconds since the Unix epoch.
 	Created int64 `json:"created"`
-	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overridden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
+	// The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.
 	DefaultReturnURL string                              `json:"default_return_url"`
 	Features         *BillingPortalConfigurationFeatures `json:"features"`
 	// Unique identifier for the object.

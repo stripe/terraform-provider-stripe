@@ -3,10 +3,9 @@ package plan
 import (
 	"testing"
 
-	"github.com/shopspring/decimal"
 	assert "github.com/stretchr/testify/require"
-	stripe "github.com/stripe/stripe-go/v87"
-	_ "github.com/stripe/stripe-go/v87/testing"
+	stripe "github.com/stripe/stripe-go/v86"
+	_ "github.com/stripe/stripe-go/v86/testing"
 )
 
 func TestPlanDel(t *testing.T) {
@@ -33,7 +32,7 @@ func TestPlanList(t *testing.T) {
 
 func TestPlanNew(t *testing.T) {
 	plan, err := New(&stripe.PlanParams{
-		AmountDecimal: stripe.Pointer(decimal.RequireFromString("0.0123456789")),
+		AmountDecimal: stripe.Float64(0.0123456789),
 		BillingScheme: stripe.String(string(stripe.PlanBillingSchemeTiered)),
 		Currency:      stripe.String(string(stripe.CurrencyUSD)),
 		ID:            stripe.String("sapphire-elite"),

@@ -25,7 +25,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"reflect"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ resource.Resource = &PaymentLinkResource{}
@@ -170,13 +170,13 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:      true,
 				Computed:      true,
 				Description:   "The amount of the application fee (if any) that will be requested to be applied to the payment and transferred to the application owner's Stripe account.",
-				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
 			},
 			"application_fee_percent": schema.Float64Attribute{
 				Optional:      true,
 				Computed:      true,
 				Description:   "This represents the percentage of the subscription invoice total that will be transferred to the application owner's Stripe account.",
-				PlanModifiers: []planmodifier.Float64{float64planmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Float64{float64planmodifier.UseStateForUnknown(), float64planmodifier.RequiresReplace()},
 			},
 			"automatic_tax": schema.SingleNestedAttribute{
 				Optional: true,
@@ -220,18 +220,19 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:      true,
 				Computed:      true,
 				Description:   "When set, provides configuration to gather active consent from customers.",
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
 				Attributes: map[string]schema.Attribute{
 					"payment_method_reuse_agreement": schema.SingleNestedAttribute{
 						Optional:      true,
 						Computed:      true,
 						Description:   "Settings related to the payment method reuse text shown in the Checkout UI.",
-						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
 						Attributes: map[string]schema.Attribute{
 							"position": schema.StringAttribute{
-								Required:    true,
-								Description: "Determines the position and visibility of the payment method reuse agreement in the UI. When set to `auto`, Stripe's defaults will be used.\n\nWhen set to `hidden`, the payment method reuse agreement text will always be hidden in the UI.",
-								Validators:  []validator.String{stringvalidator.OneOf("auto", "hidden")},
+								Required:      true,
+								Description:   "Determines the position and visibility of the payment method reuse agreement in the UI. When set to `auto`, Stripe's defaults will be used.\n\nWhen set to `hidden`, the payment method reuse agreement text will always be hidden in the UI.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+								Validators:    []validator.String{stringvalidator.OneOf("auto", "hidden")},
 							},
 						},
 					},
@@ -239,14 +240,14 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 						Optional:      true,
 						Computed:      true,
 						Description:   "If set to `auto`, enables the collection of customer consent for promotional communications.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 						Validators:    []validator.String{stringvalidator.OneOf("auto", "none")},
 					},
 					"terms_of_service": schema.StringAttribute{
 						Optional:      true,
 						Computed:      true,
 						Description:   "If set to `required`, it requires cutomers to accept the terms of service before being able to pay. If set to `none`, customers won't be shown a checkbox to accept the terms of service.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 						Validators:    []validator.String{stringvalidator.OneOf("none", "required")},
 					},
 				},
@@ -260,7 +261,7 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 			"custom_fields": schema.ListNestedAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.",
+				Description:   "Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.",
 				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -304,7 +305,7 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 							Attributes: map[string]schema.Attribute{
 								"custom": schema.StringAttribute{
 									Required:    true,
-									Description: "Custom text for the label, displayed to the customer. Up to 100 characters.",
+									Description: "Custom text for the label, displayed to the customer. Up to 50 characters.",
 								},
 								"type": schema.StringAttribute{
 									Required:    true,
@@ -648,26 +649,6 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 											Description:   "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
 											PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 										},
-										"tax_details": schema.SingleNestedAttribute{
-											Optional:      true,
-											Computed:      true,
-											Description:   "Tax details for this product, including the [tax code](/tax/tax-codes) and an optional performance location.",
-											PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-											Attributes: map[string]schema.Attribute{
-												"performance_location": schema.StringAttribute{
-													Optional:      true,
-													Computed:      true,
-													Description:   "A tax location ID. Depending on the [tax code](/tax/tax-for-tickets/reference/tax-location-performance), this is required, optional, or not supported.",
-													PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-												},
-												"tax_code": schema.StringAttribute{
-													Optional:      true,
-													Computed:      true,
-													Description:   "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
-													PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-												},
-											},
-										},
 										"unit_label": schema.StringAttribute{
 											Optional:      true,
 											Computed:      true,
@@ -796,7 +777,7 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:      true,
 				Computed:      true,
 				Description:   "The account on behalf of which to charge. See the [Connect documentation](https://support.stripe.com/questions/sending-invoices-on-behalf-of-connected-accounts) for details.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"optional_items": schema.ListNestedAttribute{
 				Optional:      true,
@@ -868,7 +849,7 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 						Optional:      true,
 						Computed:      true,
 						Description:   "Indicates that you intend to make future payments with the payment method collected during checkout.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 						Validators:    []validator.String{stringvalidator.OneOf("off_session", "on_session")},
 					},
 					"statement_descriptor": schema.StringAttribute{
@@ -988,7 +969,7 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:      true,
 				Computed:      true,
 				Description:   "The shipping rate options applied to the session.",
-				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"shipping_amount": schema.Int64Attribute{
@@ -1000,7 +981,7 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 							Optional:      true,
 							Computed:      true,
 							Description:   "The ID of the Shipping Rate to use for this shipping option.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 						},
 					},
 				},
@@ -1030,43 +1011,6 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 
 						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 						Attributes: map[string]schema.Attribute{
-							"account_tax_ids": schema.ListAttribute{
-								Optional:      true,
-								Computed:      true,
-								Description:   "The account tax IDs associated with the subscription. Will be set on invoices generated by the subscription.",
-								PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-								ElementType:   types.StringType,
-							},
-							"custom_fields": schema.ListNestedAttribute{
-								Optional:      true,
-								Computed:      true,
-								Description:   "A list of up to 4 custom fields to be displayed on the invoice.",
-								PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-								NestedObject: schema.NestedAttributeObject{
-									Attributes: map[string]schema.Attribute{
-										"name": schema.StringAttribute{
-											Required:    true,
-											Description: "The name of the custom field.",
-										},
-										"value": schema.StringAttribute{
-											Required:    true,
-											Description: "The value of the custom field.",
-										},
-									},
-								},
-							},
-							"description": schema.StringAttribute{
-								Optional:      true,
-								Computed:      true,
-								Description:   "An arbitrary string attached to the object. Often useful for displaying to users.",
-								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-							},
-							"footer": schema.StringAttribute{
-								Optional:      true,
-								Computed:      true,
-								Description:   "Footer to be displayed on the invoice.",
-								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-							},
 							"issuer": schema.SingleNestedAttribute{
 								Optional: true,
 								Computed: true,
@@ -1145,17 +1089,18 @@ func (r *PaymentLinkResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:      true,
 				Computed:      true,
 				Description:   "The account (if any) the payments will be attributed to for tax reporting, and where funds from each payment will be transferred to.",
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
 				Attributes: map[string]schema.Attribute{
 					"amount": schema.Int64Attribute{
 						Optional:      true,
 						Computed:      true,
 						Description:   "The amount in cents (or local equivalent) that will be transferred to the destination account. By default, the entire amount is transferred to the destination.",
-						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown(), int64planmodifier.RequiresReplace()},
 					},
 					"destination": schema.StringAttribute{
-						Required:    true,
-						Description: "The connected account receiving the transfer.",
+						Required:      true,
+						Description:   "The connected account receiving the transfer.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 				},
 			},
@@ -1210,7 +1155,7 @@ func (r *PaymentLinkResource) Create(ctx context.Context, req resource.CreateReq
 		resp.Diagnostics.AddError("Error flattening PaymentLink create response", err.Error())
 		return
 	}
-	hydrateWriteOnlyPaths(&createdState, &config, [][]string{[]string{"LineItems", "*", "adjustable_quantity"}, []string{"LineItems", "*", "adjustable_quantity", "enabled"}, []string{"LineItems", "*", "adjustable_quantity", "maximum"}, []string{"LineItems", "*", "adjustable_quantity", "minimum"}, []string{"LineItems", "*", "price"}, []string{"LineItems", "*", "price_data"}, []string{"LineItems", "*", "price_data", "currency"}, []string{"LineItems", "*", "price_data", "product"}, []string{"LineItems", "*", "price_data", "product_data"}, []string{"LineItems", "*", "price_data", "product_data", "description"}, []string{"LineItems", "*", "price_data", "product_data", "images"}, []string{"LineItems", "*", "price_data", "product_data", "metadata"}, []string{"LineItems", "*", "price_data", "product_data", "name"}, []string{"LineItems", "*", "price_data", "product_data", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details", "performance_location"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "unit_label"}, []string{"LineItems", "*", "price_data", "recurring"}, []string{"LineItems", "*", "price_data", "recurring", "interval"}, []string{"LineItems", "*", "price_data", "recurring", "interval_count"}, []string{"LineItems", "*", "price_data", "tax_behavior"}, []string{"LineItems", "*", "price_data", "unit_amount"}, []string{"LineItems", "*", "price_data", "unit_amount_decimal"}})
+	hydrateWriteOnlyPaths(&createdState, &config, [][]string{[]string{"LineItems", "*", "adjustable_quantity"}, []string{"LineItems", "*", "adjustable_quantity", "enabled"}, []string{"LineItems", "*", "adjustable_quantity", "maximum"}, []string{"LineItems", "*", "adjustable_quantity", "minimum"}, []string{"LineItems", "*", "price"}, []string{"LineItems", "*", "price_data"}, []string{"LineItems", "*", "price_data", "currency"}, []string{"LineItems", "*", "price_data", "product"}, []string{"LineItems", "*", "price_data", "product_data"}, []string{"LineItems", "*", "price_data", "product_data", "description"}, []string{"LineItems", "*", "price_data", "product_data", "images"}, []string{"LineItems", "*", "price_data", "product_data", "metadata"}, []string{"LineItems", "*", "price_data", "product_data", "name"}, []string{"LineItems", "*", "price_data", "product_data", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "unit_label"}, []string{"LineItems", "*", "price_data", "recurring"}, []string{"LineItems", "*", "price_data", "recurring", "interval"}, []string{"LineItems", "*", "price_data", "recurring", "interval_count"}, []string{"LineItems", "*", "price_data", "tax_behavior"}, []string{"LineItems", "*", "price_data", "unit_amount"}, []string{"LineItems", "*", "price_data", "unit_amount_decimal"}})
 	normalizeUnknownValues(&createdState)
 
 	diffPlan := plan
@@ -1248,7 +1193,7 @@ func (r *PaymentLinkResource) Create(ctx context.Context, req resource.CreateReq
 		resp.Diagnostics.AddError("Error flattening PaymentLink create response", err.Error())
 		return
 	}
-	hydrateWriteOnlyPaths(&plan, &config, [][]string{[]string{"LineItems", "*", "adjustable_quantity"}, []string{"LineItems", "*", "adjustable_quantity", "enabled"}, []string{"LineItems", "*", "adjustable_quantity", "maximum"}, []string{"LineItems", "*", "adjustable_quantity", "minimum"}, []string{"LineItems", "*", "price"}, []string{"LineItems", "*", "price_data"}, []string{"LineItems", "*", "price_data", "currency"}, []string{"LineItems", "*", "price_data", "product"}, []string{"LineItems", "*", "price_data", "product_data"}, []string{"LineItems", "*", "price_data", "product_data", "description"}, []string{"LineItems", "*", "price_data", "product_data", "images"}, []string{"LineItems", "*", "price_data", "product_data", "metadata"}, []string{"LineItems", "*", "price_data", "product_data", "name"}, []string{"LineItems", "*", "price_data", "product_data", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details", "performance_location"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "unit_label"}, []string{"LineItems", "*", "price_data", "recurring"}, []string{"LineItems", "*", "price_data", "recurring", "interval"}, []string{"LineItems", "*", "price_data", "recurring", "interval_count"}, []string{"LineItems", "*", "price_data", "tax_behavior"}, []string{"LineItems", "*", "price_data", "unit_amount"}, []string{"LineItems", "*", "price_data", "unit_amount_decimal"}})
+	hydrateWriteOnlyPaths(&plan, &config, [][]string{[]string{"LineItems", "*", "adjustable_quantity"}, []string{"LineItems", "*", "adjustable_quantity", "enabled"}, []string{"LineItems", "*", "adjustable_quantity", "maximum"}, []string{"LineItems", "*", "adjustable_quantity", "minimum"}, []string{"LineItems", "*", "price"}, []string{"LineItems", "*", "price_data"}, []string{"LineItems", "*", "price_data", "currency"}, []string{"LineItems", "*", "price_data", "product"}, []string{"LineItems", "*", "price_data", "product_data"}, []string{"LineItems", "*", "price_data", "product_data", "description"}, []string{"LineItems", "*", "price_data", "product_data", "images"}, []string{"LineItems", "*", "price_data", "product_data", "metadata"}, []string{"LineItems", "*", "price_data", "product_data", "name"}, []string{"LineItems", "*", "price_data", "product_data", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "unit_label"}, []string{"LineItems", "*", "price_data", "recurring"}, []string{"LineItems", "*", "price_data", "recurring", "interval"}, []string{"LineItems", "*", "price_data", "recurring", "interval_count"}, []string{"LineItems", "*", "price_data", "tax_behavior"}, []string{"LineItems", "*", "price_data", "unit_amount"}, []string{"LineItems", "*", "price_data", "unit_amount_decimal"}})
 	clearWriteOnlyPaths(&plan, [][]string{[]string{"LineItems", "*", "quantity"}})
 	normalizeUnknownValues(&plan)
 	diags = resp.State.Set(ctx, plan)
@@ -1284,7 +1229,7 @@ func (r *PaymentLinkResource) Read(ctx context.Context, req resource.ReadRequest
 		resp.Diagnostics.AddError("Error flattening PaymentLink read response", err.Error())
 		return
 	}
-	hydrateWriteOnlyPaths(&state, &priorState, [][]string{[]string{"LineItems", "*", "adjustable_quantity"}, []string{"LineItems", "*", "adjustable_quantity", "enabled"}, []string{"LineItems", "*", "adjustable_quantity", "maximum"}, []string{"LineItems", "*", "adjustable_quantity", "minimum"}, []string{"LineItems", "*", "price"}, []string{"LineItems", "*", "price_data"}, []string{"LineItems", "*", "price_data", "currency"}, []string{"LineItems", "*", "price_data", "product"}, []string{"LineItems", "*", "price_data", "product_data"}, []string{"LineItems", "*", "price_data", "product_data", "description"}, []string{"LineItems", "*", "price_data", "product_data", "images"}, []string{"LineItems", "*", "price_data", "product_data", "metadata"}, []string{"LineItems", "*", "price_data", "product_data", "name"}, []string{"LineItems", "*", "price_data", "product_data", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details", "performance_location"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "unit_label"}, []string{"LineItems", "*", "price_data", "recurring"}, []string{"LineItems", "*", "price_data", "recurring", "interval"}, []string{"LineItems", "*", "price_data", "recurring", "interval_count"}, []string{"LineItems", "*", "price_data", "tax_behavior"}, []string{"LineItems", "*", "price_data", "unit_amount"}, []string{"LineItems", "*", "price_data", "unit_amount_decimal"}})
+	hydrateWriteOnlyPaths(&state, &priorState, [][]string{[]string{"LineItems", "*", "adjustable_quantity"}, []string{"LineItems", "*", "adjustable_quantity", "enabled"}, []string{"LineItems", "*", "adjustable_quantity", "maximum"}, []string{"LineItems", "*", "adjustable_quantity", "minimum"}, []string{"LineItems", "*", "price"}, []string{"LineItems", "*", "price_data"}, []string{"LineItems", "*", "price_data", "currency"}, []string{"LineItems", "*", "price_data", "product"}, []string{"LineItems", "*", "price_data", "product_data"}, []string{"LineItems", "*", "price_data", "product_data", "description"}, []string{"LineItems", "*", "price_data", "product_data", "images"}, []string{"LineItems", "*", "price_data", "product_data", "metadata"}, []string{"LineItems", "*", "price_data", "product_data", "name"}, []string{"LineItems", "*", "price_data", "product_data", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "unit_label"}, []string{"LineItems", "*", "price_data", "recurring"}, []string{"LineItems", "*", "price_data", "recurring", "interval"}, []string{"LineItems", "*", "price_data", "recurring", "interval_count"}, []string{"LineItems", "*", "price_data", "tax_behavior"}, []string{"LineItems", "*", "price_data", "unit_amount"}, []string{"LineItems", "*", "price_data", "unit_amount_decimal"}})
 	clearWriteOnlyPaths(&state, [][]string{[]string{"LineItems", "*", "quantity"}})
 	normalizeUnknownValues(&state)
 	diags = resp.State.Set(ctx, state)
@@ -1349,7 +1294,7 @@ func (r *PaymentLinkResource) Update(ctx context.Context, req resource.UpdateReq
 		resp.Diagnostics.AddError("Error flattening PaymentLink update response", err.Error())
 		return
 	}
-	hydrateWriteOnlyPaths(&plan, &config, [][]string{[]string{"LineItems", "*", "adjustable_quantity"}, []string{"LineItems", "*", "adjustable_quantity", "enabled"}, []string{"LineItems", "*", "adjustable_quantity", "maximum"}, []string{"LineItems", "*", "adjustable_quantity", "minimum"}, []string{"LineItems", "*", "price"}, []string{"LineItems", "*", "price_data"}, []string{"LineItems", "*", "price_data", "currency"}, []string{"LineItems", "*", "price_data", "product"}, []string{"LineItems", "*", "price_data", "product_data"}, []string{"LineItems", "*", "price_data", "product_data", "description"}, []string{"LineItems", "*", "price_data", "product_data", "images"}, []string{"LineItems", "*", "price_data", "product_data", "metadata"}, []string{"LineItems", "*", "price_data", "product_data", "name"}, []string{"LineItems", "*", "price_data", "product_data", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details", "performance_location"}, []string{"LineItems", "*", "price_data", "product_data", "tax_details", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "unit_label"}, []string{"LineItems", "*", "price_data", "recurring"}, []string{"LineItems", "*", "price_data", "recurring", "interval"}, []string{"LineItems", "*", "price_data", "recurring", "interval_count"}, []string{"LineItems", "*", "price_data", "tax_behavior"}, []string{"LineItems", "*", "price_data", "unit_amount"}, []string{"LineItems", "*", "price_data", "unit_amount_decimal"}})
+	hydrateWriteOnlyPaths(&plan, &config, [][]string{[]string{"LineItems", "*", "adjustable_quantity"}, []string{"LineItems", "*", "adjustable_quantity", "enabled"}, []string{"LineItems", "*", "adjustable_quantity", "maximum"}, []string{"LineItems", "*", "adjustable_quantity", "minimum"}, []string{"LineItems", "*", "price"}, []string{"LineItems", "*", "price_data"}, []string{"LineItems", "*", "price_data", "currency"}, []string{"LineItems", "*", "price_data", "product"}, []string{"LineItems", "*", "price_data", "product_data"}, []string{"LineItems", "*", "price_data", "product_data", "description"}, []string{"LineItems", "*", "price_data", "product_data", "images"}, []string{"LineItems", "*", "price_data", "product_data", "metadata"}, []string{"LineItems", "*", "price_data", "product_data", "name"}, []string{"LineItems", "*", "price_data", "product_data", "tax_code"}, []string{"LineItems", "*", "price_data", "product_data", "unit_label"}, []string{"LineItems", "*", "price_data", "recurring"}, []string{"LineItems", "*", "price_data", "recurring", "interval"}, []string{"LineItems", "*", "price_data", "recurring", "interval_count"}, []string{"LineItems", "*", "price_data", "tax_behavior"}, []string{"LineItems", "*", "price_data", "unit_amount"}, []string{"LineItems", "*", "price_data", "unit_amount_decimal"}})
 	clearWriteOnlyPaths(&plan, [][]string{[]string{"LineItems", "*", "quantity"}})
 	normalizeUnknownValues(&plan)
 	diags = resp.State.Set(ctx, plan)
@@ -1404,9 +1349,7 @@ func expandPaymentLinkCreate(plan PaymentLinkResourceModel) (*stripe.PaymentLink
 		params.ApplicationFeeAmount = stripe.Int64(plan.ApplicationFeeAmount.ValueInt64())
 	}
 	if !plan.ApplicationFeePercent.IsNull() && !plan.ApplicationFeePercent.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "ApplicationFeePercent", plan.ApplicationFeePercent) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "application_fee_percent", params)
-		}
+		params.ApplicationFeePercent = stripe.Float64(plan.ApplicationFeePercent.ValueFloat64())
 	}
 	if !plan.AutomaticTax.IsNull() && !plan.AutomaticTax.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "AutomaticTax", plan.AutomaticTax) {
@@ -1563,16 +1506,6 @@ func expandPaymentLinkUpdate(plan PaymentLinkResourceModel, state PaymentLinkRes
 	if !plan.AllowPromotionCodes.Equal(state.AllowPromotionCodes) && !plan.AllowPromotionCodes.IsNull() && !plan.AllowPromotionCodes.IsUnknown() {
 		params.AllowPromotionCodes = stripe.Bool(plan.AllowPromotionCodes.ValueBool())
 	}
-	if !plan.ApplicationFeeAmount.Equal(state.ApplicationFeeAmount) && !plan.ApplicationFeeAmount.IsNull() && !plan.ApplicationFeeAmount.IsUnknown() {
-		params.ApplicationFeeAmount = stripe.Int64(plan.ApplicationFeeAmount.ValueInt64())
-	}
-	if !plan.ApplicationFeePercent.Equal(state.ApplicationFeePercent) && !plan.ApplicationFeePercent.IsNull() && !plan.ApplicationFeePercent.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "ApplicationFeePercent", plan.ApplicationFeePercent) {
-			if !plan.ApplicationFeePercent.Equal(state.ApplicationFeePercent) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "application_fee_percent", params)
-			}
-		}
-	}
 	if !plan.AutomaticTax.Equal(state.AutomaticTax) && !plan.AutomaticTax.IsNull() && !plan.AutomaticTax.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "AutomaticTax", plan.AutomaticTax) {
 			if !plan.AutomaticTax.Equal(state.AutomaticTax) {
@@ -1584,13 +1517,6 @@ func expandPaymentLinkUpdate(plan PaymentLinkResourceModel, state PaymentLinkRes
 		if !assignStringToNamedFieldOrMethod(params, "BillingAddressCollection", "BillingAddressCollection", plan.BillingAddressCollection.ValueString()) {
 			if !plan.BillingAddressCollection.Equal(state.BillingAddressCollection) {
 				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "billing_address_collection", params)
-			}
-		}
-	}
-	if !plan.ConsentCollection.Equal(state.ConsentCollection) && !plan.ConsentCollection.IsNull() && !plan.ConsentCollection.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "ConsentCollection", plan.ConsentCollection) {
-			if !plan.ConsentCollection.Equal(state.ConsentCollection) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "consent_collection", params)
 			}
 		}
 	}
@@ -1650,13 +1576,6 @@ func expandPaymentLinkUpdate(plan PaymentLinkResourceModel, state PaymentLinkRes
 			}
 		}
 	}
-	if !plan.OnBehalfOf.Equal(state.OnBehalfOf) && !plan.OnBehalfOf.IsNull() && !plan.OnBehalfOf.IsUnknown() {
-		if !assignStringToNamedFieldOrMethod(params, "OnBehalfOfID", "OnBehalfOf", plan.OnBehalfOf.ValueString()) {
-			if !plan.OnBehalfOf.Equal(state.OnBehalfOf) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "on_behalf_of", params)
-			}
-		}
-	}
 	if !plan.OptionalItems.Equal(state.OptionalItems) && !plan.OptionalItems.IsNull() && !plan.OptionalItems.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "OptionalItems", plan.OptionalItems) {
 			if !plan.OptionalItems.Equal(state.OptionalItems) {
@@ -1713,13 +1632,6 @@ func expandPaymentLinkUpdate(plan PaymentLinkResourceModel, state PaymentLinkRes
 			}
 		}
 	}
-	if !plan.ShippingOptions.Equal(state.ShippingOptions) && !plan.ShippingOptions.IsNull() && !plan.ShippingOptions.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "ShippingOptions", plan.ShippingOptions) {
-			if !plan.ShippingOptions.Equal(state.ShippingOptions) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "shipping_options", params)
-			}
-		}
-	}
 	if !plan.SubmitType.Equal(state.SubmitType) && !plan.SubmitType.IsNull() && !plan.SubmitType.IsUnknown() {
 		if !assignStringToNamedFieldOrMethod(params, "SubmitType", "SubmitType", plan.SubmitType.ValueString()) {
 			if !plan.SubmitType.Equal(state.SubmitType) {
@@ -1738,13 +1650,6 @@ func expandPaymentLinkUpdate(plan PaymentLinkResourceModel, state PaymentLinkRes
 		if !assignAttrValueToNamedField(params, "TaxIDCollection", plan.TaxIDCollection) {
 			if !plan.TaxIDCollection.Equal(state.TaxIDCollection) {
 				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "tax_id_collection", params)
-			}
-		}
-	}
-	if !plan.TransferData.Equal(state.TransferData) && !plan.TransferData.IsNull() && !plan.TransferData.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "TransferData", plan.TransferData) {
-			if !plan.TransferData.Equal(state.TransferData) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "transfer_data", params)
 			}
 		}
 	}
@@ -2243,7 +2148,7 @@ func flattenPaymentLink(obj *stripe.PaymentLink, state *PaymentLinkResourceModel
 	{
 		if rawValueLineItems, rawOk := plainValueAtPath(raw, "line_items"); rawOk {
 			rawPlainLineItems := extractListObjectData(rawValueLineItems)
-			if valueLineItems, err := flattenPlainValue(preserveEquivalentDecimalStringLeaves(suppressUnconfiguredDecimalMirrorLeaves(applyConfiguredKeyedListShapes(rawPlainLineItems, attrValueToPlain(state.LineItems)), attrValueToPlain(state.LineItems)), attrValueToPlain(state.LineItems)), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "price": types.StringType, "price_data": types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "product": types.StringType, "product_data": types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "images": types.ListType{ElemType: types.StringType}, "metadata": types.MapType{ElemType: types.StringType}, "name": types.StringType, "tax_code": types.StringType, "tax_details": types.ObjectType{AttrTypes: map[string]attr.Type{"performance_location": types.StringType, "tax_code": types.StringType}}, "unit_label": types.StringType}}, "recurring": types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.Float64Type}}, "quantity": types.Int64Type}}}, "line_items", "raw response"); err != nil {
+			if valueLineItems, err := flattenPlainValue(preserveEquivalentDecimalStringLeaves(suppressUnconfiguredDecimalMirrorLeaves(applyConfiguredKeyedListShapes(rawPlainLineItems, attrValueToPlain(state.LineItems)), attrValueToPlain(state.LineItems)), attrValueToPlain(state.LineItems)), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "price": types.StringType, "price_data": types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "product": types.StringType, "product_data": types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "images": types.ListType{ElemType: types.StringType}, "metadata": types.MapType{ElemType: types.StringType}, "name": types.StringType, "tax_code": types.StringType, "unit_label": types.StringType}}, "recurring": types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.Float64Type}}, "quantity": types.Int64Type}}}, "line_items", "raw response"); err != nil {
 				return err
 			} else {
 				if typedLineItems, ok := valueLineItems.(types.List); ok {
@@ -2255,7 +2160,7 @@ func flattenPaymentLink(obj *stripe.PaymentLink, state *PaymentLinkResourceModel
 				fallbackPlainLineItems := extractListObjectData(responseValueLineItems)
 				if valueLineItems, err := flattenPlainValue(
 					preserveEquivalentDecimalStringLeaves(suppressUnconfiguredDecimalMirrorLeaves(applyConfiguredKeyedListShapes(fallbackPlainLineItems, attrValueToPlain(state.LineItems)), attrValueToPlain(state.LineItems)), attrValueToPlain(state.LineItems)),
-					types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "price": types.StringType, "price_data": types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "product": types.StringType, "product_data": types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "images": types.ListType{ElemType: types.StringType}, "metadata": types.MapType{ElemType: types.StringType}, "name": types.StringType, "tax_code": types.StringType, "tax_details": types.ObjectType{AttrTypes: map[string]attr.Type{"performance_location": types.StringType, "tax_code": types.StringType}}, "unit_label": types.StringType}}, "recurring": types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.Float64Type}}, "quantity": types.Int64Type}}},
+					types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "price": types.StringType, "price_data": types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "product": types.StringType, "product_data": types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "images": types.ListType{ElemType: types.StringType}, "metadata": types.MapType{ElemType: types.StringType}, "name": types.StringType, "tax_code": types.StringType, "unit_label": types.StringType}}, "recurring": types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.Float64Type}}, "quantity": types.Int64Type}}},
 					"line_items",
 					"response struct",
 				); err != nil {
@@ -2406,7 +2311,7 @@ func flattenPaymentLink(obj *stripe.PaymentLink, state *PaymentLinkResourceModel
 		}
 	}
 	{
-		if true {
+		if state.OnBehalfOf.IsNull() || state.OnBehalfOf.IsUnknown() {
 			if rawValueOnBehalfOf, rawOk := plainValueAtPath(raw, "on_behalf_of"); rawOk {
 				if typedOnBehalfOf, ok := plainToStringIDValue(rawValueOnBehalfOf); ok {
 					state.OnBehalfOf = typedOnBehalfOf
@@ -2772,7 +2677,7 @@ func flattenPaymentLink(obj *stripe.PaymentLink, state *PaymentLinkResourceModel
 			hadRawSubscriptionData = true
 			if rawValueSubscriptionData != nil {
 				sourceSubscriptionData := applyConfiguredKeyedListShapes(rawValueSubscriptionData, attrValueToPlain(state.SubscriptionData))
-				if valueSubscriptionData, err := flattenPlainValue(sourceSubscriptionData, types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "invoice_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "custom_fields": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"name": types.StringType, "value": types.StringType}}}, "description": types.StringType, "footer": types.StringType, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}, "metadata": types.MapType{ElemType: types.StringType}, "trial_period_days": types.Int64Type, "trial_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}}}}, "subscription_data", "raw response"); err != nil {
+				if valueSubscriptionData, err := flattenPlainValue(sourceSubscriptionData, types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "invoice_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}, "metadata": types.MapType{ElemType: types.StringType}, "trial_period_days": types.Int64Type, "trial_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}}}}, "subscription_data", "raw response"); err != nil {
 					return err
 				} else {
 					if typedSubscriptionData, ok := valueSubscriptionData.(types.Object); ok {
@@ -2788,7 +2693,7 @@ func flattenPaymentLink(obj *stripe.PaymentLink, state *PaymentLinkResourceModel
 					sourceSubscriptionData := applyConfiguredKeyedListShapes(responseValueSubscriptionData, attrValueToPlain(state.SubscriptionData))
 					if valueSubscriptionData, err := flattenPlainValue(
 						sourceSubscriptionData,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "invoice_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "custom_fields": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"name": types.StringType, "value": types.StringType}}}, "description": types.StringType, "footer": types.StringType, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}, "metadata": types.MapType{ElemType: types.StringType}, "trial_period_days": types.Int64Type, "trial_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}}}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "invoice_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}, "metadata": types.MapType{ElemType: types.StringType}, "trial_period_days": types.Int64Type, "trial_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}}}},
 						"subscription_data",
 						"response struct",
 					); err != nil {
@@ -2803,7 +2708,7 @@ func flattenPaymentLink(obj *stripe.PaymentLink, state *PaymentLinkResourceModel
 			}
 		}
 		if !assignedSubscriptionData && hadRawSubscriptionData {
-			if nullSubscriptionData, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "invoice_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "custom_fields": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"name": types.StringType, "value": types.StringType}}}, "description": types.StringType, "footer": types.StringType, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}, "metadata": types.MapType{ElemType: types.StringType}, "trial_period_days": types.Int64Type, "trial_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}}}}); ok {
+			if nullSubscriptionData, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"description": types.StringType, "invoice_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}, "metadata": types.MapType{ElemType: types.StringType}, "trial_period_days": types.Int64Type, "trial_settings": types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}}}}); ok {
 				if typedSubscriptionData, ok := nullSubscriptionData.(types.Object); ok {
 					state.SubscriptionData = typedSubscriptionData
 				}

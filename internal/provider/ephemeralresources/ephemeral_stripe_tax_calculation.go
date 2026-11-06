@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ ephemeral.EphemeralResource = &TaxCalculationEphemeralResource{}
@@ -133,8 +133,8 @@ func (r *TaxCalculationEphemeralResource) Schema(_ context.Context, _ ephemeral.
 							Attributes: map[string]ephemeralSchema.Attribute{
 								"type": ephemeralSchema.StringAttribute{
 									Required:    true,
-									Description: "The type of the tax ID, one of `ad_nrt`, `ar_cuit`, `eu_vat`, `bo_tin`, `br_cnpj`, `br_cpf`, `cn_tin`, `co_nit`, `cr_tin`, `do_rcn`, `ec_ruc`, `eu_oss_vat`, `hr_oib`, `pe_ruc`, `ro_tin`, `rs_pib`, `sv_nit`, `uy_ruc`, `ve_rif`, `vn_tin`, `gb_vat`, `nz_gst`, `au_abn`, `au_arn`, `in_gst`, `no_vat`, `no_voec`, `za_vat`, `ch_vat`, `mx_rfc`, `sg_uen`, `ru_inn`, `ru_kpp`, `ca_bn`, `hk_br`, `es_cif`, `pl_nip`, `it_cf`, `fo_vat`, `gi_tin`, `py_ruc`, `tw_vat`, `th_vat`, `jp_cn`, `jp_rn`, `jp_trn`, `li_uid`, `li_vat`, `lk_vat`, `my_itn`, `us_ein`, `kr_brn`, `ca_qst`, `ca_gst_hst`, `ca_pst_bc`, `ca_pst_mb`, `ca_pst_sk`, `my_sst`, `sg_gst`, `ae_trn`, `cl_tin`, `sa_vat`, `id_npwp`, `my_frp`, `il_vat`, `ge_vat`, `ua_vat`, `is_vat`, `bg_uic`, `hu_tin`, `si_tin`, `ke_pin`, `tr_tin`, `eg_tin`, `ph_tin`, `al_tin`, `bh_vat`, `kz_bin`, `ng_tin`, `om_vat`, `de_stn`, `ch_uid`, `tz_vat`, `uz_vat`, `uz_tin`, `md_vat`, `ma_vat`, `by_tin`, `ao_tin`, `bs_tin`, `bb_tin`, `cd_nif`, `mr_nif`, `me_pib`, `zw_tin`, `ba_tin`, `gn_nif`, `mk_vat`, `sr_fin`, `sn_ninea`, `am_tin`, `np_pan`, `tj_tin`, `ug_tin`, `zm_tin`, `kh_tin`, `aw_tin`, `az_tin`, `bd_bin`, `au_acn`, `nz_bn`, `pt_nif`, `cz_dic`, `fr_siret`, `fr_siren`, `fr_spi`, `sm_coe`, `tt_vat`, `tt_bir`, `mu_vat`, `mz_nuit`, `au_wpn`, `md_cf`, `is_kt`, `bj_ifu`, `et_tin`, `kg_tin`, `la_tin`, `cm_niu`, `cv_nif`, `bf_ifu`, `ic_nif`, `gh_tin`, `bw_vat`, `ci_vat`, or `unknown`",
-									Validators:  []validator.String{stringvalidator.OneOf("ad_nrt", "ae_trn", "al_tin", "am_tin", "ao_tin", "ar_cuit", "au_abn", "au_acn", "au_arn", "au_wpn", "aw_tin", "az_tin", "ba_tin", "bb_tin", "bd_bin", "bf_ifu", "bg_uic", "bh_vat", "bj_ifu", "bo_tin", "br_cnpj", "br_cpf", "bs_tin", "bw_vat", "by_tin", "ca_bn", "ca_gst_hst", "ca_pst_bc", "ca_pst_mb", "ca_pst_sk", "ca_qst", "cd_nif", "ch_uid", "ch_vat", "ci_vat", "cl_tin", "cm_niu", "cn_tin", "co_nit", "cr_tin", "cv_nif", "cz_dic", "de_stn", "do_rcn", "ec_ruc", "eg_tin", "es_cif", "et_tin", "eu_oss_vat", "eu_vat", "fo_vat", "fr_siren", "fr_siret", "fr_spi", "gb_vat", "ge_vat", "gh_tin", "gi_tin", "gn_nif", "hk_br", "hr_oib", "hu_tin", "ic_nif", "id_npwp", "il_vat", "in_gst", "is_kt", "is_vat", "it_cf", "jp_cn", "jp_rn", "jp_trn", "ke_pin", "kg_tin", "kh_tin", "kr_brn", "kz_bin", "la_tin", "li_uid", "li_vat", "lk_vat", "ma_vat", "md_cf", "md_vat", "me_pib", "mk_vat", "mr_nif", "mu_vat", "mx_rfc", "my_frp", "my_itn", "my_sst", "mz_nuit", "ng_tin", "no_vat", "no_voec", "np_pan", "nz_bn", "nz_gst", "om_vat", "pe_ruc", "ph_tin", "pl_nip", "pt_nif", "py_ruc", "ro_tin", "rs_pib", "ru_inn", "ru_kpp", "sa_vat", "sg_gst", "sg_uen", "si_tin", "sm_coe", "sn_ninea", "sr_fin", "sv_nit", "th_vat", "tj_tin", "tr_tin", "tt_bir", "tt_vat", "tw_vat", "tz_vat", "ua_vat", "ug_tin", "unknown", "us_ein", "uy_ruc", "uz_tin", "uz_vat", "ve_rif", "vn_tin", "za_vat", "zm_tin", "zw_tin")},
+									Description: "The type of the tax ID, one of `ad_nrt`, `ar_cuit`, `eu_vat`, `bo_tin`, `br_cnpj`, `br_cpf`, `cn_tin`, `co_nit`, `cr_tin`, `do_rcn`, `ec_ruc`, `eu_oss_vat`, `hr_oib`, `pe_ruc`, `ro_tin`, `rs_pib`, `sv_nit`, `uy_ruc`, `ve_rif`, `vn_tin`, `gb_vat`, `nz_gst`, `au_abn`, `au_arn`, `in_gst`, `no_vat`, `no_voec`, `za_vat`, `ch_vat`, `mx_rfc`, `sg_uen`, `ru_inn`, `ru_kpp`, `ca_bn`, `hk_br`, `es_cif`, `pl_nip`, `it_cf`, `fo_vat`, `gi_tin`, `py_ruc`, `tw_vat`, `th_vat`, `jp_cn`, `jp_rn`, `jp_trn`, `li_uid`, `li_vat`, `lk_vat`, `my_itn`, `us_ein`, `kr_brn`, `ca_qst`, `ca_gst_hst`, `ca_pst_bc`, `ca_pst_mb`, `ca_pst_sk`, `my_sst`, `sg_gst`, `ae_trn`, `cl_tin`, `sa_vat`, `id_npwp`, `my_frp`, `il_vat`, `ge_vat`, `ua_vat`, `is_vat`, `bg_uic`, `hu_tin`, `si_tin`, `ke_pin`, `tr_tin`, `eg_tin`, `ph_tin`, `al_tin`, `bh_vat`, `kz_bin`, `ng_tin`, `om_vat`, `de_stn`, `ch_uid`, `tz_vat`, `uz_vat`, `uz_tin`, `md_vat`, `ma_vat`, `by_tin`, `ao_tin`, `bs_tin`, `bb_tin`, `cd_nif`, `mr_nif`, `me_pib`, `zw_tin`, `ba_tin`, `gn_nif`, `mk_vat`, `sr_fin`, `sn_ninea`, `am_tin`, `np_pan`, `tj_tin`, `ug_tin`, `zm_tin`, `kh_tin`, `aw_tin`, `az_tin`, `bd_bin`, `bj_ifu`, `et_tin`, `kg_tin`, `la_tin`, `cm_niu`, `cv_nif`, `bf_ifu`, or `unknown`",
+									Validators:  []validator.String{stringvalidator.OneOf("ad_nrt", "ae_trn", "al_tin", "am_tin", "ao_tin", "ar_cuit", "au_abn", "au_arn", "aw_tin", "az_tin", "ba_tin", "bb_tin", "bd_bin", "bf_ifu", "bg_uic", "bh_vat", "bj_ifu", "bo_tin", "br_cnpj", "br_cpf", "bs_tin", "by_tin", "ca_bn", "ca_gst_hst", "ca_pst_bc", "ca_pst_mb", "ca_pst_sk", "ca_qst", "cd_nif", "ch_uid", "ch_vat", "cl_tin", "cm_niu", "cn_tin", "co_nit", "cr_tin", "cv_nif", "de_stn", "do_rcn", "ec_ruc", "eg_tin", "es_cif", "et_tin", "eu_oss_vat", "eu_vat", "fo_vat", "gb_vat", "ge_vat", "gi_tin", "gn_nif", "hk_br", "hr_oib", "hu_tin", "id_npwp", "il_vat", "in_gst", "is_vat", "it_cf", "jp_cn", "jp_rn", "jp_trn", "ke_pin", "kg_tin", "kh_tin", "kr_brn", "kz_bin", "la_tin", "li_uid", "li_vat", "lk_vat", "ma_vat", "md_vat", "me_pib", "mk_vat", "mr_nif", "mx_rfc", "my_frp", "my_itn", "my_sst", "ng_tin", "no_vat", "no_voec", "np_pan", "nz_gst", "om_vat", "pe_ruc", "ph_tin", "pl_nip", "py_ruc", "ro_tin", "rs_pib", "ru_inn", "ru_kpp", "sa_vat", "sg_gst", "sg_uen", "si_tin", "sn_ninea", "sr_fin", "sv_nit", "th_vat", "tj_tin", "tr_tin", "tw_vat", "tz_vat", "ua_vat", "ug_tin", "unknown", "us_ein", "uy_ruc", "uz_tin", "uz_vat", "ve_rif", "vn_tin", "za_vat", "zm_tin", "zw_tin")},
 								},
 								"value": ephemeralSchema.StringAttribute{
 									Required:    true,
@@ -172,10 +172,6 @@ func (r *TaxCalculationEphemeralResource) Schema(_ context.Context, _ ephemeral.
 							Optional:    true,
 							Description: "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.",
 							ElementType: types.StringType,
-						},
-						"performance_location": ephemeralSchema.StringAttribute{
-							Optional:    true,
-							Description: "A tax location ID. Depending on the [tax code](/tax/tax-for-tickets/reference/tax-location-performance), this is required, optional, or not supported.",
 						},
 						"product": ephemeralSchema.StringAttribute{
 							Optional:    true,
@@ -306,7 +302,7 @@ func (r *TaxCalculationEphemeralResource) Schema(_ context.Context, _ ephemeral.
 								"sourcing": ephemeralSchema.StringAttribute{
 									Computed:    true,
 									Description: "Indicates whether the jurisdiction was determined by the origin (merchant's address) or destination (customer's address).",
-									Validators:  []validator.String{stringvalidator.OneOf("destination", "origin", "performance")},
+									Validators:  []validator.String{stringvalidator.OneOf("destination", "origin")},
 								},
 								"tax_rate_details": ephemeralSchema.SingleNestedAttribute{
 									Computed:    true,
@@ -323,7 +319,7 @@ func (r *TaxCalculationEphemeralResource) Schema(_ context.Context, _ ephemeral.
 										"tax_type": ephemeralSchema.StringAttribute{
 											Computed:    true,
 											Description: "The tax type, such as `vat` or `sales_tax`.",
-											Validators:  []validator.String{stringvalidator.OneOf("admissions_tax", "amusement_tax", "attendance_tax", "communications_tax", "digital_excise_tax", "entertainment_tax", "get_fund", "gross_receipts_tax", "gst", "hospitality_tax", "hst", "igst", "jct", "lease_tax", "luxury_tax", "mass_transit_parking_tax", "nhil", "parking_tax", "pst", "qst", "recycling_fee", "resort_tax", "retail_delivery_fee", "rst", "sales_tax", "service_tax", "tourism_tax", "utility_users_tax", "vat")},
+											Validators:  []validator.String{stringvalidator.OneOf("amusement_tax", "communications_tax", "gst", "hst", "igst", "jct", "lease_tax", "pst", "qst", "retail_delivery_fee", "rst", "sales_tax", "service_tax", "vat")},
 										},
 									},
 								},
@@ -405,7 +401,7 @@ func (r *TaxCalculationEphemeralResource) Schema(_ context.Context, _ ephemeral.
 								"tax_type": ephemeralSchema.StringAttribute{
 									Computed:    true,
 									Description: "The tax type, such as `vat` or `sales_tax`.",
-									Validators:  []validator.String{stringvalidator.OneOf("admissions_tax", "amusement_tax", "attendance_tax", "communications_tax", "digital_excise_tax", "entertainment_tax", "get_fund", "gross_receipts_tax", "gst", "hospitality_tax", "hst", "igst", "jct", "lease_tax", "luxury_tax", "mass_transit_parking_tax", "nhil", "parking_tax", "pst", "qst", "recycling_fee", "resort_tax", "retail_delivery_fee", "rst", "sales_tax", "service_tax", "tourism_tax", "utility_users_tax", "vat")},
+									Validators:  []validator.String{stringvalidator.OneOf("amusement_tax", "communications_tax", "gst", "hst", "igst", "jct", "lease_tax", "pst", "qst", "retail_delivery_fee", "rst", "sales_tax", "service_tax", "vat")},
 								},
 							},
 						},
@@ -660,7 +656,7 @@ func flattenTaxCalculation(obj *stripe.TaxCalculation, state *TaxCalculationReso
 	{
 		if rawValueLineItems, rawOk := plainValueAtPath(raw, "line_items"); rawOk {
 			rawPlainLineItems := extractListObjectData(rawValueLineItems)
-			if valueLineItems, err := flattenPlainValue(applyConfiguredKeyedListShapes(rawPlainLineItems, attrValueToPlain(state.LineItems)), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "performance_location": types.StringType, "product": types.StringType, "quantity": types.Int64Type, "reference": types.StringType, "tax_behavior": types.StringType, "tax_code": types.StringType}}}, "line_items", "raw response"); err != nil {
+			if valueLineItems, err := flattenPlainValue(applyConfiguredKeyedListShapes(rawPlainLineItems, attrValueToPlain(state.LineItems)), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "product": types.StringType, "quantity": types.Int64Type, "reference": types.StringType, "tax_behavior": types.StringType, "tax_code": types.StringType}}}, "line_items", "raw response"); err != nil {
 				return err
 			} else {
 				if typedLineItems, ok := valueLineItems.(types.List); ok {
@@ -672,7 +668,7 @@ func flattenTaxCalculation(obj *stripe.TaxCalculation, state *TaxCalculationReso
 				fallbackPlainLineItems := extractListObjectData(responseValueLineItems)
 				if valueLineItems, err := flattenPlainValue(
 					applyConfiguredKeyedListShapes(fallbackPlainLineItems, attrValueToPlain(state.LineItems)),
-					types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "performance_location": types.StringType, "product": types.StringType, "quantity": types.Int64Type, "reference": types.StringType, "tax_behavior": types.StringType, "tax_code": types.StringType}}},
+					types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "product": types.StringType, "quantity": types.Int64Type, "reference": types.StringType, "tax_behavior": types.StringType, "tax_code": types.StringType}}},
 					"line_items",
 					"response struct",
 				); err != nil {

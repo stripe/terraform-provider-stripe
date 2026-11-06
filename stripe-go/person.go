@@ -113,10 +113,9 @@ const (
 	PersonVerificationStatusVerified   PersonVerificationStatus = "verified"
 )
 
-// Deletes an existing person's relationship to the account's legal entity. Any person with a relationship for an account can be deleted through the API, except if the person is the representative. If your integration is using the executive parameter, you cannot delete the only verified executive on file.
+// Deletes an existing person's relationship to the account's legal entity. Any person with a relationship for an account can be deleted through the API, except if the person is the account_opener. If your integration is using the executive parameter, you cannot delete the only verified executive on file.
 type PersonParams struct {
-	Params `form:"*"`
-	// Unique identifier for the object.
+	Params  `form:"*"`
 	Account *string `form:"-"` // Included in URL
 	// Details on the legal guardian's or authorizer's acceptance of the required Stripe agreements.
 	AdditionalTOSAcceptances *PersonAdditionalTOSAcceptancesParams `form:"additional_tos_acceptances" json:"additional_tos_acceptances,omitempty"`
@@ -145,12 +144,8 @@ type PersonParams struct {
 	// The person's gender (International regulations require either "male" or "female").
 	Gender *string `form:"gender" json:"gender,omitempty"`
 	// The person's ID number, as appropriate for their country. For example, a social security number in the U.S., social insurance number in Canada, etc. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	IDNumber *string `form:"id_number" json:"id_number,omitempty"`
 	// The person's secondary ID number, as appropriate for their country, will be used for enhanced verification checks. In Thailand, this would be the laser code found on the back of an ID card. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	IDNumberSecondary *string `form:"id_number_secondary" json:"id_number_secondary,omitempty"`
 	// The person's last name.
 	LastName *string `form:"last_name" json:"last_name,omitempty"`
@@ -175,8 +170,6 @@ type PersonParams struct {
 	// The relationship that this person has with the account's legal entity.
 	Relationship *PersonRelationshipParams `form:"relationship" json:"relationship,omitempty"`
 	// The last four digits of the person's Social Security number (U.S. only).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	SSNLast4 *string `form:"ssn_last_4" json:"ssn_last_4,omitempty"`
 	// Demographic data related to the person.
 	USCfpbData *PersonUSCfpbDataParams `form:"us_cfpb_data" json:"us_cfpb_data,omitempty"`
@@ -290,19 +283,19 @@ type PersonDOBParams struct {
 
 // One or more documents that demonstrate proof that this person is authorized to represent the company.
 type PersonDocumentsCompanyAuthorizationParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
 // One or more documents showing the person's passport page with photo and personal data.
 type PersonDocumentsPassportParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
 // One or more documents showing the person's visa required for living in the country where they are residing.
 type PersonDocumentsVisaParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
@@ -377,9 +370,9 @@ type PersonUSCfpbDataParams struct {
 
 // A document showing address, either a passport, local ID card, or utility bill from a well-known utility company.
 type PersonVerificationDocumentParams struct {
-	// The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Back *string `form:"back" json:"back,omitempty"`
-	// The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Front *string `form:"front" json:"front,omitempty"`
 }
 
@@ -410,8 +403,7 @@ type PersonListRelationshipParams struct {
 // Returns a list of people associated with the account's legal entity. The people are returned sorted by creation date, with the most recent people appearing first.
 type PersonListParams struct {
 	ListParams `form:"*"`
-	// Unique identifier for the object.
-	Account *string `form:"-"` // Included in URL
+	Account    *string `form:"-"` // Included in URL
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
 	// Filters on the list of people returned based on the person's relationship to the account's company.
@@ -423,7 +415,7 @@ func (p *PersonListParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
 }
 
-// Deletes an existing person's relationship to the account's legal entity. Any person with a relationship for an account can be deleted through the API, except if the person is the representative. If your integration is using the executive parameter, you cannot delete the only verified executive on file.
+// Deletes an existing person's relationship to the account's legal entity. Any person with a relationship for an account can be deleted through the API, except if the person is the account_opener. If your integration is using the executive parameter, you cannot delete the only verified executive on file.
 type PersonDeleteParams struct {
 	Params  `form:"*"`
 	Account *string `form:"-"` // Included in URL
@@ -519,19 +511,19 @@ type PersonUpdateDOBParams struct {
 
 // One or more documents that demonstrate proof that this person is authorized to represent the company.
 type PersonUpdateDocumentsCompanyAuthorizationParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
 // One or more documents showing the person's passport page with photo and personal data.
 type PersonUpdateDocumentsPassportParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
 // One or more documents showing the person's visa required for living in the country where they are residing.
 type PersonUpdateDocumentsVisaParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
@@ -606,17 +598,17 @@ type PersonUpdateUSCfpbDataParams struct {
 
 // A document showing address, either a passport, local ID card, or utility bill from a well-known utility company.
 type PersonUpdateVerificationAdditionalDocumentParams struct {
-	// The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Back *string `form:"back" json:"back,omitempty"`
-	// The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Front *string `form:"front" json:"front,omitempty"`
 }
 
 // An identifying document, either a passport or local ID card.
 type PersonUpdateVerificationDocumentParams struct {
-	// The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Back *string `form:"back" json:"back,omitempty"`
-	// The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Front *string `form:"front" json:"front,omitempty"`
 }
 
@@ -630,8 +622,7 @@ type PersonUpdateVerificationParams struct {
 
 // Updates an existing person.
 type PersonUpdateParams struct {
-	Params `form:"*"`
-	// Unique identifier for the object.
+	Params  `form:"*"`
 	Account *string `form:"-"` // Included in URL
 	// Details on the legal guardian's or authorizer's acceptance of the required Stripe agreements.
 	AdditionalTOSAcceptances *PersonUpdateAdditionalTOSAcceptancesParams `form:"additional_tos_acceptances" json:"additional_tos_acceptances,omitempty"`
@@ -660,12 +651,8 @@ type PersonUpdateParams struct {
 	// The person's gender (International regulations require either "male" or "female").
 	Gender *string `form:"gender" json:"gender,omitempty"`
 	// The person's ID number, as appropriate for their country. For example, a social security number in the U.S., social insurance number in Canada, etc. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	IDNumber *string `form:"id_number" json:"id_number,omitempty"`
 	// The person's secondary ID number, as appropriate for their country, will be used for enhanced verification checks. In Thailand, this would be the laser code found on the back of an ID card. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	IDNumberSecondary *string `form:"id_number_secondary" json:"id_number_secondary,omitempty"`
 	// The person's last name.
 	LastName *string `form:"last_name" json:"last_name,omitempty"`
@@ -690,8 +677,6 @@ type PersonUpdateParams struct {
 	// The relationship that this person has with the account's legal entity.
 	Relationship *PersonUpdateRelationshipParams `form:"relationship" json:"relationship,omitempty"`
 	// The last four digits of the person's Social Security number (U.S. only).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	SSNLast4 *string `form:"ssn_last_4" json:"ssn_last_4,omitempty"`
 	// Demographic data related to the person.
 	USCfpbData *PersonUpdateUSCfpbDataParams `form:"us_cfpb_data" json:"us_cfpb_data,omitempty"`
@@ -805,19 +790,19 @@ type PersonCreateDOBParams struct {
 
 // One or more documents that demonstrate proof that this person is authorized to represent the company.
 type PersonCreateDocumentsCompanyAuthorizationParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
 // One or more documents showing the person's passport page with photo and personal data.
 type PersonCreateDocumentsPassportParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
 // One or more documents showing the person's visa required for living in the country where they are residing.
 type PersonCreateDocumentsVisaParams struct {
-	// One or more document ids returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `account_requirement`.
+	// One or more document ids returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `account_requirement`.
 	Files []*string `form:"files" json:"files,omitempty"`
 }
 
@@ -892,17 +877,17 @@ type PersonCreateUSCfpbDataParams struct {
 
 // A document showing address, either a passport, local ID card, or utility bill from a well-known utility company.
 type PersonCreateVerificationAdditionalDocumentParams struct {
-	// The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Back *string `form:"back" json:"back,omitempty"`
-	// The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Front *string `form:"front" json:"front,omitempty"`
 }
 
 // An identifying document, either a passport or local ID card.
 type PersonCreateVerificationDocumentParams struct {
-	// The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Back *string `form:"back" json:"back,omitempty"`
-	// The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Front *string `form:"front" json:"front,omitempty"`
 }
 
@@ -916,8 +901,7 @@ type PersonCreateVerificationParams struct {
 
 // Creates a new person.
 type PersonCreateParams struct {
-	Params `form:"*"`
-	// Unique identifier for the object.
+	Params  `form:"*"`
 	Account *string `form:"-"` // Included in URL
 	// Details on the legal guardian's or authorizer's acceptance of the required Stripe agreements.
 	AdditionalTOSAcceptances *PersonCreateAdditionalTOSAcceptancesParams `form:"additional_tos_acceptances" json:"additional_tos_acceptances,omitempty"`
@@ -946,12 +930,8 @@ type PersonCreateParams struct {
 	// The person's gender (International regulations require either "male" or "female").
 	Gender *string `form:"gender" json:"gender,omitempty"`
 	// The person's ID number, as appropriate for their country. For example, a social security number in the U.S., social insurance number in Canada, etc. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	IDNumber *string `form:"id_number" json:"id_number,omitempty"`
 	// The person's secondary ID number, as appropriate for their country, will be used for enhanced verification checks. In Thailand, this would be the laser code found on the back of an ID card. Instead of the number itself, you can also provide a [PII token provided by Stripe.js](https://docs.stripe.com/js/tokens/create_token?type=pii).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	IDNumberSecondary *string `form:"id_number_secondary" json:"id_number_secondary,omitempty"`
 	// The person's last name.
 	LastName *string `form:"last_name" json:"last_name,omitempty"`
@@ -976,8 +956,6 @@ type PersonCreateParams struct {
 	// The relationship that this person has with the account's legal entity.
 	Relationship *PersonCreateRelationshipParams `form:"relationship" json:"relationship,omitempty"`
 	// The last four digits of the person's Social Security number (U.S. only).
-	//
-	// Changing this value for the account's representative requires that the account re-accept the [terms of service](https://docs.stripe.com/api/accounts/object#account_object-tos_acceptance).
 	SSNLast4 *string `form:"ssn_last_4" json:"ssn_last_4,omitempty"`
 	// Demographic data related to the person.
 	USCfpbData *PersonCreateUSCfpbDataParams `form:"us_cfpb_data" json:"us_cfpb_data,omitempty"`
@@ -1080,7 +1058,7 @@ type PersonFutureRequirementsAlternative struct {
 	OriginalFieldsDue []string `json:"original_fields_due"`
 }
 
-// Fields that are `currently_due` and need to be collected again because validation or verification failed.
+// Details about validation and verification failures for `due` requirements that must be resolved.
 type PersonFutureRequirementsError struct {
 	// The code for the type of error.
 	Code string `json:"code"`
@@ -1096,7 +1074,7 @@ type PersonFutureRequirements struct {
 	Alternatives []*PersonFutureRequirementsAlternative `json:"alternatives"`
 	// Fields that need to be resolved to keep the person's account enabled. If not resolved by the account's `future_requirements[current_deadline]`, these fields will transition to the main `requirements` hash, and may immediately become `past_due`, but the account may also be given a grace period depending on the account's enablement state prior to transition.
 	CurrentlyDue []string `json:"currently_due"`
-	// Fields that are `currently_due` and need to be collected again because validation or verification failed.
+	// Details about validation and verification failures for `due` requirements that must be resolved.
 	Errors []*PersonFutureRequirementsError `json:"errors"`
 	// Fields you must collect when all thresholds are reached. As they become required, they appear in `currently_due` as well, and the account's `future_requirements[current_deadline]` becomes set.
 	EventuallyDue []string `json:"eventually_due"`
@@ -1138,7 +1116,7 @@ type PersonRequirements struct {
 	Alternatives []*PersonRequirementsAlternative `json:"alternatives"`
 	// Fields that need to be resolved to keep the person's account enabled. If not resolved by the account's `current_deadline`, these fields will appear in `past_due` as well, and the account is disabled.
 	CurrentlyDue []string `json:"currently_due"`
-	// Fields that are `currently_due` and need to be collected again because validation or verification failed.
+	// Details about validation and verification failures for `due` requirements that must be resolved.
 	Errors []*AccountRequirementsError `json:"errors"`
 	// Fields you must collect when all thresholds are reached. As they become required, they appear in `currently_due` as well, and the account's `current_deadline` becomes set.
 	EventuallyDue []string `json:"eventually_due"`
@@ -1176,13 +1154,13 @@ type PersonUSCfpbData struct {
 
 // A document showing address, either a passport, local ID card, or utility bill from a well-known utility company.
 type PersonVerificationDocument struct {
-	// The back of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`.
+	// The back of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`.
 	Back *File `json:"back"`
 	// A user-displayable string describing the verification state of this document. For example, if a document is uploaded and the picture is too fuzzy, this may say "Identity document is too unclear to read".
 	Details string `json:"details"`
 	// One of `document_corrupt`, `document_country_not_supported`, `document_expired`, `document_failed_copy`, `document_failed_other`, `document_failed_test_mode`, `document_fraudulent`, `document_failed_greyscale`, `document_incomplete`, `document_invalid`, `document_manipulated`, `document_missing_back`, `document_missing_front`, `document_not_readable`, `document_not_uploaded`, `document_photo_mismatch`, `document_too_large`, or `document_type_not_supported`. A machine-readable code specifying the verification state for this document.
 	DetailsCode PersonVerificationDocumentDetailsCode `json:"details_code"`
-	// The front of an ID returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `identity_document`.
+	// The front of an ID returned by a [file upload](https://api.stripe.com#create_file) with a `purpose` value of `identity_document`.
 	Front *File `json:"front"`
 }
 type PersonVerification struct {

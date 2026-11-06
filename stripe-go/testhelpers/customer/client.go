@@ -10,7 +10,7 @@ package customer
 import (
 	"net/http"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 // Client is used to invoke /v1/customers APIs.
@@ -22,12 +22,12 @@ type Client struct {
 	Key string
 }
 
-// Create a test incoming bank transfer
+// Create an incoming testmode bank transfer
 func FundCashBalance(id string, params *stripe.TestHelpersCustomerFundCashBalanceParams) (*stripe.CustomerCashBalanceTransaction, error) {
 	return getC().FundCashBalance(id, params)
 }
 
-// Create a test incoming bank transfer
+// Create an incoming testmode bank transfer
 //
 // Deprecated: Client methods are deprecated. This should be accessed instead through [stripe.Client]. See the [migration guide] for more info.
 //

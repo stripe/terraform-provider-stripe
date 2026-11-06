@@ -6,10 +6,7 @@
 
 package stripe
 
-import (
-	"github.com/shopspring/decimal"
-	"time"
-)
+import "time"
 
 // Purpose of additional address.
 type V2CoreAccountPersonAdditionalAddressPurpose string
@@ -248,7 +245,7 @@ type V2CoreAccountPersonDateOfBirth struct {
 
 // One or more documents that demonstrate proof that this person is authorized to represent the company.
 type V2CoreAccountPersonDocumentsCompanyAuthorization struct {
-	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api/files/create) with a purpose value of `account_requirement`.
+	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api/persons/update#create_file) with a purpose value of `account_requirement`.
 	Files []string `json:"files"`
 	// The format of the document. Currently supports `files` only.
 	Type V2CoreAccountPersonDocumentsCompanyAuthorizationType `json:"type"`
@@ -256,39 +253,39 @@ type V2CoreAccountPersonDocumentsCompanyAuthorization struct {
 
 // One or more documents showing the person's passport page with photo and personal data.
 type V2CoreAccountPersonDocumentsPassport struct {
-	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api/files/create) with a purpose value of `account_requirement`.
+	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api/persons/update#create_file) with a purpose value of `account_requirement`.
 	Files []string `json:"files"`
 	// The format of the document. Currently supports `files` only.
 	Type V2CoreAccountPersonDocumentsPassportType `json:"type"`
 }
 
-// The [file upload](https://docs.stripe.com/api/files/create) tokens for the front and back of the verification document.
+// The [file upload](https://docs.stripe.com/api/persons/update#create_file) tokens for the front and back of the verification document.
 type V2CoreAccountPersonDocumentsPrimaryVerificationFrontBack struct {
-	// A [file upload](https://docs.stripe.com/api/files/create) token representing the back of the verification document. The purpose of the uploaded file should be 'identity_document'. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// A [file upload](https://docs.stripe.com/api/persons/update#create_file) token representing the back of the verification document. The purpose of the uploaded file should be 'identity_document'. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Back string `json:"back,omitempty"`
-	// A [file upload](https://docs.stripe.com/api/files/create) token representing the front of the verification document. The purpose of the uploaded file should be 'identity_document'. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// A [file upload](https://docs.stripe.com/api/persons/update#create_file) token representing the front of the verification document. The purpose of the uploaded file should be 'identity_document'. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Front string `json:"front"`
 }
 
 // An identifying document showing the person's name, either a passport or local ID card.
 type V2CoreAccountPersonDocumentsPrimaryVerification struct {
-	// The [file upload](https://docs.stripe.com/api/files/create) tokens for the front and back of the verification document.
+	// The [file upload](https://docs.stripe.com/api/persons/update#create_file) tokens for the front and back of the verification document.
 	FrontBack *V2CoreAccountPersonDocumentsPrimaryVerificationFrontBack `json:"front_back"`
 	// The format of the verification document. Currently supports `front_back` only.
 	Type V2CoreAccountPersonDocumentsPrimaryVerificationType `json:"type"`
 }
 
-// The [file upload](https://docs.stripe.com/api/files/create) tokens for the front and back of the verification document.
+// The [file upload](https://docs.stripe.com/api/persons/update#create_file) tokens for the front and back of the verification document.
 type V2CoreAccountPersonDocumentsSecondaryVerificationFrontBack struct {
-	// A [file upload](https://docs.stripe.com/api/files/create) token representing the back of the verification document. The purpose of the uploaded file should be 'identity_document'. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// A [file upload](https://docs.stripe.com/api/persons/update#create_file) token representing the back of the verification document. The purpose of the uploaded file should be 'identity_document'. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Back string `json:"back,omitempty"`
-	// A [file upload](https://docs.stripe.com/api/files/create) token representing the front of the verification document. The purpose of the uploaded file should be 'identity_document'. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
+	// A [file upload](https://docs.stripe.com/api/persons/update#create_file) token representing the front of the verification document. The purpose of the uploaded file should be 'identity_document'. The uploaded file needs to be a color image (smaller than 8,000px by 8,000px), in JPG, PNG, or PDF format, and less than 10 MB in size.
 	Front string `json:"front"`
 }
 
 // A document showing address, either a passport, local ID card, or utility bill from a well-known utility company.
 type V2CoreAccountPersonDocumentsSecondaryVerification struct {
-	// The [file upload](https://docs.stripe.com/api/files/create) tokens for the front and back of the verification document.
+	// The [file upload](https://docs.stripe.com/api/persons/update#create_file) tokens for the front and back of the verification document.
 	FrontBack *V2CoreAccountPersonDocumentsSecondaryVerificationFrontBack `json:"front_back"`
 	// The format of the verification document. Currently supports `front_back` only.
 	Type V2CoreAccountPersonDocumentsSecondaryVerificationType `json:"type"`
@@ -296,7 +293,7 @@ type V2CoreAccountPersonDocumentsSecondaryVerification struct {
 
 // One or more documents showing the person's visa required for living in the country where they are residing.
 type V2CoreAccountPersonDocumentsVisa struct {
-	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api/files/create) with a purpose value of `account_requirement`.
+	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api/persons/update#create_file) with a purpose value of `account_requirement`.
 	Files []string `json:"files"`
 	// The format of the document. Currently supports `files` only.
 	Type V2CoreAccountPersonDocumentsVisaType `json:"type"`
@@ -335,7 +332,7 @@ type V2CoreAccountPersonRelationship struct {
 	// Whether the individual is an owner of the Account's identity.
 	Owner bool `json:"owner,omitempty"`
 	// The percentage of the Account's identity that the individual owns.
-	PercentOwnership decimal.Decimal `json:"percent_ownership,omitempty"`
+	PercentOwnership float64 `json:"percent_ownership,string,omitempty"`
 	// Whether the individual is authorized as the primary representative of the Account. This is the person nominated by the business to provide information about themselves, and general information about the account. There can only be one representative at any given time. At the time the account is created, this person should be set to the person responsible for opening the account.
 	Representative bool `json:"representative,omitempty"`
 	// The individual's title (e.g., CEO, Support Engineer).

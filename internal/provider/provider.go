@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 	"github.com/stripe/terraform-provider-stripe/internal/provider/actions"
 	"github.com/stripe/terraform-provider-stripe/internal/provider/ephemeralresources"
 	"github.com/stripe/terraform-provider-stripe/internal/provider/resources"
@@ -115,10 +115,8 @@ func (p *StripeProvider) Resources(_ context.Context) []func() resource.Resource
 	return []func() resource.Resource{
 		resources.NewPersonResource,
 		resources.NewApplePayDomainResource,
-		resources.NewAppsInstallResource,
 		resources.NewBillingAlertResource,
 		resources.NewBillingCreditGrantResource,
-		resources.NewBillingFeedbackOptionResource,
 		resources.NewBillingMeterResource,
 		resources.NewBillingPortalConfigurationResource,
 		resources.NewChargeResource,
@@ -145,7 +143,6 @@ func (p *StripeProvider) Resources(_ context.Context) []func() resource.Resource
 		resources.NewPriceResource,
 		resources.NewProductResource,
 		resources.NewProductFeatureResource,
-		resources.NewProductCatalogTrialOfferResource,
 		resources.NewPromotionCodeResource,
 		resources.NewQuoteResource,
 		resources.NewRadarValueListResource,
@@ -156,25 +153,15 @@ func (p *StripeProvider) Resources(_ context.Context) []func() resource.Resource
 		resources.NewSubscriptionResource,
 		resources.NewSubscriptionItemResource,
 		resources.NewSubscriptionScheduleResource,
-		resources.NewTaxLocationResource,
 		resources.NewTaxRegistrationResource,
 		resources.NewTaxIDResource,
 		resources.NewTaxRateResource,
 		resources.NewTerminalConfigurationResource,
 		resources.NewTerminalLocationResource,
 		resources.NewTerminalReaderResource,
-		resources.NewThreeDSecureAuthenticationResource,
 		resources.NewTreasuryFinancialAccountResource,
 		resources.NewWebhookEndpointResource,
 		resources.NewV2CoreEventDestinationResource,
-		resources.NewV2CoreVaultGBBankAccountResource,
-		resources.NewV2CoreVaultUSBankAccountResource,
-		resources.NewV2MoneyManagementFinancialAddressResource,
-		resources.NewV2MoneyManagementInboundTransferResource,
-		resources.NewV2MoneyManagementOutboundPaymentResource,
-		resources.NewV2MoneyManagementOutboundSetupIntentResource,
-		resources.NewV2MoneyManagementPayoutIntentResource,
-		resources.NewV2MoneyManagementRecipientVerificationResource,
 	}
 }
 

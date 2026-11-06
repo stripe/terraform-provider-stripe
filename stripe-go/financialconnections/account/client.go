@@ -10,8 +10,8 @@ package account
 import (
 	"net/http"
 
-	stripe "github.com/stripe/stripe-go/v87"
-	"github.com/stripe/stripe-go/v87/form"
+	stripe "github.com/stripe/stripe-go/v86"
+	"github.com/stripe/stripe-go/v86/form"
 )
 
 // Client is used to invoke /v1/financial_connections/accounts APIs.
@@ -23,12 +23,12 @@ type Client struct {
 	Key string
 }
 
-// Retrieves the details of a Financial Connections Account.
+// Retrieves the details of an Financial Connections Account.
 func GetByID(id string, params *stripe.FinancialConnectionsAccountParams) (*stripe.FinancialConnectionsAccount, error) {
 	return getC().GetByID(id, params)
 }
 
-// Retrieves the details of a Financial Connections Account.
+// Retrieves the details of an Financial Connections Account.
 //
 // Deprecated: Client methods are deprecated. This should be accessed instead through [stripe.Client]. See the [migration guide] for more info.
 //

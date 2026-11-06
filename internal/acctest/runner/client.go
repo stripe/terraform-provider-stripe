@@ -2,7 +2,7 @@
 // Handwritten Terraform acceptance source emitted by sdk-codegen.
 package runner
 
-import stripe "github.com/stripe/stripe-go/v87"
+import stripe "github.com/stripe/stripe-go/v86"
 
 func NewStripeClient(env TestEnv) *stripe.Client {
 	if env.StripeAccount != "" {

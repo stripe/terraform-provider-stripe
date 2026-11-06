@@ -10,7 +10,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/stripe/stripe-go/v87/form"
+	"github.com/stripe/stripe-go/v86/form"
 )
 
 // v1PaymentIntentService is used to invoke /v1/payment_intents APIs.
@@ -44,7 +44,7 @@ func (c v1PaymentIntentService) Create(ctx context.Context, params *PaymentInten
 //
 // You can retrieve a PaymentIntent client-side using a publishable key when the client_secret is in the query string.
 //
-// If you retrieve a PaymentIntent with a publishable key, it only returns a subset of properties. Refer to the [payment intent](https://docs.stripe.com/api/payment_intents/object) object reference for more details.
+// If you retrieve a PaymentIntent with a publishable key, it only returns a subset of properties. Refer to the [payment intent](https://docs.stripe.com/api#payment_intent_object) object reference for more details.
 func (c v1PaymentIntentService) Retrieve(ctx context.Context, id string, params *PaymentIntentRetrieveParams) (*PaymentIntent, error) {
 	if params == nil {
 		params = &PaymentIntentRetrieveParams{}

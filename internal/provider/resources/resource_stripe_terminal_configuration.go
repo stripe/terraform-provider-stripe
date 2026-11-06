@@ -22,7 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ resource.Resource = &TerminalConfigurationResource{}
@@ -49,11 +49,9 @@ type TerminalConfigurationResourceModel struct {
 	Livemode         types.Bool   `tfsdk:"livemode"`
 	Name             types.String `tfsdk:"name"`
 	Offline          types.Object `tfsdk:"offline"`
-	ReaderSecurity   types.Object `tfsdk:"reader_security"`
 	RebootWindow     types.Object `tfsdk:"reboot_window"`
 	StripeS700       types.Object `tfsdk:"stripe_s700"`
 	StripeS710       types.Object `tfsdk:"stripe_s710"`
-	StripeT600       types.Object `tfsdk:"stripe_t600"`
 	Tipping          types.Object `tfsdk:"tipping"`
 	VerifoneM425     types.Object `tfsdk:"verifone_m425"`
 	VerifoneP400     types.Object `tfsdk:"verifone_p400"`
@@ -164,20 +162,6 @@ func (r *TerminalConfigurationResource) Schema(_ context.Context, _ resource.Sch
 					},
 				},
 			},
-			"reader_security": schema.SingleNestedAttribute{
-				Optional: true,
-				Computed: true,
-
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Attributes: map[string]schema.Attribute{
-					"admin_menu_passcode": schema.StringAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "Passcode used to access a reader's admin menu.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-					},
-				},
-			},
 			"reboot_window": schema.SingleNestedAttribute{
 				Optional: true,
 				Computed: true,
@@ -209,20 +193,6 @@ func (r *TerminalConfigurationResource) Schema(_ context.Context, _ resource.Sch
 				},
 			},
 			"stripe_s710": schema.SingleNestedAttribute{
-				Optional: true,
-				Computed: true,
-
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-				Attributes: map[string]schema.Attribute{
-					"splashscreen": schema.StringAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "A File ID representing an image to display on the reader",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-					},
-				},
-			},
-			"stripe_t600": schema.SingleNestedAttribute{
 				Optional: true,
 				Computed: true,
 
@@ -1152,11 +1122,6 @@ func expandTerminalConfigurationCreate(plan TerminalConfigurationResourceModel) 
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "offline", params)
 		}
 	}
-	if !plan.ReaderSecurity.IsNull() && !plan.ReaderSecurity.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "ReaderSecurity", plan.ReaderSecurity) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "reader_security", params)
-		}
-	}
 	if !plan.RebootWindow.IsNull() && !plan.RebootWindow.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "RebootWindow", plan.RebootWindow) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "reboot_window", params)
@@ -1170,11 +1135,6 @@ func expandTerminalConfigurationCreate(plan TerminalConfigurationResourceModel) 
 	if !plan.StripeS710.IsNull() && !plan.StripeS710.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "StripeS710", plan.StripeS710) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "stripe_s710", params)
-		}
-	}
-	if !plan.StripeT600.IsNull() && !plan.StripeT600.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "StripeT600", plan.StripeT600) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "stripe_t600", params)
 		}
 	}
 	if !plan.Tipping.IsNull() && !plan.Tipping.IsUnknown() {
@@ -1254,13 +1214,6 @@ func expandTerminalConfigurationUpdate(plan TerminalConfigurationResourceModel, 
 			}
 		}
 	}
-	if !plan.ReaderSecurity.Equal(state.ReaderSecurity) && !plan.ReaderSecurity.IsNull() && !plan.ReaderSecurity.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "ReaderSecurity", plan.ReaderSecurity) {
-			if !plan.ReaderSecurity.Equal(state.ReaderSecurity) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "reader_security", params)
-			}
-		}
-	}
 	if !plan.RebootWindow.Equal(state.RebootWindow) && !plan.RebootWindow.IsNull() && !plan.RebootWindow.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "RebootWindow", plan.RebootWindow) {
 			if !plan.RebootWindow.Equal(state.RebootWindow) {
@@ -1279,13 +1232,6 @@ func expandTerminalConfigurationUpdate(plan TerminalConfigurationResourceModel, 
 		if !assignAttrValueToNamedField(params, "StripeS710", plan.StripeS710) {
 			if !plan.StripeS710.Equal(state.StripeS710) {
 				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "stripe_s710", params)
-			}
-		}
-	}
-	if !plan.StripeT600.Equal(state.StripeT600) && !plan.StripeT600.IsNull() && !plan.StripeT600.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "StripeT600", plan.StripeT600) {
-			if !plan.StripeT600.Equal(state.StripeT600) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "stripe_t600", params)
 			}
 		}
 	}
@@ -1630,51 +1576,6 @@ func flattenTerminalConfiguration(obj *stripe.TerminalConfiguration, state *Term
 		}
 	}
 	{
-		assignedReaderSecurity := false
-		hadRawReaderSecurity := false
-		if rawValueReaderSecurity, rawOk := plainValueAtPath(raw, "reader_security"); rawOk {
-			hadRawReaderSecurity = true
-			if rawValueReaderSecurity != nil {
-				sourceReaderSecurity := applyConfiguredKeyedListShapes(rawValueReaderSecurity, attrValueToPlain(state.ReaderSecurity))
-				if valueReaderSecurity, err := flattenPlainValue(sourceReaderSecurity, types.ObjectType{AttrTypes: map[string]attr.Type{"admin_menu_passcode": types.StringType}}, "reader_security", "raw response"); err != nil {
-					return err
-				} else {
-					if typedReaderSecurity, ok := valueReaderSecurity.(types.Object); ok {
-						state.ReaderSecurity = typedReaderSecurity
-						assignedReaderSecurity = true
-					}
-				}
-			}
-		}
-		if !assignedReaderSecurity {
-			if !hasRaw {
-				if responseValueReaderSecurity, ok := plainFromResponseField(obj, "ReaderSecurity"); ok {
-					sourceReaderSecurity := applyConfiguredKeyedListShapes(responseValueReaderSecurity, attrValueToPlain(state.ReaderSecurity))
-					if valueReaderSecurity, err := flattenPlainValue(
-						sourceReaderSecurity,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"admin_menu_passcode": types.StringType}},
-						"reader_security",
-						"response struct",
-					); err != nil {
-						return err
-					} else {
-						if typedReaderSecurity, ok := valueReaderSecurity.(types.Object); ok {
-							state.ReaderSecurity = typedReaderSecurity
-							assignedReaderSecurity = true
-						}
-					}
-				}
-			}
-		}
-		if !assignedReaderSecurity && hadRawReaderSecurity {
-			if nullReaderSecurity, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"admin_menu_passcode": types.StringType}}); ok {
-				if typedReaderSecurity, ok := nullReaderSecurity.(types.Object); ok {
-					state.ReaderSecurity = typedReaderSecurity
-				}
-			}
-		}
-	}
-	{
 		assignedRebootWindow := false
 		hadRawRebootWindow := false
 		if rawValueRebootWindow, rawOk := plainValueAtPath(raw, "reboot_window"); rawOk {
@@ -1805,51 +1706,6 @@ func flattenTerminalConfiguration(obj *stripe.TerminalConfiguration, state *Term
 			if nullStripeS710, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"splashscreen": types.StringType}}); ok {
 				if typedStripeS710, ok := nullStripeS710.(types.Object); ok {
 					state.StripeS710 = typedStripeS710
-				}
-			}
-		}
-	}
-	{
-		assignedStripeT600 := false
-		hadRawStripeT600 := false
-		if rawValueStripeT600, rawOk := plainValueAtPath(raw, "stripe_t600"); rawOk {
-			hadRawStripeT600 = true
-			if rawValueStripeT600 != nil {
-				sourceStripeT600 := applyConfiguredKeyedListShapes(rawValueStripeT600, attrValueToPlain(state.StripeT600))
-				if valueStripeT600, err := flattenPlainValue(sourceStripeT600, types.ObjectType{AttrTypes: map[string]attr.Type{"splashscreen": types.StringType}}, "stripe_t600", "raw response"); err != nil {
-					return err
-				} else {
-					if typedStripeT600, ok := valueStripeT600.(types.Object); ok {
-						state.StripeT600 = typedStripeT600
-						assignedStripeT600 = true
-					}
-				}
-			}
-		}
-		if !assignedStripeT600 {
-			if !hasRaw {
-				if responseValueStripeT600, ok := plainFromResponseField(obj, "StripeT600"); ok {
-					sourceStripeT600 := applyConfiguredKeyedListShapes(responseValueStripeT600, attrValueToPlain(state.StripeT600))
-					if valueStripeT600, err := flattenPlainValue(
-						sourceStripeT600,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"splashscreen": types.StringType}},
-						"stripe_t600",
-						"response struct",
-					); err != nil {
-						return err
-					} else {
-						if typedStripeT600, ok := valueStripeT600.(types.Object); ok {
-							state.StripeT600 = typedStripeT600
-							assignedStripeT600 = true
-						}
-					}
-				}
-			}
-		}
-		if !assignedStripeT600 && hadRawStripeT600 {
-			if nullStripeT600, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"splashscreen": types.StringType}}); ok {
-				if typedStripeT600, ok := nullStripeT600.(types.Object); ok {
-					state.StripeT600 = typedStripeT600
 				}
 			}
 		}

@@ -18,8 +18,8 @@ import (
 	"os"
 	"time"
 
-	stripe "github.com/stripe/stripe-go/v87"
-	rawrequest "github.com/stripe/stripe-go/v87/rawrequest"
+	stripe "github.com/stripe/stripe-go/v86"
+	rawrequest "github.com/stripe/stripe-go/v86/rawrequest"
 )
 
 var sessionAuthToken string = ""
@@ -35,7 +35,7 @@ func refreshMeterEventSession(client rawrequest.Client) (err error) {
 			return err
 		}
 		if rawResp.StatusCode != 200 {
-			return fmt.Errorf("%s", rawResp.Status)
+			return fmt.Errorf(rawResp.Status)
 		}
 
 		var resp map[string]interface{}

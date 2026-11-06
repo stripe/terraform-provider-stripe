@@ -28,7 +28,7 @@ import (
 	"strconv"
 	"strings"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ resource.Resource = &ProductResource{}
@@ -61,7 +61,6 @@ type ProductResourceModel struct {
 	Shippable           types.Bool   `tfsdk:"shippable"`
 	StatementDescriptor types.String `tfsdk:"statement_descriptor"`
 	TaxCode             types.String `tfsdk:"tax_code"`
-	TaxDetails          types.Object `tfsdk:"tax_details"`
 	Type                types.String `tfsdk:"type"`
 	UnitLabel           types.String `tfsdk:"unit_label"`
 	Updated             types.Int64  `tfsdk:"updated"`
@@ -132,7 +131,7 @@ func (r *ProductResource) UpgradeState(ctx context.Context) map[int64]resource.S
 
 func productResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
-		Description: "Products describe the specific goods or services you offer to your customers.\nFor example, you might offer a Standard and Premium version of your goods or service; each version would be a separate Product.\nThey can be used in conjunction with [Prices](https://docs.stripe.com/api#prices) to configure pricing in Payment Links, Checkout, and Subscriptions.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription),\n[share a Payment Link](https://docs.stripe.com/payment-links),\n[accept payments with Checkout](https://docs.stripe.com/payments/accept-a-payment#create-product-prices-upfront),\nand more about [Products and Prices](https://docs.stripe.com/products-prices/overview)",
+		Description: "Products describe the specific goods or services you offer to your customers.\nFor example, you might offer a Standard and Premium version of your goods or service; each version would be a separate Product.\nThey can be used in conjunction with [Prices](https://api.stripe.com#prices) to configure pricing in Payment Links, Checkout, and Subscriptions.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription),\n[share a Payment Link](https://docs.stripe.com/payment-links),\n[accept payments with Checkout](https://docs.stripe.com/payments/accept-a-payment#create-product-prices-upfront),\nand more about [Products and Prices](https://docs.stripe.com/products-prices/overview)",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -163,10 +162,9 @@ func productResourceV1Schema() *schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"id": schema.StringAttribute{
-				Optional:      true,
 				Computed:      true,
 				Description:   "Unique identifier for the object.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"images": schema.ListAttribute{
 				Optional:    true,
@@ -236,27 +234,10 @@ func productResourceV1Schema() *schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"tax_code": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
-			},
-			"tax_details": schema.SingleNestedAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "Tax details for this product, including the [tax code](/tax/tax-codes) and an optional performance location.",
-				Attributes: map[string]schema.Attribute{
-					"performance_location": schema.StringAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "The ID of a tax location with type `performance`, representing where the performance takes place.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-					},
-					"tax_code": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
-					},
-				},
+				Optional:      true,
+				Computed:      true,
+				Description:   "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"type": schema.StringAttribute{
 				Optional:      true,
@@ -453,7 +434,7 @@ func productResourceV1Schema() *schema.Schema {
 
 func productResourceV0Schema() *schema.Schema {
 	return &schema.Schema{
-		Description: "Products describe the specific goods or services you offer to your customers.\nFor example, you might offer a Standard and Premium version of your goods or service; each version would be a separate Product.\nThey can be used in conjunction with [Prices](https://docs.stripe.com/api#prices) to configure pricing in Payment Links, Checkout, and Subscriptions.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription),\n[share a Payment Link](https://docs.stripe.com/payment-links),\n[accept payments with Checkout](https://docs.stripe.com/payments/accept-a-payment#create-product-prices-upfront),\nand more about [Products and Prices](https://docs.stripe.com/products-prices/overview)",
+		Description: "Products describe the specific goods or services you offer to your customers.\nFor example, you might offer a Standard and Premium version of your goods or service; each version would be a separate Product.\nThey can be used in conjunction with [Prices](https://api.stripe.com#prices) to configure pricing in Payment Links, Checkout, and Subscriptions.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription),\n[share a Payment Link](https://docs.stripe.com/payment-links),\n[accept payments with Checkout](https://docs.stripe.com/payments/accept-a-payment#create-product-prices-upfront),\nand more about [Products and Prices](https://docs.stripe.com/products-prices/overview)",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -484,10 +465,9 @@ func productResourceV0Schema() *schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"id": schema.StringAttribute{
-				Optional:      true,
 				Computed:      true,
 				Description:   "Unique identifier for the object.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"images": schema.ListAttribute{
 				Optional:    true,
@@ -523,27 +503,10 @@ func productResourceV0Schema() *schema.Schema {
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"tax_code": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
-			},
-			"tax_details": schema.SingleNestedAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "Tax details for this product, including the [tax code](/tax/tax-codes) and an optional performance location.",
-				Attributes: map[string]schema.Attribute{
-					"performance_location": schema.StringAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "The ID of a tax location with type `performance`, representing where the performance takes place.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-					},
-					"tax_code": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
-					},
-				},
+				Optional:      true,
+				Computed:      true,
+				Description:   "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"type": schema.StringAttribute{
 				Optional:      true,
@@ -797,7 +760,6 @@ type ProductResourceV1Model struct {
 	Shippable           types.Bool   `tfsdk:"shippable"`
 	StatementDescriptor types.String `tfsdk:"statement_descriptor"`
 	TaxCode             types.String `tfsdk:"tax_code"`
-	TaxDetails          types.Object `tfsdk:"tax_details"`
 	Type                types.String `tfsdk:"type"`
 	UnitLabel           types.String `tfsdk:"unit_label"`
 	Updated             types.Int64  `tfsdk:"updated"`
@@ -813,7 +775,7 @@ type productStateUpgradeAttrMeta struct {
 	Nested                  map[string]productStateUpgradeAttrMeta
 }
 
-var productStateUpgradeRootMeta = map[string]productStateUpgradeAttrMeta{"object": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "active": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "created": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "default_price": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "description": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "images": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional", LegacyBehavior: "optional"}, "livemode": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "marketing_features": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"name": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"name": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "metadata": productStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "name": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "package_dimensions": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"height": types.Float64Type, "length": types.Float64Type, "weight": types.Float64Type, "width": types.Float64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"height": productStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "required", LegacyBehavior: "required"}, "length": productStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "required", LegacyBehavior: "required"}, "weight": productStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "required", LegacyBehavior: "required"}, "width": productStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "required", LegacyBehavior: "required"}}}, "shippable": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "statement_descriptor": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "tax_code": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "tax_details": productStateUpgradeAttrMeta{AttrType: types.ObjectType{AttrTypes: map[string]attr.Type{"performance_location": types.StringType, "tax_code": types.StringType}}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed", Nested: map[string]productStateUpgradeAttrMeta{"performance_location": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "tax_code": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}}}, "type": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "unit_label": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "updated": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "url": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "default_price_data": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "custom_unit_amount": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, "tax_behavior": types.StringType, "tiers": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"flat_amount": types.Int64Type, "flat_amount_decimal": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType, "up_to": types.Int64Type}}}, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType}}}, "custom_unit_amount": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, "metadata": types.MapType{ElemType: types.StringType}, "recurring": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", PreserveConfiguredValue: true, Nested: map[string]productStateUpgradeAttrMeta{"currency": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "currency_options": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "custom_unit_amount": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, "tax_behavior": types.StringType, "tiers": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"flat_amount": types.Int64Type, "flat_amount_decimal": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType, "up_to": types.Int64Type}}}, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"key": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "custom_unit_amount": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"enabled": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "required", LegacyBehavior: "required"}, "maximum": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "minimum": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "preset": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}}}, "tax_behavior": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}, "tiers": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"flat_amount": types.Int64Type, "flat_amount_decimal": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType, "up_to": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"flat_amount": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "flat_amount_decimal": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount_decimal": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}, "up_to": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "required", LegacyBehavior: "required"}}}, "unit_amount": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount_decimal": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}}}, "custom_unit_amount": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"enabled": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "required", LegacyBehavior: "required"}, "maximum": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "minimum": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "preset": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}}}, "metadata": productStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional", LegacyBehavior: "optional"}, "recurring": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"interval": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "interval_count": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}}}, "tax_behavior": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount_decimal": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}}}}
+var productStateUpgradeRootMeta = map[string]productStateUpgradeAttrMeta{"object": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "active": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "created": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "default_price": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "description": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "id": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "computed", LegacyBehavior: "computed"}, "images": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.StringType}, Behavior: "optional", LegacyBehavior: "optional"}, "livemode": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "computed", LegacyBehavior: "computed"}, "marketing_features": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"name": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"name": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}}}, "metadata": productStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "name": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "package_dimensions": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"height": types.Float64Type, "length": types.Float64Type, "weight": types.Float64Type, "width": types.Float64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"height": productStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "required", LegacyBehavior: "required"}, "length": productStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "required", LegacyBehavior: "required"}, "weight": productStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "required", LegacyBehavior: "required"}, "width": productStateUpgradeAttrMeta{AttrType: types.Float64Type, Behavior: "required", LegacyBehavior: "required"}}}, "shippable": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "statement_descriptor": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "tax_code": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "type": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "unit_label": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "updated": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "computed", LegacyBehavior: "computed"}, "url": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional_and_computed", LegacyBehavior: "optional_and_computed"}, "default_price_data": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "currency_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "custom_unit_amount": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, "tax_behavior": types.StringType, "tiers": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"flat_amount": types.Int64Type, "flat_amount_decimal": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType, "up_to": types.Int64Type}}}, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType}}}, "custom_unit_amount": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, "metadata": types.MapType{ElemType: types.StringType}, "recurring": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", PreserveConfiguredValue: true, Nested: map[string]productStateUpgradeAttrMeta{"currency": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "currency_options": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"key": types.StringType, "custom_unit_amount": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, "tax_behavior": types.StringType, "tiers": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"flat_amount": types.Int64Type, "flat_amount_decimal": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType, "up_to": types.Int64Type}}}, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"key": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "custom_unit_amount": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"enabled": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "required", LegacyBehavior: "required"}, "maximum": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "minimum": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "preset": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}}}, "tax_behavior": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}, "tiers": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"flat_amount": types.Int64Type, "flat_amount_decimal": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.StringType, "up_to": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"flat_amount": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "flat_amount_decimal": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount_decimal": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}, "up_to": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "required", LegacyBehavior: "required"}}}, "unit_amount": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount_decimal": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}}}, "custom_unit_amount": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type, "preset": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"enabled": productStateUpgradeAttrMeta{AttrType: types.BoolType, Behavior: "required", LegacyBehavior: "required"}, "maximum": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "minimum": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "preset": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}}}, "metadata": productStateUpgradeAttrMeta{AttrType: types.MapType{ElemType: types.StringType}, Behavior: "optional", LegacyBehavior: "optional"}, "recurring": productStateUpgradeAttrMeta{AttrType: types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, Behavior: "optional", LegacyBehavior: "optional", Nested: map[string]productStateUpgradeAttrMeta{"interval": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "required", LegacyBehavior: "required"}, "interval_count": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}}}, "tax_behavior": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount": productStateUpgradeAttrMeta{AttrType: types.Int64Type, Behavior: "optional", LegacyBehavior: "optional"}, "unit_amount_decimal": productStateUpgradeAttrMeta{AttrType: types.StringType, Behavior: "optional", LegacyBehavior: "optional"}}}}
 
 var productStateUpgradeSingletonPaths = map[string]struct{}{}
 
@@ -1210,7 +1172,7 @@ func upgradeProductStateV1(ctx context.Context, prior interface{}) (ProductResou
 func (r *ProductResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Version:     2,
-		Description: "Products describe the specific goods or services you offer to your customers.\nFor example, you might offer a Standard and Premium version of your goods or service; each version would be a separate Product.\nThey can be used in conjunction with [Prices](https://docs.stripe.com/api#prices) to configure pricing in Payment Links, Checkout, and Subscriptions.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription),\n[share a Payment Link](https://docs.stripe.com/payment-links),\n[accept payments with Checkout](https://docs.stripe.com/payments/accept-a-payment#create-product-prices-upfront),\nand more about [Products and Prices](https://docs.stripe.com/products-prices/overview)",
+		Description: "Products describe the specific goods or services you offer to your customers.\nFor example, you might offer a Standard and Premium version of your goods or service; each version would be a separate Product.\nThey can be used in conjunction with [Prices](https://api.stripe.com#prices) to configure pricing in Payment Links, Checkout, and Subscriptions.\n\nRelated guides: [Set up a subscription](https://docs.stripe.com/billing/subscriptions/set-up-subscription),\n[share a Payment Link](https://docs.stripe.com/payment-links),\n[accept payments with Checkout](https://docs.stripe.com/payments/accept-a-payment#create-product-prices-upfront),\nand more about [Products and Prices](https://docs.stripe.com/products-prices/overview)",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -1241,10 +1203,9 @@ func (r *ProductResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"id": schema.StringAttribute{
-				Optional:      true,
 				Computed:      true,
 				Description:   "Unique identifier for the object.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"images": schema.ListAttribute{
 				Optional:    true,
@@ -1280,27 +1241,10 @@ func (r *ProductResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"tax_code": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
-			},
-			"tax_details": schema.SingleNestedAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "Tax details for this product, including the [tax code](/tax/tax-codes) and an optional performance location.",
-				Attributes: map[string]schema.Attribute{
-					"performance_location": schema.StringAttribute{
-						Optional:      true,
-						Computed:      true,
-						Description:   "The ID of a tax location with type `performance`, representing where the performance takes place.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-					},
-					"tax_code": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
-					},
-				},
+				Optional:      true,
+				Computed:      true,
+				Description:   "A [tax code](https://docs.stripe.com/tax/tax-categories) ID.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"type": schema.StringAttribute{
 				Optional:      true,
@@ -1733,11 +1677,6 @@ func expandProductCreate(plan ProductResourceModel) (*stripe.ProductCreateParams
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "description", params)
 		}
 	}
-	if !plan.ID.IsNull() && !plan.ID.IsUnknown() {
-		if !assignStringToNamedFieldOrMethod(params, "ID", "ID", plan.ID.ValueString()) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "id", params)
-		}
-	}
 	if !plan.Images.IsNull() && !plan.Images.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "Images", plan.Images) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "images", params)
@@ -1774,11 +1713,6 @@ func expandProductCreate(plan ProductResourceModel) (*stripe.ProductCreateParams
 	if !plan.TaxCode.IsNull() && !plan.TaxCode.IsUnknown() {
 		if !assignStringToNamedFieldOrMethod(params, "TaxCodeID", "TaxCode", plan.TaxCode.ValueString()) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "tax_code", params)
-		}
-	}
-	if !plan.TaxDetails.IsNull() && !plan.TaxDetails.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "TaxDetails", plan.TaxDetails) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "tax_details", params)
 		}
 	}
 	if !plan.Type.IsNull() && !plan.Type.IsUnknown() {
@@ -1867,13 +1801,6 @@ func expandProductUpdate(plan ProductResourceModel, state ProductResourceModel) 
 		if !assignStringToNamedFieldOrMethod(params, "TaxCodeID", "TaxCode", plan.TaxCode.ValueString()) {
 			if !plan.TaxCode.Equal(state.TaxCode) {
 				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "tax_code", params)
-			}
-		}
-	}
-	if !plan.TaxDetails.Equal(state.TaxDetails) && !plan.TaxDetails.IsNull() && !plan.TaxDetails.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "TaxDetails", plan.TaxDetails) {
-			if !plan.TaxDetails.Equal(state.TaxDetails) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "tax_details", params)
 			}
 		}
 	}
@@ -2245,51 +2172,6 @@ func flattenProduct(obj *stripe.Product, state *ProductResourceModel) error {
 					if typedTaxCode, ok := plainToStringIDValue(responseValueTaxCode); ok {
 						state.TaxCode = typedTaxCode
 					}
-				}
-			}
-		}
-	}
-	{
-		assignedTaxDetails := false
-		hadRawTaxDetails := false
-		if rawValueTaxDetails, rawOk := plainValueAtPath(raw, "tax_details"); rawOk {
-			hadRawTaxDetails = true
-			if rawValueTaxDetails != nil {
-				sourceTaxDetails := applyConfiguredKeyedListShapes(rawValueTaxDetails, attrValueToPlain(state.TaxDetails))
-				if valueTaxDetails, err := flattenPlainValue(sourceTaxDetails, types.ObjectType{AttrTypes: map[string]attr.Type{"performance_location": types.StringType, "tax_code": types.StringType}}, "tax_details", "raw response"); err != nil {
-					return err
-				} else {
-					if typedTaxDetails, ok := valueTaxDetails.(types.Object); ok {
-						state.TaxDetails = typedTaxDetails
-						assignedTaxDetails = true
-					}
-				}
-			}
-		}
-		if !assignedTaxDetails {
-			if !hasRaw {
-				if responseValueTaxDetails, ok := plainFromResponseField(obj, "TaxDetails"); ok {
-					sourceTaxDetails := applyConfiguredKeyedListShapes(responseValueTaxDetails, attrValueToPlain(state.TaxDetails))
-					if valueTaxDetails, err := flattenPlainValue(
-						sourceTaxDetails,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"performance_location": types.StringType, "tax_code": types.StringType}},
-						"tax_details",
-						"response struct",
-					); err != nil {
-						return err
-					} else {
-						if typedTaxDetails, ok := valueTaxDetails.(types.Object); ok {
-							state.TaxDetails = typedTaxDetails
-							assignedTaxDetails = true
-						}
-					}
-				}
-			}
-		}
-		if !assignedTaxDetails && hadRawTaxDetails {
-			if nullTaxDetails, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"performance_location": types.StringType, "tax_code": types.StringType}}); ok {
-				if typedTaxDetails, ok := nullTaxDetails.(types.Object); ok {
-					state.TaxDetails = typedTaxDetails
 				}
 			}
 		}

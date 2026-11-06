@@ -30,7 +30,6 @@ type TreasuryFinancialAccountFinancialAddressSupportedNetwork string
 // List of values that TreasuryFinancialAccountFinancialAddressSupportedNetwork can take
 const (
 	TreasuryFinancialAccountFinancialAddressSupportedNetworkACH            TreasuryFinancialAccountFinancialAddressSupportedNetwork = "ach"
-	TreasuryFinancialAccountFinancialAddressSupportedNetworkRTP            TreasuryFinancialAccountFinancialAddressSupportedNetwork = "rtp"
 	TreasuryFinancialAccountFinancialAddressSupportedNetworkUSDomesticWire TreasuryFinancialAccountFinancialAddressSupportedNetwork = "us_domestic_wire"
 )
 
@@ -719,10 +718,8 @@ type TreasuryFinancialAccountStatusDetails struct {
 	Closed *TreasuryFinancialAccountStatusDetailsClosed `json:"closed"`
 }
 
-// Legacy FinancialAccounts are part of the v1 version of Treasury for platforms and do not support many of the features introduced in [Treasury for platforms v2](https://docs.stripe.com/treasury/connect). Use [Financial Accounts](https://docs.stripe.com/api/v2/money-management/financial-accounts) instead of building a new v1 integration.
-//
-// Stripe Treasury for Platforms provides users with a container for money called a FinancialAccount that is separate from their Payments balance.
-// FinancialAccounts serve as the source and destination of Treasury for Platform's money movement APIs.
+// Stripe Treasury provides users with a container for money called a FinancialAccount that is separate from their Payments balance.
+// FinancialAccounts serve as the source and destination of Treasury's money movement APIs.
 type TreasuryFinancialAccount struct {
 	APIResource
 	// The array of paths to active Features in the Features hash.

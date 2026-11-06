@@ -28,7 +28,7 @@ import (
 	"strconv"
 	"strings"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ resource.Resource = &TaxRateResource{}
@@ -224,7 +224,7 @@ func taxRateResourceV0Schema() *schema.Schema {
 				Computed:      true,
 				Description:   "The high-level tax type, such as `vat` or `sales_tax`.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Validators:    []validator.String{stringvalidator.OneOf("admissions_tax", "amusement_tax", "attendance_tax", "communications_tax", "digital_excise_tax", "entertainment_tax", "get_fund", "gross_receipts_tax", "gst", "hospitality_tax", "hst", "igst", "jct", "lease_tax", "luxury_tax", "mass_transit_parking_tax", "nhil", "parking_tax", "pst", "qst", "resort_tax", "retail_delivery_fee", "rst", "sales_tax", "service_tax", "tourism_tax", "utility_users_tax", "vat")},
+				Validators:    []validator.String{stringvalidator.OneOf("amusement_tax", "communications_tax", "gst", "hst", "igst", "jct", "lease_tax", "pst", "qst", "retail_delivery_fee", "rst", "sales_tax", "service_tax", "vat")},
 			},
 		},
 	}
@@ -769,7 +769,7 @@ func (r *TaxRateResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				Computed:      true,
 				Description:   "The high-level tax type, such as `vat` or `sales_tax`.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-				Validators:    []validator.String{stringvalidator.OneOf("admissions_tax", "amusement_tax", "attendance_tax", "communications_tax", "digital_excise_tax", "entertainment_tax", "get_fund", "gross_receipts_tax", "gst", "hospitality_tax", "hst", "igst", "jct", "lease_tax", "luxury_tax", "mass_transit_parking_tax", "nhil", "parking_tax", "pst", "qst", "resort_tax", "retail_delivery_fee", "rst", "sales_tax", "service_tax", "tourism_tax", "utility_users_tax", "vat")},
+				Validators:    []validator.String{stringvalidator.OneOf("amusement_tax", "communications_tax", "gst", "hst", "igst", "jct", "lease_tax", "pst", "qst", "retail_delivery_fee", "rst", "sales_tax", "service_tax", "vat")},
 			},
 		},
 	}
@@ -959,9 +959,7 @@ func expandTaxRateCreate(plan TaxRateResourceModel) (*stripe.TaxRateCreateParams
 		}
 	}
 	if !plan.Percentage.IsNull() && !plan.Percentage.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "Percentage", plan.Percentage) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "percentage", params)
-		}
+		params.Percentage = stripe.Float64(plan.Percentage.ValueFloat64())
 	}
 	if !plan.State.IsNull() && !plan.State.IsUnknown() {
 		if !assignStringToNamedFieldOrMethod(params, "State", "State", plan.State.ValueString()) {

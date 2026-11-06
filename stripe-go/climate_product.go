@@ -6,10 +6,7 @@
 
 package stripe
 
-import (
-	"encoding/json"
-	"github.com/shopspring/decimal"
-)
+import "encoding/json"
 
 // Lists all available Climate product objects.
 type ClimateProductListParams struct {
@@ -65,7 +62,7 @@ type ClimateProduct struct {
 	Created int64 `json:"created"`
 	// Current prices for a metric ton of carbon removal in a currency's smallest unit.
 	CurrentPricesPerMetricTon map[string]*ClimateProductCurrentPricesPerMetricTon `json:"current_prices_per_metric_ton"`
-	// The year in which the carbon removal is expected to be delivered. If the year is in the past, this represents spot inventory with guaranteed delivery.
+	// The year in which the carbon removal is expected to be delivered.
 	DeliveryYear int64 `json:"delivery_year"`
 	// Unique identifier for the object. For convenience, Climate product IDs are human-readable strings
 	// that start with `climsku_`. See [carbon removal inventory](https://stripe.com/docs/climate/orders/carbon-removal-inventory)
@@ -74,7 +71,7 @@ type ClimateProduct struct {
 	// Has the value `true` if the object exists in live mode or the value `false` if the object exists in test mode.
 	Livemode bool `json:"livemode"`
 	// The quantity of metric tons available for reservation.
-	MetricTonsAvailable decimal.Decimal `json:"metric_tons_available"`
+	MetricTonsAvailable float64 `json:"metric_tons_available,string"`
 	// The Climate product's name.
 	Name string `json:"name"`
 	// String representing the object's type. Objects of the same type share the same value.

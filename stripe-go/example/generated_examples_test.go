@@ -7,5 +7,5 @@
 package example
 
 import (
-	. "github.com/stripe/stripe-go/v87/testing"
+	. "github.com/stripe/stripe-go/v86/testing"
 )

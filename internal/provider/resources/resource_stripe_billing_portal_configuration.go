@@ -24,7 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"reflect"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ resource.Resource = &BillingPortalConfigurationResource{}
@@ -130,7 +130,7 @@ func (r *BillingPortalConfigurationResource) Schema(_ context.Context, _ resourc
 			"default_return_url": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overridden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.",
+				Description:   "The default URL to redirect customers to when they click on the portal's link to return to your website. This can be [overriden](https://docs.stripe.com/api/customer_portal/sessions/create#create_portal_session-return_url) when creating the session.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"features": schema.SingleNestedAttribute{
@@ -202,13 +202,6 @@ func (r *BillingPortalConfigurationResource) Schema(_ context.Context, _ resourc
 										Required:    true,
 										Description: "Whether the feature is enabled.",
 									},
-									"feedback_options": schema.ListAttribute{
-										Optional:      true,
-										Computed:      true,
-										Description:   "The IDs of custom feedback options configured for this cancellation reason.",
-										PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-										ElementType:   types.StringType,
-									},
 									"options": schema.ListAttribute{
 										Required:    true,
 										Description: "Which cancellation reasons will be given as options to the customer.",
@@ -233,54 +226,6 @@ func (r *BillingPortalConfigurationResource) Schema(_ context.Context, _ resourc
 								Description:   "Whether to create prorations when canceling subscriptions. Possible values are `none` and `create_prorations`.",
 								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 								Validators:    []validator.String{stringvalidator.OneOf("always_invoice", "create_prorations", "none")},
-							},
-						},
-					},
-					"subscription_pause": schema.SingleNestedAttribute{
-						Optional: true,
-						Computed: true,
-
-						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-						Attributes: map[string]schema.Attribute{
-							"duration": schema.SingleNestedAttribute{
-								Optional: true,
-								Computed: true,
-
-								PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
-								Attributes: map[string]schema.Attribute{
-									"interval_options": schema.ListNestedAttribute{
-										Optional:      true,
-										Computed:      true,
-										Description:   "The preset pause durations customers can choose from.",
-										PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-										NestedObject: schema.NestedAttributeObject{
-											Attributes: map[string]schema.Attribute{
-												"interval": schema.StringAttribute{
-													Required:    true,
-													Description: "Specifies the pause duration unit. Either `day`, `week`, `month`, or `year`.",
-													Validators:  []validator.String{stringvalidator.OneOf("day", "month", "week", "year")},
-												},
-												"interval_count": schema.Int64Attribute{
-													Optional:      true,
-													Computed:      true,
-													Description:   "The number of intervals in the pause duration. The maximum duration is three years.",
-													PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
-												},
-											},
-										},
-									},
-									"type": schema.StringAttribute{
-										Required:    true,
-										Description: "Whether subscriptions can be paused indefinitely or for a preset duration.",
-										Validators:  []validator.String{stringvalidator.OneOf("indefinite", "interval_options")},
-									},
-								},
-							},
-							"enabled": schema.BoolAttribute{
-								Optional:      true,
-								Computed:      true,
-								Description:   "Whether the feature is enabled. Customers can only pause subscriptions in the [redesigned customer portal](/customer-management).",
-								PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 							},
 						},
 					},
@@ -455,17 +400,13 @@ func (r *BillingPortalConfigurationResource) Create(ctx context.Context, req res
 		return
 	}
 
-	params.AddExpand("features.subscription_update.products")
 	obj, err := r.client.V1BillingPortalConfigurations.Create(ctx, params)
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating BillingPortalConfiguration", err.Error())
 		return
 	}
 
-	rawReadParams := &stripe.BillingPortalConfigurationRetrieveParams{}
-	rawReadParams.AddExpand("features.subscription_update.products")
-
-	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), rawReadParams); err != nil {
+	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), nil); err != nil {
 		resp.Diagnostics.AddError("Error hydrating BillingPortalConfiguration create raw response", err.Error())
 		return
 	}
@@ -499,10 +440,7 @@ func (r *BillingPortalConfigurationResource) Create(ctx context.Context, req res
 			resp.Diagnostics.AddError("Error finalizing BillingPortalConfiguration after create", err.Error())
 			return
 		}
-		rawReadParams := &stripe.BillingPortalConfigurationRetrieveParams{}
-		rawReadParams.AddExpand("features.subscription_update.products")
-
-		if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), rawReadParams); err != nil {
+		if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), nil); err != nil {
 			resp.Diagnostics.AddError("Error hydrating BillingPortalConfiguration post-create update raw response", err.Error())
 			return
 		}
@@ -528,16 +466,13 @@ func (r *BillingPortalConfigurationResource) Read(ctx context.Context, req resou
 	var state BillingPortalConfigurationResourceModel
 	state = priorState
 
-	params := &stripe.BillingPortalConfigurationRetrieveParams{}
-	params.AddExpand("features.subscription_update.products")
-
-	obj, err := r.client.V1BillingPortalConfigurations.Retrieve(ctx, state.ID.ValueString(), params)
+	obj, err := r.client.V1BillingPortalConfigurations.Retrieve(ctx, state.ID.ValueString(), nil)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading BillingPortalConfiguration", err.Error())
 		return
 	}
 
-	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", state.ID.ValueString()), params); err != nil {
+	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", state.ID.ValueString()), nil); err != nil {
 		resp.Diagnostics.AddError("Error hydrating BillingPortalConfiguration raw response", err.Error())
 		return
 	}
@@ -559,13 +494,6 @@ func (r *BillingPortalConfigurationResource) Update(ctx context.Context, req res
 		return
 	}
 
-	var config BillingPortalConfigurationResourceModel
-	diags = req.Config.Get(ctx, &config)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	var state BillingPortalConfigurationResourceModel
 	diags = req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -576,7 +504,7 @@ func (r *BillingPortalConfigurationResource) Update(ctx context.Context, req res
 	diffPlan := plan
 	diffState := state
 
-	params, err := expandBillingPortalConfigurationUpdate(diffPlan, diffState, config)
+	params, err := expandBillingPortalConfigurationUpdate(diffPlan, diffState)
 	if err != nil {
 		resp.Diagnostics.AddError("Error building BillingPortalConfiguration update params", err.Error())
 		return
@@ -589,17 +517,13 @@ func (r *BillingPortalConfigurationResource) Update(ctx context.Context, req res
 			return
 		}
 	}
-	params.AddExpand("features.subscription_update.products")
 	obj, err := r.client.V1BillingPortalConfigurations.Update(ctx, state.ID.ValueString(), params)
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating BillingPortalConfiguration", err.Error())
 		return
 	}
 
-	rawReadParams := &stripe.BillingPortalConfigurationRetrieveParams{}
-	rawReadParams.AddExpand("features.subscription_update.products")
-
-	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), rawReadParams); err != nil {
+	if err := ensureRawResponse(obj, r.client.V1BillingPortalConfigurations.B, r.client.V1BillingPortalConfigurations.Key, stripe.FormatURLPath("/v1/billing_portal/configurations/%s", obj.ID), nil); err != nil {
 		resp.Diagnostics.AddError("Error hydrating BillingPortalConfiguration update raw response", err.Error())
 		return
 	}
@@ -683,7 +607,7 @@ func expandBillingPortalConfigurationCreate(plan BillingPortalConfigurationResou
 	return params, nil
 }
 
-func expandBillingPortalConfigurationUpdate(plan BillingPortalConfigurationResourceModel, state BillingPortalConfigurationResourceModel, config BillingPortalConfigurationResourceModel) (*stripe.BillingPortalConfigurationUpdateParams, error) {
+func expandBillingPortalConfigurationUpdate(plan BillingPortalConfigurationResourceModel, state BillingPortalConfigurationResourceModel) (*stripe.BillingPortalConfigurationUpdateParams, error) {
 	params := &stripe.BillingPortalConfigurationUpdateParams{}
 
 	if !plan.Active.Equal(state.Active) && !plan.Active.IsNull() && !plan.Active.IsUnknown() {
@@ -703,9 +627,9 @@ func expandBillingPortalConfigurationUpdate(plan BillingPortalConfigurationResou
 			}
 		}
 	}
-	if !plan.Features.Equal(state.Features) && !config.Features.IsNull() && !config.Features.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "Features", config.Features) {
-			if !config.Features.Equal(state.Features) {
+	if !plan.Features.Equal(state.Features) && !plan.Features.IsNull() && !plan.Features.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "Features", plan.Features) {
+			if !plan.Features.Equal(state.Features) {
 				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "features", params)
 			}
 		}
@@ -898,7 +822,7 @@ func flattenBillingPortalConfiguration(obj *stripe.BillingPortalConfiguration, s
 			hadRawFeatures = true
 			if rawValueFeatures != nil {
 				sourceFeatures := applyConfiguredKeyedListShapes(rawValueFeatures, attrValueToPlain(state.Features))
-				if valueFeatures, err := flattenPlainValue(sourceFeatures, types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "feedback_options": types.ListType{ElemType: types.StringType}, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_pause": types.ObjectType{AttrTypes: map[string]attr.Type{"duration": types.ObjectType{AttrTypes: map[string]attr.Type{"interval_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, "type": types.StringType}}, "enabled": types.BoolType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}}, "features", "raw response"); err != nil {
+				if valueFeatures, err := flattenPlainValue(sourceFeatures, types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}}, "features", "raw response"); err != nil {
 					return err
 				} else {
 					if typedFeatures, ok := valueFeatures.(types.Object); ok {
@@ -914,7 +838,7 @@ func flattenBillingPortalConfiguration(obj *stripe.BillingPortalConfiguration, s
 					sourceFeatures := applyConfiguredKeyedListShapes(responseValueFeatures, attrValueToPlain(state.Features))
 					if valueFeatures, err := flattenPlainValue(
 						sourceFeatures,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "feedback_options": types.ListType{ElemType: types.StringType}, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_pause": types.ObjectType{AttrTypes: map[string]attr.Type{"duration": types.ObjectType{AttrTypes: map[string]attr.Type{"interval_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, "type": types.StringType}}, "enabled": types.BoolType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}},
 						"features",
 						"response struct",
 					); err != nil {
@@ -929,7 +853,7 @@ func flattenBillingPortalConfiguration(obj *stripe.BillingPortalConfiguration, s
 			}
 		}
 		if !assignedFeatures && hadRawFeatures {
-			if nullFeatures, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "feedback_options": types.ListType{ElemType: types.StringType}, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_pause": types.ObjectType{AttrTypes: map[string]attr.Type{"duration": types.ObjectType{AttrTypes: map[string]attr.Type{"interval_options": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}}, "type": types.StringType}}, "enabled": types.BoolType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}}); ok {
+			if nullFeatures, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"customer_update": types.ObjectType{AttrTypes: map[string]attr.Type{"allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType}}, "invoice_history": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}}, "payment_method_update": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "payment_method_configuration": types.StringType}}, "subscription_cancel": types.ObjectType{AttrTypes: map[string]attr.Type{"cancellation_reason": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "options": types.ListType{ElemType: types.StringType}}}, "enabled": types.BoolType, "mode": types.StringType, "proration_behavior": types.StringType}}, "subscription_update": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "default_allowed_updates": types.ListType{ElemType: types.StringType}, "enabled": types.BoolType, "products": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"adjustable_quantity": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType, "maximum": types.Int64Type, "minimum": types.Int64Type}}, "prices": types.ListType{ElemType: types.StringType}, "product": types.StringType}}}, "proration_behavior": types.StringType, "schedule_at_period_end": types.ObjectType{AttrTypes: map[string]attr.Type{"conditions": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}}}, "trial_update_behavior": types.StringType}}}}); ok {
 				if typedFeatures, ok := nullFeatures.(types.Object); ok {
 					state.Features = typedFeatures
 				}

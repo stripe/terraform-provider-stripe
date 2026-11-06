@@ -12,7 +12,7 @@ import (
 	actionSchema "github.com/hashicorp/terraform-plugin-framework/action/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ action.Action = &TransferAction{}
@@ -43,7 +43,7 @@ func (r *TransferAction) Metadata(_ context.Context, req action.MetadataRequest,
 
 func (r *TransferAction) Schema(_ context.Context, _ action.SchemaRequest, resp *action.SchemaResponse) {
 	resp.Schema = actionSchema.Schema{
-		Description: "A `Transfer` object is created when you move funds between Stripe accounts as\npart of Connect.\n\nBefore April 6, 2017, transfers also represented movement of funds from a\nStripe account to a card or bank account. This behavior has since been split\nout into a [Payout](https://docs.stripe.com/api#payout_object) object, with corresponding payout endpoints. For more\ninformation, read about the\n[transfer/payout split](https://docs.stripe.com/transfer-payout-split).\n\nRelated guide: [Creating separate charges and transfers](https://docs.stripe.com/connect/separate-charges-and-transfers)",
+		Description: "A `Transfer` object is created when you move funds between Stripe accounts as\npart of Connect.\n\nBefore April 6, 2017, transfers also represented movement of funds from a\nStripe account to a card or bank account. This behavior has since been split\nout into a [Payout](https://api.stripe.com#payout_object) object, with corresponding payout endpoints. For more\ninformation, read about the\n[transfer/payout split](https://docs.stripe.com/transfer-payout-split).\n\nRelated guide: [Creating separate charges and transfers](https://docs.stripe.com/connect/separate-charges-and-transfers)",
 		Attributes: map[string]actionSchema.Attribute{
 			"amount": actionSchema.Int64Attribute{
 				Optional:    true,

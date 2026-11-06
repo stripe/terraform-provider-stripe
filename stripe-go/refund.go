@@ -280,12 +280,7 @@ func (p *RefundUpdateParams) AddMetadata(key string, value string) {
 }
 
 type RefundDestinationDetailsAffirm struct{}
-type RefundDestinationDetailsAfterpayClearpay struct {
-	// The reference assigned to the refund.
-	Reference string `json:"reference"`
-	// Status of the reference on the refund. This can be `pending`, `available` or `unavailable`.
-	ReferenceStatus string `json:"reference_status"`
-}
+type RefundDestinationDetailsAfterpayClearpay struct{}
 type RefundDestinationDetailsAlipay struct{}
 type RefundDestinationDetailsAlma struct{}
 type RefundDestinationDetailsAmazonPay struct{}
@@ -341,12 +336,7 @@ type RefundDestinationDetailsJPBankTransfer struct {
 	// Status of the reference on the refund. This can be `pending`, `available` or `unavailable`.
 	ReferenceStatus string `json:"reference_status"`
 }
-type RefundDestinationDetailsKlarna struct {
-	// The reference assigned to the refund.
-	Reference string `json:"reference"`
-	// Status of the reference on the refund. This can be `pending`, `available` or `unavailable`.
-	ReferenceStatus string `json:"reference_status"`
-}
+type RefundDestinationDetailsKlarna struct{}
 type RefundDestinationDetailsMbWay struct {
 	// The reference assigned to the refund.
 	Reference string `json:"reference"`
@@ -376,10 +366,6 @@ type RefundDestinationDetailsPayNow struct{}
 type RefundDestinationDetailsPaypal struct {
 	// For refunds declined by the network, a decline code provided by the network which indicates the reason the refund failed.
 	NetworkDeclineCode string `json:"network_decline_code"`
-	// The reference assigned to the refund.
-	Reference string `json:"reference"`
-	// Status of the reference on the refund. This can be `pending`, `available` or `unavailable`.
-	ReferenceStatus string `json:"reference_status"`
 }
 type RefundDestinationDetailsPix struct{}
 type RefundDestinationDetailsRevolut struct{}
@@ -488,10 +474,6 @@ type Refund struct {
 	Created int64 `json:"created"`
 	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
 	Currency Currency `json:"currency"`
-	// ID of the customer of this refund.
-	Customer *Customer `json:"customer"`
-	// ID of the account of this refund.
-	CustomerAccount string `json:"customer_account"`
 	// An arbitrary string attached to the object. You can use this for displaying to users (available on non-card refunds only).
 	Description        string                    `json:"description,omitempty"`
 	DestinationDetails *RefundDestinationDetails `json:"destination_details,omitempty"`
@@ -510,8 +492,6 @@ type Refund struct {
 	Object string `json:"object"`
 	// ID of the PaymentIntent that's refunded.
 	PaymentIntent *PaymentIntent `json:"payment_intent"`
-	// ID of the payment method associated with this refund.
-	PaymentMethod *PaymentMethod `json:"payment_method"`
 	// Provides the reason for why the refund is pending. Possible values are: `processing`, `insufficient_funds`, or `charge_pending`.
 	PendingReason      RefundPendingReason       `json:"pending_reason,omitempty"`
 	PresentmentDetails *RefundPresentmentDetails `json:"presentment_details,omitempty"`

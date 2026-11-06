@@ -27,7 +27,7 @@ import (
 	"strconv"
 	"strings"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ resource.Resource = &V2CoreEventDestinationResource{}
@@ -129,7 +129,7 @@ func (r *V2CoreEventDestinationResource) UpgradeState(ctx context.Context) map[i
 
 func v2CoreEventDestinationResourceV1Schema() *schema.Schema {
 	return &schema.Schema{
-		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks), [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge), and [Azure Event Grid](https://docs.stripe.com/event-destinations/eventgrid). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
+		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks) and [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -140,28 +140,28 @@ func v2CoreEventDestinationResourceV1Schema() *schema.Schema {
 			"amazon_eventbridge": schema.SingleNestedAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "Configuration for delivering events through an Amazon EventBridge partner event source.",
+				Description:   "Amazon EventBridge configuration.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
 				Attributes: map[string]schema.Attribute{
 					"aws_account_id": schema.StringAttribute{
 						Required:      true,
-						Description:   "The AWS account ID that owns the event bus receiving events.",
+						Description:   "The AWS account ID.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 					"aws_event_source_arn": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The ARN of the Stripe-created partner event source in your AWS account.",
+						Description:   "The ARN of the AWS event source.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 					"aws_event_source_status": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The AWS-reported lifecycle state of the partner event source.",
+						Description:   "The state of the AWS event source.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Validators:    []validator.String{stringvalidator.OneOf("active", "deleted", "pending", "unknown")},
 					},
 					"aws_region": schema.StringAttribute{
 						Required:      true,
-						Description:   "The AWS region where Stripe creates the partner event source.",
+						Description:   "The region of the AWS event source.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 				},
@@ -169,56 +169,56 @@ func v2CoreEventDestinationResourceV1Schema() *schema.Schema {
 			"azure_event_grid": schema.SingleNestedAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "Configuration for delivering events through an Azure Event Grid partner topic.",
+				Description:   "Azure Event Grid configuration.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
 				Attributes: map[string]schema.Attribute{
 					"azure_partner_topic_name": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The name of the Stripe-created partner topic that receives events.",
+						Description:   "The name of the Azure partner topic.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 					"azure_partner_topic_status": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The Azure-reported lifecycle state of the partner topic.",
+						Description:   "The status of the Azure partner topic.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Validators:    []validator.String{stringvalidator.OneOf("activated", "deleted", "never_activated", "unknown")},
 					},
 					"azure_region": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure region where the partner topic is located.",
+						Description:   "The Azure region.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 					"azure_resource_group_name": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure resource group containing the partner topic.",
+						Description:   "The name of the Azure resource group.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 					"azure_subscription_id": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure subscription containing the resource group and partner topic.",
+						Description:   "The Azure subscription ID.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 				},
 			},
 			"created": schema.StringAttribute{
 				Computed:      true,
-				Description:   "The time when the destination was created.",
+				Description:   "Time at which the object was created.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"description": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "An optional user-defined description of the destination's purpose.",
+				Description:   "An optional description of what the event destination is used for.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"enabled_events": schema.ListAttribute{
 				Required:    true,
-				Description: "The list of event types enabled for delivery to this destination.",
+				Description: "The list of events to enable for this endpoint.",
 				ElementType: types.StringType,
 			},
 			"event_payload": schema.StringAttribute{
 				Required:      true,
-				Description:   "Whether to deliver as snapshot or thin events.",
+				Description:   "Payload type of events being subscribed to.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 				Validators:    []validator.String{stringvalidator.OneOf("snapshot", "thin")},
 			},
@@ -242,34 +242,34 @@ func v2CoreEventDestinationResourceV1Schema() *schema.Schema {
 			"metadata": schema.MapAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "User-defined key/value data for the destination; it has no effect on event matching or delivery.",
+				Description:   "Metadata.",
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
 				ElementType:   types.StringType,
 			},
 			"name": schema.StringAttribute{
 				Required:    true,
-				Description: "A user-defined label for identifying the destination in Stripe.",
+				Description: "Event destination name.",
 			},
 			"snapshot_api_version": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "For snapshot events only, the Stripe API version used to render event objects. You can't change this value after you create the event destination. Thin events are not pinned to an API version.",
+				Description:   "If using the snapshot event payload, the API version events are rendered as.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"status": schema.StringAttribute{
 				Computed:      true,
-				Description:   "Whether Stripe currently attempts delivery. Stripe attempts delivery to enabled destinations when their provider configuration is active; disabled destinations do not receive delivery attempts.",
+				Description:   "Status. It can be set to either enabled or disabled.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators:    []validator.String{stringvalidator.OneOf("disabled", "enabled")},
 			},
 			"status_details": schema.SingleNestedAttribute{
 				Computed:      true,
-				Description:   "Additional lifecycle context for the destination status, when available.",
+				Description:   "Additional information about event destination status.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"disabled": schema.SingleNestedAttribute{
 						Computed:      true,
-						Description:   "Present when the destination was disabled; identifies the cause, time, and provider-side object involved when available.",
+						Description:   "Details about why the event destination has been disabled.",
 						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 						Attributes: map[string]schema.Attribute{
 							"reason": schema.StringAttribute{
@@ -284,35 +284,35 @@ func v2CoreEventDestinationResourceV1Schema() *schema.Schema {
 			},
 			"type": schema.StringAttribute{
 				Required:      true,
-				Description:   "The delivery transport. Chosen when the destination is created and cannot be changed by update.",
+				Description:   "Event destination type.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 				Validators:    []validator.String{stringvalidator.OneOf("amazon_eventbridge", "azure_event_grid", "webhook_endpoint")},
 			},
 			"updated": schema.StringAttribute{
 				Computed:    true,
-				Description: "The time when the destination object was last updated.",
+				Description: "Time at which the object was last updated.",
 			},
 			"webhook_endpoint": schema.SingleNestedAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "Configuration for delivering events to a webhook endpoint. Live mode requires HTTPS; sandbox mode also supports HTTP.",
+				Description:   "Webhook endpoint configuration.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"signing_secret": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The secret used to verify Stripe signatures on delivered events. Returned only in the create response when explicitly included; public API clients cannot retrieve it later.",
+						Description:   "The signing secret of the webhook endpoint, only includable on creation.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Sensitive:     true,
 					},
 					"url": schema.StringAttribute{
 						Required:    true,
-						Description: "The URL where Stripe sends matching events. Live mode requires HTTPS; sandbox mode also supports HTTP. Returned only when explicitly included.",
+						Description: "The URL of the webhook endpoint, includable.",
 					},
 				},
 			},
 			"include": schema.ListAttribute{
 				Optional:    true,
-				Description: "Include normally redacted webhook fields in the create response. Public API clients must include `webhook_endpoint.signing_secret` to receive the signing secret.",
+				Description: "Additional fields to include in the response.",
 				WriteOnly:   true,
 				ElementType: types.StringType,
 			},
@@ -322,7 +322,7 @@ func v2CoreEventDestinationResourceV1Schema() *schema.Schema {
 
 func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 	return &schema.Schema{
-		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks), [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge), and [Azure Event Grid](https://docs.stripe.com/event-destinations/eventgrid). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
+		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks) and [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -333,56 +333,56 @@ func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 			"azure_event_grid": schema.SingleNestedAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "Configuration for delivering events through an Azure Event Grid partner topic.",
+				Description:   "Azure Event Grid configuration.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
 				Attributes: map[string]schema.Attribute{
 					"azure_partner_topic_name": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The name of the Stripe-created partner topic that receives events.",
+						Description:   "The name of the Azure partner topic.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 					"azure_partner_topic_status": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The Azure-reported lifecycle state of the partner topic.",
+						Description:   "The status of the Azure partner topic.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Validators:    []validator.String{stringvalidator.OneOf("activated", "deleted", "never_activated", "unknown")},
 					},
 					"azure_region": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure region where the partner topic is located.",
+						Description:   "The Azure region.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 					"azure_resource_group_name": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure resource group containing the partner topic.",
+						Description:   "The name of the Azure resource group.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 					"azure_subscription_id": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure subscription containing the resource group and partner topic.",
+						Description:   "The Azure subscription ID.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 				},
 			},
 			"created": schema.StringAttribute{
 				Computed:      true,
-				Description:   "The time when the destination was created.",
+				Description:   "Time at which the object was created.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"description": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "An optional user-defined description of the destination's purpose.",
+				Description:   "An optional description of what the event destination is used for.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"enabled_events": schema.ListAttribute{
 				Required:    true,
-				Description: "The list of event types enabled for delivery to this destination.",
+				Description: "The list of events to enable for this endpoint.",
 				ElementType: types.StringType,
 			},
 			"event_payload": schema.StringAttribute{
 				Required:      true,
-				Description:   "Whether to deliver as snapshot or thin events.",
+				Description:   "Payload type of events being subscribed to.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 				Validators:    []validator.String{stringvalidator.OneOf("snapshot", "thin")},
 			},
@@ -406,34 +406,34 @@ func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 			"metadata": schema.MapAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "User-defined key/value data for the destination; it has no effect on event matching or delivery.",
+				Description:   "Metadata.",
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
 				ElementType:   types.StringType,
 			},
 			"name": schema.StringAttribute{
 				Required:    true,
-				Description: "A user-defined label for identifying the destination in Stripe.",
+				Description: "Event destination name.",
 			},
 			"snapshot_api_version": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "For snapshot events only, the Stripe API version used to render event objects. You can't change this value after you create the event destination. Thin events are not pinned to an API version.",
+				Description:   "If using the snapshot event payload, the API version events are rendered as.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"status": schema.StringAttribute{
 				Computed:      true,
-				Description:   "Whether Stripe currently attempts delivery. Stripe attempts delivery to enabled destinations when their provider configuration is active; disabled destinations do not receive delivery attempts.",
+				Description:   "Status. It can be set to either enabled or disabled.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators:    []validator.String{stringvalidator.OneOf("disabled", "enabled")},
 			},
 			"status_details": schema.SingleNestedAttribute{
 				Computed:      true,
-				Description:   "Additional lifecycle context for the destination status, when available.",
+				Description:   "Additional information about event destination status.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"disabled": schema.SingleNestedAttribute{
 						Computed:      true,
-						Description:   "Present when the destination was disabled; identifies the cause, time, and provider-side object involved when available.",
+						Description:   "Details about why the event destination has been disabled.",
 						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 						Attributes: map[string]schema.Attribute{
 							"reason": schema.StringAttribute{
@@ -448,65 +448,65 @@ func v2CoreEventDestinationResourceV0Schema() *schema.Schema {
 			},
 			"type": schema.StringAttribute{
 				Required:      true,
-				Description:   "The delivery transport. Chosen when the destination is created and cannot be changed by update.",
+				Description:   "Event destination type.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 				Validators:    []validator.String{stringvalidator.OneOf("amazon_eventbridge", "azure_event_grid", "webhook_endpoint")},
 			},
 			"updated": schema.StringAttribute{
 				Computed:    true,
-				Description: "The time when the destination object was last updated.",
+				Description: "Time at which the object was last updated.",
 			},
 			"include": schema.ListAttribute{
 				Optional:    true,
-				Description: "Include normally redacted webhook fields in the create response. Public API clients must include `webhook_endpoint.signing_secret` to receive the signing secret.",
+				Description: "Additional fields to include in the response.",
 				WriteOnly:   true,
 				ElementType: types.StringType,
 			},
 		},
 		Blocks: map[string]schema.Block{
 			"amazon_eventbridge": schema.ListNestedBlock{
-				Description:   "Configuration for delivering events through an Amazon EventBridge partner event source.",
+				Description:   "Amazon EventBridge configuration.",
 				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"aws_account_id": schema.StringAttribute{
 							Required:      true,
-							Description:   "The AWS account ID that owns the event bus receiving events.",
+							Description:   "The AWS account ID.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 						},
 						"aws_event_source_arn": schema.StringAttribute{
 							Computed:      true,
-							Description:   "The ARN of the Stripe-created partner event source in your AWS account.",
+							Description:   "The ARN of the AWS event source.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						},
 						"aws_event_source_status": schema.StringAttribute{
 							Computed:      true,
-							Description:   "The AWS-reported lifecycle state of the partner event source.",
+							Description:   "The state of the AWS event source.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 							Validators:    []validator.String{stringvalidator.OneOf("active", "deleted", "pending", "unknown")},
 						},
 						"aws_region": schema.StringAttribute{
 							Required:      true,
-							Description:   "The AWS region where Stripe creates the partner event source.",
+							Description:   "The region of the AWS event source.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 						},
 					},
 				},
 			},
 			"webhook_endpoint": schema.ListNestedBlock{
-				Description:   "Configuration for delivering events to a webhook endpoint. Live mode requires HTTPS; sandbox mode also supports HTTP.",
+				Description:   "Webhook endpoint configuration.",
 				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"signing_secret": schema.StringAttribute{
 							Computed:      true,
-							Description:   "The secret used to verify Stripe signatures on delivered events. Returned only in the create response when explicitly included; public API clients cannot retrieve it later.",
+							Description:   "The signing secret of the webhook endpoint, only includable on creation.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 							Sensitive:     true,
 						},
 						"url": schema.StringAttribute{
 							Required:    true,
-							Description: "The URL where Stripe sends matching events. Live mode requires HTTPS; sandbox mode also supports HTTP. Returned only when explicitly included.",
+							Description: "The URL of the webhook endpoint, includable.",
 						},
 					},
 				},
@@ -942,7 +942,7 @@ func upgradeV2CoreEventDestinationStateV1(ctx context.Context, prior interface{}
 func (r *V2CoreEventDestinationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Version:     2,
-		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks), [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge), and [Azure Event Grid](https://docs.stripe.com/event-destinations/eventgrid). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
+		Description: "Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks) and [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -953,56 +953,56 @@ func (r *V2CoreEventDestinationResource) Schema(_ context.Context, _ resource.Sc
 			"azure_event_grid": schema.SingleNestedAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "Configuration for delivering events through an Azure Event Grid partner topic.",
+				Description:   "Azure Event Grid configuration.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
 				Attributes: map[string]schema.Attribute{
 					"azure_partner_topic_name": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The name of the Stripe-created partner topic that receives events.",
+						Description:   "The name of the Azure partner topic.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 					"azure_partner_topic_status": schema.StringAttribute{
 						Computed:      true,
-						Description:   "The Azure-reported lifecycle state of the partner topic.",
+						Description:   "The status of the Azure partner topic.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Validators:    []validator.String{stringvalidator.OneOf("activated", "deleted", "never_activated", "unknown")},
 					},
 					"azure_region": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure region where the partner topic is located.",
+						Description:   "The Azure region.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 					"azure_resource_group_name": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure resource group containing the partner topic.",
+						Description:   "The name of the Azure resource group.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 					"azure_subscription_id": schema.StringAttribute{
 						Required:      true,
-						Description:   "The Azure subscription containing the resource group and partner topic.",
+						Description:   "The Azure subscription ID.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 					},
 				},
 			},
 			"created": schema.StringAttribute{
 				Computed:      true,
-				Description:   "The time when the destination was created.",
+				Description:   "Time at which the object was created.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"description": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "An optional user-defined description of the destination's purpose.",
+				Description:   "An optional description of what the event destination is used for.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"enabled_events": schema.ListAttribute{
 				Required:    true,
-				Description: "The list of event types enabled for delivery to this destination.",
+				Description: "The list of events to enable for this endpoint.",
 				ElementType: types.StringType,
 			},
 			"event_payload": schema.StringAttribute{
 				Required:      true,
-				Description:   "Whether to deliver as snapshot or thin events.",
+				Description:   "Payload type of events being subscribed to.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 				Validators:    []validator.String{stringvalidator.OneOf("snapshot", "thin")},
 			},
@@ -1026,34 +1026,34 @@ func (r *V2CoreEventDestinationResource) Schema(_ context.Context, _ resource.Sc
 			"metadata": schema.MapAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "User-defined key/value data for the destination; it has no effect on event matching or delivery.",
+				Description:   "Metadata.",
 				PlanModifiers: []planmodifier.Map{mapplanmodifier.UseStateForUnknown()},
 				ElementType:   types.StringType,
 			},
 			"name": schema.StringAttribute{
 				Required:    true,
-				Description: "A user-defined label for identifying the destination in Stripe.",
+				Description: "Event destination name.",
 			},
 			"snapshot_api_version": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "For snapshot events only, the Stripe API version used to render event objects. You can't change this value after you create the event destination. Thin events are not pinned to an API version.",
+				Description:   "If using the snapshot event payload, the API version events are rendered as.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"status": schema.StringAttribute{
 				Computed:      true,
-				Description:   "Whether Stripe currently attempts delivery. Stripe attempts delivery to enabled destinations when their provider configuration is active; disabled destinations do not receive delivery attempts.",
+				Description:   "Status. It can be set to either enabled or disabled.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators:    []validator.String{stringvalidator.OneOf("disabled", "enabled")},
 			},
 			"status_details": schema.SingleNestedAttribute{
 				Computed:      true,
-				Description:   "Additional lifecycle context for the destination status, when available.",
+				Description:   "Additional information about event destination status.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"disabled": schema.SingleNestedAttribute{
 						Computed:      true,
-						Description:   "Present when the destination was disabled; identifies the cause, time, and provider-side object involved when available.",
+						Description:   "Details about why the event destination has been disabled.",
 						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 						Attributes: map[string]schema.Attribute{
 							"reason": schema.StringAttribute{
@@ -1068,65 +1068,65 @@ func (r *V2CoreEventDestinationResource) Schema(_ context.Context, _ resource.Sc
 			},
 			"type": schema.StringAttribute{
 				Required:      true,
-				Description:   "The delivery transport. Chosen when the destination is created and cannot be changed by update.",
+				Description:   "Event destination type.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 				Validators:    []validator.String{stringvalidator.OneOf("amazon_eventbridge", "azure_event_grid", "webhook_endpoint")},
 			},
 			"updated": schema.StringAttribute{
 				Computed:    true,
-				Description: "The time when the destination object was last updated.",
+				Description: "Time at which the object was last updated.",
 			},
 			"include": schema.ListAttribute{
 				Optional:    true,
-				Description: "Include normally redacted webhook fields in the create response. Public API clients must include `webhook_endpoint.signing_secret` to receive the signing secret.",
+				Description: "Additional fields to include in the response.",
 				WriteOnly:   true,
 				ElementType: types.StringType,
 			},
 		},
 		Blocks: map[string]schema.Block{
 			"amazon_eventbridge": schema.ListNestedBlock{
-				Description:   "Configuration for delivering events through an Amazon EventBridge partner event source.",
+				Description:   "Amazon EventBridge configuration.",
 				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown(), listplanmodifier.RequiresReplace()},
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"aws_account_id": schema.StringAttribute{
 							Required:      true,
-							Description:   "The AWS account ID that owns the event bus receiving events.",
+							Description:   "The AWS account ID.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 						},
 						"aws_event_source_arn": schema.StringAttribute{
 							Computed:      true,
-							Description:   "The ARN of the Stripe-created partner event source in your AWS account.",
+							Description:   "The ARN of the AWS event source.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						},
 						"aws_event_source_status": schema.StringAttribute{
 							Computed:      true,
-							Description:   "The AWS-reported lifecycle state of the partner event source.",
+							Description:   "The state of the AWS event source.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 							Validators:    []validator.String{stringvalidator.OneOf("active", "deleted", "pending", "unknown")},
 						},
 						"aws_region": schema.StringAttribute{
 							Required:      true,
-							Description:   "The AWS region where Stripe creates the partner event source.",
+							Description:   "The region of the AWS event source.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 						},
 					},
 				},
 			},
 			"webhook_endpoint": schema.ListNestedBlock{
-				Description:   "Configuration for delivering events to a webhook endpoint. Live mode requires HTTPS; sandbox mode also supports HTTP.",
+				Description:   "Webhook endpoint configuration.",
 				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 				NestedObject: schema.NestedBlockObject{
 					Attributes: map[string]schema.Attribute{
 						"signing_secret": schema.StringAttribute{
 							Computed:      true,
-							Description:   "The secret used to verify Stripe signatures on delivered events. Returned only in the create response when explicitly included; public API clients cannot retrieve it later.",
+							Description:   "The signing secret of the webhook endpoint, only includable on creation.",
 							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 							Sensitive:     true,
 						},
 						"url": schema.StringAttribute{
 							Required:    true,
-							Description: "The URL where Stripe sends matching events. Live mode requires HTTPS; sandbox mode also supports HTTP. Returned only when explicitly included.",
+							Description: "The URL of the webhook endpoint, includable.",
 						},
 					},
 				},
@@ -1172,19 +1172,6 @@ func (r *V2CoreEventDestinationResource) Create(ctx context.Context, req resourc
 		}
 	}
 
-	{
-		found := false
-		for _, include := range rawReadParams.Include {
-			if include != nil && *include == "webhook_endpoint.url" {
-				found = true
-				break
-			}
-		}
-		if !found {
-			rawReadParams.Include = append(rawReadParams.Include, stripe.String("webhook_endpoint.url"))
-		}
-	}
-
 	if err := ensureRawResponse(obj, r.client.V2CoreEventDestinations.B, r.client.V2CoreEventDestinations.Key, stripe.FormatURLPath("/v2/core/event_destinations/%s", obj.ID), rawReadParams); err != nil {
 		resp.Diagnostics.AddError("Error hydrating V2CoreEventDestination create raw response", err.Error())
 		return
@@ -1216,19 +1203,6 @@ func (r *V2CoreEventDestinationResource) Read(ctx context.Context, req resource.
 		if !assignAttrValueToNamedField(params, "Include", state.Include) {
 			resp.Diagnostics.AddError("Error building V2CoreEventDestination read params", fmt.Sprintf("failed to assign attribute %q on %T", "include", params))
 			return
-		}
-	}
-
-	{
-		found := false
-		for _, include := range params.Include {
-			if include != nil && *include == "webhook_endpoint.url" {
-				found = true
-				break
-			}
-		}
-		if !found {
-			params.Include = append(params.Include, stripe.String("webhook_endpoint.url"))
 		}
 	}
 
@@ -1302,19 +1276,6 @@ func (r *V2CoreEventDestinationResource) Update(ctx context.Context, req resourc
 		if !assignAttrValueToNamedField(rawReadParams, "Include", state.Include) {
 			resp.Diagnostics.AddError("Error building V2CoreEventDestination read params", fmt.Sprintf("failed to assign attribute %q on %T", "include", rawReadParams))
 			return
-		}
-	}
-
-	{
-		found := false
-		for _, include := range rawReadParams.Include {
-			if include != nil && *include == "webhook_endpoint.url" {
-				found = true
-				break
-			}
-		}
-		if !found {
-			rawReadParams.Include = append(rawReadParams.Include, stripe.String("webhook_endpoint.url"))
 		}
 	}
 

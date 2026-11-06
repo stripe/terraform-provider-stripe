@@ -10,8 +10,8 @@ package balancetransaction
 import (
 	"net/http"
 
-	stripe "github.com/stripe/stripe-go/v87"
-	"github.com/stripe/stripe-go/v87/form"
+	stripe "github.com/stripe/stripe-go/v86"
+	"github.com/stripe/stripe-go/v86/form"
 )
 
 // Client is used to invoke /v1/balance_transactions APIs.
@@ -44,16 +44,16 @@ func (c Client) Get(id string, params *stripe.BalanceTransactionParams) (*stripe
 	return balancetransaction, err
 }
 
-// Returns a list of transactions that have contributed to the Stripe account balance (for example, charges, transfers, and so on). The transactions return in sorted order, with the most recent transactions appearing first.
+// Returns a list of transactions that have contributed to the Stripe account balance (e.g., charges, transfers, and so forth). The transactions are returned in sorted order, with the most recent transactions appearing first.
 //
-// The previous name of this endpoint was “Balance history,” and it used the path /v1/balance/history.
+// Note that this endpoint was previously called “Balance history” and used the path /v1/balance/history.
 func List(params *stripe.BalanceTransactionListParams) *Iter {
 	return getC().List(params)
 }
 
-// Returns a list of transactions that have contributed to the Stripe account balance (for example, charges, transfers, and so on). The transactions return in sorted order, with the most recent transactions appearing first.
+// Returns a list of transactions that have contributed to the Stripe account balance (e.g., charges, transfers, and so forth). The transactions are returned in sorted order, with the most recent transactions appearing first.
 //
-// The previous name of this endpoint was “Balance history,” and it used the path /v1/balance/history.
+// Note that this endpoint was previously called “Balance history” and used the path /v1/balance/history.
 //
 // Deprecated: Client methods are deprecated. This should be accessed instead through [stripe.Client]. See the [migration guide] for more info.
 //

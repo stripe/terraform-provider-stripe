@@ -4,7 +4,7 @@ package cases
 
 import (
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 
 	"github.com/stripe/terraform-provider-stripe/internal/acctest/runner"
 )

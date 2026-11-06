@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shopspring/decimal"
 	assert "github.com/stretchr/testify/require"
 )
 
@@ -53,7 +52,7 @@ func TestApiVersion(t *testing.T) {
 	c := GetBackend(APIBackend).(*BackendImplementation)
 	key := "apiKey"
 
-	req, err := c.NewRequest("", "/v1/hello", key, "", nil)
+	req, err := c.NewRequest("", "", key, "", nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, APIVersion, req.Header.Get("Stripe-Version"))
@@ -152,46 +151,6 @@ func TestDo_Retry(t *testing.T) {
 	assert.Equal(t, 2, requestNum)
 }
 
-func TestDo_RetryOnAPIError(t *testing.T) {
-	type testServerResponse struct {
-		APIResource
-	}
-
-	requestNum := 0
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		requestNum++
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusServiceUnavailable)
-		_, err := w.Write([]byte(`{"error":{"type":"api_error","message":"try again"}}`))
-		assert.NoError(t, err)
-	}))
-	defer testServer.Close()
-
-	backend := GetBackendWithConfig(
-		APIBackend,
-		&BackendConfig{
-			LeveledLogger:     nullLeveledLogger,
-			MaxNetworkRetries: Int64(2),
-			URL:               String(testServer.URL),
-		},
-	).(*BackendImplementation)
-	backend.SetNetworkRetriesSleep(false)
-
-	request, err := backend.NewRequest(http.MethodPost, "/v1/hello", "sk_test_123", "", nil)
-	assert.NoError(t, err)
-
-	var response testServerResponse
-	err = backend.Do(request, nil, &response)
-
-	var stripeErr *Error
-	assert.ErrorAs(t, err, &stripeErr)
-	assert.Equal(t, http.StatusServiceUnavailable, stripeErr.HTTPStatusCode)
-	assert.Equal(t, "try again", stripeErr.Msg)
-	assert.NotNil(t, stripeErr.LastResponse)
-	assert.Equal(t, http.StatusServiceUnavailable, stripeErr.LastResponse.StatusCode)
-	assert.Equal(t, 3, requestNum)
-}
-
 func TestShouldRetry(t *testing.T) {
 	MaxNetworkRetries := int64(3)
 
@@ -288,14 +247,14 @@ func TestShouldRetry(t *testing.T) {
 	// `Stripe-Should-Retry: false`
 	t.Run("DontRetryOnStripeRetryHeaderFalse", func(t *testing.T) {
 		shouldRetry, _ := c.shouldRetry(
-			&Error{Msg: "An error from Stripe"},
+			nil,
 			&http.Request{},
 			&http.Response{
 				Header: http.Header(map[string][]string{
 					"Stripe-Should-Retry": {"false"},
 				}),
-				// Note we send status 500 here, which would normally be retried
-				StatusCode: http.StatusInternalServerError,
+				// Note we send status 409 here, which would normally be retried
+				StatusCode: http.StatusConflict,
 			},
 			0,
 		)
@@ -305,7 +264,7 @@ func TestShouldRetry(t *testing.T) {
 	// `Stripe-Should-Retry: true`
 	t.Run("RetryOnStripeRetryHeaderTrue", func(t *testing.T) {
 		shouldRetry, _ := c.shouldRetry(
-			&Error{Msg: "An error from Stripe"},
+			nil,
 			&http.Request{},
 			&http.Response{
 				Header: http.Header(map[string][]string{
@@ -323,7 +282,7 @@ func TestShouldRetry(t *testing.T) {
 	// 409 Conflict
 	t.Run("RetryOn409Conflict", func(t *testing.T) {
 		shouldRetry, _ := c.shouldRetry(
-			&Error{Msg: "An error from Stripe"},
+			nil,
 			&http.Request{},
 			&http.Response{StatusCode: http.StatusConflict},
 			0,
@@ -336,32 +295,16 @@ func TestShouldRetry(t *testing.T) {
 		shouldRetry, _ := c.shouldRetry(
 			&Error{Code: ErrorCodeLockTimeout, HTTPStatusCode: http.StatusTooManyRequests},
 			&http.Request{},
-			&http.Response{StatusCode: http.StatusTooManyRequests},
+			&http.Response{},
 			0,
 		)
 		assert.True(t, shouldRetry)
 	})
 
-	// `Stripe-Should-Retry: false` takes precedence over a lock timeout.
-	t.Run("DontRetryOn429LockTimeoutWithRetryHeaderFalse", func(t *testing.T) {
-		shouldRetry, _ := c.shouldRetry(
-			&Error{Code: ErrorCodeLockTimeout, HTTPStatusCode: http.StatusTooManyRequests},
-			&http.Request{},
-			&http.Response{
-				Header: http.Header(map[string][]string{
-					"Stripe-Should-Retry": {"false"},
-				}),
-				StatusCode: http.StatusTooManyRequests,
-			},
-			0,
-		)
-		assert.False(t, shouldRetry)
-	})
-
 	// 429 Too Many Requests -- don't retry normally
 	t.Run("DontRetryOn429TooManyRequests", func(t *testing.T) {
 		shouldRetry, _ := c.shouldRetry(
-			&Error{Code: ErrorCodeRateLimit, HTTPStatusCode: http.StatusTooManyRequests},
+			nil,
 			&http.Request{},
 			&http.Response{StatusCode: http.StatusTooManyRequests},
 			0,
@@ -380,21 +323,10 @@ func TestShouldRetry(t *testing.T) {
 		assert.True(t, shouldRetry)
 	})
 
-	// 503 Service Unavailable with a V1 API error
-	t.Run("RetryOn503ServiceUnavailableV1Error", func(t *testing.T) {
+	// 503 Service Unavailable
+	t.Run("RetryOn503ServiceUnavailable", func(t *testing.T) {
 		shouldRetry, _ := c.shouldRetry(
-			&Error{HTTPStatusCode: http.StatusServiceUnavailable},
-			&http.Request{},
-			&http.Response{StatusCode: http.StatusServiceUnavailable},
-			0,
-		)
-		assert.True(t, shouldRetry)
-	})
-
-	// 503 Service Unavailable with a V2 API error
-	t.Run("RetryOn503ServiceUnavailableV2Error", func(t *testing.T) {
-		shouldRetry, _ := c.shouldRetry(
-			&V2RawError{HTTPStatusCode: http.StatusServiceUnavailable},
+			nil,
 			&http.Request{},
 			&http.Response{StatusCode: http.StatusServiceUnavailable},
 			0,
@@ -546,53 +478,6 @@ func TestDo_StripeNoticeHeaderLogged(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Contains(t, stderr.String(), noticeMessage)
-}
-
-func TestBuildStripeNoticeMessage(t *testing.T) {
-	t.Run("TellsHumanHowToSuppressNotices", func(t *testing.T) {
-		message := buildStripeNoticeMessage("test notice", func(string) (string, bool) {
-			return "", false
-		})
-		assert.Equal(t, "test notice\n"+stripeNoticeSuppressionMessage, message)
-	})
-
-	for _, value := range []string{"true", "TRUE"} {
-		t.Run("SuppressesHumanNoticeFor"+value, func(t *testing.T) {
-			message := buildStripeNoticeMessage("test notice", func(key string) (string, bool) {
-				if key == "STRIPE_SUPPRESS_NOTICES" {
-					return value, true
-				}
-				return "", false
-			})
-			assert.Empty(t, message)
-		})
-	}
-
-	for _, value := range []string{"", "false", "1", "invalid"} {
-		t.Run("DoesNotSuppressHumanNoticeFor"+value, func(t *testing.T) {
-			message := buildStripeNoticeMessage("test notice", func(key string) (string, bool) {
-				if key == "STRIPE_SUPPRESS_NOTICES" {
-					return value, true
-				}
-				return "", false
-			})
-			assert.Equal(t, "test notice\n"+stripeNoticeSuppressionMessage, message)
-		})
-	}
-
-	t.Run("DoesNotSuppressAIAgentNotice", func(t *testing.T) {
-		message := buildStripeNoticeMessage("test notice", func(key string) (string, bool) {
-			switch key {
-			case "STRIPE_SUPPRESS_NOTICES":
-				return "true", true
-			case "CODEX_SANDBOX":
-				return "1", true
-			default:
-				return "", false
-			}
-		})
-		assert.Equal(t, "test notice", message)
-	})
 }
 
 func TestDo_StripeNoticeHeaderAbsent(t *testing.T) {
@@ -1109,35 +994,6 @@ func TestMarshalV2JSON(t *testing.T) {
 		UnsetFields []string `form:"-" json:"-"`
 	}
 
-	t.Run("decimal fields are always quoted", func(t *testing.T) {
-		type nestedParams struct {
-			Amount *decimal.Decimal `json:"amount,omitempty"`
-		}
-		type decimalParams struct {
-			Params `form:"*"`
-			Detail *nestedParams   `json:"detail,omitempty"`
-			Items  []*nestedParams `json:"items,omitempty"`
-		}
-
-		oldMarshalJSONWithoutQuotes := decimal.MarshalJSONWithoutQuotes
-		decimal.MarshalJSONWithoutQuotes = true
-		t.Cleanup(func() {
-			decimal.MarshalJSONWithoutQuotes = oldMarshalJSONWithoutQuotes
-		})
-
-		value := decimal.RequireFromString("12345678901234567890.123456789012")
-		params := &decimalParams{
-			Detail: &nestedParams{Amount: &value},
-			Items:  []*nestedParams{{Amount: &value}},
-		}
-		data, err := marshalV2JSON(params)
-		assert.NoError(t, err)
-		assert.JSONEq(t, `{
-			"detail": {"amount": "12345678901234567890.123456789012"},
-			"items": [{"amount": "12345678901234567890.123456789012"}]
-		}`, string(data))
-	})
-
 	t.Run("without UnsetFields", func(t *testing.T) {
 		params := &testParams{
 			Name: String("test"),
@@ -1152,21 +1008,6 @@ func TestMarshalV2JSON(t *testing.T) {
 		assert.Equal(t, `"test"`, string(raw["name"]))
 		_, hasDesc := raw["description"]
 		assert.False(t, hasDesc, "description should not be present")
-	})
-
-	t.Run("with extra values", func(t *testing.T) {
-		params := &testParams{Name: String("test")}
-		params.AddExtra("future", "value")
-		params.AddExtra("repeated", "one")
-		params.AddExtra("repeated", "two")
-
-		data, err := marshalV2JSON(params)
-		assert.NoError(t, err)
-		assert.JSONEq(t, `{
-			"name": "test",
-			"future": "value",
-			"repeated": ["one", "two"]
-		}`, string(data))
 	})
 
 	t.Run("with UnsetFields", func(t *testing.T) {
@@ -1936,22 +1777,6 @@ func TestStripeAccount(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, "acct_123", req.Header.Get("Stripe-Account"))
-}
-
-func TestExtractParamsWithoutMetadataField(t *testing.T) {
-	type searchParams struct {
-		SearchParams `form:"*"`
-		Sort         string `form:"sort" json:"sort"`
-	}
-
-	formValues, commonParams, err := extractParams(&searchParams{
-		SearchParams: SearchParams{Query: "status:'active'"},
-		Sort:         "-created",
-	})
-
-	assert.NoError(t, err)
-	assert.NotNil(t, formValues)
-	assert.NotNil(t, commonParams)
 }
 
 func TestErrorOnDuplicateMetadata(t *testing.T) {
@@ -2946,58 +2771,4 @@ func BenchmarkCollectAllUnsetFields(b *testing.B) {
 			collectAllUnsetFields(reflect.ValueOf(params))
 		}
 	})
-}
-
-func TestAssertOriginRelativePath(t *testing.T) {
-	originRelative := []string{
-		"/v1/customers/cus_123",
-		"/v1/customers",
-		"/v2/core/accounts?page=page_123&limit=2",
-		// "@" is legal inside a path or query string -- it only opens an
-		// authority when it precedes the first "/".
-		"/v1/customers?email=user%40example.com",
-		"/v1/invoices/in_123@456",
-		// A backslash does not open an authority: the "/" already closed it.
-		`/v1/\evil.example`,
-	}
-	for _, path := range originRelative {
-		assert.NoError(t, validatePath(path), "expected to accept %q", path)
-	}
-
-	hostile := []string{
-		// Each of these moves the request's authority off api.stripe.com.
-		"@evil.example/v1/leak",
-		":pw@evil.example/v1/leak",
-		":80@evil.example/v1/leak",
-		// Extends the host into an attacker-owned subdomain
-		// (api.stripe.com.evil.example), which has a valid certificate.
-		".evil.example/v1/leak",
-		"-evil.example/v1/leak",
-		"https://evil.example/v1/leak",
-		"//evil.example/v1/leak",
-		"",
-		"v1/customers",
-	}
-	for _, path := range hostile {
-		assert.Error(t, validatePath(path), "expected to reject %q", path)
-	}
-}
-
-func TestNewRequestRejectsHostilePath(t *testing.T) {
-	c := GetBackend(APIBackend).(*BackendImplementation)
-
-	req, err := c.NewRequest(http.MethodGet, "@evil.example/v1/leak", "sk_test_123", "", nil)
-
-	assert.Error(t, err)
-	assert.Nil(t, req)
-	assert.Contains(t, err.Error(), `must begin with a single "/"`)
-}
-
-func TestRawRequestRejectsHostilePath(t *testing.T) {
-	backend := GetBackend(APIBackend).(*BackendImplementation)
-
-	// A hostile path must be refused before any connection is attempted.
-	_, err := backend.RawRequest(http.MethodGet, "@evil.example/v1/leak", "sk_test_123", "", nil)
-
-	assert.Error(t, err)
 }

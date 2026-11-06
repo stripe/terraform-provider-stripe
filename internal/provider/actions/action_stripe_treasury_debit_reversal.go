@@ -12,7 +12,7 @@ import (
 	actionSchema "github.com/hashicorp/terraform-plugin-framework/action/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ action.Action = &TreasuryDebitReversalAction{}
@@ -37,7 +37,7 @@ func (r *TreasuryDebitReversalAction) Metadata(_ context.Context, req action.Met
 
 func (r *TreasuryDebitReversalAction) Schema(_ context.Context, _ action.SchemaRequest, resp *action.SchemaResponse) {
 	resp.Schema = actionSchema.Schema{
-		Description: "Legacy DebitReversals are part of the v1 version of Treasury for platforms and do not support many of the features introduced in [Treasury for platforms v2](https://docs.stripe.com/treasury/connect).\n\nYou can reverse some [ReceivedDebits](https://docs.stripe.com/api#received_debits) depending on their network and source flow. Reversing a ReceivedDebit leads to the creation of a new object known as a DebitReversal.",
+		Description: "You can reverse some [ReceivedDebits](https://api.stripe.com#received_debits) depending on their network and source flow. Reversing a ReceivedDebit leads to the creation of a new object known as a DebitReversal.",
 		Attributes: map[string]actionSchema.Attribute{
 			"metadata": actionSchema.MapAttribute{
 				Optional:    true,

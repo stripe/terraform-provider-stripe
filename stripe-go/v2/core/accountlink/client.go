@@ -10,7 +10,7 @@ package accountlink
 import (
 	"net/http"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 // Client is used to invoke accountlink related APIs.

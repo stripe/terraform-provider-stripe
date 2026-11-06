@@ -10,8 +10,8 @@ package invoice
 import (
 	"net/http"
 
-	stripe "github.com/stripe/stripe-go/v87"
-	"github.com/stripe/stripe-go/v87/form"
+	stripe "github.com/stripe/stripe-go/v86"
+	"github.com/stripe/stripe-go/v86/form"
 )
 
 // Client is used to invoke /v1/invoices APIs.
@@ -57,8 +57,7 @@ func (c Client) Get(id string, params *stripe.InvoiceParams) (*stripe.Invoice, e
 }
 
 // Draft invoices are fully editable. Once an invoice is [finalized](https://docs.stripe.com/docs/billing/invoices/workflow#finalized),
-// you can no longer change most of its details, including monetary values and collection_method. For most invoices,
-// this also includes description.
+// monetary values, as well as collection_method, become uneditable.
 //
 // If you would like to stop the Stripe Billing engine from automatically finalizing, reattempting payments on,
 // sending reminders for, or [automatically reconciling](https://docs.stripe.com/docs/billing/invoices/reconciliation) invoices, pass
@@ -68,8 +67,7 @@ func Update(id string, params *stripe.InvoiceParams) (*stripe.Invoice, error) {
 }
 
 // Draft invoices are fully editable. Once an invoice is [finalized](https://docs.stripe.com/docs/billing/invoices/workflow#finalized),
-// you can no longer change most of its details, including monetary values and collection_method. For most invoices,
-// this also includes description.
+// monetary values, as well as collection_method, become uneditable.
 //
 // If you would like to stop the Stripe Billing engine from automatically finalizing, reattempting payments on,
 // sending reminders for, or [automatically reconciling](https://docs.stripe.com/docs/billing/invoices/reconciliation) invoices, pass

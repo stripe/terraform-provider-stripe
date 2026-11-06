@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 
 	"github.com/stripe/terraform-provider-stripe/internal/acctest/runner"
 )
@@ -210,29 +210,6 @@ func TestAccManagedProductBasic(t *testing.T) {
 		}),
 		verifyProductDestroyInactive,
 	)
-}
-
-func TestAccManagedProductTaxCodeMirrors(t *testing.T) {
-	runBaseManagedCase(t, "product_tax_code_mirrors", "stripe_product", "stripe_product.test",
-		"product_tax_code_mirrors_create.tf", "product_tax_code_mirrors_update.tf", true,
-		verifyProductTaxCodeMirrors("txcd_10000000"), verifyProductTaxCodeMirrors("txcd_20030000"), verifyProductDestroyInactive)
-}
-
-func TestAccManagedProductTaxCodeTopLevelMirrors(t *testing.T) {
-	runBaseManagedCase(t, "product_tax_code_top_level_mirrors", "stripe_product", "stripe_product.test",
-		"product_tax_code_top_level_mirrors_create.tf", "product_tax_code_top_level_mirrors_update.tf", true,
-		verifyProductTaxCodeMirrors("txcd_10000000"), verifyProductTaxCodeMirrors("txcd_20030000"), verifyProductDestroyInactive)
-}
-
-func verifyProductTaxCodeMirrors(expected string) runner.StateVerifier {
-	return func(env runner.TestEnv, client *stripe.Client, state *terraform.State) error {
-		for _, attribute := range []string{"tax_code", "tax_details.tax_code"} {
-			if err := expectStateString(state, "stripe_product.test", attribute, expected); err != nil {
-				return err
-			}
-		}
-		return verifyProduct(productExpectations{Address: "stripe_product.test", CompareStateAttrs: []string{"tax_code"}})(env, client, state)
-	}
 }
 
 func TestAccManagedProductActiveToggle(t *testing.T) {
@@ -1934,7 +1911,7 @@ func TestAccManagedCouponRepeating(t *testing.T) {
 }
 
 func TestAccManagedCouponAppliesTo(t *testing.T) {
-	runBaseManagedCase(
+	runBaseManagedCaseWithImportIgnore(
 		t,
 		"coupon_applies_to",
 		"stripe_coupon",
@@ -1942,13 +1919,19 @@ func TestAccManagedCouponAppliesTo(t *testing.T) {
 		"coupon_applies_to_create.tf",
 		"coupon_applies_to_update.tf",
 		true,
+		[]string{
+			"applies_to",
+			"applies_to.%", // sdkv2 import path retained in failure diff output
+			"applies_to.0.products",
+			"applies_to.0.products.#",
+			"applies_to.0.products.0",
+		},
 		verifyCoupon(couponExpectations{
 			Address:                 "stripe_coupon.test",
 			CompareStateStringAttrs: []string{"name", "duration"},
 			CompareMetadata:         true,
 			CheckPercentOff:         true,
 			ExpectedPercentOff:      10.0,
-			CheckAppliesToProduct:   true,
 		}),
 		verifyCoupon(couponExpectations{
 			Address:                 "stripe_coupon.test",
@@ -1956,14 +1939,13 @@ func TestAccManagedCouponAppliesTo(t *testing.T) {
 			CompareMetadata:         true,
 			CheckPercentOff:         true,
 			ExpectedPercentOff:      10.0,
-			CheckAppliesToProduct:   true,
 		}),
 		verifyCouponDestroyMissing,
 	)
 }
 
 func TestAccManagedCouponAppliesToProductUpdate(t *testing.T) {
-	runBaseManagedCase(
+	runBaseManagedCaseWithImportIgnore(
 		t,
 		"coupon_applies_to_product_update",
 		"stripe_coupon",
@@ -1971,6 +1953,13 @@ func TestAccManagedCouponAppliesToProductUpdate(t *testing.T) {
 		"coupon_applies_to_product_update_create.tf",
 		"coupon_applies_to_product_update_update.tf",
 		true,
+		[]string{
+			"applies_to",
+			"applies_to.%",
+			"applies_to.0.products",
+			"applies_to.0.products.#",
+			"applies_to.0.products.0",
+		},
 		verifyCoupon(couponExpectations{
 			Address:                 "stripe_coupon.test",
 			CompareStateStringAttrs: []string{"name", "duration"},

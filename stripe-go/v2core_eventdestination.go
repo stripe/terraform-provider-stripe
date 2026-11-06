@@ -8,7 +8,7 @@ package stripe
 
 import "time"
 
-// The AWS-reported lifecycle state of the partner event source.
+// The state of the AWS event source.
 type V2CoreEventDestinationAmazonEventbridgeAwsEventSourceStatus string
 
 // List of values that V2CoreEventDestinationAmazonEventbridgeAwsEventSourceStatus can take
@@ -19,7 +19,7 @@ const (
 	V2CoreEventDestinationAmazonEventbridgeAwsEventSourceStatusUnknown V2CoreEventDestinationAmazonEventbridgeAwsEventSourceStatus = "unknown"
 )
 
-// The Azure-reported lifecycle state of the partner topic.
+// The status of the Azure partner topic.
 type V2CoreEventDestinationAzureEventGridAzurePartnerTopicStatus string
 
 // List of values that V2CoreEventDestinationAzureEventGridAzurePartnerTopicStatus can take
@@ -30,7 +30,7 @@ const (
 	V2CoreEventDestinationAzureEventGridAzurePartnerTopicStatusUnknown        V2CoreEventDestinationAzureEventGridAzurePartnerTopicStatus = "unknown"
 )
 
-// Whether to deliver as snapshot or thin events.
+// Payload type of events being subscribed to.
 type V2CoreEventDestinationEventPayload string
 
 // List of values that V2CoreEventDestinationEventPayload can take
@@ -39,7 +39,7 @@ const (
 	V2CoreEventDestinationEventPayloadThin     V2CoreEventDestinationEventPayload = "thin"
 )
 
-// Whether Stripe currently attempts delivery. Stripe attempts delivery to enabled destinations when their provider configuration is active; disabled destinations do not receive delivery attempts.
+// Status. It can be set to either enabled or disabled.
 type V2CoreEventDestinationStatus string
 
 // List of values that V2CoreEventDestinationStatus can take
@@ -58,7 +58,7 @@ const (
 	V2CoreEventDestinationStatusDetailsDisabledReasonUser                      V2CoreEventDestinationStatusDetailsDisabledReason = "user"
 )
 
-// The delivery transport. Chosen when the destination is created and cannot be changed by update.
+// Event destination type.
 type V2CoreEventDestinationType string
 
 // List of values that V2CoreEventDestinationType can take
@@ -68,64 +68,64 @@ const (
 	V2CoreEventDestinationTypeWebhookEndpoint   V2CoreEventDestinationType = "webhook_endpoint"
 )
 
-// Configuration for delivering events through an Amazon EventBridge partner event source.
+// Amazon EventBridge configuration.
 type V2CoreEventDestinationAmazonEventbridge struct {
-	// The AWS account ID that owns the event bus receiving events.
+	// The AWS account ID.
 	AwsAccountID string `json:"aws_account_id"`
-	// The ARN of the Stripe-created partner event source in your AWS account.
+	// The ARN of the AWS event source.
 	AwsEventSourceArn string `json:"aws_event_source_arn"`
-	// The AWS-reported lifecycle state of the partner event source.
+	// The state of the AWS event source.
 	AwsEventSourceStatus V2CoreEventDestinationAmazonEventbridgeAwsEventSourceStatus `json:"aws_event_source_status"`
 }
 
-// Configuration for delivering events through an Azure Event Grid partner topic.
+// Azure Event Grid configuration.
 type V2CoreEventDestinationAzureEventGrid struct {
-	// The name of the Stripe-created partner topic that receives events.
+	// The name of the Azure partner topic.
 	AzurePartnerTopicName string `json:"azure_partner_topic_name"`
-	// The Azure-reported lifecycle state of the partner topic.
+	// The status of the Azure partner topic.
 	AzurePartnerTopicStatus V2CoreEventDestinationAzureEventGridAzurePartnerTopicStatus `json:"azure_partner_topic_status"`
-	// The Azure region where the partner topic is located.
+	// The Azure region.
 	AzureRegion string `json:"azure_region"`
-	// The Azure resource group containing the partner topic.
+	// The name of the Azure resource group.
 	AzureResourceGroupName string `json:"azure_resource_group_name"`
-	// The Azure subscription containing the resource group and partner topic.
+	// The Azure subscription ID.
 	AzureSubscriptionID string `json:"azure_subscription_id"`
 }
 
-// Present when the destination was disabled; identifies the cause, time, and provider-side object involved when available.
+// Details about why the event destination has been disabled.
 type V2CoreEventDestinationStatusDetailsDisabled struct {
 	// Reason event destination has been disabled.
 	Reason V2CoreEventDestinationStatusDetailsDisabledReason `json:"reason"`
 }
 
-// Additional lifecycle context for the destination status, when available.
+// Additional information about event destination status.
 type V2CoreEventDestinationStatusDetails struct {
-	// Present when the destination was disabled; identifies the cause, time, and provider-side object involved when available.
+	// Details about why the event destination has been disabled.
 	Disabled *V2CoreEventDestinationStatusDetailsDisabled `json:"disabled,omitempty"`
 }
 
-// Configuration for delivering events to a webhook endpoint. Live mode requires HTTPS; sandbox mode also supports HTTP.
+// Webhook endpoint configuration.
 type V2CoreEventDestinationWebhookEndpoint struct {
-	// The secret used to verify Stripe signatures on delivered events. Returned only in the create response when explicitly included; public API clients cannot retrieve it later.
+	// The signing secret of the webhook endpoint, only includable on creation.
 	SigningSecret string `json:"signing_secret,omitempty"`
-	// The URL where Stripe sends matching events. Live mode requires HTTPS; sandbox mode also supports HTTP. Returned only when explicitly included.
+	// The URL of the webhook endpoint, includable.
 	URL string `json:"url,omitempty"`
 }
 
-// Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks), [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge), and [Azure Event Grid](https://docs.stripe.com/event-destinations/eventgrid). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).
+// Set up an event destination to receive events from Stripe across multiple destination types, including [webhook endpoints](https://docs.stripe.com/webhooks) and [Amazon EventBridge](https://docs.stripe.com/event-destinations/eventbridge). Event destinations support receiving [thin events](https://docs.stripe.com/api/v2/events) and [snapshot events](https://docs.stripe.com/api/events).
 type V2CoreEventDestination struct {
 	APIResource
-	// Configuration for delivering events through an Amazon EventBridge partner event source.
+	// Amazon EventBridge configuration.
 	AmazonEventbridge *V2CoreEventDestinationAmazonEventbridge `json:"amazon_eventbridge,omitempty"`
-	// Configuration for delivering events through an Azure Event Grid partner topic.
+	// Azure Event Grid configuration.
 	AzureEventGrid *V2CoreEventDestinationAzureEventGrid `json:"azure_event_grid,omitempty"`
-	// The time when the destination was created.
+	// Time at which the object was created.
 	Created time.Time `json:"created"`
-	// An optional user-defined description of the destination's purpose.
+	// An optional description of what the event destination is used for.
 	Description string `json:"description"`
-	// The list of event types enabled for delivery to this destination.
+	// The list of events to enable for this endpoint.
 	EnabledEvents []string `json:"enabled_events"`
-	// Whether to deliver as snapshot or thin events.
+	// Payload type of events being subscribed to.
 	EventPayload V2CoreEventDestinationEventPayload `json:"event_payload"`
 	// Specifies which accounts' events route to this destination.
 	// `@self`: Receive events from the account that owns the event destination.
@@ -137,22 +137,22 @@ type V2CoreEventDestination struct {
 	ID string `json:"id"`
 	// Has the value `true` if the object exists in live mode or the value `false` if the object exists in test mode.
 	Livemode bool `json:"livemode"`
-	// User-defined key/value data for the destination; it has no effect on event matching or delivery.
+	// Metadata.
 	Metadata map[string]string `json:"metadata,omitempty"`
-	// A user-defined label for identifying the destination in Stripe.
+	// Event destination name.
 	Name string `json:"name"`
 	// String representing the object's type. Objects of the same type share the same value of the object field.
 	Object string `json:"object"`
-	// For snapshot events only, the Stripe API version used to render event objects. You can't change this value after you create the event destination. Thin events are not pinned to an API version.
+	// If using the snapshot event payload, the API version events are rendered as.
 	SnapshotAPIVersion string `json:"snapshot_api_version,omitempty"`
-	// Whether Stripe currently attempts delivery. Stripe attempts delivery to enabled destinations when their provider configuration is active; disabled destinations do not receive delivery attempts.
+	// Status. It can be set to either enabled or disabled.
 	Status V2CoreEventDestinationStatus `json:"status"`
-	// Additional lifecycle context for the destination status, when available.
+	// Additional information about event destination status.
 	StatusDetails *V2CoreEventDestinationStatusDetails `json:"status_details,omitempty"`
-	// The delivery transport. Chosen when the destination is created and cannot be changed by update.
+	// Event destination type.
 	Type V2CoreEventDestinationType `json:"type"`
-	// The time when the destination object was last updated.
+	// Time at which the object was last updated.
 	Updated time.Time `json:"updated"`
-	// Configuration for delivering events to a webhook endpoint. Live mode requires HTTPS; sandbox mode also supports HTTP.
+	// Webhook endpoint configuration.
 	WebhookEndpoint *V2CoreEventDestinationWebhookEndpoint `json:"webhook_endpoint,omitempty"`
 }

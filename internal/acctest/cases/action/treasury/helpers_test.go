@@ -5,11 +5,10 @@ package cases
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 	"github.com/stripe/terraform-provider-stripe/internal/acctest/runner"
 )
 
@@ -428,44 +427,38 @@ func treasuryFinancialAccountFeatures() *stripe.TreasuryFinancialAccountCreateFe
 func createTreasuryOriginPaymentMethod(t *testing.T, client *stripe.Client) string {
 	t.Helper()
 
-	params := &stripe.SetupIntentCreateParams{
-		AttachToSelf: stripe.Bool(true),
-		Confirm:      stripe.Bool(true),
-		FlowDirections: []*string{
-			stripe.String(string(stripe.SetupIntentFlowDirectionInbound)),
-		},
-		MandateData: &stripe.SetupIntentCreateMandateDataParams{
-			CustomerAcceptance: &stripe.SetupIntentCreateMandateDataCustomerAcceptanceParams{
-				Type: stripe.String("offline"),
+	setupIntent, err := client.V1SetupIntents.Create(
+		context.Background(),
+		&stripe.SetupIntentCreateParams{
+			AttachToSelf: stripe.Bool(true),
+			Confirm:      stripe.Bool(true),
+			FlowDirections: []*string{
+				stripe.String(string(stripe.SetupIntentFlowDirectionInbound)),
 			},
-		},
-		PaymentMethodData: &stripe.SetupIntentCreatePaymentMethodDataParams{
-			BillingDetails: &stripe.SetupIntentCreatePaymentMethodDataBillingDetailsParams{
-				Name: stripe.String("SDK Codegen Treasury Origin"),
+			MandateData: &stripe.SetupIntentCreateMandateDataParams{
+				CustomerAcceptance: &stripe.SetupIntentCreateMandateDataCustomerAcceptanceParams{
+					Type: stripe.String("offline"),
+				},
 			},
-			Type: stripe.String(string(stripe.PaymentMethodTypeUSBankAccount)),
-			USBankAccount: &stripe.SetupIntentCreatePaymentMethodDataUSBankAccountParams{
-				AccountHolderType: stripe.String("individual"),
-				AccountNumber:     stripe.String("000123456789"),
-				RoutingNumber:     stripe.String("110000000"),
+			PaymentMethodData: &stripe.SetupIntentCreatePaymentMethodDataParams{
+				BillingDetails: &stripe.SetupIntentCreatePaymentMethodDataBillingDetailsParams{
+					Name: stripe.String("SDK Codegen Treasury Origin"),
+				},
+				Type: stripe.String(string(stripe.PaymentMethodTypeUSBankAccount)),
+				USBankAccount: &stripe.SetupIntentCreatePaymentMethodDataUSBankAccountParams{
+					AccountHolderType: stripe.String("individual"),
+					AccountNumber:     stripe.String("000123456789"),
+					RoutingNumber:     stripe.String("110000000"),
+				},
 			},
-		},
-		PaymentMethodOptions: &stripe.SetupIntentCreatePaymentMethodOptionsParams{
-			USBankAccount: &stripe.SetupIntentCreatePaymentMethodOptionsUSBankAccountParams{
-				VerificationMethod: stripe.String(string(stripe.SetupIntentPaymentMethodOptionsUSBankAccountVerificationMethodMicrodeposits)),
+			PaymentMethodOptions: &stripe.SetupIntentCreatePaymentMethodOptionsParams{
+				USBankAccount: &stripe.SetupIntentCreatePaymentMethodOptionsUSBankAccountParams{
+					VerificationMethod: stripe.String(string(stripe.SetupIntentPaymentMethodOptionsUSBankAccountVerificationMethodMicrodeposits)),
+				},
 			},
+			PaymentMethodTypes: []*string{stripe.String(string(stripe.PaymentMethodTypeUSBankAccount))},
 		},
-	}
-	// The allowed payment method field was renamed in newer SDK versions.
-	field := reflect.ValueOf(params).Elem().FieldByName("AllowedPaymentMethodTypes")
-	if !field.IsValid() {
-		field = reflect.ValueOf(params).Elem().FieldByName("PaymentMethodTypes")
-	}
-	if !field.IsValid() || !field.CanSet() {
-		t.Fatal("setup intent params have no writable payment method types field")
-	}
-	field.Set(reflect.ValueOf([]*string{stripe.String(string(stripe.PaymentMethodTypeUSBankAccount))}))
-	setupIntent, err := client.V1SetupIntents.Create(context.Background(), params)
+	)
 	if err != nil {
 		t.Fatalf("create treasury origin setup intent: %v", err)
 	}

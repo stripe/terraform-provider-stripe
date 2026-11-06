@@ -6,10 +6,7 @@
 
 package stripe
 
-import (
-	"encoding/json"
-	"github.com/shopspring/decimal"
-)
+import "encoding/json"
 
 // Type of the pretax credit amount referenced.
 type CreditNotePretaxCreditAmountType string
@@ -143,7 +140,7 @@ func (p *CreditNoteListParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
 }
 
-// A list of up to 20 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
+// A list of up to 10 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
 type CreditNoteLineTaxAmountParams struct {
 	// The amount, in cents (or local equivalent), of the tax.
 	Amount *int64 `form:"amount" json:"amount"`
@@ -165,7 +162,7 @@ type CreditNoteLineParams struct {
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
 	// The line item quantity to credit.
 	Quantity *int64 `form:"quantity" json:"quantity,omitempty"`
-	// A list of up to 20 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
+	// A list of up to 10 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
 	TaxAmounts []*CreditNoteLineTaxAmountParams `form:"tax_amounts" json:"tax_amounts,omitempty"`
 	// The tax rates which apply to the credit note line item. Only valid when the `type` is `custom_line_item` and `tax_amounts` is not used.
 	TaxRates []*string `form:"tax_rates" json:"tax_rates,omitempty"`
@@ -174,7 +171,7 @@ type CreditNoteLineParams struct {
 	// The integer unit amount in cents (or local equivalent) of the credit note line item. This `unit_amount` will be multiplied by the quantity to get the full amount to credit for this line item. Only valid when `type` is `custom_line_item`.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *decimal.Decimal                 `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
+	UnitAmountDecimal *float64                         `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
 	UnsetFields       []CreditNoteLineParamsUnsetField `form:"-" json:"-"`
 }
 
@@ -237,8 +234,6 @@ type CreditNoteShippingCostParams struct {
 //
 // You may issue multiple credit notes for an invoice. Each credit note may increment the invoice's pre_payment_credit_notes_amount,
 // post_payment_credit_notes_amount, or both, depending on the invoice's amount_remaining at the time of credit note creation.
-//
-// For invoices that also have refunds created through the [Refund API](https://docs.stripe.com/docs/api/refunds), the credit note API subtracts those refund amounts from the maximum creditable amount. This prevents the combined credit notes and refunds from exceeding the invoice amount. If you use both, ensure the combined total does not exceed the invoice's paid amount.
 type CreditNoteParams struct {
 	Params `form:"*"`
 	// The integer amount in cents (or local equivalent) representing the total amount of the credit note. One of `amount`, `lines`, or `shipping_cost` must be provided.
@@ -285,7 +280,7 @@ func (p *CreditNoteParams) AddMetadata(key string, value string) {
 	p.Metadata[key] = value
 }
 
-// A list of up to 20 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
+// A list of up to 10 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
 type CreditNotePreviewLineTaxAmountParams struct {
 	// The amount, in cents (or local equivalent), of the tax.
 	Amount *int64 `form:"amount" json:"amount"`
@@ -307,7 +302,7 @@ type CreditNotePreviewLineParams struct {
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
 	// The line item quantity to credit.
 	Quantity *int64 `form:"quantity" json:"quantity,omitempty"`
-	// A list of up to 20 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
+	// A list of up to 10 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
 	TaxAmounts []*CreditNotePreviewLineTaxAmountParams `form:"tax_amounts" json:"tax_amounts,omitempty"`
 	// The tax rates which apply to the credit note line item. Only valid when the `type` is `custom_line_item` and `tax_amounts` is not used.
 	TaxRates []*string `form:"tax_rates" json:"tax_rates,omitempty"`
@@ -316,7 +311,7 @@ type CreditNotePreviewLineParams struct {
 	// The integer unit amount in cents (or local equivalent) of the credit note line item. This `unit_amount` will be multiplied by the quantity to get the full amount to credit for this line item. Only valid when `type` is `custom_line_item`.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *decimal.Decimal                        `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
+	UnitAmountDecimal *float64                                `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
 	UnsetFields       []CreditNotePreviewLineParamsUnsetField `form:"-" json:"-"`
 }
 
@@ -415,7 +410,7 @@ func (p *CreditNotePreviewParams) AddMetadata(key string, value string) {
 	p.Metadata[key] = value
 }
 
-// A list of up to 20 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
+// A list of up to 10 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
 type CreditNotePreviewLinesLineTaxAmountParams struct {
 	// The amount, in cents (or local equivalent), of the tax.
 	Amount *int64 `form:"amount" json:"amount"`
@@ -437,7 +432,7 @@ type CreditNotePreviewLinesLineParams struct {
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
 	// The line item quantity to credit.
 	Quantity *int64 `form:"quantity" json:"quantity,omitempty"`
-	// A list of up to 20 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
+	// A list of up to 10 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
 	TaxAmounts []*CreditNotePreviewLinesLineTaxAmountParams `form:"tax_amounts" json:"tax_amounts,omitempty"`
 	// The tax rates which apply to the credit note line item. Only valid when the `type` is `custom_line_item` and `tax_amounts` is not used.
 	TaxRates []*string `form:"tax_rates" json:"tax_rates,omitempty"`
@@ -446,7 +441,7 @@ type CreditNotePreviewLinesLineParams struct {
 	// The integer unit amount in cents (or local equivalent) of the credit note line item. This `unit_amount` will be multiplied by the quantity to get the full amount to credit for this line item. Only valid when `type` is `custom_line_item`.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *decimal.Decimal                             `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
+	UnitAmountDecimal *float64                                     `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
 	UnsetFields       []CreditNotePreviewLinesLineParamsUnsetField `form:"-" json:"-"`
 }
 
@@ -560,7 +555,6 @@ func (p *CreditNoteVoidCreditNoteParams) AddExpand(f string) {
 // When retrieving a credit note, you'll get a lines property containing the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.
 type CreditNoteListLinesParams struct {
 	ListParams `form:"*"`
-	// Unique identifier for the object.
 	CreditNote *string `form:"-"` // Included in URL
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
@@ -571,7 +565,7 @@ func (p *CreditNoteListLinesParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
 }
 
-// A list of up to 20 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
+// A list of up to 10 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
 type CreditNoteCreateLineTaxAmountParams struct {
 	// The amount, in cents (or local equivalent), of the tax.
 	Amount *int64 `form:"amount" json:"amount"`
@@ -593,7 +587,7 @@ type CreditNoteCreateLineParams struct {
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
 	// The line item quantity to credit.
 	Quantity *int64 `form:"quantity" json:"quantity,omitempty"`
-	// A list of up to 20 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
+	// A list of up to 10 tax amounts for the credit note line item. Not valid when `tax_rates` is used or if invoice is set up with `automatic_tax[enabled]=true`.
 	TaxAmounts []*CreditNoteCreateLineTaxAmountParams `form:"tax_amounts" json:"tax_amounts,omitempty"`
 	// The tax rates which apply to the credit note line item. Only valid when the `type` is `custom_line_item` and `tax_amounts` is not used.
 	TaxRates []*string `form:"tax_rates" json:"tax_rates,omitempty"`
@@ -602,7 +596,7 @@ type CreditNoteCreateLineParams struct {
 	// The integer unit amount in cents (or local equivalent) of the credit note line item. This `unit_amount` will be multiplied by the quantity to get the full amount to credit for this line item. Only valid when `type` is `custom_line_item`.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *decimal.Decimal                       `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
+	UnitAmountDecimal *float64                               `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
 	UnsetFields       []CreditNoteCreateLineParamsUnsetField `form:"-" json:"-"`
 }
 
@@ -665,8 +659,6 @@ type CreditNoteCreateShippingCostParams struct {
 //
 // You may issue multiple credit notes for an invoice. Each credit note may increment the invoice's pre_payment_credit_notes_amount,
 // post_payment_credit_notes_amount, or both, depending on the invoice's amount_remaining at the time of credit note creation.
-//
-// For invoices that also have refunds created through the [Refund API](https://docs.stripe.com/docs/api/refunds), the credit note API subtracts those refund amounts from the maximum creditable amount. This prevents the combined credit notes and refunds from exceeding the invoice amount. If you use both, ensure the combined total does not exceed the invoice's paid amount.
 type CreditNoteCreateParams struct {
 	Params `form:"*"`
 	// The integer amount in cents (or local equivalent) representing the total amount of the credit note. One of `amount`, `lines`, or `shipping_cost` must be provided.

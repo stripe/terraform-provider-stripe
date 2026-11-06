@@ -108,7 +108,6 @@ const (
 	TerminalReaderDeviceTypeMobilePhoneReader      TerminalReaderDeviceType = "mobile_phone_reader"
 	TerminalReaderDeviceTypeSimulatedStripeS700    TerminalReaderDeviceType = "simulated_stripe_s700"
 	TerminalReaderDeviceTypeSimulatedStripeS710    TerminalReaderDeviceType = "simulated_stripe_s710"
-	TerminalReaderDeviceTypeSimulatedStripeT600    TerminalReaderDeviceType = "simulated_stripe_t600"
 	TerminalReaderDeviceTypeSimulatedVerifoneM425  TerminalReaderDeviceType = "simulated_verifone_m425"
 	TerminalReaderDeviceTypeSimulatedVerifoneP630  TerminalReaderDeviceType = "simulated_verifone_p630"
 	TerminalReaderDeviceTypeSimulatedVerifoneUx700 TerminalReaderDeviceType = "simulated_verifone_ux700"
@@ -117,7 +116,6 @@ const (
 	TerminalReaderDeviceTypeStripeM2               TerminalReaderDeviceType = "stripe_m2"
 	TerminalReaderDeviceTypeStripeS700             TerminalReaderDeviceType = "stripe_s700"
 	TerminalReaderDeviceTypeStripeS710             TerminalReaderDeviceType = "stripe_s710"
-	TerminalReaderDeviceTypeStripeT600             TerminalReaderDeviceType = "stripe_t600"
 	TerminalReaderDeviceTypeVerifoneP400           TerminalReaderDeviceType = "verifone_P400"
 	TerminalReaderDeviceTypeVerifoneM425           TerminalReaderDeviceType = "verifone_m425"
 	TerminalReaderDeviceTypeVerifoneP630           TerminalReaderDeviceType = "verifone_p630"
@@ -125,7 +123,7 @@ const (
 	TerminalReaderDeviceTypeVerifoneV660p          TerminalReaderDeviceType = "verifone_v660p"
 )
 
-// The networking status of the reader. This value is `null` for mobile readers. We do not recommend using this field in flows that may block taking payments.
+// The networking status of the reader. We do not recommend using this field in flows that may block taking payments.
 type TerminalReaderStatus string
 
 // List of values that TerminalReaderStatus can take
@@ -911,7 +909,7 @@ type TerminalReader struct {
 	Object string `json:"object"`
 	// Serial number of the reader.
 	SerialNumber string `json:"serial_number"`
-	// The networking status of the reader. This value is `null` for mobile readers. We do not recommend using this field in flows that may block taking payments.
+	// The networking status of the reader. We do not recommend using this field in flows that may block taking payments.
 	Status TerminalReaderStatus `json:"status"`
 }
 

@@ -56,11 +56,6 @@ type V2CoreEventRelatedObject struct {
 	URL  string `json:"url"`
 }
 
-type V2CoreEventRelatedSingletonObject struct {
-	Type string `json:"type"`
-	URL  string `json:"url"`
-}
-
 type UnknownEventNotification struct {
 	V2CoreEventNotification
 
@@ -85,6 +80,6 @@ func (n *UnknownEventNotification) FetchRelatedObject(ctx context.Context) (*API
 	params.Headers = make(http.Header)
 	params.Headers.Set("Stripe-Request-Trigger", fmt.Sprintf("event=%s", n.ID))
 
-	err := n.client.backends.API.Call(http.MethodGet, n.RelatedObject.URL, n.client.key, params, obj)
+	err := n.client.backend.Call(http.MethodGet, n.RelatedObject.URL, n.client.key, params, obj)
 	return obj, err
 }

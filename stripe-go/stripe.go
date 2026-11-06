@@ -21,8 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shopspring/decimal"
-	"github.com/stripe/stripe-go/v87/form"
+	"github.com/stripe/stripe-go/v86/form"
 )
 
 //
@@ -342,15 +341,13 @@ func extractParams(params ParamsContainer) (*form.Values, *Params, error) {
 		if reflectValue.Kind() == reflect.Ptr && !reflectValue.IsNil() {
 			commonParams = params.GetParams()
 
-			metadataField := reflectValue.Elem().FieldByName("Metadata")
-			if metadataField.IsValid() && !metadataField.IsZero() {
+			if !reflectValue.Elem().FieldByName("Metadata").IsZero() {
 				if commonParams.Metadata != nil {
 					return nil, nil, fmt.Errorf("you cannot specify both the (deprecated) .Params.Metadata and .Metadata in %s", reflectValue.Elem().Type().Name())
 				}
 			}
 
-			expandField := reflectValue.Elem().FieldByName("Expand")
-			if expandField.IsValid() && !expandField.IsZero() {
+			if !reflectValue.Elem().FieldByName("Expand").IsZero() {
 				if commonParams.Expand != nil {
 					return nil, nil, fmt.Errorf("you cannot specify both the (deprecated) .Params.Expand and .Expand in %s", reflectValue.Elem().Type().Name())
 				}
@@ -467,86 +464,36 @@ func collectAllUnsetFields(v reflect.Value) [][]string {
 	return result
 }
 
-type decimalJSONField struct {
-	path  []string
-	value string
-}
-
-var decimalType = reflect.TypeOf(decimal.Decimal{})
-
-func collectDecimalJSONFields(v reflect.Value, path []string) []decimalJSONField {
-	for v.IsValid() && (v.Kind() == reflect.Interface || v.Kind() == reflect.Ptr) {
-		if v.IsNil() {
-			return nil
-		}
-		v = v.Elem()
-	}
-	if !v.IsValid() {
-		return nil
-	}
-	if v.Type() == decimalType {
-		return []decimalJSONField{{path: path, value: v.Interface().(decimal.Decimal).String()}}
-	}
-
-	var result []decimalJSONField
-	switch v.Kind() {
-	case reflect.Struct:
-		t := v.Type()
-		for i := 0; i < t.NumField(); i++ {
-			field := t.Field(i)
-			if field.PkgPath != "" {
-				continue
-			}
-			if field.Anonymous {
-				result = append(result, collectDecimalJSONFields(v.Field(i), path)...)
-				continue
-			}
-
-			jsonTag := field.Tag.Get("json")
-			name := strings.Split(jsonTag, ",")[0]
-			if name == "-" {
-				continue
-			}
-			if name == "" {
-				name = field.Name
-			}
-			fieldPath := append(append([]string(nil), path...), name)
-			result = append(result, collectDecimalJSONFields(v.Field(i), fieldPath)...)
-		}
-	case reflect.Array, reflect.Slice:
-		for i := 0; i < v.Len(); i++ {
-			elementPath := append(append([]string(nil), path...), strconv.Itoa(i))
-			result = append(result, collectDecimalJSONFields(v.Index(i), elementPath)...)
-		}
-	}
-	return result
-}
-
-// setNestedJSONValue navigates into a nested JSON structure using the given
-// path and replaces the leaf. Numeric path segments navigate into JSON arrays.
-func setNestedJSONValue(m map[string]json.RawMessage, path []string, value json.RawMessage) {
+// setNestedNull navigates into a nested JSON structure using the given path and
+// sets the leaf value to null. Intermediate objects are created if they don't
+// exist (e.g. when a nested struct was nil/omitted but has UnsetFields entries).
+// Numeric path segments navigate into JSON arrays by index.
+func setNestedNull(m map[string]json.RawMessage, path []string) {
 	if len(path) == 1 {
-		m[path[0]] = value
+		m[path[0]] = json.RawMessage("null")
 		return
 	}
 
 	key := path[0]
 	rest := path[1:]
 
+	// Check if the next path segment is an array index
 	if idx, err := strconv.Atoi(rest[0]); err == nil {
 		var arr []json.RawMessage
 		if existing, ok := m[key]; ok {
-			_ = json.Unmarshal(existing, &arr)
+			_ = json.Unmarshal(existing, &arr) // on failure arr stays nil; idx < len(arr) will be false and the null is silently not written
 		}
 		if idx < len(arr) {
 			if len(rest) == 1 {
-				arr[idx] = value
+				// The array element itself should be null (unlikely but handle it)
+				arr[idx] = json.RawMessage("null")
 			} else {
+				// Navigate into the array element (must be an object)
 				var elem map[string]json.RawMessage
 				if err := json.Unmarshal(arr[idx], &elem); err != nil {
 					elem = make(map[string]json.RawMessage)
 				}
-				setNestedJSONValue(elem, rest[1:], value)
+				setNestedNull(elem, rest[1:])
 				data, _ := json.Marshal(elem)
 				arr[idx] = json.RawMessage(data)
 			}
@@ -565,14 +512,10 @@ func setNestedJSONValue(m map[string]json.RawMessage, path []string, value json.
 		nested = make(map[string]json.RawMessage)
 	}
 
-	setNestedJSONValue(nested, rest, value)
+	setNestedNull(nested, rest)
 
 	data, _ := json.Marshal(nested)
 	m[key] = json.RawMessage(data)
-}
-
-func setNestedNull(m map[string]json.RawMessage, path []string) {
-	setNestedJSONValue(m, path, json.RawMessage("null"))
 }
 
 // marshalV2JSON marshals params to JSON for v2 POST requests. UnsetFields
@@ -584,44 +527,20 @@ func marshalV2JSON(params ParamsContainer) ([]byte, error) {
 		return nil, err
 	}
 
-	paramsValue := reflect.ValueOf(params)
-	unsetFieldPaths := collectAllUnsetFields(paramsValue)
-	decimalFields := collectDecimalJSONFields(paramsValue, nil)
-	var extraValues url.Values
-	if baseParams := params.GetParams(); baseParams != nil && baseParams.Extra != nil {
-		extraValues = baseParams.Extra.Values
-	}
-	if len(unsetFieldPaths) == 0 && len(decimalFields) == 0 && len(extraValues) == 0 {
+	// Collect all UnsetFields from root and nested structs
+	unsetFieldPaths := collectAllUnsetFields(reflect.ValueOf(params))
+	if len(unsetFieldPaths) == 0 {
 		return data, nil
 	}
 
+	// Parse the marshaled JSON, inject null at each path
 	var m map[string]json.RawMessage
 	if err := json.Unmarshal(data, &m); err != nil {
 		return nil, err
 	}
 
-	for _, field := range decimalFields {
-		quotedValue, err := json.Marshal(field.value)
-		if err != nil {
-			return nil, err
-		}
-		setNestedJSONValue(m, field.path, quotedValue)
-	}
 	for _, path := range unsetFieldPaths {
 		setNestedNull(m, path)
-	}
-	for key, values := range extraValues {
-		var value interface{}
-		if len(values) == 1 {
-			value = values[0]
-		} else {
-			value = values
-		}
-		encoded, err := json.Marshal(value)
-		if err != nil {
-			return nil, err
-		}
-		m[key] = encoded
 	}
 
 	return json.Marshal(m)
@@ -729,25 +648,6 @@ func (s *BackendImplementation) CallMultipart(method, path, key, boundary string
 	return nil
 }
 
-// validatePath ensures a request path is origin-relative: that it
-// begins with a single "/".
-//
-// The absolute URL is built by concatenating a base URL onto this path, and no
-// base URL ends in a slash (normalizeURL actively strips a trailing one). A path
-// like "@evil.example/v1/x" or ".evil.example/v1/x" would modify the resulting
-// host and direct the request (including the API key) to a non-Stripe host.
-//
-// Because some relative urls arrive from potentially untrusted sources (like
-// webhook bodies), we have to be a little defensive.
-//
-// So, we require that a path starts with a leading slash.
-func validatePath(path string) error {
-	if !strings.HasPrefix(path, "/") || strings.HasPrefix(path, "//") {
-		return fmt.Errorf("path must begin with a single \"/\", got %q", path)
-	}
-	return nil
-}
-
 // extractVersion ensures the path starts with /v1, /v2, or contains /oauth
 // and returns the corresponding APIMode.
 func extractVersion(path string) (APIMode, error) {
@@ -852,13 +752,8 @@ func (s *BackendImplementation) CallRaw(method, path, key string, body []byte, p
 // NewRequest is used by Call to generate an http.Request. It handles encoding
 // parameters and attaching the appropriate headers.
 func (s *BackendImplementation) NewRequest(method, path, key, contentType string, params *Params) (*http.Request, error) {
-	if err := validatePath(path); err != nil {
-		ctx := context.Background()
-		if params != nil && params.Context != nil {
-			ctx = params.Context
-		}
-		s.logErrorf(ctx, "Cannot create Stripe request: %v", err)
-		return nil, err
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
 	}
 
 	// Body is set later by `Do`.
@@ -1093,9 +988,7 @@ func (s *BackendImplementation) requestWithRetriesAndTelemetry(
 	}
 
 	if notice := resp.Header.Get("Stripe-Notice"); notice != "" {
-		if message := buildStripeNoticeMessage(notice, os.LookupEnv); message != "" {
-			s.logWarnf(req.Context(), "%s", message)
-		}
+		s.logWarnf(req.Context(), "%s", notice)
 	}
 
 	return resp, result, &requestDuration, nil
@@ -1310,160 +1203,6 @@ func (s *BackendImplementation) responseToErrorV2(res *http.Response, resBody []
 
 	// errorTypeSwitch: The beginning of the section generated from our OpenAPI spec
 	switch *raw.Error.Type {
-	case "already_canceled":
-		tmp := struct {
-			Error *AlreadyCanceledError `json:"error"`
-		}{
-			Error: &AlreadyCanceledError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "blocked_by_stripe":
-		tmp := struct {
-			Error *BlockedByStripeError `json:"error"`
-		}{
-			Error: &BlockedByStripeError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "cannot_proceed":
-		tmp := struct {
-			Error *CannotProceedError `json:"error"`
-		}{
-			Error: &CannotProceedError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "capability_not_enabled":
-		tmp := struct {
-			Error *CapabilityNotEnabledError `json:"error"`
-		}{
-			Error: &CapabilityNotEnabledError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "controlled_by_alternate_resource":
-		tmp := struct {
-			Error *ControlledByAlternateResourceError `json:"error"`
-		}{
-			Error: &ControlledByAlternateResourceError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "feature_not_enabled":
-		tmp := struct {
-			Error *FeatureNotEnabledError `json:"error"`
-		}{
-			Error: &FeatureNotEnabledError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "financial_account_not_open":
-		tmp := struct {
-			Error *FinancialAccountNotOpenError `json:"error"`
-		}{
-			Error: &FinancialAccountNotOpenError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "fx_quote_needs_refresh":
-		tmp := struct {
-			Error *FxQuoteNeedsRefreshError `json:"error"`
-		}{
-			Error: &FxQuoteNeedsRefreshError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "insufficient_funds":
-		tmp := struct {
-			Error *InsufficientFundsError `json:"error"`
-		}{
-			Error: &InsufficientFundsError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "invalid_payment_method":
-		tmp := struct {
-			Error *InvalidPaymentMethodError `json:"error"`
-		}{
-			Error: &InvalidPaymentMethodError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "invalid_payout_method":
-		tmp := struct {
-			Error *InvalidPayoutMethodError `json:"error"`
-		}{
-			Error: &InvalidPayoutMethodError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "invalid_vaulted_credential":
-		tmp := struct {
-			Error *InvalidVaultedCredentialError `json:"error"`
-		}{
-			Error: &InvalidVaultedCredentialError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "not_cancelable":
-		tmp := struct {
-			Error *NotCancelableError `json:"error"`
-		}{
-			Error: &NotCancelableError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "quota_exceeded":
-		tmp := struct {
-			Error *QuotaExceededError `json:"error"`
-		}{
-			Error: &QuotaExceededError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
 	case "rate_limit":
 		tmp := struct {
 			Error *RateLimitError `json:"error"`
@@ -1475,55 +1214,11 @@ func (s *BackendImplementation) responseToErrorV2(res *http.Response, resBody []
 		}
 		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
 		typedError = tmp.Error
-	case "recipient_not_notifiable":
-		tmp := struct {
-			Error *RecipientNotNotifiableError `json:"error"`
-		}{
-			Error: &RecipientNotNotifiableError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
 	case "temporary_session_expired":
 		tmp := struct {
 			Error *TemporarySessionExpiredError `json:"error"`
 		}{
 			Error: &TemporarySessionExpiredError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "verification_attempt_failed":
-		tmp := struct {
-			Error *VerificationAttemptFailedError `json:"error"`
-		}{
-			Error: &VerificationAttemptFailedError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "verification_expired":
-		tmp := struct {
-			Error *VerificationExpiredError `json:"error"`
-		}{
-			Error: &VerificationExpiredError{},
-		}
-		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
-			return err
-		}
-		tmp.Error.SetLastResponse(newAPIResponse(res, resBody, nil))
-		typedError = tmp.Error
-	case "verification_not_initiated":
-		tmp := struct {
-			Error *VerificationNotInitiatedError `json:"error"`
-		}{
-			Error: &VerificationNotInitiatedError{},
 		}
 		if err := s.unmarshalJSONVerbose(ctx, res.StatusCode, resBody, &tmp); err != nil {
 			return err
@@ -1621,27 +1316,10 @@ func (s *BackendImplementation) shouldRetry(err error, req *http.Request, resp *
 		}
 	}
 
-	// The API may ask us not to retry (e.g. if doing so would be a no-op), or
-	// advise us to retry (e.g. in cases of lock timeouts). Defer to those
-	// instructions if given.
-	if resp != nil {
-		if resp.Header.Get("Stripe-Should-Retry") == "false" {
-			return false, "`Stripe-Should-Retry` header returned `false`"
-		}
-		if resp.Header.Get("Stripe-Should-Retry") == "true" {
-			return true, ""
-		}
-	}
-
 	// All errors from the Stripe API should implement the `retrier` interface.
-	// A retrier can independently opt in to a retry, but a false result should
-	// still allow the response status to be evaluated below.
-	isStripeError := false
-	if retryError, ok := err.(retrier); ok {
-		isStripeError = true
-		if retryError.canRetry() {
-			return true, ""
-		}
+	// Any other error comes from a different layer
+	if err, ok := err.(retrier); ok {
+		return err.canRetry(), "not retriable error"
 	}
 
 	// We retry most errors that come out of HTTP requests except for a curated
@@ -1650,7 +1328,7 @@ func (s *BackendImplementation) shouldRetry(err error, req *http.Request, resp *
 	// flip this to an inverted strategy of retrying only errors that we know
 	// to be retryable in a future refactor, if a good methodology is found for
 	// identifying that full set of errors.
-	if err != nil && !isStripeError {
+	if err != nil {
 		if urlErr, ok := err.(*url.Error); ok {
 			// Don't retry too many redirects.
 			if redirectsErrorRE.MatchString(urlErr.Error()) {
@@ -1672,20 +1350,28 @@ func (s *BackendImplementation) shouldRetry(err error, req *http.Request, resp *
 		return true, ""
 	}
 
-	if resp != nil {
-		// 409 Conflict
-		if resp.StatusCode == http.StatusConflict {
-			return true, ""
-		}
+	// The API may ask us not to retry (e.g. if doing so would be a no-op), or
+	// advise us to retry (e.g. in cases of lock timeouts). Defer to those
+	// instructions if given.
+	if resp.Header.Get("Stripe-Should-Retry") == "false" {
+		return false, "`Stripe-Should-Retry` header returned `false`"
+	}
+	if resp.Header.Get("Stripe-Should-Retry") == "true" {
+		return true, ""
+	}
 
-		// Retry on 500, 503, and other internal errors.
-		//
-		// Note that we expect the stripe-should-retry header to be false
-		// in most cases when a 500 is returned, since our idempotency framework
-		// would typically replay it anyway.
-		if resp.StatusCode >= http.StatusInternalServerError {
-			return true, ""
-		}
+	// 409 Conflict
+	if resp.StatusCode == http.StatusConflict {
+		return true, ""
+	}
+
+	// Retry on 500, 503, and other internal errors.
+	//
+	// Note that we expect the stripe-should-retry header to be false
+	// in most cases when a 500 is returned, since our idempotency framework
+	// would typically replay it anyway.
+	if resp.StatusCode >= http.StatusInternalServerError {
+		return true, ""
 	}
 
 	return false, "response not known to be safe for retry"
@@ -1722,7 +1408,6 @@ func (s *BackendImplementation) sleepTime(numRetries int) time.Duration {
 // Backends are the currently supported endpoints.
 type Backends struct {
 	API, Connect, Uploads, MeterEvents Backend
-	config                             *BackendConfig
 	mu                                 sync.RWMutex
 }
 
@@ -1941,8 +1626,16 @@ func Int64Slice(v []int64) []*int64 {
 
 // NewBackends creates a new set of backends with the given HTTP client.
 func NewBackends(httpClient *http.Client) *Backends {
-	config := &BackendConfig{HTTPClient: httpClient}
-	return NewBackendsWithConfig(config)
+	apiConfig := &BackendConfig{HTTPClient: httpClient}
+	connectConfig := &BackendConfig{HTTPClient: httpClient}
+	uploadConfig := &BackendConfig{HTTPClient: httpClient}
+	meterConfig := &BackendConfig{HTTPClient: httpClient}
+	return &Backends{
+		API:         GetBackendWithConfig(APIBackend, apiConfig),
+		Connect:     GetBackendWithConfig(ConnectBackend, connectConfig),
+		Uploads:     GetBackendWithConfig(UploadsBackend, uploadConfig),
+		MeterEvents: GetBackendWithConfig(MeterEventsBackend, meterConfig),
+	}
 }
 
 // NewBackendsWithConfig creates a new set of backends with the given config for all backends.
@@ -1953,7 +1646,6 @@ func NewBackendsWithConfig(config *BackendConfig) *Backends {
 		Connect:     GetBackendWithConfig(ConnectBackend, config),
 		Uploads:     GetBackendWithConfig(UploadsBackend, config),
 		MeterEvents: GetBackendWithConfig(MeterEventsBackend, config),
-		config:      config,
 	}
 }
 
@@ -2078,7 +1770,7 @@ func TimeValue(v *time.Time) time.Time {
 //
 
 // clientversion is the binding version
-const clientversion = "87.1.0"
+const clientversion = "86.2.0"
 
 // defaultHTTPTimeout is the default timeout on the http.Client used by the library.
 // This is chosen to be consistent with the other Stripe language libraries and
@@ -2168,24 +1860,9 @@ var aiAgents = map[string]string{
 	"CODEX_CI":                       "codex_cli",
 	"CURSOR_AGENT":                   "cursor",
 	"GEMINI_CLI":                     "gemini_cli",
-	"HERMES_AGENT":                   "hermes",
 	"OPENCLAW_SHELL":                 "openclaw",
 	"OPENCODE":                       "open_code",
 	// aiAgents: The end of the section generated from our OpenAPI spec
-}
-
-const stripeNoticeSuppressionMessage = "To suppress Stripe notices in test and sandbox environments, set the STRIPE_SUPPRESS_NOTICES environment variable to true."
-
-func buildStripeNoticeMessage(notice string, lookupEnv func(string) (string, bool)) string {
-	_, isAIAgent := detectAIAgent(lookupEnv)
-	suppressionValue, _ := lookupEnv("STRIPE_SUPPRESS_NOTICES")
-	if !isAIAgent && strings.EqualFold(suppressionValue, "true") {
-		return ""
-	}
-	if !isAIAgent {
-		return notice + "\n" + stripeNoticeSuppressionMessage
-	}
-	return notice
 }
 
 func detectAIAgent(lookupEnv func(string) (string, bool)) (string, bool) {

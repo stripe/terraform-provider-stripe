@@ -175,7 +175,7 @@ const (
 	ConfirmationTokenPaymentMethodPreviewFPXAccountHolderTypeIndividual ConfirmationTokenPaymentMethodPreviewFPXAccountHolderType = "individual"
 )
 
-// The customer's bank, if provided. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bnp_paribas`, `bank_rakyat`, `bsn`, `cimb`, `citibank`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `mbsb_bank`, `pb_enterprise`, or `bank_of_china`.
+// The customer's bank, if provided. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bank_rakyat`, `bsn`, `cimb`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `pb_enterprise`, or `bank_of_china`.
 type ConfirmationTokenPaymentMethodPreviewFPXBank string
 
 // List of values that ConfirmationTokenPaymentMethodPreviewFPXBank can take
@@ -188,17 +188,14 @@ const (
 	ConfirmationTokenPaymentMethodPreviewFPXBankBankMuamalat      ConfirmationTokenPaymentMethodPreviewFPXBank = "bank_muamalat"
 	ConfirmationTokenPaymentMethodPreviewFPXBankBankOfChina       ConfirmationTokenPaymentMethodPreviewFPXBank = "bank_of_china"
 	ConfirmationTokenPaymentMethodPreviewFPXBankBankRakyat        ConfirmationTokenPaymentMethodPreviewFPXBank = "bank_rakyat"
-	ConfirmationTokenPaymentMethodPreviewFPXBankBnpParibas        ConfirmationTokenPaymentMethodPreviewFPXBank = "bnp_paribas"
 	ConfirmationTokenPaymentMethodPreviewFPXBankBsn               ConfirmationTokenPaymentMethodPreviewFPXBank = "bsn"
 	ConfirmationTokenPaymentMethodPreviewFPXBankCimb              ConfirmationTokenPaymentMethodPreviewFPXBank = "cimb"
-	ConfirmationTokenPaymentMethodPreviewFPXBankCitibank          ConfirmationTokenPaymentMethodPreviewFPXBank = "citibank"
 	ConfirmationTokenPaymentMethodPreviewFPXBankDeutscheBank      ConfirmationTokenPaymentMethodPreviewFPXBank = "deutsche_bank"
 	ConfirmationTokenPaymentMethodPreviewFPXBankHongLeongBank     ConfirmationTokenPaymentMethodPreviewFPXBank = "hong_leong_bank"
 	ConfirmationTokenPaymentMethodPreviewFPXBankHsbc              ConfirmationTokenPaymentMethodPreviewFPXBank = "hsbc"
 	ConfirmationTokenPaymentMethodPreviewFPXBankKfh               ConfirmationTokenPaymentMethodPreviewFPXBank = "kfh"
 	ConfirmationTokenPaymentMethodPreviewFPXBankMaybank2e         ConfirmationTokenPaymentMethodPreviewFPXBank = "maybank2e"
 	ConfirmationTokenPaymentMethodPreviewFPXBankMaybank2u         ConfirmationTokenPaymentMethodPreviewFPXBank = "maybank2u"
-	ConfirmationTokenPaymentMethodPreviewFPXBankMbsbBank          ConfirmationTokenPaymentMethodPreviewFPXBank = "mbsb_bank"
 	ConfirmationTokenPaymentMethodPreviewFPXBankOcbc              ConfirmationTokenPaymentMethodPreviewFPXBank = "ocbc"
 	ConfirmationTokenPaymentMethodPreviewFPXBankPbEnterprise      ConfirmationTokenPaymentMethodPreviewFPXBank = "pb_enterprise"
 	ConfirmationTokenPaymentMethodPreviewFPXBankPublicBank        ConfirmationTokenPaymentMethodPreviewFPXBank = "public_bank"
@@ -391,7 +388,6 @@ const (
 	ConfirmationTokenPaymentMethodPreviewTypePayco            ConfirmationTokenPaymentMethodPreviewType = "payco"
 	ConfirmationTokenPaymentMethodPreviewTypePayNow           ConfirmationTokenPaymentMethodPreviewType = "paynow"
 	ConfirmationTokenPaymentMethodPreviewTypePaypal           ConfirmationTokenPaymentMethodPreviewType = "paypal"
-	ConfirmationTokenPaymentMethodPreviewTypePaypay           ConfirmationTokenPaymentMethodPreviewType = "paypay"
 	ConfirmationTokenPaymentMethodPreviewTypePayto            ConfirmationTokenPaymentMethodPreviewType = "payto"
 	ConfirmationTokenPaymentMethodPreviewTypePix              ConfirmationTokenPaymentMethodPreviewType = "pix"
 	ConfirmationTokenPaymentMethodPreviewTypePromptPay        ConfirmationTokenPaymentMethodPreviewType = "promptpay"
@@ -400,7 +396,6 @@ const (
 	ConfirmationTokenPaymentMethodPreviewTypeSatispay         ConfirmationTokenPaymentMethodPreviewType = "satispay"
 	ConfirmationTokenPaymentMethodPreviewTypeScalapay         ConfirmationTokenPaymentMethodPreviewType = "scalapay"
 	ConfirmationTokenPaymentMethodPreviewTypeSEPADebit        ConfirmationTokenPaymentMethodPreviewType = "sepa_debit"
-	ConfirmationTokenPaymentMethodPreviewTypeSequra           ConfirmationTokenPaymentMethodPreviewType = "sequra"
 	ConfirmationTokenPaymentMethodPreviewTypeSofort           ConfirmationTokenPaymentMethodPreviewType = "sofort"
 	ConfirmationTokenPaymentMethodPreviewTypeSunbit           ConfirmationTokenPaymentMethodPreviewType = "sunbit"
 	ConfirmationTokenPaymentMethodPreviewTypeSwish            ConfirmationTokenPaymentMethodPreviewType = "swish"
@@ -602,14 +597,8 @@ type ConfirmationTokenPaymentMethodPreviewBillingDetails struct {
 	// Taxpayer identification number. Used only for transactions between LATAM buyers and non-LATAM sellers.
 	TaxID string `json:"tax_id"`
 }
-type ConfirmationTokenPaymentMethodPreviewBizum struct {
-	// A unique identifier for the buyer as determined by the local payment processor.
-	BuyerID string `json:"buyer_id,omitempty"`
-}
-type ConfirmationTokenPaymentMethodPreviewBLIK struct {
-	// A unique and immutable identifier assigned by BLIK to every buyer.
-	BuyerID string `json:"buyer_id,omitempty"`
-}
+type ConfirmationTokenPaymentMethodPreviewBizum struct{}
+type ConfirmationTokenPaymentMethodPreviewBLIK struct{}
 type ConfirmationTokenPaymentMethodPreviewBoleto struct {
 	// Uniquely identifies the customer tax id (CNPJ or CPF)
 	TaxID string `json:"tax_id"`
@@ -896,7 +885,7 @@ type ConfirmationTokenPaymentMethodPreviewEPS struct {
 type ConfirmationTokenPaymentMethodPreviewFPX struct {
 	// Account holder type, if provided. Can be one of `individual` or `company`.
 	AccountHolderType ConfirmationTokenPaymentMethodPreviewFPXAccountHolderType `json:"account_holder_type"`
-	// The customer's bank, if provided. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bnp_paribas`, `bank_rakyat`, `bsn`, `cimb`, `citibank`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `mbsb_bank`, `pb_enterprise`, or `bank_of_china`.
+	// The customer's bank, if provided. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bank_rakyat`, `bsn`, `cimb`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `pb_enterprise`, or `bank_of_china`.
 	Bank ConfirmationTokenPaymentMethodPreviewFPXBank `json:"bank"`
 }
 type ConfirmationTokenPaymentMethodPreviewGiropay struct{}
@@ -1016,7 +1005,6 @@ type ConfirmationTokenPaymentMethodPreviewPaypal struct {
 	// PayPal account PayerID. This identifier uniquely identifies the PayPal customer.
 	PayerID string `json:"payer_id"`
 }
-type ConfirmationTokenPaymentMethodPreviewPaypay struct{}
 type ConfirmationTokenPaymentMethodPreviewPayto struct {
 	// Bank-State-Branch number of the bank account.
 	BSBNumber string `json:"bsb_number"`
@@ -1025,10 +1013,7 @@ type ConfirmationTokenPaymentMethodPreviewPayto struct {
 	// The PayID alias for the bank account.
 	PayID string `json:"pay_id"`
 }
-type ConfirmationTokenPaymentMethodPreviewPix struct {
-	// Uniquely identifies this particular Pix account. You can use this attribute to check whether two Pix accounts are the same.
-	Fingerprint string `json:"fingerprint,omitempty"`
-}
+type ConfirmationTokenPaymentMethodPreviewPix struct{}
 type ConfirmationTokenPaymentMethodPreviewPromptPay struct{}
 type ConfirmationTokenPaymentMethodPreviewRevolutPay struct{}
 type ConfirmationTokenPaymentMethodPreviewSamsungPay struct{}
@@ -1056,7 +1041,6 @@ type ConfirmationTokenPaymentMethodPreviewSEPADebit struct {
 	// Last four characters of the IBAN.
 	Last4 string `json:"last4"`
 }
-type ConfirmationTokenPaymentMethodPreviewSequra struct{}
 type ConfirmationTokenPaymentMethodPreviewSofort struct {
 	// Two-letter ISO code representing the country the bank account is located in.
 	Country string `json:"country"`
@@ -1158,7 +1142,6 @@ type ConfirmationTokenPaymentMethodPreview struct {
 	Payco           *ConfirmationTokenPaymentMethodPreviewPayco           `json:"payco,omitempty"`
 	PayNow          *ConfirmationTokenPaymentMethodPreviewPayNow          `json:"paynow,omitempty"`
 	Paypal          *ConfirmationTokenPaymentMethodPreviewPaypal          `json:"paypal,omitempty"`
-	Paypay          *ConfirmationTokenPaymentMethodPreviewPaypay          `json:"paypay,omitempty"`
 	Payto           *ConfirmationTokenPaymentMethodPreviewPayto           `json:"payto,omitempty"`
 	Pix             *ConfirmationTokenPaymentMethodPreviewPix             `json:"pix,omitempty"`
 	PromptPay       *ConfirmationTokenPaymentMethodPreviewPromptPay       `json:"promptpay,omitempty"`
@@ -1167,7 +1150,6 @@ type ConfirmationTokenPaymentMethodPreview struct {
 	Satispay        *ConfirmationTokenPaymentMethodPreviewSatispay        `json:"satispay,omitempty"`
 	Scalapay        *ConfirmationTokenPaymentMethodPreviewScalapay        `json:"scalapay,omitempty"`
 	SEPADebit       *ConfirmationTokenPaymentMethodPreviewSEPADebit       `json:"sepa_debit,omitempty"`
-	Sequra          *ConfirmationTokenPaymentMethodPreviewSequra          `json:"sequra,omitempty"`
 	Sofort          *ConfirmationTokenPaymentMethodPreviewSofort          `json:"sofort,omitempty"`
 	Sunbit          *ConfirmationTokenPaymentMethodPreviewSunbit          `json:"sunbit,omitempty"`
 	Swish           *ConfirmationTokenPaymentMethodPreviewSwish           `json:"swish,omitempty"`
@@ -1208,8 +1190,6 @@ type ConfirmationToken struct {
 	Livemode bool `json:"livemode"`
 	// Data used for generating a Mandate.
 	MandateData *ConfirmationTokenMandateData `json:"mandate_data,omitempty"`
-	// Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
-	Metadata map[string]string `json:"metadata"`
 	// String representing the object's type. Objects of the same type share the same value.
 	Object string `json:"object"`
 	// ID of the PaymentIntent that this ConfirmationToken was used to confirm, or null if this ConfirmationToken has not yet been used.

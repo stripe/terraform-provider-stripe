@@ -6,10 +6,7 @@
 
 package stripe
 
-import (
-	"encoding/json"
-	"github.com/shopspring/decimal"
-)
+import "encoding/json"
 
 // The specified behavior after the purchase is complete.
 type PaymentLinkAfterCompletionType string
@@ -176,14 +173,11 @@ const (
 	PaymentLinkPaymentMethodTypePayByBank        PaymentLinkPaymentMethodType = "pay_by_bank"
 	PaymentLinkPaymentMethodTypePayNow           PaymentLinkPaymentMethodType = "paynow"
 	PaymentLinkPaymentMethodTypePaypal           PaymentLinkPaymentMethodType = "paypal"
-	PaymentLinkPaymentMethodTypePaypay           PaymentLinkPaymentMethodType = "paypay"
 	PaymentLinkPaymentMethodTypePayto            PaymentLinkPaymentMethodType = "payto"
 	PaymentLinkPaymentMethodTypePix              PaymentLinkPaymentMethodType = "pix"
 	PaymentLinkPaymentMethodTypePromptPay        PaymentLinkPaymentMethodType = "promptpay"
 	PaymentLinkPaymentMethodTypeSatispay         PaymentLinkPaymentMethodType = "satispay"
-	PaymentLinkPaymentMethodTypeScalapay         PaymentLinkPaymentMethodType = "scalapay"
 	PaymentLinkPaymentMethodTypeSEPADebit        PaymentLinkPaymentMethodType = "sepa_debit"
-	PaymentLinkPaymentMethodTypeSequra           PaymentLinkPaymentMethodType = "sequra"
 	PaymentLinkPaymentMethodTypeSofort           PaymentLinkPaymentMethodType = "sofort"
 	PaymentLinkPaymentMethodTypeSunbit           PaymentLinkPaymentMethodType = "sunbit"
 	PaymentLinkPaymentMethodTypeSwish            PaymentLinkPaymentMethodType = "swish"
@@ -317,7 +311,7 @@ type PaymentLinkCustomFieldDropdownOptionParams struct {
 
 // Configuration for `type=dropdown` fields.
 type PaymentLinkCustomFieldDropdownParams struct {
-	// The value that pre-fills the field on the payment page. Must match a `value` in the `options` array.
+	// The value that pre-fills the field on the payment page.Must match a `value` in the `options` array.
 	DefaultValue *string `form:"default_value" json:"default_value,omitempty"`
 	// The options available for the customer to select. Up to 200 options allowed.
 	Options []*PaymentLinkCustomFieldDropdownOptionParams `form:"options" json:"options"`
@@ -325,7 +319,7 @@ type PaymentLinkCustomFieldDropdownParams struct {
 
 // The label for the field, displayed to the customer.
 type PaymentLinkCustomFieldLabelParams struct {
-	// Custom text for the label, displayed to the customer. Up to 100 characters.
+	// Custom text for the label, displayed to the customer. Up to 50 characters.
 	Custom *string `form:"custom" json:"custom"`
 	// The type of the label.
 	Type *string `form:"type" json:"type"`
@@ -351,7 +345,7 @@ type PaymentLinkCustomFieldTextParams struct {
 	MinimumLength *int64 `form:"minimum_length" json:"minimum_length,omitempty"`
 }
 
-// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.
+// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.
 type PaymentLinkCustomFieldParams struct {
 	// Configuration for `type=dropdown` fields.
 	Dropdown *PaymentLinkCustomFieldDropdownParams `form:"dropdown" json:"dropdown,omitempty"`
@@ -393,7 +387,7 @@ type PaymentLinkCustomTextTermsOfServiceAcceptanceParams struct {
 	Message *string `form:"message" json:"message"`
 }
 
-// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `elements`.
+// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `custom`.
 type PaymentLinkCustomTextParams struct {
 	// Custom text that should be displayed after the payment confirmation button.
 	AfterSubmit *PaymentLinkCustomTextAfterSubmitParams `form:"after_submit" json:"after_submit,omitempty"`
@@ -519,27 +513,6 @@ type PaymentLinkLineItemAdjustableQuantityParams struct {
 	Minimum *int64 `form:"minimum" json:"minimum,omitempty"`
 }
 
-// Tax details for this product, including the [tax code](https://docs.stripe.com/tax/tax-codes) and an optional performance location.
-type PaymentLinkLineItemPriceDataProductDataTaxDetailsParams struct {
-	// A tax location ID. Depending on the [tax code](https://docs.stripe.com/tax/tax-for-tickets/reference/tax-location-performance), this is required, optional, or not supported.
-	PerformanceLocation *string `form:"performance_location" json:"performance_location,omitempty"`
-	// A [tax code](https://docs.stripe.com/tax/tax-categories) ID.
-	TaxCode     *string                                                             `form:"tax_code" json:"tax_code,omitempty"`
-	UnsetFields []PaymentLinkLineItemPriceDataProductDataTaxDetailsParamsUnsetField `form:"-" json:"-"`
-}
-
-// PaymentLinkLineItemPriceDataProductDataTaxDetailsParamsUnsetField is the list of fields that can be cleared/unset on PaymentLinkLineItemPriceDataProductDataTaxDetailsParams.
-type PaymentLinkLineItemPriceDataProductDataTaxDetailsParamsUnsetField string
-
-const (
-	PaymentLinkLineItemPriceDataProductDataTaxDetailsParamsUnsetFieldTaxCode PaymentLinkLineItemPriceDataProductDataTaxDetailsParamsUnsetField = "tax_code"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *PaymentLinkLineItemPriceDataProductDataTaxDetailsParams) AddUnsetField(field PaymentLinkLineItemPriceDataProductDataTaxDetailsParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
-}
-
 // Data used to generate a new [Product](https://docs.stripe.com/api/products) object inline. One of `product` or `product_data` is required.
 type PaymentLinkLineItemPriceDataProductDataParams struct {
 	// The product's description, meant to be displayable to the customer. Use this field to optionally store a long form explanation of the product being sold for your own rendering purposes.
@@ -552,8 +525,6 @@ type PaymentLinkLineItemPriceDataProductDataParams struct {
 	Name *string `form:"name" json:"name"`
 	// A [tax code](https://docs.stripe.com/tax/tax-categories) ID.
 	TaxCode *string `form:"tax_code" json:"tax_code,omitempty"`
-	// Tax details for this product, including the [tax code](https://docs.stripe.com/tax/tax-codes) and an optional performance location.
-	TaxDetails *PaymentLinkLineItemPriceDataProductDataTaxDetailsParams `form:"tax_details" json:"tax_details,omitempty"`
 	// A label that represents units of this product. When set, this will be included in customers' receipts, invoices, Checkout, and the customer portal.
 	UnitLabel *string `form:"unit_label" json:"unit_label,omitempty"`
 }
@@ -590,7 +561,7 @@ type PaymentLinkLineItemPriceDataParams struct {
 	// A non-negative integer in cents (or local equivalent) representing how much to charge. One of `unit_amount` or `unit_amount_decimal` is required.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
+	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
 }
 
 // The line items representing what is being sold. Each line item represents an item being sold. Up to 20 line items are supported.
@@ -696,7 +667,6 @@ type PaymentLinkPaymentIntentDataParamsUnsetField string
 const (
 	PaymentLinkPaymentIntentDataParamsUnsetFieldDescription               PaymentLinkPaymentIntentDataParamsUnsetField = "description"
 	PaymentLinkPaymentIntentDataParamsUnsetFieldMetadata                  PaymentLinkPaymentIntentDataParamsUnsetField = "metadata"
-	PaymentLinkPaymentIntentDataParamsUnsetFieldSetupFutureUsage          PaymentLinkPaymentIntentDataParamsUnsetField = "setup_future_usage"
 	PaymentLinkPaymentIntentDataParamsUnsetFieldStatementDescriptor       PaymentLinkPaymentIntentDataParamsUnsetField = "statement_descriptor"
 	PaymentLinkPaymentIntentDataParamsUnsetFieldStatementDescriptorSuffix PaymentLinkPaymentIntentDataParamsUnsetField = "statement_descriptor_suffix"
 	PaymentLinkPaymentIntentDataParamsUnsetFieldTransferGroup             PaymentLinkPaymentIntentDataParamsUnsetField = "transfer_group"
@@ -806,14 +776,6 @@ type PaymentLinkShippingOptionParams struct {
 	ShippingRate *string `form:"shipping_rate" json:"shipping_rate,omitempty"`
 }
 
-// A list of up to 4 custom fields to be displayed on the invoice.
-type PaymentLinkSubscriptionDataInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
-
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type PaymentLinkSubscriptionDataInvoiceSettingsIssuerParams struct {
 	// The connected account being referenced when `type` is `account`.
@@ -824,30 +786,8 @@ type PaymentLinkSubscriptionDataInvoiceSettingsIssuerParams struct {
 
 // All invoices will be billed using the specified settings.
 type PaymentLinkSubscriptionDataInvoiceSettingsParams struct {
-	// The account tax IDs associated with the subscription. Will be set on invoices generated by the subscription.
-	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*PaymentLinkSubscriptionDataInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description *string `form:"description" json:"description,omitempty"`
-	// Footer to be displayed on the invoice.
-	Footer *string `form:"footer" json:"footer,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
-	Issuer      *PaymentLinkSubscriptionDataInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
-	UnsetFields []PaymentLinkSubscriptionDataInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
-}
-
-// PaymentLinkSubscriptionDataInvoiceSettingsParamsUnsetField is the list of fields that can be cleared/unset on PaymentLinkSubscriptionDataInvoiceSettingsParams.
-type PaymentLinkSubscriptionDataInvoiceSettingsParamsUnsetField string
-
-const (
-	PaymentLinkSubscriptionDataInvoiceSettingsParamsUnsetFieldAccountTaxIDs PaymentLinkSubscriptionDataInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	PaymentLinkSubscriptionDataInvoiceSettingsParamsUnsetFieldCustomFields  PaymentLinkSubscriptionDataInvoiceSettingsParamsUnsetField = "custom_fields"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *PaymentLinkSubscriptionDataInvoiceSettingsParams) AddUnsetField(field PaymentLinkSubscriptionDataInvoiceSettingsParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
+	Issuer *PaymentLinkSubscriptionDataInvoiceSettingsIssuerParams `form:"issuer" json:"issuer,omitempty"`
 }
 
 // Defines how the subscription should behave when the user's free trial ends.
@@ -904,7 +844,7 @@ func (p *PaymentLinkSubscriptionDataParams) AddMetadata(key string, value string
 type PaymentLinkTaxIDCollectionParams struct {
 	// Enable tax ID collection during checkout. Defaults to `false`.
 	Enabled *bool `form:"enabled" json:"enabled"`
-	// Describes whether a tax ID is required during checkout. Defaults to `never`. You can't set this parameter if `ui_mode` is `elements`.
+	// Describes whether a tax ID is required during checkout. Defaults to `never`. You can't set this parameter if `ui_mode` is `custom`.
 	Required *string `form:"required" json:"required,omitempty"`
 }
 
@@ -913,23 +853,10 @@ type PaymentLinkTransferDataParams struct {
 	// The amount that will be transferred automatically when a charge succeeds.
 	Amount *int64 `form:"amount" json:"amount,omitempty"`
 	// If specified, successful charges will be attributed to the destination
-	//  account for tax reporting, and the funds from charges will be transferred
-	//  to the destination account. The ID of the resulting transfer will be
-	//  returned on the successful charge's `transfer` field.
-	Destination *string                                   `form:"destination" json:"destination"`
-	UnsetFields []PaymentLinkTransferDataParamsUnsetField `form:"-" json:"-"`
-}
-
-// PaymentLinkTransferDataParamsUnsetField is the list of fields that can be cleared/unset on PaymentLinkTransferDataParams.
-type PaymentLinkTransferDataParamsUnsetField string
-
-const (
-	PaymentLinkTransferDataParamsUnsetFieldAmount PaymentLinkTransferDataParamsUnsetField = "amount"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *PaymentLinkTransferDataParams) AddUnsetField(field PaymentLinkTransferDataParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
+	// account for tax reporting, and the funds from charges will be transferred
+	// to the destination account. The ID of the resulting transfer will be
+	// returned on the successful charge's `transfer` field.
+	Destination *string `form:"destination" json:"destination"`
 }
 
 // Creates a payment link.
@@ -955,9 +882,9 @@ type PaymentLinkParams struct {
 	Currency *string `form:"currency" json:"currency,omitempty"`
 	// Configures whether [checkout sessions](https://docs.stripe.com/api/checkout/sessions) created by this payment link create a [Customer](https://docs.stripe.com/api/customers).
 	CustomerCreation *string `form:"customer_creation" json:"customer_creation,omitempty"`
-	// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.
+	// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.
 	CustomFields []*PaymentLinkCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `elements`.
+	// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `custom`.
 	CustomText *PaymentLinkCustomTextParams `form:"custom_text" json:"custom_text,omitempty"`
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
@@ -1016,19 +943,14 @@ type PaymentLinkParams struct {
 type PaymentLinkParamsUnsetField string
 
 const (
-	PaymentLinkParamsUnsetFieldApplicationFeeAmount      PaymentLinkParamsUnsetField = "application_fee_amount"
-	PaymentLinkParamsUnsetFieldApplicationFeePercent     PaymentLinkParamsUnsetField = "application_fee_percent"
 	PaymentLinkParamsUnsetFieldCustomFields              PaymentLinkParamsUnsetField = "custom_fields"
 	PaymentLinkParamsUnsetFieldInactiveMessage           PaymentLinkParamsUnsetField = "inactive_message"
 	PaymentLinkParamsUnsetFieldNameCollection            PaymentLinkParamsUnsetField = "name_collection"
-	PaymentLinkParamsUnsetFieldOnBehalfOf                PaymentLinkParamsUnsetField = "on_behalf_of"
 	PaymentLinkParamsUnsetFieldOptionalItems             PaymentLinkParamsUnsetField = "optional_items"
 	PaymentLinkParamsUnsetFieldPaymentMethodOptions      PaymentLinkParamsUnsetField = "payment_method_options"
 	PaymentLinkParamsUnsetFieldPaymentMethodTypes        PaymentLinkParamsUnsetField = "payment_method_types"
 	PaymentLinkParamsUnsetFieldRestrictions              PaymentLinkParamsUnsetField = "restrictions"
 	PaymentLinkParamsUnsetFieldShippingAddressCollection PaymentLinkParamsUnsetField = "shipping_address_collection"
-	PaymentLinkParamsUnsetFieldShippingOptions           PaymentLinkParamsUnsetField = "shipping_options"
-	PaymentLinkParamsUnsetFieldTransferData              PaymentLinkParamsUnsetField = "transfer_data"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -1052,8 +974,7 @@ func (p *PaymentLinkParams) AddMetadata(key string, value string) {
 
 // When retrieving a payment link, there is an includable line_items property containing the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.
 type PaymentLinkListLineItemsParams struct {
-	ListParams `form:"*"`
-	// Unique identifier for the object.
+	ListParams  `form:"*"`
 	PaymentLink *string `form:"-"` // Included in URL
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
@@ -1134,7 +1055,7 @@ type PaymentLinkCreateCustomFieldDropdownOptionParams struct {
 
 // Configuration for `type=dropdown` fields.
 type PaymentLinkCreateCustomFieldDropdownParams struct {
-	// The value that pre-fills the field on the payment page. Must match a `value` in the `options` array.
+	// The value that pre-fills the field on the payment page.Must match a `value` in the `options` array.
 	DefaultValue *string `form:"default_value" json:"default_value,omitempty"`
 	// The options available for the customer to select. Up to 200 options allowed.
 	Options []*PaymentLinkCreateCustomFieldDropdownOptionParams `form:"options" json:"options"`
@@ -1142,7 +1063,7 @@ type PaymentLinkCreateCustomFieldDropdownParams struct {
 
 // The label for the field, displayed to the customer.
 type PaymentLinkCreateCustomFieldLabelParams struct {
-	// Custom text for the label, displayed to the customer. Up to 100 characters.
+	// Custom text for the label, displayed to the customer. Up to 50 characters.
 	Custom *string `form:"custom" json:"custom"`
 	// The type of the label.
 	Type *string `form:"type" json:"type"`
@@ -1168,7 +1089,7 @@ type PaymentLinkCreateCustomFieldTextParams struct {
 	MinimumLength *int64 `form:"minimum_length" json:"minimum_length,omitempty"`
 }
 
-// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.
+// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.
 type PaymentLinkCreateCustomFieldParams struct {
 	// Configuration for `type=dropdown` fields.
 	Dropdown *PaymentLinkCreateCustomFieldDropdownParams `form:"dropdown" json:"dropdown,omitempty"`
@@ -1210,7 +1131,7 @@ type PaymentLinkCreateCustomTextTermsOfServiceAcceptanceParams struct {
 	Message *string `form:"message" json:"message"`
 }
 
-// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `elements`.
+// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `custom`.
 type PaymentLinkCreateCustomTextParams struct {
 	// Custom text that should be displayed after the payment confirmation button.
 	AfterSubmit *PaymentLinkCreateCustomTextAfterSubmitParams `form:"after_submit" json:"after_submit,omitempty"`
@@ -1336,27 +1257,6 @@ type PaymentLinkCreateLineItemAdjustableQuantityParams struct {
 	Minimum *int64 `form:"minimum" json:"minimum,omitempty"`
 }
 
-// Tax details for this product, including the [tax code](https://docs.stripe.com/tax/tax-codes) and an optional performance location.
-type PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParams struct {
-	// A tax location ID. Depending on the [tax code](https://docs.stripe.com/tax/tax-for-tickets/reference/tax-location-performance), this is required, optional, or not supported.
-	PerformanceLocation *string `form:"performance_location" json:"performance_location,omitempty"`
-	// A [tax code](https://docs.stripe.com/tax/tax-categories) ID.
-	TaxCode     *string                                                                   `form:"tax_code" json:"tax_code,omitempty"`
-	UnsetFields []PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParamsUnsetField `form:"-" json:"-"`
-}
-
-// PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParamsUnsetField is the list of fields that can be cleared/unset on PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParams.
-type PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParamsUnsetField string
-
-const (
-	PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParamsUnsetFieldTaxCode PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParamsUnsetField = "tax_code"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParams) AddUnsetField(field PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
-}
-
 // Data used to generate a new [Product](https://docs.stripe.com/api/products) object inline. One of `product` or `product_data` is required.
 type PaymentLinkCreateLineItemPriceDataProductDataParams struct {
 	// The product's description, meant to be displayable to the customer. Use this field to optionally store a long form explanation of the product being sold for your own rendering purposes.
@@ -1369,8 +1269,6 @@ type PaymentLinkCreateLineItemPriceDataProductDataParams struct {
 	Name *string `form:"name" json:"name"`
 	// A [tax code](https://docs.stripe.com/tax/tax-categories) ID.
 	TaxCode *string `form:"tax_code" json:"tax_code,omitempty"`
-	// Tax details for this product, including the [tax code](https://docs.stripe.com/tax/tax-codes) and an optional performance location.
-	TaxDetails *PaymentLinkCreateLineItemPriceDataProductDataTaxDetailsParams `form:"tax_details" json:"tax_details,omitempty"`
 	// A label that represents units of this product. When set, this will be included in customers' receipts, invoices, Checkout, and the customer portal.
 	UnitLabel *string `form:"unit_label" json:"unit_label,omitempty"`
 }
@@ -1407,7 +1305,7 @@ type PaymentLinkCreateLineItemPriceDataParams struct {
 	// A non-negative integer in cents (or local equivalent) representing how much to charge. One of `unit_amount` or `unit_amount_decimal` is required.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
+	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
 }
 
 // The line items representing what is being sold. Each line item represents an item being sold. Up to 20 line items are supported.
@@ -1524,8 +1422,6 @@ type PaymentLinkCreatePaymentMethodOptionsCardParams struct {
 	// Restrictions to apply to the card payment method. For example, you can block specific card brands.
 	Restrictions *PaymentLinkCreatePaymentMethodOptionsCardRestrictionsParams `form:"restrictions" json:"restrictions,omitempty"`
 }
-
-// Payment-method-specific configuration.
 type PaymentLinkCreatePaymentMethodOptionsParams struct {
 	// Configuration for `card` payment methods.
 	Card *PaymentLinkCreatePaymentMethodOptionsCardParams `form:"card" json:"card,omitempty"`
@@ -1564,14 +1460,6 @@ type PaymentLinkCreateShippingOptionParams struct {
 	ShippingRate *string `form:"shipping_rate" json:"shipping_rate,omitempty"`
 }
 
-// A list of up to 4 custom fields to be displayed on the invoice.
-type PaymentLinkCreateSubscriptionDataInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
-
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type PaymentLinkCreateSubscriptionDataInvoiceSettingsIssuerParams struct {
 	// The connected account being referenced when `type` is `account`.
@@ -1582,30 +1470,8 @@ type PaymentLinkCreateSubscriptionDataInvoiceSettingsIssuerParams struct {
 
 // All invoices will be billed using the specified settings.
 type PaymentLinkCreateSubscriptionDataInvoiceSettingsParams struct {
-	// The account tax IDs associated with the subscription. Will be set on invoices generated by the subscription.
-	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*PaymentLinkCreateSubscriptionDataInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description *string `form:"description" json:"description,omitempty"`
-	// Footer to be displayed on the invoice.
-	Footer *string `form:"footer" json:"footer,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
-	Issuer      *PaymentLinkCreateSubscriptionDataInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
-	UnsetFields []PaymentLinkCreateSubscriptionDataInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
-}
-
-// PaymentLinkCreateSubscriptionDataInvoiceSettingsParamsUnsetField is the list of fields that can be cleared/unset on PaymentLinkCreateSubscriptionDataInvoiceSettingsParams.
-type PaymentLinkCreateSubscriptionDataInvoiceSettingsParamsUnsetField string
-
-const (
-	PaymentLinkCreateSubscriptionDataInvoiceSettingsParamsUnsetFieldAccountTaxIDs PaymentLinkCreateSubscriptionDataInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	PaymentLinkCreateSubscriptionDataInvoiceSettingsParamsUnsetFieldCustomFields  PaymentLinkCreateSubscriptionDataInvoiceSettingsParamsUnsetField = "custom_fields"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *PaymentLinkCreateSubscriptionDataInvoiceSettingsParams) AddUnsetField(field PaymentLinkCreateSubscriptionDataInvoiceSettingsParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
+	Issuer *PaymentLinkCreateSubscriptionDataInvoiceSettingsIssuerParams `form:"issuer" json:"issuer,omitempty"`
 }
 
 // Defines how the subscription should behave when the user's free trial ends.
@@ -1647,7 +1513,7 @@ func (p *PaymentLinkCreateSubscriptionDataParams) AddMetadata(key string, value 
 type PaymentLinkCreateTaxIDCollectionParams struct {
 	// Enable tax ID collection during checkout. Defaults to `false`.
 	Enabled *bool `form:"enabled" json:"enabled"`
-	// Describes whether a tax ID is required during checkout. Defaults to `never`. You can't set this parameter if `ui_mode` is `elements`.
+	// Describes whether a tax ID is required during checkout. Defaults to `never`. You can't set this parameter if `ui_mode` is `custom`.
 	Required *string `form:"required" json:"required,omitempty"`
 }
 
@@ -1683,9 +1549,9 @@ type PaymentLinkCreateParams struct {
 	Currency *string `form:"currency" json:"currency,omitempty"`
 	// Configures whether [checkout sessions](https://docs.stripe.com/api/checkout/sessions) created by this payment link create a [Customer](https://docs.stripe.com/api/customers).
 	CustomerCreation *string `form:"customer_creation" json:"customer_creation,omitempty"`
-	// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.
+	// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.
 	CustomFields []*PaymentLinkCreateCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `elements`.
+	// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `custom`.
 	CustomText *PaymentLinkCreateCustomTextParams `form:"custom_text" json:"custom_text,omitempty"`
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
@@ -1714,9 +1580,8 @@ type PaymentLinkCreateParams struct {
 	// Can only be set in `subscription` mode. Defaults to `always`.
 	//
 	// If you'd like information on how to collect a payment method outside of Checkout, read the guide on [configuring subscriptions with a free trial](https://docs.stripe.com/payments/checkout/free-trials).
-	PaymentMethodCollection *string `form:"payment_method_collection" json:"payment_method_collection,omitempty"`
-	// Payment-method-specific configuration.
-	PaymentMethodOptions *PaymentLinkCreatePaymentMethodOptionsParams `form:"payment_method_options" json:"payment_method_options,omitempty"`
+	PaymentMethodCollection *string                                      `form:"payment_method_collection" json:"payment_method_collection,omitempty"`
+	PaymentMethodOptions    *PaymentLinkCreatePaymentMethodOptionsParams `form:"payment_method_options" json:"payment_method_options,omitempty"`
 	// The list of payment method types that customers can use. If no value is passed, Stripe will dynamically show relevant payment methods from your [payment method settings](https://dashboard.stripe.com/settings/payment_methods) (20+ payment methods [supported](https://docs.stripe.com/payments/payment-methods/integration-options#payment-method-product-support)).
 	PaymentMethodTypes []*string `form:"payment_method_types" json:"payment_method_types,omitempty"`
 	// Controls phone number collection settings during checkout.
@@ -1805,26 +1670,6 @@ type PaymentLinkUpdateAutomaticTaxParams struct {
 	Liability *PaymentLinkUpdateAutomaticTaxLiabilityParams `form:"liability" json:"liability,omitempty"`
 }
 
-// Determines the display of payment method reuse agreement text in the UI. If set to `hidden`, it will hide legal text related to the reuse of a payment method.
-type PaymentLinkUpdateConsentCollectionPaymentMethodReuseAgreementParams struct {
-	// Determines the position and visibility of the payment method reuse agreement in the UI. When set to `auto`, Stripe's
-	// defaults will be used. When set to `hidden`, the payment method reuse agreement text will always be hidden in the UI.
-	Position *string `form:"position" json:"position"`
-}
-
-// Configure fields to gather active consent from customers.
-type PaymentLinkUpdateConsentCollectionParams struct {
-	// Determines the display of payment method reuse agreement text in the UI. If set to `hidden`, it will hide legal text related to the reuse of a payment method.
-	PaymentMethodReuseAgreement *PaymentLinkUpdateConsentCollectionPaymentMethodReuseAgreementParams `form:"payment_method_reuse_agreement" json:"payment_method_reuse_agreement,omitempty"`
-	// If set to `auto`, enables the collection of customer consent for promotional communications. The Checkout
-	// Session will determine whether to display an option to opt into promotional communication
-	// from the merchant depending on the customer's locale. Only available to US merchants and US customers.
-	Promotions *string `form:"promotions" json:"promotions,omitempty"`
-	// If set to `required`, it requires customers to check a terms of service checkbox before being able to pay.
-	// There must be a valid terms of service URL set in your [Dashboard settings](https://dashboard.stripe.com/settings/public).
-	TermsOfService *string `form:"terms_of_service" json:"terms_of_service,omitempty"`
-}
-
 // The options available for the customer to select. Up to 200 options allowed.
 type PaymentLinkUpdateCustomFieldDropdownOptionParams struct {
 	// The label for the option, displayed to the customer. Up to 100 characters.
@@ -1835,7 +1680,7 @@ type PaymentLinkUpdateCustomFieldDropdownOptionParams struct {
 
 // Configuration for `type=dropdown` fields.
 type PaymentLinkUpdateCustomFieldDropdownParams struct {
-	// The value that pre-fills the field on the payment page. Must match a `value` in the `options` array.
+	// The value that pre-fills the field on the payment page.Must match a `value` in the `options` array.
 	DefaultValue *string `form:"default_value" json:"default_value,omitempty"`
 	// The options available for the customer to select. Up to 200 options allowed.
 	Options []*PaymentLinkUpdateCustomFieldDropdownOptionParams `form:"options" json:"options"`
@@ -1843,7 +1688,7 @@ type PaymentLinkUpdateCustomFieldDropdownParams struct {
 
 // The label for the field, displayed to the customer.
 type PaymentLinkUpdateCustomFieldLabelParams struct {
-	// Custom text for the label, displayed to the customer. Up to 100 characters.
+	// Custom text for the label, displayed to the customer. Up to 50 characters.
 	Custom *string `form:"custom" json:"custom"`
 	// The type of the label.
 	Type *string `form:"type" json:"type"`
@@ -1869,7 +1714,7 @@ type PaymentLinkUpdateCustomFieldTextParams struct {
 	MinimumLength *int64 `form:"minimum_length" json:"minimum_length,omitempty"`
 }
 
-// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.
+// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.
 type PaymentLinkUpdateCustomFieldParams struct {
 	// Configuration for `type=dropdown` fields.
 	Dropdown *PaymentLinkUpdateCustomFieldDropdownParams `form:"dropdown" json:"dropdown,omitempty"`
@@ -1911,7 +1756,7 @@ type PaymentLinkUpdateCustomTextTermsOfServiceAcceptanceParams struct {
 	Message *string `form:"message" json:"message"`
 }
 
-// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `elements`.
+// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `custom`.
 type PaymentLinkUpdateCustomTextParams struct {
 	// Custom text that should be displayed after the payment confirmation button.
 	AfterSubmit *PaymentLinkUpdateCustomTextAfterSubmitParams `form:"after_submit" json:"after_submit,omitempty"`
@@ -2099,18 +1944,6 @@ type PaymentLinkUpdatePaymentIntentDataParams struct {
 	Description *string `form:"description" json:"description,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that will declaratively set metadata on [Payment Intents](https://docs.stripe.com/api/payment_intents) generated from this payment link. Unlike object-level metadata, this field is declarative. Updates will clear prior values.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
-	// Indicates that you intend to [make future payments](https://docs.stripe.com/payments/payment-intents#future-usage) with the payment method collected by this Checkout Session.
-	//
-	// When setting this to `on_session`, Checkout will show a notice to the customer that their payment details will be saved.
-	//
-	// When setting this to `off_session`, Checkout will show a notice to the customer that their payment details will be saved and used for future payments.
-	//
-	// If a Customer has been provided or Checkout creates a new Customer,Checkout will attach the payment method to the Customer.
-	//
-	// If Checkout does not create a Customer, the payment method is not attached to a Customer. To reuse the payment method, you can retrieve it from the Checkout Session's PaymentIntent.
-	//
-	// When processing card payments, Checkout also uses `setup_future_usage` to dynamically optimize your payment flow and comply with regional legislation and network rules, such as SCA.
-	SetupFutureUsage *string `form:"setup_future_usage" json:"setup_future_usage,omitempty"`
 	// Text that appears on the customer's statement as the statement descriptor for a non-card charge. This value overrides the account's default statement descriptor. For information about requirements, including the 22-character limit, see [the Statement Descriptor docs](https://docs.stripe.com/get-started/account/statement-descriptors).
 	//
 	// Setting this value for a card charge returns an error. For card charges, set the [statement_descriptor_suffix](https://docs.stripe.com/get-started/account/statement-descriptors#dynamic) instead.
@@ -2128,7 +1961,6 @@ type PaymentLinkUpdatePaymentIntentDataParamsUnsetField string
 const (
 	PaymentLinkUpdatePaymentIntentDataParamsUnsetFieldDescription               PaymentLinkUpdatePaymentIntentDataParamsUnsetField = "description"
 	PaymentLinkUpdatePaymentIntentDataParamsUnsetFieldMetadata                  PaymentLinkUpdatePaymentIntentDataParamsUnsetField = "metadata"
-	PaymentLinkUpdatePaymentIntentDataParamsUnsetFieldSetupFutureUsage          PaymentLinkUpdatePaymentIntentDataParamsUnsetField = "setup_future_usage"
 	PaymentLinkUpdatePaymentIntentDataParamsUnsetFieldStatementDescriptor       PaymentLinkUpdatePaymentIntentDataParamsUnsetField = "statement_descriptor"
 	PaymentLinkUpdatePaymentIntentDataParamsUnsetFieldStatementDescriptorSuffix PaymentLinkUpdatePaymentIntentDataParamsUnsetField = "statement_descriptor_suffix"
 	PaymentLinkUpdatePaymentIntentDataParamsUnsetFieldTransferGroup             PaymentLinkUpdatePaymentIntentDataParamsUnsetField = "transfer_group"
@@ -2232,20 +2064,6 @@ type PaymentLinkUpdateShippingAddressCollectionParams struct {
 	AllowedCountries []*string `form:"allowed_countries" json:"allowed_countries"`
 }
 
-// The shipping rate options to apply to [checkout sessions](https://docs.stripe.com/api/checkout/sessions) created by this payment link.
-type PaymentLinkUpdateShippingOptionParams struct {
-	// The ID of the Shipping Rate to use for this shipping option.
-	ShippingRate *string `form:"shipping_rate" json:"shipping_rate,omitempty"`
-}
-
-// A list of up to 4 custom fields to be displayed on the invoice.
-type PaymentLinkUpdateSubscriptionDataInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
-
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type PaymentLinkUpdateSubscriptionDataInvoiceSettingsIssuerParams struct {
 	// The connected account being referenced when `type` is `account`.
@@ -2256,30 +2074,8 @@ type PaymentLinkUpdateSubscriptionDataInvoiceSettingsIssuerParams struct {
 
 // All invoices will be billed using the specified settings.
 type PaymentLinkUpdateSubscriptionDataInvoiceSettingsParams struct {
-	// The account tax IDs associated with the subscription. Will be set on invoices generated by the subscription.
-	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*PaymentLinkUpdateSubscriptionDataInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description *string `form:"description" json:"description,omitempty"`
-	// Footer to be displayed on the invoice.
-	Footer *string `form:"footer" json:"footer,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
-	Issuer      *PaymentLinkUpdateSubscriptionDataInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
-	UnsetFields []PaymentLinkUpdateSubscriptionDataInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
-}
-
-// PaymentLinkUpdateSubscriptionDataInvoiceSettingsParamsUnsetField is the list of fields that can be cleared/unset on PaymentLinkUpdateSubscriptionDataInvoiceSettingsParams.
-type PaymentLinkUpdateSubscriptionDataInvoiceSettingsParamsUnsetField string
-
-const (
-	PaymentLinkUpdateSubscriptionDataInvoiceSettingsParamsUnsetFieldAccountTaxIDs PaymentLinkUpdateSubscriptionDataInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	PaymentLinkUpdateSubscriptionDataInvoiceSettingsParamsUnsetFieldCustomFields  PaymentLinkUpdateSubscriptionDataInvoiceSettingsParamsUnsetField = "custom_fields"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *PaymentLinkUpdateSubscriptionDataInvoiceSettingsParams) AddUnsetField(field PaymentLinkUpdateSubscriptionDataInvoiceSettingsParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
+	Issuer *PaymentLinkUpdateSubscriptionDataInvoiceSettingsIssuerParams `form:"issuer" json:"issuer,omitempty"`
 }
 
 // Defines how the subscription should behave when the user's free trial ends.
@@ -2334,32 +2130,8 @@ func (p *PaymentLinkUpdateSubscriptionDataParams) AddMetadata(key string, value 
 type PaymentLinkUpdateTaxIDCollectionParams struct {
 	// Enable tax ID collection during checkout. Defaults to `false`.
 	Enabled *bool `form:"enabled" json:"enabled"`
-	// Describes whether a tax ID is required during checkout. Defaults to `never`. You can't set this parameter if `ui_mode` is `elements`.
+	// Describes whether a tax ID is required during checkout. Defaults to `never`. You can't set this parameter if `ui_mode` is `custom`.
 	Required *string `form:"required" json:"required,omitempty"`
-}
-
-// The account (if any) the payments will be attributed to for tax reporting, and where funds from each payment will be transferred to.
-type PaymentLinkUpdateTransferDataParams struct {
-	// The amount that will be transferred automatically when a charge succeeds.
-	Amount *int64 `form:"amount" json:"amount,omitempty"`
-	// If specified, successful charges will be attributed to the destination
-	//  account for tax reporting, and the funds from charges will be transferred
-	//  to the destination account. The ID of the resulting transfer will be
-	//  returned on the successful charge's `transfer` field.
-	Destination *string                                         `form:"destination" json:"destination"`
-	UnsetFields []PaymentLinkUpdateTransferDataParamsUnsetField `form:"-" json:"-"`
-}
-
-// PaymentLinkUpdateTransferDataParamsUnsetField is the list of fields that can be cleared/unset on PaymentLinkUpdateTransferDataParams.
-type PaymentLinkUpdateTransferDataParamsUnsetField string
-
-const (
-	PaymentLinkUpdateTransferDataParamsUnsetFieldAmount PaymentLinkUpdateTransferDataParamsUnsetField = "amount"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *PaymentLinkUpdateTransferDataParams) AddUnsetField(field PaymentLinkUpdateTransferDataParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
 }
 
 // Updates a payment link.
@@ -2371,21 +2143,15 @@ type PaymentLinkUpdateParams struct {
 	AfterCompletion *PaymentLinkUpdateAfterCompletionParams `form:"after_completion" json:"after_completion,omitempty"`
 	// Enables user redeemable promotion codes.
 	AllowPromotionCodes *bool `form:"allow_promotion_codes" json:"allow_promotion_codes,omitempty"`
-	// The amount of the application fee (if any) that will be requested to be applied to the payment and transferred to the application owner's Stripe account. Can only be applied when there are no line items with recurring prices.
-	ApplicationFeeAmount *int64 `form:"application_fee_amount" json:"application_fee_amount,omitempty"`
-	// A non-negative decimal between 0 and 100, with at most two decimal places. This represents the percentage of the subscription invoice total that will be transferred to the application owner's Stripe account. There must be at least 1 line item with a recurring price to use this field.
-	ApplicationFeePercent *float64 `form:"application_fee_percent" json:"application_fee_percent,omitempty"`
 	// Configuration for automatic tax collection.
 	AutomaticTax *PaymentLinkUpdateAutomaticTaxParams `form:"automatic_tax" json:"automatic_tax,omitempty"`
 	// Configuration for collecting the customer's billing address. Defaults to `auto`.
 	BillingAddressCollection *string `form:"billing_address_collection" json:"billing_address_collection,omitempty"`
-	// Configure fields to gather active consent from customers.
-	ConsentCollection *PaymentLinkUpdateConsentCollectionParams `form:"consent_collection" json:"consent_collection,omitempty"`
 	// Configures whether [checkout sessions](https://docs.stripe.com/api/checkout/sessions) created by this payment link create a [Customer](https://docs.stripe.com/api/customers).
 	CustomerCreation *string `form:"customer_creation" json:"customer_creation,omitempty"`
-	// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.
+	// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.
 	CustomFields []*PaymentLinkUpdateCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `elements`.
+	// Display additional text for your customers using custom text. You can't set this parameter if `ui_mode` is `custom`.
 	CustomText *PaymentLinkUpdateCustomTextParams `form:"custom_text" json:"custom_text,omitempty"`
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
@@ -2399,8 +2165,6 @@ type PaymentLinkUpdateParams struct {
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
 	// Controls settings applied for collecting the customer's name.
 	NameCollection *PaymentLinkUpdateNameCollectionParams `form:"name_collection" json:"name_collection,omitempty"`
-	// The account on behalf of which to charge.
-	OnBehalfOf *string `form:"on_behalf_of" json:"on_behalf_of,omitempty"`
 	// A list of optional items the customer can add to their order at checkout. Use this parameter to pass one-time or recurring [Prices](https://docs.stripe.com/api/prices).
 	// There is a maximum of 10 optional items allowed on a payment link, and the existing limits on the number of line items allowed on a payment link apply to the combined number of line items and optional items.
 	// There is a maximum of 20 combined line items and optional items.
@@ -2425,36 +2189,27 @@ type PaymentLinkUpdateParams struct {
 	Restrictions *PaymentLinkUpdateRestrictionsParams `form:"restrictions" json:"restrictions,omitempty"`
 	// Configuration for collecting the customer's shipping address.
 	ShippingAddressCollection *PaymentLinkUpdateShippingAddressCollectionParams `form:"shipping_address_collection" json:"shipping_address_collection,omitempty"`
-	// The shipping rate options to apply to [checkout sessions](https://docs.stripe.com/api/checkout/sessions) created by this payment link.
-	ShippingOptions []*PaymentLinkUpdateShippingOptionParams `form:"shipping_options" json:"shipping_options,omitempty"`
 	// Describes the type of transaction being performed in order to customize relevant text on the page, such as the submit button. Changing this value will also affect the hostname in the [url](https://docs.stripe.com/api/payment_links/payment_links/object#url) property (example: `donate.stripe.com`).
 	SubmitType *string `form:"submit_type" json:"submit_type,omitempty"`
 	// When creating a subscription, the specified configuration data will be used. There must be at least one line item with a recurring price to use `subscription_data`.
 	SubscriptionData *PaymentLinkUpdateSubscriptionDataParams `form:"subscription_data" json:"subscription_data,omitempty"`
 	// Controls tax ID collection during checkout.
 	TaxIDCollection *PaymentLinkUpdateTaxIDCollectionParams `form:"tax_id_collection" json:"tax_id_collection,omitempty"`
-	// The account (if any) the payments will be attributed to for tax reporting, and where funds from each payment will be transferred to.
-	TransferData *PaymentLinkUpdateTransferDataParams `form:"transfer_data" json:"transfer_data,omitempty"`
-	UnsetFields  []PaymentLinkUpdateParamsUnsetField  `form:"-" json:"-"`
+	UnsetFields     []PaymentLinkUpdateParamsUnsetField     `form:"-" json:"-"`
 }
 
 // PaymentLinkUpdateParamsUnsetField is the list of fields that can be cleared/unset on PaymentLinkUpdateParams.
 type PaymentLinkUpdateParamsUnsetField string
 
 const (
-	PaymentLinkUpdateParamsUnsetFieldApplicationFeeAmount      PaymentLinkUpdateParamsUnsetField = "application_fee_amount"
-	PaymentLinkUpdateParamsUnsetFieldApplicationFeePercent     PaymentLinkUpdateParamsUnsetField = "application_fee_percent"
 	PaymentLinkUpdateParamsUnsetFieldCustomFields              PaymentLinkUpdateParamsUnsetField = "custom_fields"
 	PaymentLinkUpdateParamsUnsetFieldInactiveMessage           PaymentLinkUpdateParamsUnsetField = "inactive_message"
 	PaymentLinkUpdateParamsUnsetFieldNameCollection            PaymentLinkUpdateParamsUnsetField = "name_collection"
-	PaymentLinkUpdateParamsUnsetFieldOnBehalfOf                PaymentLinkUpdateParamsUnsetField = "on_behalf_of"
 	PaymentLinkUpdateParamsUnsetFieldOptionalItems             PaymentLinkUpdateParamsUnsetField = "optional_items"
 	PaymentLinkUpdateParamsUnsetFieldPaymentMethodOptions      PaymentLinkUpdateParamsUnsetField = "payment_method_options"
 	PaymentLinkUpdateParamsUnsetFieldPaymentMethodTypes        PaymentLinkUpdateParamsUnsetField = "payment_method_types"
 	PaymentLinkUpdateParamsUnsetFieldRestrictions              PaymentLinkUpdateParamsUnsetField = "restrictions"
 	PaymentLinkUpdateParamsUnsetFieldShippingAddressCollection PaymentLinkUpdateParamsUnsetField = "shipping_address_collection"
-	PaymentLinkUpdateParamsUnsetFieldShippingOptions           PaymentLinkUpdateParamsUnsetField = "shipping_options"
-	PaymentLinkUpdateParamsUnsetFieldTransferData              PaymentLinkUpdateParamsUnsetField = "transfer_data"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -2537,7 +2292,7 @@ type PaymentLinkCustomFieldDropdown struct {
 	Options []*PaymentLinkCustomFieldDropdownOption `json:"options"`
 }
 type PaymentLinkCustomFieldLabel struct {
-	// Custom text for the label, displayed to the customer. Up to 100 characters.
+	// Custom text for the label, displayed to the customer. Up to 50 characters.
 	Custom string `json:"custom"`
 	// The type of the label.
 	Type PaymentLinkCustomFieldLabelType `json:"type"`
@@ -2559,7 +2314,7 @@ type PaymentLinkCustomFieldText struct {
 	MinimumLength int64 `json:"minimum_length"`
 }
 
-// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.
+// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.
 type PaymentLinkCustomField struct {
 	Dropdown *PaymentLinkCustomFieldDropdown `json:"dropdown,omitempty"`
 	// String of your choice that your integration can use to reconcile this field. Must be unique to this field, alphanumeric, and up to 200 characters.
@@ -2758,14 +2513,6 @@ type PaymentLinkShippingOption struct {
 	// The ID of the Shipping Rate to use for this shipping option.
 	ShippingRate *ShippingRate `json:"shipping_rate"`
 }
-
-// A list of up to 4 custom fields to be displayed on the invoice.
-type PaymentLinkSubscriptionDataInvoiceSettingsCustomField struct {
-	// The name of the custom field.
-	Name string `json:"name"`
-	// The value of the custom field.
-	Value string `json:"value"`
-}
 type PaymentLinkSubscriptionDataInvoiceSettingsIssuer struct {
 	// The connected account being referenced when `type` is `account`.
 	Account *Account `json:"account,omitempty"`
@@ -2773,14 +2520,6 @@ type PaymentLinkSubscriptionDataInvoiceSettingsIssuer struct {
 	Type PaymentLinkSubscriptionDataInvoiceSettingsIssuerType `json:"type"`
 }
 type PaymentLinkSubscriptionDataInvoiceSettings struct {
-	// The account tax IDs associated with the subscription. Will be set on invoices generated by the subscription.
-	AccountTaxIDs []*TaxID `json:"account_tax_ids"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*PaymentLinkSubscriptionDataInvoiceSettingsCustomField `json:"custom_fields"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description string `json:"description"`
-	// Footer to be displayed on the invoice.
-	Footer string                                            `json:"footer"`
 	Issuer *PaymentLinkSubscriptionDataInvoiceSettingsIssuer `json:"issuer"`
 }
 
@@ -2849,7 +2588,7 @@ type PaymentLink struct {
 	Currency Currency `json:"currency"`
 	// Configuration for Customer creation during checkout.
 	CustomerCreation PaymentLinkCustomerCreation `json:"customer_creation"`
-	// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `elements`.
+	// Collect additional information from your customer using custom fields. Up to 3 fields are supported. You can't set this parameter if `ui_mode` is `custom`.
 	CustomFields []*PaymentLinkCustomField `json:"custom_fields"`
 	CustomText   *PaymentLinkCustomText    `json:"custom_text"`
 	// Unique identifier for the object.

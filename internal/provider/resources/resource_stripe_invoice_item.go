@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ resource.Resource = &InvoiceItemResource{}
@@ -49,10 +49,8 @@ type InvoiceItemResourceModel struct {
 	Description       types.String  `tfsdk:"description"`
 	Discountable      types.Bool    `tfsdk:"discountable"`
 	Discounts         types.List    `tfsdk:"discounts"`
-	FrozenFields      types.List    `tfsdk:"frozen_fields"`
 	ID                types.String  `tfsdk:"id"`
 	Invoice           types.String  `tfsdk:"invoice"`
-	InvoicingRules    types.List    `tfsdk:"invoicing_rules"`
 	Livemode          types.Bool    `tfsdk:"livemode"`
 	Metadata          types.Map     `tfsdk:"metadata"`
 	Parent            types.Object  `tfsdk:"parent"`
@@ -155,12 +153,6 @@ func (r *InvoiceItemResource) Schema(_ context.Context, _ resource.SchemaRequest
 					},
 				},
 			},
-			"frozen_fields": schema.ListAttribute{
-				Computed:      true,
-				Description:   "Array of field names that can't be modified. Attempting to update a frozen field returns an error.",
-				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-				ElementType:   types.StringType,
-			},
 			"id": schema.StringAttribute{
 				Computed:      true,
 				Description:   "Unique identifier for the object.",
@@ -171,22 +163,6 @@ func (r *InvoiceItemResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Computed:      true,
 				Description:   "The ID of the invoice this invoice item belongs to.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
-			},
-			"invoicing_rules": schema.ListNestedAttribute{
-				Optional:      true,
-				Computed:      true,
-				Description:   "The rules that control when this invoice item is eligible for invoicing. All rules must be satisfied for the item to be invoiced.",
-				PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"type": schema.StringAttribute{
-							Computed:      true,
-							Description:   "The type of invoicing rule.",
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-							Validators:    []validator.String{stringvalidator.OneOf("defer_until_credited_items_resolved")},
-						},
-					},
-				},
 			},
 			"livemode": schema.BoolAttribute{
 				Computed:      true,
@@ -298,7 +274,7 @@ func (r *InvoiceItemResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Attributes: map[string]schema.Attribute{
 					"credited_items": schema.SingleNestedAttribute{
 						Computed:      true,
-						Description:   "For a credit proration, links to the debit that the credit applies to. The reference is to an invoice item if the debit was pending when the credit was created, and to invoice line items if the debit was already invoiced.",
+						Description:   "For a credit proration, links to the debit invoice line items or invoice item that the credit applies to.",
 						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 						Attributes: map[string]schema.Attribute{
 							"invoice_item": schema.StringAttribute{
@@ -334,7 +310,7 @@ func (r *InvoiceItemResource) Schema(_ context.Context, _ resource.SchemaRequest
 					},
 					"discount_amounts": schema.ListNestedAttribute{
 						Computed:      true,
-						Description:   "Discount amounts applied when the proration was created. This field is only populated for prorations created from subscriptions with `billing_mode=flexible`.",
+						Description:   "Discount amounts applied when the proration was created.",
 						PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
@@ -466,44 +442,6 @@ func (r *InvoiceItemResource) Create(ctx context.Context, req resource.CreateReq
 	if err := ensureRawResponse(obj, r.client.V1InvoiceItems.B, r.client.V1InvoiceItems.Key, stripe.FormatURLPath("/v1/invoiceitems/%s", obj.ID), nil); err != nil {
 		resp.Diagnostics.AddError("Error hydrating InvoiceItem create raw response", err.Error())
 		return
-	}
-
-	var createdState InvoiceItemResourceModel
-	if err := flattenInvoiceItem(obj, &createdState); err != nil {
-		resp.Diagnostics.AddError("Error flattening InvoiceItem create response", err.Error())
-		return
-	}
-	hydrateWriteOnlyPaths(&createdState, &config, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}})
-	normalizeUnknownValues(&createdState)
-
-	diffPlan := plan
-	diffCreatedState := createdState
-	clearWriteOnlyPaths(&diffPlan, [][]string{[]string{"Subscription"}})
-	clearWriteOnlyPaths(&diffCreatedState, [][]string{[]string{"Subscription"}})
-
-	postCreateParams, err := expandInvoiceItemPostCreateUpdate(diffPlan, diffCreatedState)
-	if err != nil {
-		resp.Diagnostics.AddError("Error building InvoiceItem post-create update params", err.Error())
-		return
-	}
-
-	if paramsHaveValues(postCreateParams) {
-		if !plan.Metadata.IsNull() && !plan.Metadata.IsUnknown() &&
-			!createdState.Metadata.IsNull() && !createdState.Metadata.IsUnknown() {
-			if !assignMetadataDiffToNamedField(postCreateParams, "Metadata", plan.Metadata, createdState.Metadata) {
-				resp.Diagnostics.AddError("Error building InvoiceItem update params", fmt.Sprintf("failed to assign metadata diff %q on %T", "metadata", postCreateParams))
-				return
-			}
-		}
-		obj, err = r.client.V1InvoiceItems.Update(ctx, createdState.ID.ValueString(), postCreateParams)
-		if err != nil {
-			resp.Diagnostics.AddError("Error finalizing InvoiceItem after create", err.Error())
-			return
-		}
-		if err := ensureRawResponse(obj, r.client.V1InvoiceItems.B, r.client.V1InvoiceItems.Key, stripe.FormatURLPath("/v1/invoiceitems/%s", obj.ID), nil); err != nil {
-			resp.Diagnostics.AddError("Error hydrating InvoiceItem post-create update raw response", err.Error())
-			return
-		}
 	}
 
 	if err := flattenInvoiceItem(obj, &plan); err != nil {
@@ -686,9 +624,7 @@ func expandInvoiceItemCreate(plan InvoiceItemResourceModel) (*stripe.InvoiceItem
 		params.Quantity = stripe.Int64(plan.Quantity.ValueInt64())
 	}
 	if !plan.QuantityDecimal.IsNull() && !plan.QuantityDecimal.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "QuantityDecimal", plan.QuantityDecimal) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "quantity_decimal", params)
-		}
+		params.QuantityDecimal = stripe.Float64(plan.QuantityDecimal.ValueFloat64())
 	}
 	if !plan.TaxRates.IsNull() && !plan.TaxRates.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "TaxRates", plan.TaxRates) {
@@ -716,9 +652,7 @@ func expandInvoiceItemCreate(plan InvoiceItemResourceModel) (*stripe.InvoiceItem
 		}
 	}
 	if !plan.UnitAmountDecimal.IsNull() && !plan.UnitAmountDecimal.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "UnitAmountDecimal", plan.UnitAmountDecimal) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "unit_amount_decimal", params)
-		}
+		params.UnitAmountDecimal = stripe.Float64(plan.UnitAmountDecimal.ValueFloat64())
 	}
 
 	return params, nil
@@ -772,11 +706,7 @@ func expandInvoiceItemUpdate(plan InvoiceItemResourceModel, state InvoiceItemRes
 		params.Quantity = stripe.Int64(plan.Quantity.ValueInt64())
 	}
 	if !plan.QuantityDecimal.Equal(state.QuantityDecimal) && !plan.QuantityDecimal.IsNull() && !plan.QuantityDecimal.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "QuantityDecimal", plan.QuantityDecimal) {
-			if !plan.QuantityDecimal.Equal(state.QuantityDecimal) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "quantity_decimal", params)
-			}
-		}
+		params.QuantityDecimal = stripe.Float64(plan.QuantityDecimal.ValueFloat64())
 	}
 	if !plan.TaxRates.Equal(state.TaxRates) && !plan.TaxRates.IsNull() && !plan.TaxRates.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "TaxRates", plan.TaxRates) {
@@ -807,18 +737,8 @@ func expandInvoiceItemUpdate(plan InvoiceItemResourceModel, state InvoiceItemRes
 		}
 	}
 	if !plan.UnitAmountDecimal.Equal(state.UnitAmountDecimal) && !plan.UnitAmountDecimal.IsNull() && !plan.UnitAmountDecimal.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "UnitAmountDecimal", plan.UnitAmountDecimal) {
-			if !plan.UnitAmountDecimal.Equal(state.UnitAmountDecimal) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "unit_amount_decimal", params)
-			}
-		}
+		params.UnitAmountDecimal = stripe.Float64(plan.UnitAmountDecimal.ValueFloat64())
 	}
-
-	return params, nil
-}
-
-func expandInvoiceItemPostCreateUpdate(plan InvoiceItemResourceModel, state InvoiceItemResourceModel) (*stripe.InvoiceItemUpdateParams, error) {
-	params := &stripe.InvoiceItemUpdateParams{}
 
 	return params, nil
 }
@@ -993,32 +913,6 @@ func flattenInvoiceItem(obj *stripe.InvoiceItem, state *InvoiceItemResourceModel
 		}
 	}
 	{
-		if rawValueFrozenFields, rawOk := plainValueAtPath(raw, "frozen_fields"); rawOk {
-			if valueFrozenFields, err := flattenPlainValue(applyConfiguredKeyedListShapes(rawValueFrozenFields, attrValueToPlain(state.FrozenFields)), types.ListType{ElemType: types.StringType}, "frozen_fields", "raw response"); err != nil {
-				return err
-			} else {
-				if typedFrozenFields, ok := valueFrozenFields.(types.List); ok {
-					state.FrozenFields = typedFrozenFields
-				}
-			}
-		} else if !hasRaw {
-			if responseValueFrozenFields, ok := plainFromResponseField(obj, "FrozenFields"); ok {
-				if valueFrozenFields, err := flattenPlainValue(
-					applyConfiguredKeyedListShapes(responseValueFrozenFields, attrValueToPlain(state.FrozenFields)),
-					types.ListType{ElemType: types.StringType},
-					"frozen_fields",
-					"response struct",
-				); err != nil {
-					return err
-				} else {
-					if typedFrozenFields, ok := valueFrozenFields.(types.List); ok {
-						state.FrozenFields = typedFrozenFields
-					}
-				}
-			}
-		}
-	}
-	{
 		if rawValueID, rawOk := plainValueAtPath(raw, "id"); rawOk {
 			if valueID, err := flattenPlainValue(rawValueID, types.StringType, "id", "raw response"); err != nil {
 				return err
@@ -1049,32 +943,6 @@ func flattenInvoiceItem(obj *stripe.InvoiceItem, state *InvoiceItemResourceModel
 				if responseValueInvoice, ok := plainFromResponseField(obj, "Invoice"); ok {
 					if typedInvoice, ok := plainToStringIDValue(responseValueInvoice); ok {
 						state.Invoice = typedInvoice
-					}
-				}
-			}
-		}
-	}
-	{
-		if rawValueInvoicingRules, rawOk := plainValueAtPath(raw, "invoicing_rules"); rawOk {
-			if valueInvoicingRules, err := flattenPlainValue(applyConfiguredKeyedListShapes(rawValueInvoicingRules, attrValueToPlain(state.InvoicingRules)), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}}, "invoicing_rules", "raw response"); err != nil {
-				return err
-			} else {
-				if typedInvoicingRules, ok := valueInvoicingRules.(types.List); ok {
-					state.InvoicingRules = typedInvoicingRules
-				}
-			}
-		} else if !hasRaw {
-			if responseValueInvoicingRules, ok := plainFromResponseField(obj, "InvoicingRules"); ok {
-				if valueInvoicingRules, err := flattenPlainValue(
-					applyConfiguredKeyedListShapes(responseValueInvoicingRules, attrValueToPlain(state.InvoicingRules)),
-					types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}},
-					"invoicing_rules",
-					"response struct",
-				); err != nil {
-					return err
-				} else {
-					if typedInvoicingRules, ok := valueInvoicingRules.(types.List); ok {
-						state.InvoicingRules = typedInvoicingRules
 					}
 				}
 			}

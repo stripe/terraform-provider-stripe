@@ -22,7 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 func snakeToPascalName(name string) string {
@@ -1332,14 +1332,6 @@ func assignStringToNamedField(target interface{}, primary string, fallback strin
 		case reflect.Pointer:
 			if field.Type().Elem().Kind() == reflect.String {
 				field.Set(reflect.ValueOf(stripe.String(value)))
-				return true
-			}
-			parsed := reflect.New(field.Type().Elem())
-			if decoder, ok := parsed.Interface().(interface{ UnmarshalText([]byte) error }); ok {
-				if err := decoder.UnmarshalText([]byte(value)); err != nil {
-					return false
-				}
-				field.Set(parsed)
 				return true
 			}
 		}

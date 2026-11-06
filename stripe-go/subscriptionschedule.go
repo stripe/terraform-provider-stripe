@@ -8,7 +8,7 @@ package stripe
 
 import (
 	"encoding/json"
-	"github.com/stripe/stripe-go/v87/form"
+	"github.com/stripe/stripe-go/v86/form"
 )
 
 // Controls how invoices and invoice items display proration amounts and discount amounts.
@@ -56,92 +56,6 @@ const (
 	SubscriptionScheduleEndBehaviorNone    SubscriptionScheduleEndBehavior = "none"
 	SubscriptionScheduleEndBehaviorRelease SubscriptionScheduleEndBehavior = "release"
 	SubscriptionScheduleEndBehaviorRenew   SubscriptionScheduleEndBehavior = "renew"
-)
-
-// The type of outstanding usage billing behavior.
-type SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughType string
-
-// List of values that SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughType can take
-const (
-	SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughTypeNone    SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughType = "none"
-	SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughTypePauseAt SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughType = "pause_at"
-)
-
-// The type of unused time credit behavior.
-type SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromType string
-
-// List of values that SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromType can take
-const (
-	SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromTypeItemCurrentPeriodStart SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromType = "item_current_period_start"
-	SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromTypeNone                   SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromType = "none"
-	SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromTypePauseAt                SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromType = "pause_at"
-)
-
-// Determines how to handle debits and credits when pausing.
-type SubscriptionSchedulePauseSchedulePauseSettingsInvoicingBehavior string
-
-// List of values that SubscriptionSchedulePauseSchedulePauseSettingsInvoicingBehavior can take
-const (
-	SubscriptionSchedulePauseSchedulePauseSettingsInvoicingBehaviorInvoice            SubscriptionSchedulePauseSchedulePauseSettingsInvoicingBehavior = "invoice"
-	SubscriptionSchedulePauseSchedulePauseSettingsInvoicingBehaviorPendingInvoiceItem SubscriptionSchedulePauseSchedulePauseSettingsInvoicingBehavior = "pending_invoice_item"
-)
-
-// The type of pause settings.
-type SubscriptionSchedulePauseSchedulePauseSettingsType string
-
-// List of values that SubscriptionSchedulePauseSchedulePauseSettingsType can take
-const (
-	SubscriptionSchedulePauseSchedulePauseSettingsTypeSubscription SubscriptionSchedulePauseSchedulePauseSettingsType = "subscription"
-)
-
-// The lifecycle state of the pause operation.
-type SubscriptionSchedulePauseSchedulePauseStatusType string
-
-// List of values that SubscriptionSchedulePauseSchedulePauseStatusType can take
-const (
-	SubscriptionSchedulePauseSchedulePauseStatusTypeError     SubscriptionSchedulePauseSchedulePauseStatusType = "error"
-	SubscriptionSchedulePauseSchedulePauseStatusTypeScheduled SubscriptionSchedulePauseSchedulePauseStatusType = "scheduled"
-	SubscriptionSchedulePauseSchedulePauseStatusTypeSucceeded SubscriptionSchedulePauseSchedulePauseStatusType = "succeeded"
-)
-
-// The billing cycle anchor that applies when the subscription is resumed.
-type SubscriptionSchedulePauseScheduleResumeSettingsBillingCycleAnchor string
-
-// List of values that SubscriptionSchedulePauseScheduleResumeSettingsBillingCycleAnchor can take
-const (
-	SubscriptionSchedulePauseScheduleResumeSettingsBillingCycleAnchorResumeAt  SubscriptionSchedulePauseScheduleResumeSettingsBillingCycleAnchor = "resume_at"
-	SubscriptionSchedulePauseScheduleResumeSettingsBillingCycleAnchorUnchanged SubscriptionSchedulePauseScheduleResumeSettingsBillingCycleAnchor = "unchanged"
-)
-
-// Controls whether Stripe attempts payment on the resumption invoice and how that affects the subscription's status.
-type SubscriptionSchedulePauseScheduleResumeSettingsPaymentBehavior string
-
-// List of values that SubscriptionSchedulePauseScheduleResumeSettingsPaymentBehavior can take
-const (
-	SubscriptionSchedulePauseScheduleResumeSettingsPaymentBehaviorResumeOnPaymentAttempt SubscriptionSchedulePauseScheduleResumeSettingsPaymentBehavior = "resume_on_payment_attempt"
-	SubscriptionSchedulePauseScheduleResumeSettingsPaymentBehaviorResumeOnPaymentSuccess SubscriptionSchedulePauseScheduleResumeSettingsPaymentBehavior = "resume_on_payment_success"
-)
-
-// Determines how to handle prorations resulting from the billing_cycle_anchor change on resume.
-type SubscriptionSchedulePauseScheduleResumeSettingsProrationBehavior string
-
-// List of values that SubscriptionSchedulePauseScheduleResumeSettingsProrationBehavior can take
-const (
-	SubscriptionSchedulePauseScheduleResumeSettingsProrationBehaviorAlwaysInvoice    SubscriptionSchedulePauseScheduleResumeSettingsProrationBehavior = "always_invoice"
-	SubscriptionSchedulePauseScheduleResumeSettingsProrationBehaviorCreateProrations SubscriptionSchedulePauseScheduleResumeSettingsProrationBehavior = "create_prorations"
-	SubscriptionSchedulePauseScheduleResumeSettingsProrationBehaviorNone             SubscriptionSchedulePauseScheduleResumeSettingsProrationBehavior = "none"
-)
-
-// The lifecycle state of the resume operation.
-type SubscriptionSchedulePauseScheduleResumeStatusType string
-
-// List of values that SubscriptionSchedulePauseScheduleResumeStatusType can take
-const (
-	SubscriptionSchedulePauseScheduleResumeStatusTypeError          SubscriptionSchedulePauseScheduleResumeStatusType = "error"
-	SubscriptionSchedulePauseScheduleResumeStatusTypePending        SubscriptionSchedulePauseScheduleResumeStatusType = "pending"
-	SubscriptionSchedulePauseScheduleResumeStatusTypeRequiresAction SubscriptionSchedulePauseScheduleResumeStatusType = "requires_action"
-	SubscriptionSchedulePauseScheduleResumeStatusTypeScheduled      SubscriptionSchedulePauseScheduleResumeStatusType = "scheduled"
-	SubscriptionSchedulePauseScheduleResumeStatusTypeSucceeded      SubscriptionSchedulePauseScheduleResumeStatusType = "succeeded"
 )
 
 // Select how to calculate the end of the invoice item period.
@@ -219,7 +133,7 @@ type SubscriptionScheduleListParams struct {
 	Created *int64 `form:"created" json:"created,omitempty"`
 	// Only return subscription schedules that were created during the given date interval.
 	CreatedRange *RangeQueryParams `form:"created" json:"-"`
-	// Only return subscription schedules for the given customer. The response will not include subscription schedules for customers with a test clock attached if this parameter is not set.
+	// Only return subscription schedules for the given customer.
 	Customer *string `form:"customer" json:"customer,omitempty"`
 	// Only return subscription schedules for the given account.
 	CustomerAccount *string `form:"customer_account" json:"customer_account,omitempty"`
@@ -259,12 +173,6 @@ type SubscriptionScheduleDefaultSettingsBillingThresholdsParams struct {
 	// Indicates if the `billing_cycle_anchor` should be reset when a threshold is reached. If true, `billing_cycle_anchor` will be updated to the date/time the threshold was last reached; otherwise, the value will remain unchanged.
 	ResetBillingCycleAnchor *bool `form:"reset_billing_cycle_anchor" json:"reset_billing_cycle_anchor,omitempty"`
 }
-type SubscriptionScheduleDefaultSettingsInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
 
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type SubscriptionScheduleDefaultSettingsInvoiceSettingsIssuerParams struct {
@@ -277,12 +185,9 @@ type SubscriptionScheduleDefaultSettingsInvoiceSettingsIssuerParams struct {
 // All invoices will be billed using the specified settings.
 type SubscriptionScheduleDefaultSettingsInvoiceSettingsParams struct {
 	// The account tax IDs associated with the subscription schedule. Will be set on invoices generated by the subscription schedule.
-	AccountTaxIDs []*string                                                              `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	CustomFields  []*SubscriptionScheduleDefaultSettingsInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
+	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
 	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `collection_method=charge_automatically`.
-	DaysUntilDue *int64  `form:"days_until_due" json:"days_until_due,omitempty"`
-	Description  *string `form:"description" json:"description,omitempty"`
-	Footer       *string `form:"footer" json:"footer,omitempty"`
+	DaysUntilDue *int64 `form:"days_until_due" json:"days_until_due,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 	Issuer      *SubscriptionScheduleDefaultSettingsInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
 	UnsetFields []SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
@@ -293,9 +198,6 @@ type SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetField string
 
 const (
 	SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetFieldAccountTaxIDs SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetFieldCustomFields  SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetField = "custom_fields"
-	SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetFieldDescription   SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetField = "description"
-	SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetFieldFooter        SubscriptionScheduleDefaultSettingsInvoiceSettingsParamsUnsetField = "footer"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -340,111 +242,6 @@ const (
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
 func (p *SubscriptionScheduleDefaultSettingsParams) AddUnsetField(field SubscriptionScheduleDefaultSettingsParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
-}
-
-// When to pause the subscription.
-type SubscriptionSchedulePauseSchedulePausePauseAtParams struct {
-	// The Unix timestamp at which to pause the subscription. Required when `type` is `timestamp`.
-	Timestamp *int64 `form:"timestamp" json:"timestamp,omitempty"`
-	// When to pause the subscription. Use `now` to pause immediately or `timestamp` to pause at a specific time.
-	Type *string `form:"type" json:"type"`
-}
-
-// Controls whether to collect metered usage accrued up to the pause date.
-type SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughParams struct {
-	// Determines whether to collect metered usage accrued up to the pause date. When adding a pause schedule, defaults to `pause_at`. On updates, the existing value is preserved if not provided.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Controls how unused time on subscription items is credited when pausing.
-type SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromParams struct {
-	// Determines which point in the billing period unused time is credited from. When adding a pause schedule, defaults to `pause_at`. On updates, the existing value is preserved if not provided.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Controls what to bill for when pausing the subscription.
-type SubscriptionSchedulePauseSchedulePauseSettingsBillForParams struct {
-	// Controls whether to collect metered usage accrued up to the pause date.
-	OutstandingUsageThrough *SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughParams `form:"outstanding_usage_through" json:"outstanding_usage_through,omitempty"`
-	// Controls how unused time on subscription items is credited when pausing.
-	UnusedTimeFrom *SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromParams `form:"unused_time_from" json:"unused_time_from,omitempty"`
-}
-
-// Settings controlling billing behavior during the pause.
-type SubscriptionSchedulePauseSchedulePauseSettingsParams struct {
-	// Controls what to bill for when pausing the subscription.
-	BillFor *SubscriptionSchedulePauseSchedulePauseSettingsBillForParams `form:"bill_for" json:"bill_for,omitempty"`
-	// Determines whether to generate an invoice for outstanding amounts when pausing. When adding a pause schedule, defaults to `pending_invoice_item`. On updates, the existing value is preserved if not provided.
-	InvoicingBehavior *string `form:"invoicing_behavior" json:"invoicing_behavior,omitempty"`
-	// The pause type. Currently only `subscription` is supported.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Configuration for when and how the subscription pauses.
-type SubscriptionSchedulePauseSchedulePauseParams struct {
-	// When to pause the subscription.
-	PauseAt *SubscriptionSchedulePauseSchedulePausePauseAtParams `form:"pause_at" json:"pause_at,omitempty"`
-	// Settings controlling billing behavior during the pause.
-	Settings *SubscriptionSchedulePauseSchedulePauseSettingsParams `form:"settings" json:"settings,omitempty"`
-}
-
-// The duration after which to resume the subscription. Required when `type` is `duration`.
-type SubscriptionSchedulePauseScheduleResumeResumeAtDurationParams struct {
-	// The time unit for the resume duration. One of `day`, `week`, `month`, or `year`.
-	Interval *string `form:"interval" json:"interval"`
-	// The number of intervals after which the subscription resumes.
-	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
-}
-
-// When to resume the subscription.
-type SubscriptionSchedulePauseScheduleResumeResumeAtParams struct {
-	// The duration after which to resume the subscription. Required when `type` is `duration`.
-	Duration *SubscriptionSchedulePauseScheduleResumeResumeAtDurationParams `form:"duration" json:"duration,omitempty"`
-	// The Unix timestamp at which to resume the subscription. Required when `type` is `timestamp`.
-	Timestamp *int64 `form:"timestamp" json:"timestamp,omitempty"`
-	// When to resume the subscription. Use `now` to resume immediately, `duration` to resume after a set duration, or `timestamp` to resume at a specific time.
-	Type *string `form:"type" json:"type"`
-}
-
-// Settings controlling how the subscription resumes.
-type SubscriptionSchedulePauseScheduleResumeSettingsParams struct {
-	// Controls the billing cycle anchor when the subscription resumes. When adding a pause schedule, defaults to `resume_at`. On updates, the existing value is preserved if not provided.
-	BillingCycleAnchor *string `form:"billing_cycle_anchor" json:"billing_cycle_anchor,omitempty"`
-	// Controls whether Stripe attempts payment on the resumption invoice and how payment affects the subscription's status. When adding a pause schedule, defaults to `resume_on_payment_success`. On updates, the existing value is preserved if not provided.
-	PaymentBehavior *string `form:"payment_behavior" json:"payment_behavior,omitempty"`
-	// Determines how to handle prorations when the subscription resumes. When adding a pause schedule, defaults to `create_prorations`. On updates, the existing value is preserved if not provided.
-	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-}
-
-// Configuration for when and how the subscription resumes.
-type SubscriptionSchedulePauseScheduleResumeParams struct {
-	// When to resume the subscription.
-	ResumeAt *SubscriptionSchedulePauseScheduleResumeResumeAtParams `form:"resume_at" json:"resume_at,omitempty"`
-	// Settings controlling how the subscription resumes.
-	Settings *SubscriptionSchedulePauseScheduleResumeSettingsParams `form:"settings" json:"settings,omitempty"`
-}
-
-// Configures the subscription's pause behavior and, optionally, its resume behavior. Only one entry is supported.
-type SubscriptionSchedulePauseScheduleParams struct {
-	// A unique identifier for this pause schedule entry.
-	Key *string `form:"key" json:"key,omitempty"`
-	// Configuration for when and how the subscription pauses.
-	Pause *SubscriptionSchedulePauseSchedulePauseParams `form:"pause" json:"pause,omitempty"`
-	// Configuration for when and how the subscription resumes.
-	Resume      *SubscriptionSchedulePauseScheduleResumeParams      `form:"resume" json:"resume,omitempty"`
-	UnsetFields []SubscriptionSchedulePauseScheduleParamsUnsetField `form:"-" json:"-"`
-}
-
-// SubscriptionSchedulePauseScheduleParamsUnsetField is the list of fields that can be cleared/unset on SubscriptionSchedulePauseScheduleParams.
-type SubscriptionSchedulePauseScheduleParamsUnsetField string
-
-const (
-	SubscriptionSchedulePauseScheduleParamsUnsetFieldResume SubscriptionSchedulePauseScheduleParamsUnsetField = "resume"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *SubscriptionSchedulePauseScheduleParams) AddUnsetField(field SubscriptionSchedulePauseScheduleParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
@@ -566,14 +363,6 @@ type SubscriptionSchedulePhaseDurationParams struct {
 	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
 }
 
-// A list of up to 4 custom fields to be displayed on the invoice.
-type SubscriptionSchedulePhaseInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
-
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type SubscriptionSchedulePhaseInvoiceSettingsIssuerParams struct {
 	// The connected account being referenced when `type` is `account`.
@@ -586,14 +375,8 @@ type SubscriptionSchedulePhaseInvoiceSettingsIssuerParams struct {
 type SubscriptionSchedulePhaseInvoiceSettingsParams struct {
 	// The account tax IDs associated with this phase of the subscription schedule. Will be set on invoices generated by this phase of the subscription schedule.
 	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*SubscriptionSchedulePhaseInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `collection_method=charge_automatically`.
+	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `billing=charge_automatically`.
 	DaysUntilDue *int64 `form:"days_until_due" json:"days_until_due,omitempty"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description *string `form:"description" json:"description,omitempty"`
-	// Footer to be displayed on the invoice.
-	Footer *string `form:"footer" json:"footer,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 	Issuer      *SubscriptionSchedulePhaseInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
 	UnsetFields []SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
@@ -604,9 +387,6 @@ type SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetField string
 
 const (
 	SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetFieldAccountTaxIDs SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetFieldCustomFields  SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetField = "custom_fields"
-	SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetFieldDescription   SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetField = "description"
-	SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetFieldFooter        SubscriptionSchedulePhaseInvoiceSettingsParamsUnsetField = "footer"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -713,14 +493,14 @@ type SubscriptionSchedulePhaseParams struct {
 	OnBehalfOf *string `form:"on_behalf_of" json:"on_behalf_of,omitempty"`
 	// Controls whether the subscription schedule should create [prorations](https://docs.stripe.com/billing/subscriptions/prorations) when transitioning to this phase if there is a difference in billing configuration. It's different from the request-level [proration_behavior](https://docs.stripe.com/api/subscription_schedules/update#update_subscription_schedule-proration_behavior) parameter which controls what happens if the update request affects the billing configuration (item price, quantity, etc.) of the current phase.
 	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-	// The date at which this phase of the subscription schedule starts or `now`. Must be set on the first phase. Prefer to specify `now` over an explicit timestamp when appropriate to avoid unexpected behavior due to request delays or clock skew resulting in the phase being slightly backdated or postdated.
+	// The date at which this phase of the subscription schedule starts or `now`. Must be set on the first phase.
 	StartDate    *int64 `form:"start_date" json:"start_date,omitempty"`
 	StartDateNow *bool  `form:"-"` // See custom AppendTo
 	// The data with which to automatically create a Transfer for each of the associated subscription's invoices.
 	TransferData *SubscriptionTransferDataParams `form:"transfer_data" json:"transfer_data,omitempty"`
 	// If set to true the entire phase is counted as a trial and the customer will not be charged for any fees.
 	Trial *bool `form:"trial" json:"trial,omitempty"`
-	// Sets the phase to trialing from the start date to this date. Must be within the phase. When combined with `trial=true`, it must match the phase end date.
+	// Sets the phase to trialing from the start date to this date. Must be before the phase end date, can not be combined with `trial`
 	TrialEnd    *int64                                      `form:"trial_end" json:"trial_end,omitempty"`
 	TrialEndNow *bool                                       `form:"-"` // See custom AppendTo
 	UnsetFields []SubscriptionSchedulePhaseParamsUnsetField `form:"-" json:"-"`
@@ -782,13 +562,11 @@ type SubscriptionScheduleParams struct {
 	FromSubscription *string `form:"from_subscription" json:"from_subscription,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
-	// The subscription's pause behavior and optional resume behavior. You can provide one entry. Include its `key` to update an existing pause schedule. Omit `pause_schedules` to leave the existing schedule unchanged, or pass an empty string (`""`) to clear it.
-	PauseSchedules []*SubscriptionSchedulePauseScheduleParams `form:"pause_schedules" json:"pause_schedules,omitempty"`
 	// List representing phases of the subscription schedule. Each phase can be customized to have different durations, plans, and coupons. If there are multiple phases, the `end_date` of one phase will always equal the `start_date` of the next phase. Note that past phases can be omitted.
 	Phases []*SubscriptionSchedulePhaseParams `form:"phases" json:"phases,omitempty"`
 	// If the update changes the billing configuration (item price, quantity, etc.) of the current phase, indicates how prorations from this change should be handled. The default value is `create_prorations`.
 	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-	// When the subscription schedule starts. We recommend using `now` so that it starts the subscription immediately, and to avoid unexpected behavior due to request delays or clock skew resulting in a slightly backdated or postdated start. You can also use a Unix timestamp to backdate the subscription so that it starts on a past date, or set a future date for the subscription to start on.
+	// When the subscription schedule starts. We recommend using `now` so that it starts the subscription immediately. You can also use a Unix timestamp to backdate the subscription so that it starts on a past date, or set a future date for the subscription to start on.
 	StartDate    *int64                                 `form:"start_date" json:"start_date,omitempty"`
 	StartDateNow *bool                                  `form:"-"` // See custom AppendTo
 	UnsetFields  []SubscriptionScheduleParamsUnsetField `form:"-" json:"-"`
@@ -798,8 +576,7 @@ type SubscriptionScheduleParams struct {
 type SubscriptionScheduleParamsUnsetField string
 
 const (
-	SubscriptionScheduleParamsUnsetFieldMetadata       SubscriptionScheduleParamsUnsetField = "metadata"
-	SubscriptionScheduleParamsUnsetFieldPauseSchedules SubscriptionScheduleParamsUnsetField = "pause_schedules"
+	SubscriptionScheduleParamsUnsetFieldMetadata SubscriptionScheduleParamsUnsetField = "metadata"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -879,12 +656,6 @@ type SubscriptionScheduleCreateDefaultSettingsBillingThresholdsParams struct {
 	// Indicates if the `billing_cycle_anchor` should be reset when a threshold is reached. If true, `billing_cycle_anchor` will be updated to the date/time the threshold was last reached; otherwise, the value will remain unchanged.
 	ResetBillingCycleAnchor *bool `form:"reset_billing_cycle_anchor" json:"reset_billing_cycle_anchor,omitempty"`
 }
-type SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
 
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsIssuerParams struct {
@@ -897,12 +668,9 @@ type SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsIssuerParams struct
 // All invoices will be billed using the specified settings.
 type SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParams struct {
 	// The account tax IDs associated with the subscription schedule. Will be set on invoices generated by the subscription schedule.
-	AccountTaxIDs []*string                                                                    `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	CustomFields  []*SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
+	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
 	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `collection_method=charge_automatically`.
-	DaysUntilDue *int64  `form:"days_until_due" json:"days_until_due,omitempty"`
-	Description  *string `form:"description" json:"description,omitempty"`
-	Footer       *string `form:"footer" json:"footer,omitempty"`
+	DaysUntilDue *int64 `form:"days_until_due" json:"days_until_due,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 	Issuer      *SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
 	UnsetFields []SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
@@ -913,9 +681,6 @@ type SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetField st
 
 const (
 	SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetFieldAccountTaxIDs SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetFieldCustomFields  SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetField = "custom_fields"
-	SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetFieldDescription   SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetField = "description"
-	SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetFieldFooter        SubscriptionScheduleCreateDefaultSettingsInvoiceSettingsParamsUnsetField = "footer"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -960,98 +725,6 @@ const (
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
 func (p *SubscriptionScheduleCreateDefaultSettingsParams) AddUnsetField(field SubscriptionScheduleCreateDefaultSettingsParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
-}
-
-// When to pause the subscription.
-type SubscriptionScheduleCreatePauseSchedulePausePauseAtParams struct {
-	// The Unix timestamp at which to pause the subscription. Required when `type` is `timestamp`.
-	Timestamp *int64 `form:"timestamp" json:"timestamp,omitempty"`
-	// When to pause the subscription. Use `now` to pause immediately or `timestamp` to pause at a specific time.
-	Type *string `form:"type" json:"type"`
-}
-
-// Controls whether to collect metered usage accrued up to the pause date.
-type SubscriptionScheduleCreatePauseSchedulePauseSettingsBillForOutstandingUsageThroughParams struct {
-	// Determines whether to collect metered usage accrued up to the pause date. When adding a pause schedule, defaults to `pause_at`. On updates, the existing value is preserved if not provided.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Controls how unused time on subscription items is credited when pausing.
-type SubscriptionScheduleCreatePauseSchedulePauseSettingsBillForUnusedTimeFromParams struct {
-	// Determines which point in the billing period unused time is credited from. When adding a pause schedule, defaults to `pause_at`. On updates, the existing value is preserved if not provided.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Controls what to bill for when pausing the subscription.
-type SubscriptionScheduleCreatePauseSchedulePauseSettingsBillForParams struct {
-	// Controls whether to collect metered usage accrued up to the pause date.
-	OutstandingUsageThrough *SubscriptionScheduleCreatePauseSchedulePauseSettingsBillForOutstandingUsageThroughParams `form:"outstanding_usage_through" json:"outstanding_usage_through,omitempty"`
-	// Controls how unused time on subscription items is credited when pausing.
-	UnusedTimeFrom *SubscriptionScheduleCreatePauseSchedulePauseSettingsBillForUnusedTimeFromParams `form:"unused_time_from" json:"unused_time_from,omitempty"`
-}
-
-// Settings controlling billing behavior during the pause.
-type SubscriptionScheduleCreatePauseSchedulePauseSettingsParams struct {
-	// Controls what to bill for when pausing the subscription.
-	BillFor *SubscriptionScheduleCreatePauseSchedulePauseSettingsBillForParams `form:"bill_for" json:"bill_for,omitempty"`
-	// Determines whether to generate an invoice for outstanding amounts when pausing. When adding a pause schedule, defaults to `pending_invoice_item`. On updates, the existing value is preserved if not provided.
-	InvoicingBehavior *string `form:"invoicing_behavior" json:"invoicing_behavior,omitempty"`
-	// The pause type. Currently only `subscription` is supported.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Configuration for when and how the subscription pauses.
-type SubscriptionScheduleCreatePauseSchedulePauseParams struct {
-	// When to pause the subscription.
-	PauseAt *SubscriptionScheduleCreatePauseSchedulePausePauseAtParams `form:"pause_at" json:"pause_at"`
-	// Settings controlling billing behavior during the pause.
-	Settings *SubscriptionScheduleCreatePauseSchedulePauseSettingsParams `form:"settings" json:"settings,omitempty"`
-}
-
-// The duration after which to resume the subscription. Required when `type` is `duration`.
-type SubscriptionScheduleCreatePauseScheduleResumeResumeAtDurationParams struct {
-	// The time unit for the resume duration. One of `day`, `week`, `month`, or `year`.
-	Interval *string `form:"interval" json:"interval"`
-	// The number of intervals after which the subscription resumes.
-	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
-}
-
-// When to resume the subscription.
-type SubscriptionScheduleCreatePauseScheduleResumeResumeAtParams struct {
-	// The duration after which to resume the subscription. Required when `type` is `duration`.
-	Duration *SubscriptionScheduleCreatePauseScheduleResumeResumeAtDurationParams `form:"duration" json:"duration,omitempty"`
-	// The Unix timestamp at which to resume the subscription. Required when `type` is `timestamp`.
-	Timestamp *int64 `form:"timestamp" json:"timestamp,omitempty"`
-	// When to resume the subscription. Use `now` to resume immediately, `duration` to resume after a set duration, or `timestamp` to resume at a specific time.
-	Type *string `form:"type" json:"type"`
-}
-
-// Settings controlling how the subscription resumes.
-type SubscriptionScheduleCreatePauseScheduleResumeSettingsParams struct {
-	// Controls the billing cycle anchor when the subscription resumes. When adding a pause schedule, defaults to `resume_at`. On updates, the existing value is preserved if not provided.
-	BillingCycleAnchor *string `form:"billing_cycle_anchor" json:"billing_cycle_anchor,omitempty"`
-	// Controls whether Stripe attempts payment on the resumption invoice and how payment affects the subscription's status. When adding a pause schedule, defaults to `resume_on_payment_success`. On updates, the existing value is preserved if not provided.
-	PaymentBehavior *string `form:"payment_behavior" json:"payment_behavior,omitempty"`
-	// Determines how to handle prorations when the subscription resumes. When adding a pause schedule, defaults to `create_prorations`. On updates, the existing value is preserved if not provided.
-	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-}
-
-// Configuration for when and how the subscription resumes.
-type SubscriptionScheduleCreatePauseScheduleResumeParams struct {
-	// When to resume the subscription.
-	ResumeAt *SubscriptionScheduleCreatePauseScheduleResumeResumeAtParams `form:"resume_at" json:"resume_at"`
-	// Settings controlling how the subscription resumes.
-	Settings *SubscriptionScheduleCreatePauseScheduleResumeSettingsParams `form:"settings" json:"settings,omitempty"`
-}
-
-// Configures the subscription's pause behavior and, optionally, its resume behavior. Only one entry is supported.
-type SubscriptionScheduleCreatePauseScheduleParams struct {
-	// A unique identifier for this pause schedule entry.
-	Key *string `form:"key" json:"key,omitempty"`
-	// Configuration for when and how the subscription pauses.
-	Pause *SubscriptionScheduleCreatePauseSchedulePauseParams `form:"pause" json:"pause,omitempty"`
-	// Configuration for when and how the subscription resumes.
-	Resume *SubscriptionScheduleCreatePauseScheduleResumeParams `form:"resume" json:"resume,omitempty"`
 }
 
 // The coupons to redeem into discounts for the item.
@@ -1172,14 +845,6 @@ type SubscriptionScheduleCreatePhaseDurationParams struct {
 	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
 }
 
-// A list of up to 4 custom fields to be displayed on the invoice.
-type SubscriptionScheduleCreatePhaseInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
-
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type SubscriptionScheduleCreatePhaseInvoiceSettingsIssuerParams struct {
 	// The connected account being referenced when `type` is `account`.
@@ -1192,14 +857,8 @@ type SubscriptionScheduleCreatePhaseInvoiceSettingsIssuerParams struct {
 type SubscriptionScheduleCreatePhaseInvoiceSettingsParams struct {
 	// The account tax IDs associated with this phase of the subscription schedule. Will be set on invoices generated by this phase of the subscription schedule.
 	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*SubscriptionScheduleCreatePhaseInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `collection_method=charge_automatically`.
+	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `billing=charge_automatically`.
 	DaysUntilDue *int64 `form:"days_until_due" json:"days_until_due,omitempty"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description *string `form:"description" json:"description,omitempty"`
-	// Footer to be displayed on the invoice.
-	Footer *string `form:"footer" json:"footer,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 	Issuer      *SubscriptionScheduleCreatePhaseInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
 	UnsetFields []SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
@@ -1210,9 +869,6 @@ type SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetField string
 
 const (
 	SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetFieldAccountTaxIDs SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetFieldCustomFields  SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetField = "custom_fields"
-	SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetFieldDescription   SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetField = "description"
-	SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetFieldFooter        SubscriptionScheduleCreatePhaseInvoiceSettingsParamsUnsetField = "footer"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -1370,11 +1026,9 @@ type SubscriptionScheduleCreateParams struct {
 	FromSubscription *string `form:"from_subscription" json:"from_subscription,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
-	// Configures the subscription's pause behavior and, optionally, its resume behavior. Only one entry is supported.
-	PauseSchedules []*SubscriptionScheduleCreatePauseScheduleParams `form:"pause_schedules" json:"pause_schedules,omitempty"`
 	// List representing phases of the subscription schedule. Each phase can be customized to have different durations, plans, and coupons. If there are multiple phases, the `end_date` of one phase will always equal the `start_date` of the next phase.
 	Phases []*SubscriptionScheduleCreatePhaseParams `form:"phases" json:"phases,omitempty"`
-	// When the subscription schedule starts. We recommend using `now` so that it starts the subscription immediately, and to avoid unexpected behavior due to request delays or clock skew resulting in a slightly backdated or postdated start. You can also use a Unix timestamp to backdate the subscription so that it starts on a past date, or set a future date for the subscription to start on.
+	// When the subscription schedule starts. We recommend using `now` so that it starts the subscription immediately. You can also use a Unix timestamp to backdate the subscription so that it starts on a past date, or set a future date for the subscription to start on.
 	StartDate    *int64                                       `form:"start_date" json:"start_date,omitempty"`
 	StartDateNow *bool                                        `form:"-"` // See custom AppendTo
 	UnsetFields  []SubscriptionScheduleCreateParamsUnsetField `form:"-" json:"-"`
@@ -1432,12 +1086,6 @@ type SubscriptionScheduleUpdateDefaultSettingsBillingThresholdsParams struct {
 	// Indicates if the `billing_cycle_anchor` should be reset when a threshold is reached. If true, `billing_cycle_anchor` will be updated to the date/time the threshold was last reached; otherwise, the value will remain unchanged.
 	ResetBillingCycleAnchor *bool `form:"reset_billing_cycle_anchor" json:"reset_billing_cycle_anchor,omitempty"`
 }
-type SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
 
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsIssuerParams struct {
@@ -1450,12 +1098,9 @@ type SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsIssuerParams struct
 // All invoices will be billed using the specified settings.
 type SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParams struct {
 	// The account tax IDs associated with the subscription schedule. Will be set on invoices generated by the subscription schedule.
-	AccountTaxIDs []*string                                                                    `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	CustomFields  []*SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
+	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
 	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `collection_method=charge_automatically`.
-	DaysUntilDue *int64  `form:"days_until_due" json:"days_until_due,omitempty"`
-	Description  *string `form:"description" json:"description,omitempty"`
-	Footer       *string `form:"footer" json:"footer,omitempty"`
+	DaysUntilDue *int64 `form:"days_until_due" json:"days_until_due,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 	Issuer      *SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
 	UnsetFields []SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
@@ -1466,9 +1111,6 @@ type SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetField st
 
 const (
 	SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetFieldAccountTaxIDs SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetFieldCustomFields  SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetField = "custom_fields"
-	SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetFieldDescription   SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetField = "description"
-	SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetFieldFooter        SubscriptionScheduleUpdateDefaultSettingsInvoiceSettingsParamsUnsetField = "footer"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -1512,111 +1154,6 @@ const (
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
 func (p *SubscriptionScheduleUpdateDefaultSettingsParams) AddUnsetField(field SubscriptionScheduleUpdateDefaultSettingsParamsUnsetField) {
-	p.UnsetFields = append(p.UnsetFields, field)
-}
-
-// When to pause the subscription.
-type SubscriptionScheduleUpdatePauseSchedulePausePauseAtParams struct {
-	// The Unix timestamp at which to pause the subscription. Required when `type` is `timestamp`.
-	Timestamp *int64 `form:"timestamp" json:"timestamp,omitempty"`
-	// When to pause the subscription. Use `now` to pause immediately or `timestamp` to pause at a specific time.
-	Type *string `form:"type" json:"type"`
-}
-
-// Controls whether to collect metered usage accrued up to the pause date.
-type SubscriptionScheduleUpdatePauseSchedulePauseSettingsBillForOutstandingUsageThroughParams struct {
-	// Determines whether to collect metered usage accrued up to the pause date. When adding a pause schedule, defaults to `pause_at`. On updates, the existing value is preserved if not provided.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Controls how unused time on subscription items is credited when pausing.
-type SubscriptionScheduleUpdatePauseSchedulePauseSettingsBillForUnusedTimeFromParams struct {
-	// Determines which point in the billing period unused time is credited from. When adding a pause schedule, defaults to `pause_at`. On updates, the existing value is preserved if not provided.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Controls what to bill for when pausing the subscription.
-type SubscriptionScheduleUpdatePauseSchedulePauseSettingsBillForParams struct {
-	// Controls whether to collect metered usage accrued up to the pause date.
-	OutstandingUsageThrough *SubscriptionScheduleUpdatePauseSchedulePauseSettingsBillForOutstandingUsageThroughParams `form:"outstanding_usage_through" json:"outstanding_usage_through,omitempty"`
-	// Controls how unused time on subscription items is credited when pausing.
-	UnusedTimeFrom *SubscriptionScheduleUpdatePauseSchedulePauseSettingsBillForUnusedTimeFromParams `form:"unused_time_from" json:"unused_time_from,omitempty"`
-}
-
-// Settings controlling billing behavior during the pause.
-type SubscriptionScheduleUpdatePauseSchedulePauseSettingsParams struct {
-	// Controls what to bill for when pausing the subscription.
-	BillFor *SubscriptionScheduleUpdatePauseSchedulePauseSettingsBillForParams `form:"bill_for" json:"bill_for,omitempty"`
-	// Determines whether to generate an invoice for outstanding amounts when pausing. When adding a pause schedule, defaults to `pending_invoice_item`. On updates, the existing value is preserved if not provided.
-	InvoicingBehavior *string `form:"invoicing_behavior" json:"invoicing_behavior,omitempty"`
-	// The pause type. Currently only `subscription` is supported.
-	Type *string `form:"type" json:"type,omitempty"`
-}
-
-// Configuration for when and how the subscription pauses.
-type SubscriptionScheduleUpdatePauseSchedulePauseParams struct {
-	// When to pause the subscription.
-	PauseAt *SubscriptionScheduleUpdatePauseSchedulePausePauseAtParams `form:"pause_at" json:"pause_at,omitempty"`
-	// Settings controlling billing behavior during the pause.
-	Settings *SubscriptionScheduleUpdatePauseSchedulePauseSettingsParams `form:"settings" json:"settings,omitempty"`
-}
-
-// The duration after which to resume the subscription. Required when `type` is `duration`.
-type SubscriptionScheduleUpdatePauseScheduleResumeResumeAtDurationParams struct {
-	// The time unit for the resume duration. One of `day`, `week`, `month`, or `year`.
-	Interval *string `form:"interval" json:"interval"`
-	// The number of intervals after which the subscription resumes.
-	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
-}
-
-// When to resume the subscription.
-type SubscriptionScheduleUpdatePauseScheduleResumeResumeAtParams struct {
-	// The duration after which to resume the subscription. Required when `type` is `duration`.
-	Duration *SubscriptionScheduleUpdatePauseScheduleResumeResumeAtDurationParams `form:"duration" json:"duration,omitempty"`
-	// The Unix timestamp at which to resume the subscription. Required when `type` is `timestamp`.
-	Timestamp *int64 `form:"timestamp" json:"timestamp,omitempty"`
-	// When to resume the subscription. Use `now` to resume immediately, `duration` to resume after a set duration, or `timestamp` to resume at a specific time.
-	Type *string `form:"type" json:"type"`
-}
-
-// Settings controlling how the subscription resumes.
-type SubscriptionScheduleUpdatePauseScheduleResumeSettingsParams struct {
-	// Controls the billing cycle anchor when the subscription resumes. When adding a pause schedule, defaults to `resume_at`. On updates, the existing value is preserved if not provided.
-	BillingCycleAnchor *string `form:"billing_cycle_anchor" json:"billing_cycle_anchor,omitempty"`
-	// Controls whether Stripe attempts payment on the resumption invoice and how payment affects the subscription's status. When adding a pause schedule, defaults to `resume_on_payment_success`. On updates, the existing value is preserved if not provided.
-	PaymentBehavior *string `form:"payment_behavior" json:"payment_behavior,omitempty"`
-	// Determines how to handle prorations when the subscription resumes. When adding a pause schedule, defaults to `create_prorations`. On updates, the existing value is preserved if not provided.
-	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-}
-
-// Configuration for when and how the subscription resumes.
-type SubscriptionScheduleUpdatePauseScheduleResumeParams struct {
-	// When to resume the subscription.
-	ResumeAt *SubscriptionScheduleUpdatePauseScheduleResumeResumeAtParams `form:"resume_at" json:"resume_at,omitempty"`
-	// Settings controlling how the subscription resumes.
-	Settings *SubscriptionScheduleUpdatePauseScheduleResumeSettingsParams `form:"settings" json:"settings,omitempty"`
-}
-
-// The subscription's pause behavior and optional resume behavior. You can provide one entry. Include its `key` to update an existing pause schedule. Omit `pause_schedules` to leave the existing schedule unchanged, or pass an empty string (`""`) to clear it.
-type SubscriptionScheduleUpdatePauseScheduleParams struct {
-	// A unique identifier for this pause schedule entry.
-	Key *string `form:"key" json:"key,omitempty"`
-	// Configuration for when and how the subscription pauses.
-	Pause *SubscriptionScheduleUpdatePauseSchedulePauseParams `form:"pause" json:"pause,omitempty"`
-	// Configuration for when and how the subscription resumes.
-	Resume      *SubscriptionScheduleUpdatePauseScheduleResumeParams      `form:"resume" json:"resume,omitempty"`
-	UnsetFields []SubscriptionScheduleUpdatePauseScheduleParamsUnsetField `form:"-" json:"-"`
-}
-
-// SubscriptionScheduleUpdatePauseScheduleParamsUnsetField is the list of fields that can be cleared/unset on SubscriptionScheduleUpdatePauseScheduleParams.
-type SubscriptionScheduleUpdatePauseScheduleParamsUnsetField string
-
-const (
-	SubscriptionScheduleUpdatePauseScheduleParamsUnsetFieldResume SubscriptionScheduleUpdatePauseScheduleParamsUnsetField = "resume"
-)
-
-// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
-func (p *SubscriptionScheduleUpdatePauseScheduleParams) AddUnsetField(field SubscriptionScheduleUpdatePauseScheduleParamsUnsetField) {
 	p.UnsetFields = append(p.UnsetFields, field)
 }
 
@@ -1738,14 +1275,6 @@ type SubscriptionScheduleUpdatePhaseDurationParams struct {
 	IntervalCount *int64 `form:"interval_count" json:"interval_count,omitempty"`
 }
 
-// A list of up to 4 custom fields to be displayed on the invoice.
-type SubscriptionScheduleUpdatePhaseInvoiceSettingsCustomFieldParams struct {
-	// The name of the custom field. This may be up to 40 characters.
-	Name *string `form:"name" json:"name"`
-	// The value of the custom field. This may be up to 140 characters.
-	Value *string `form:"value" json:"value"`
-}
-
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type SubscriptionScheduleUpdatePhaseInvoiceSettingsIssuerParams struct {
 	// The connected account being referenced when `type` is `account`.
@@ -1758,14 +1287,8 @@ type SubscriptionScheduleUpdatePhaseInvoiceSettingsIssuerParams struct {
 type SubscriptionScheduleUpdatePhaseInvoiceSettingsParams struct {
 	// The account tax IDs associated with this phase of the subscription schedule. Will be set on invoices generated by this phase of the subscription schedule.
 	AccountTaxIDs []*string `form:"account_tax_ids" json:"account_tax_ids,omitempty"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*SubscriptionScheduleUpdatePhaseInvoiceSettingsCustomFieldParams `form:"custom_fields" json:"custom_fields,omitempty"`
-	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `collection_method=charge_automatically`.
+	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `billing=charge_automatically`.
 	DaysUntilDue *int64 `form:"days_until_due" json:"days_until_due,omitempty"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description *string `form:"description" json:"description,omitempty"`
-	// Footer to be displayed on the invoice.
-	Footer *string `form:"footer" json:"footer,omitempty"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 	Issuer      *SubscriptionScheduleUpdatePhaseInvoiceSettingsIssuerParams      `form:"issuer" json:"issuer,omitempty"`
 	UnsetFields []SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetField `form:"-" json:"-"`
@@ -1776,9 +1299,6 @@ type SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetField string
 
 const (
 	SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetFieldAccountTaxIDs SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetField = "account_tax_ids"
-	SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetFieldCustomFields  SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetField = "custom_fields"
-	SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetFieldDescription   SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetField = "description"
-	SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetFieldFooter        SubscriptionScheduleUpdatePhaseInvoiceSettingsParamsUnsetField = "footer"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -1885,14 +1405,14 @@ type SubscriptionScheduleUpdatePhaseParams struct {
 	OnBehalfOf *string `form:"on_behalf_of" json:"on_behalf_of,omitempty"`
 	// Controls whether the subscription schedule should create [prorations](https://docs.stripe.com/billing/subscriptions/prorations) when transitioning to this phase if there is a difference in billing configuration. It's different from the request-level [proration_behavior](https://docs.stripe.com/api/subscription_schedules/update#update_subscription_schedule-proration_behavior) parameter which controls what happens if the update request affects the billing configuration (item price, quantity, etc.) of the current phase.
 	ProrationBehavior *string `form:"proration_behavior" json:"proration_behavior,omitempty"`
-	// The date at which this phase of the subscription schedule starts or `now`. Must be set on the first phase. Prefer to specify `now` over an explicit timestamp when appropriate to avoid unexpected behavior due to request delays or clock skew resulting in the phase being slightly backdated or postdated.
+	// The date at which this phase of the subscription schedule starts or `now`. Must be set on the first phase.
 	StartDate    *int64 `form:"start_date" json:"start_date,omitempty"`
 	StartDateNow *bool  `form:"-"` // See custom AppendTo
 	// The data with which to automatically create a Transfer for each of the associated subscription's invoices.
 	TransferData *SubscriptionTransferDataParams `form:"transfer_data" json:"transfer_data,omitempty"`
 	// If set to true the entire phase is counted as a trial and the customer will not be charged for any fees.
 	Trial *bool `form:"trial" json:"trial,omitempty"`
-	// Sets the phase to trialing from the start date to this date. Must be within the phase. When combined with `trial=true`, it must match the phase end date.
+	// Sets the phase to trialing from the start date to this date. Must be before the phase end date, can not be combined with `trial`
 	TrialEnd    *int64                                            `form:"trial_end" json:"trial_end,omitempty"`
 	TrialEndNow *bool                                             `form:"-"` // See custom AppendTo
 	UnsetFields []SubscriptionScheduleUpdatePhaseParamsUnsetField `form:"-" json:"-"`
@@ -1946,8 +1466,6 @@ type SubscriptionScheduleUpdateParams struct {
 	Expand []*string `form:"expand" json:"expand,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
-	// The subscription's pause behavior and optional resume behavior. You can provide one entry. Include its `key` to update an existing pause schedule. Omit `pause_schedules` to leave the existing schedule unchanged, or pass an empty string (`""`) to clear it.
-	PauseSchedules []*SubscriptionScheduleUpdatePauseScheduleParams `form:"pause_schedules" json:"pause_schedules,omitempty"`
 	// List representing phases of the subscription schedule. Each phase can be customized to have different durations, plans, and coupons. If there are multiple phases, the `end_date` of one phase will always equal the `start_date` of the next phase. Note that past phases can be omitted.
 	Phases []*SubscriptionScheduleUpdatePhaseParams `form:"phases" json:"phases,omitempty"`
 	// If the update changes the billing configuration (item price, quantity, etc.) of the current phase, indicates how prorations from this change should be handled. The default value is `create_prorations`.
@@ -1959,8 +1477,7 @@ type SubscriptionScheduleUpdateParams struct {
 type SubscriptionScheduleUpdateParamsUnsetField string
 
 const (
-	SubscriptionScheduleUpdateParamsUnsetFieldMetadata       SubscriptionScheduleUpdateParamsUnsetField = "metadata"
-	SubscriptionScheduleUpdateParamsUnsetFieldPauseSchedules SubscriptionScheduleUpdateParamsUnsetField = "pause_schedules"
+	SubscriptionScheduleUpdateParamsUnsetFieldMetadata SubscriptionScheduleUpdateParamsUnsetField = "metadata"
 )
 
 // AddUnsetField adds a field to the list of fields to clear/unset on this params object.
@@ -2013,14 +1530,6 @@ type SubscriptionScheduleDefaultSettingsBillingThresholds struct {
 	// Indicates if the `billing_cycle_anchor` should be reset when a threshold is reached. If true, `billing_cycle_anchor` will be updated to the date/time the threshold was last reached; otherwise, the value will remain unchanged. This value may not be `true` if the subscription contains items with plans that have `aggregate_usage=last_ever`.
 	ResetBillingCycleAnchor bool `json:"reset_billing_cycle_anchor"`
 }
-
-// A list of up to 4 custom fields to be displayed on the invoice.
-type SubscriptionScheduleDefaultSettingsInvoiceSettingsCustomField struct {
-	// The name of the custom field.
-	Name string `json:"name"`
-	// The value of the custom field.
-	Value string `json:"value"`
-}
 type SubscriptionScheduleDefaultSettingsInvoiceSettingsIssuer struct {
 	// The connected account being referenced when `type` is `account`.
 	Account *Account `json:"account,omitempty"`
@@ -2030,15 +1539,9 @@ type SubscriptionScheduleDefaultSettingsInvoiceSettingsIssuer struct {
 type SubscriptionScheduleDefaultSettingsInvoiceSettings struct {
 	// The account tax IDs associated with the subscription schedule. Will be set on invoices generated by the subscription schedule.
 	AccountTaxIDs []*TaxID `json:"account_tax_ids"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*SubscriptionScheduleDefaultSettingsInvoiceSettingsCustomField `json:"custom_fields"`
 	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `billing=charge_automatically`.
-	DaysUntilDue int64 `json:"days_until_due"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description string `json:"description"`
-	// Footer to be displayed on the invoice.
-	Footer string                                                    `json:"footer"`
-	Issuer *SubscriptionScheduleDefaultSettingsInvoiceSettingsIssuer `json:"issuer"`
+	DaysUntilDue int64                                                     `json:"days_until_due"`
+	Issuer       *SubscriptionScheduleDefaultSettingsInvoiceSettingsIssuer `json:"issuer"`
 }
 type SubscriptionScheduleDefaultSettings struct {
 	// A non-negative decimal between 0 and 100, with at most two decimal places. This represents the percentage of the subscription invoice total that will be transferred to the application owner's Stripe account during this phase of the schedule.
@@ -2059,81 +1562,6 @@ type SubscriptionScheduleDefaultSettings struct {
 	OnBehalfOf *Account `json:"on_behalf_of"`
 	// The account (if any) the associated subscription's payments will be attributed to for tax reporting, and where funds from each payment will be transferred to for each of the subscription's invoices.
 	TransferData *SubscriptionTransferData `json:"transfer_data"`
-}
-type SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThrough struct {
-	// The type of outstanding usage billing behavior.
-	Type SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThroughType `json:"type"`
-}
-type SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFrom struct {
-	// The type of unused time credit behavior.
-	Type SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFromType `json:"type"`
-}
-type SubscriptionSchedulePauseSchedulePauseSettingsBillFor struct {
-	OutstandingUsageThrough *SubscriptionSchedulePauseSchedulePauseSettingsBillForOutstandingUsageThrough `json:"outstanding_usage_through"`
-	UnusedTimeFrom          *SubscriptionSchedulePauseSchedulePauseSettingsBillForUnusedTimeFrom          `json:"unused_time_from"`
-}
-
-// Settings controlling billing behavior during the pause.
-type SubscriptionSchedulePauseSchedulePauseSettings struct {
-	BillFor *SubscriptionSchedulePauseSchedulePauseSettingsBillFor `json:"bill_for"`
-	// Determines how to handle debits and credits when pausing.
-	InvoicingBehavior SubscriptionSchedulePauseSchedulePauseSettingsInvoicingBehavior `json:"invoicing_behavior"`
-	// The type of pause settings.
-	Type SubscriptionSchedulePauseSchedulePauseSettingsType `json:"type"`
-}
-type SubscriptionSchedulePauseSchedulePauseStatusError struct {
-	// A machine-readable error code.
-	Code string `json:"code,omitempty"`
-	// A description of the error.
-	Message string `json:"message"`
-}
-type SubscriptionSchedulePauseSchedulePauseStatus struct {
-	Error *SubscriptionSchedulePauseSchedulePauseStatusError `json:"error,omitempty"`
-	// The lifecycle state of the pause operation.
-	Type SubscriptionSchedulePauseSchedulePauseStatusType `json:"type"`
-}
-type SubscriptionSchedulePauseSchedulePause struct {
-	// Time at which the subscription pauses.
-	PauseAt int64 `json:"pause_at"`
-	// Settings controlling billing behavior during the pause.
-	Settings *SubscriptionSchedulePauseSchedulePauseSettings `json:"settings"`
-	Status   *SubscriptionSchedulePauseSchedulePauseStatus   `json:"status"`
-}
-type SubscriptionSchedulePauseScheduleResumeSettings struct {
-	// The billing cycle anchor that applies when the subscription is resumed.
-	BillingCycleAnchor SubscriptionSchedulePauseScheduleResumeSettingsBillingCycleAnchor `json:"billing_cycle_anchor"`
-	// Controls whether Stripe attempts payment on the resumption invoice and how that affects the subscription's status.
-	PaymentBehavior SubscriptionSchedulePauseScheduleResumeSettingsPaymentBehavior `json:"payment_behavior"`
-	// Determines how to handle prorations resulting from the billing_cycle_anchor change on resume.
-	ProrationBehavior SubscriptionSchedulePauseScheduleResumeSettingsProrationBehavior `json:"proration_behavior"`
-}
-type SubscriptionSchedulePauseScheduleResumeStatusError struct {
-	// A machine-readable error code.
-	Code string `json:"code,omitempty"`
-	// A description of the error.
-	Message string `json:"message"`
-}
-type SubscriptionSchedulePauseScheduleResumeStatus struct {
-	Error *SubscriptionSchedulePauseScheduleResumeStatusError `json:"error,omitempty"`
-	// The lifecycle state of the resume operation.
-	Type SubscriptionSchedulePauseScheduleResumeStatusType `json:"type"`
-}
-
-// Details about when and how the subscription resumes.
-type SubscriptionSchedulePauseScheduleResume struct {
-	// Time at which the subscription resumes.
-	ResumeAt int64                                            `json:"resume_at"`
-	Settings *SubscriptionSchedulePauseScheduleResumeSettings `json:"settings"`
-	Status   *SubscriptionSchedulePauseScheduleResumeStatus   `json:"status"`
-}
-
-// The pause schedules for this subscription schedule.
-type SubscriptionSchedulePauseSchedule struct {
-	// A unique identifier for this pause schedule.
-	Key   string                                  `json:"key"`
-	Pause *SubscriptionSchedulePauseSchedulePause `json:"pause"`
-	// Details about when and how the subscription resumes.
-	Resume *SubscriptionSchedulePauseScheduleResume `json:"resume"`
 }
 
 // The stackable discounts that will be applied to the item.
@@ -2197,14 +1625,6 @@ type SubscriptionSchedulePhaseDiscount struct {
 	PromotionCode *PromotionCode `json:"promotion_code"`
 }
 
-// A list of up to 4 custom fields to be displayed on the invoice.
-type SubscriptionSchedulePhaseInvoiceSettingsCustomField struct {
-	// The name of the custom field.
-	Name string `json:"name"`
-	// The value of the custom field.
-	Value string `json:"value"`
-}
-
 // The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 type SubscriptionSchedulePhaseInvoiceSettingsIssuer struct {
 	// The connected account being referenced when `type` is `account`.
@@ -2217,14 +1637,8 @@ type SubscriptionSchedulePhaseInvoiceSettingsIssuer struct {
 type SubscriptionSchedulePhaseInvoiceSettings struct {
 	// The account tax IDs associated with this phase of the subscription schedule. Will be set on invoices generated by this phase of the subscription schedule.
 	AccountTaxIDs []*TaxID `json:"account_tax_ids"`
-	// A list of up to 4 custom fields to be displayed on the invoice.
-	CustomFields []*SubscriptionSchedulePhaseInvoiceSettingsCustomField `json:"custom_fields"`
 	// Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be `null` for subscription schedules where `billing=charge_automatically`.
 	DaysUntilDue int64 `json:"days_until_due"`
-	// An arbitrary string attached to the object. Often useful for displaying to users.
-	Description string `json:"description"`
-	// Footer to be displayed on the invoice.
-	Footer string `json:"footer"`
 	// The connected account that issues the invoice. The invoice is presented with the branding and support information of the specified account.
 	Issuer *SubscriptionSchedulePhaseInvoiceSettingsIssuer `json:"issuer"`
 }
@@ -2302,8 +1716,6 @@ type SubscriptionSchedulePhase struct {
 	StartDate int64 `json:"start_date"`
 	// The account (if any) the associated subscription's payments will be attributed to for tax reporting, and where funds from each payment will be transferred to for each of the subscription's invoices.
 	TransferData *SubscriptionTransferData `json:"transfer_data"`
-	// If set to true the entire phase is counted as a trial and the customer will not be charged for any fees.
-	Trial bool `json:"trial,omitempty"`
 	// When the trial ends within the phase.
 	TrialEnd int64 `json:"trial_end"`
 }
@@ -2340,8 +1752,6 @@ type SubscriptionSchedule struct {
 	Metadata map[string]string `json:"metadata"`
 	// String representing the object's type. Objects of the same type share the same value.
 	Object string `json:"object"`
-	// The pause schedules for this subscription schedule.
-	PauseSchedules []*SubscriptionSchedulePauseSchedule `json:"pause_schedules"`
 	// Configuration for the subscription schedule's phases.
 	Phases []*SubscriptionSchedulePhase `json:"phases"`
 	// Time at which the subscription schedule was released. Measured in seconds since the Unix epoch.

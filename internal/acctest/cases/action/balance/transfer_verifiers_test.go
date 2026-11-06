@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 
 	"github.com/stripe/terraform-provider-stripe/internal/acctest/runner"
 )
@@ -77,17 +77,6 @@ func ensureTransferDestination(
 	client *stripe.Client,
 ) string {
 	t.Helper()
-
-	if env.TransferDestinationAccount != "" {
-		account, err := client.V1Accounts.GetByID(context.Background(), env.TransferDestinationAccount, nil)
-		if err != nil {
-			t.Fatalf("retrieve STRIPE_TRANSFER_DESTINATION: %v", err)
-		}
-		if account.Capabilities == nil || account.Capabilities.Transfers != stripe.AccountCapabilityStatusActive {
-			t.Fatal("STRIPE_TRANSFER_DESTINATION must have an active transfers capability")
-		}
-		return account.ID
-	}
 
 	if env.StripeAccount != "" {
 		account, err := client.V1Accounts.GetByID(context.Background(), env.StripeAccount, nil)

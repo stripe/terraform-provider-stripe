@@ -11,8 +11,8 @@ package scheduledqueryrun
 import (
 	"net/http"
 
-	stripe "github.com/stripe/stripe-go/v87"
-	"github.com/stripe/stripe-go/v87/form"
+	stripe "github.com/stripe/stripe-go/v86"
+	"github.com/stripe/stripe-go/v86/form"
 )
 
 // Client is used to invoke /v1/sigma/scheduled_query_runs APIs.
@@ -24,12 +24,12 @@ type Client struct {
 	Key string
 }
 
-// Retrieves the details of a scheduled query run.
+// Retrieves the details of an scheduled query run.
 func Get(id string, params *stripe.SigmaScheduledQueryRunParams) (*stripe.SigmaScheduledQueryRun, error) {
 	return getC().Get(id, params)
 }
 
-// Retrieves the details of a scheduled query run.
+// Retrieves the details of an scheduled query run.
 //
 // Deprecated: Client methods are deprecated. This should be accessed instead through [stripe.Client]. See the [migration guide] for more info.
 //

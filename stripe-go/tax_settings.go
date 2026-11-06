@@ -27,7 +27,7 @@ const (
 	TaxSettingsDefaultsTaxBehaviorInferredByCurrency TaxSettingsDefaultsTaxBehavior = "inferred_by_currency"
 )
 
-// Whether these settings have the information Stripe Tax needs to calculate tax. It doesn't reflect whether your integration is ready to collect tax.
+// The status of the Tax `Settings`.
 type TaxSettingsStatus string
 
 // List of values that TaxSettingsStatus can take
@@ -92,7 +92,7 @@ type TaxSettingsUpdateHeadOfficeParams struct {
 	Address *AddressParams `form:"address" json:"address"`
 }
 
-// Updates Tax Settings parameters used in tax calculations. All parameters are editable but none can be removed once set. Check the returned Tax Settings object and validate that its status is active.
+// Updates Tax Settings parameters used in tax calculations. All parameters are editable but none can be removed once set.
 type TaxSettingsUpdateParams struct {
 	Params `form:"*"`
 	// Default configuration to be used on Stripe Tax calculations.
@@ -143,7 +143,7 @@ type TaxSettings struct {
 	Livemode bool `json:"livemode"`
 	// String representing the object's type. Objects of the same type share the same value.
 	Object string `json:"object"`
-	// Whether these settings have the information Stripe Tax needs to calculate tax. It doesn't reflect whether your integration is ready to collect tax.
+	// The status of the Tax `Settings`.
 	Status        TaxSettingsStatus         `json:"status"`
 	StatusDetails *TaxSettingsStatusDetails `json:"status_details"`
 }

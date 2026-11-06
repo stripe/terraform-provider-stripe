@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v87"
+	stripe "github.com/stripe/stripe-go/v86"
 )
 
 var _ ephemeral.EphemeralResource = &FinancialConnectionsSessionEphemeralResource{}
@@ -30,18 +30,15 @@ type FinancialConnectionsSessionEphemeralResource struct {
 }
 
 type FinancialConnectionsSessionResourceModel struct {
-	Object           types.String `tfsdk:"object"`
-	AccountHolder    types.Object `tfsdk:"account_holder"`
-	BankAccountToken types.String `tfsdk:"bank_account_token"`
-	ClientSecret     types.String `tfsdk:"client_secret"`
-	Filters          types.Object `tfsdk:"filters"`
-	ID               types.String `tfsdk:"id"`
-	Limits           types.Object `tfsdk:"limits"`
-	Livemode         types.Bool   `tfsdk:"livemode"`
-	ManualEntry      types.Object `tfsdk:"manual_entry"`
-	Permissions      types.List   `tfsdk:"permissions"`
-	Prefetch         types.List   `tfsdk:"prefetch"`
-	ReturnURL        types.String `tfsdk:"return_url"`
+	Object        types.String `tfsdk:"object"`
+	AccountHolder types.Object `tfsdk:"account_holder"`
+	ClientSecret  types.String `tfsdk:"client_secret"`
+	Filters       types.Object `tfsdk:"filters"`
+	ID            types.String `tfsdk:"id"`
+	Livemode      types.Bool   `tfsdk:"livemode"`
+	Permissions   types.List   `tfsdk:"permissions"`
+	Prefetch      types.List   `tfsdk:"prefetch"`
+	ReturnURL     types.String `tfsdk:"return_url"`
 }
 
 func (r *FinancialConnectionsSessionEphemeralResource) Metadata(_ context.Context, req ephemeral.MetadataRequest, resp *ephemeral.MetadataResponse) {
@@ -82,10 +79,6 @@ func (r *FinancialConnectionsSessionEphemeralResource) Schema(_ context.Context,
 					},
 				},
 			},
-			"bank_account_token": ephemeralSchema.StringAttribute{
-				Computed:    true,
-				Description: "Tokenization is the process Stripe uses to collect sensitive card or bank\naccount details, or personally identifiable information (PII), directly from\nyour customers in a secure manner. A token representing this information is\nreturned to your server to use. Use our\n[recommended payments integrations](https://docs.stripe.com/payments) to perform this process\non the client-side. This guarantees that no sensitive card data touches your server,\nand allows your integration to operate in a PCI-compliant way.\n\nIf you can't use client-side tokenization, you can also create tokens using\nthe API with either your publishable or secret API key. If\nyour integration uses this method, you're responsible for any PCI compliance\nthat it might require, and you must keep your secret API key safe. Unlike with\nclient-side tokenization, your customer's information isn't sent directly to\nStripe, so we can't determine how it's handled or stored.\n\nYou can't store or use tokens more than once. To store card or bank account\ninformation for later use, create [Customer](https://docs.stripe.com/api#customers)\nobjects or [External accounts](/api#external_accounts).\n[Radar](https://docs.stripe.com/radar), our integrated solution for automatic fraud protection,\nperforms best with integrations that use client-side tokenization.",
-			},
 			"client_secret": ephemeralSchema.StringAttribute{
 				Computed:    true,
 				Description: "A value that will be passed to the client to launch the authentication flow.",
@@ -102,16 +95,11 @@ func (r *FinancialConnectionsSessionEphemeralResource) Schema(_ context.Context,
 						Description: "Restricts the Session to subcategories of accounts that can be linked. Valid subcategories are: `checking`, `savings`, `mortgage`, `line_of_credit`, `credit_card`.",
 						ElementType: types.StringType,
 					},
-					"country": ephemeralSchema.StringAttribute{
+					"countries": ephemeralSchema.ListAttribute{
 						Optional:    true,
 						Computed:    true,
-						Description: "Country from which to filter accounts.",
-					},
-					"require_payment_method_support": ephemeralSchema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "Whether the Session should require that linked accounts support payments and retrieve account numbers before completion.",
-						Validators:  []validator.String{stringvalidator.OneOf("all", "at_least_one", "none")},
+						Description: "List of countries from which to filter accounts.",
+						ElementType: types.StringType,
 					},
 				},
 			},
@@ -119,33 +107,9 @@ func (r *FinancialConnectionsSessionEphemeralResource) Schema(_ context.Context,
 				Computed:    true,
 				Description: "Unique identifier for the object.",
 			},
-			"limits": ephemeralSchema.SingleNestedAttribute{
-				Optional: true,
-				Computed: true,
-
-				Attributes: map[string]ephemeralSchema.Attribute{
-					"accounts": ephemeralSchema.Int64Attribute{
-						Required:    true,
-						Description: "The number of accounts that can be linked in this Session.",
-					},
-				},
-			},
 			"livemode": ephemeralSchema.BoolAttribute{
 				Computed:    true,
 				Description: "If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.",
-			},
-			"manual_entry": ephemeralSchema.SingleNestedAttribute{
-				Optional: true,
-				Computed: true,
-
-				Attributes: map[string]ephemeralSchema.Attribute{
-					"mode": ephemeralSchema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "Controls how manual entry of bank account details is presented to the user.",
-						Validators:  []validator.String{stringvalidator.OneOf("automatic", "disabled")},
-					},
-				},
 			},
 			"permissions": ephemeralSchema.ListAttribute{
 				Required:    true,
@@ -192,16 +156,6 @@ func expandFinancialConnectionsSessionCreate(plan FinancialConnectionsSessionRes
 	if !plan.Filters.IsNull() && !plan.Filters.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "Filters", plan.Filters) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "filters", params)
-		}
-	}
-	if !plan.Limits.IsNull() && !plan.Limits.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "Limits", plan.Limits) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "limits", params)
-		}
-	}
-	if !plan.ManualEntry.IsNull() && !plan.ManualEntry.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "ManualEntry", plan.ManualEntry) {
-			return nil, fmt.Errorf("failed to assign attribute %q on %T", "manual_entry", params)
 		}
 	}
 	if !plan.Permissions.IsNull() && !plan.Permissions.IsUnknown() {
@@ -292,21 +246,6 @@ func flattenFinancialConnectionsSession(obj *stripe.FinancialConnectionsSession,
 		}
 	}
 	{
-		if true {
-			if rawValueBankAccountToken, rawOk := plainValueAtPath(raw, "bank_account_token"); rawOk {
-				if typedBankAccountToken, ok := plainToStringIDValue(rawValueBankAccountToken); ok {
-					state.BankAccountToken = typedBankAccountToken
-				}
-			} else if !hasRaw {
-				if responseValueBankAccountToken, ok := plainFromResponseField(obj, "BankAccountToken"); ok {
-					if typedBankAccountToken, ok := plainToStringIDValue(responseValueBankAccountToken); ok {
-						state.BankAccountToken = typedBankAccountToken
-					}
-				}
-			}
-		}
-	}
-	{
 		if rawValueClientSecret, rawOk := plainValueAtPath(raw, "client_secret"); rawOk {
 			if valueClientSecret, err := flattenPlainValue(rawValueClientSecret, types.StringType, "client_secret", "raw response"); err != nil {
 				return err
@@ -334,7 +273,7 @@ func flattenFinancialConnectionsSession(obj *stripe.FinancialConnectionsSession,
 			hadRawFilters = true
 			if rawValueFilters != nil {
 				sourceFilters := applyConfiguredKeyedListShapes(rawValueFilters, attrValueToPlain(state.Filters))
-				if valueFilters, err := flattenPlainValue(sourceFilters, types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}, "country": types.StringType, "require_payment_method_support": types.StringType}}, "filters", "raw response"); err != nil {
+				if valueFilters, err := flattenPlainValue(sourceFilters, types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}, "countries": types.ListType{ElemType: types.StringType}}}, "filters", "raw response"); err != nil {
 					return err
 				} else {
 					if typedFilters, ok := valueFilters.(types.Object); ok {
@@ -350,7 +289,7 @@ func flattenFinancialConnectionsSession(obj *stripe.FinancialConnectionsSession,
 					sourceFilters := applyConfiguredKeyedListShapes(responseValueFilters, attrValueToPlain(state.Filters))
 					if valueFilters, err := flattenPlainValue(
 						sourceFilters,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}, "country": types.StringType, "require_payment_method_support": types.StringType}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}, "countries": types.ListType{ElemType: types.StringType}}},
 						"filters",
 						"response struct",
 					); err != nil {
@@ -365,7 +304,7 @@ func flattenFinancialConnectionsSession(obj *stripe.FinancialConnectionsSession,
 			}
 		}
 		if !assignedFilters && hadRawFilters {
-			if nullFilters, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}, "country": types.StringType, "require_payment_method_support": types.StringType}}); ok {
+			if nullFilters, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}, "countries": types.ListType{ElemType: types.StringType}}}); ok {
 				if typedFilters, ok := nullFilters.(types.Object); ok {
 					state.Filters = typedFilters
 				}
@@ -394,51 +333,6 @@ func flattenFinancialConnectionsSession(obj *stripe.FinancialConnectionsSession,
 		}
 	}
 	{
-		assignedLimits := false
-		hadRawLimits := false
-		if rawValueLimits, rawOk := plainValueAtPath(raw, "limits"); rawOk {
-			hadRawLimits = true
-			if rawValueLimits != nil {
-				sourceLimits := applyConfiguredKeyedListShapes(rawValueLimits, attrValueToPlain(state.Limits))
-				if valueLimits, err := flattenPlainValue(sourceLimits, types.ObjectType{AttrTypes: map[string]attr.Type{"accounts": types.Int64Type}}, "limits", "raw response"); err != nil {
-					return err
-				} else {
-					if typedLimits, ok := valueLimits.(types.Object); ok {
-						state.Limits = typedLimits
-						assignedLimits = true
-					}
-				}
-			}
-		}
-		if !assignedLimits {
-			if !hasRaw {
-				if responseValueLimits, ok := plainFromResponseField(obj, "Limits"); ok {
-					sourceLimits := applyConfiguredKeyedListShapes(responseValueLimits, attrValueToPlain(state.Limits))
-					if valueLimits, err := flattenPlainValue(
-						sourceLimits,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"accounts": types.Int64Type}},
-						"limits",
-						"response struct",
-					); err != nil {
-						return err
-					} else {
-						if typedLimits, ok := valueLimits.(types.Object); ok {
-							state.Limits = typedLimits
-							assignedLimits = true
-						}
-					}
-				}
-			}
-		}
-		if !assignedLimits && hadRawLimits {
-			if nullLimits, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"accounts": types.Int64Type}}); ok {
-				if typedLimits, ok := nullLimits.(types.Object); ok {
-					state.Limits = typedLimits
-				}
-			}
-		}
-	}
-	{
 		if rawValueLivemode, rawOk := plainValueAtPath(raw, "livemode"); rawOk {
 			if valueLivemode, err := flattenPlainValue(rawValueLivemode, types.BoolType, "livemode", "raw response"); err != nil {
 				return err
@@ -455,51 +349,6 @@ func flattenFinancialConnectionsSession(obj *stripe.FinancialConnectionsSession,
 					if typedLivemode, ok := valueLivemode.(types.Bool); ok {
 						state.Livemode = typedLivemode
 					}
-				}
-			}
-		}
-	}
-	{
-		assignedManualEntry := false
-		hadRawManualEntry := false
-		if rawValueManualEntry, rawOk := plainValueAtPath(raw, "manual_entry"); rawOk {
-			hadRawManualEntry = true
-			if rawValueManualEntry != nil {
-				sourceManualEntry := applyConfiguredKeyedListShapes(rawValueManualEntry, attrValueToPlain(state.ManualEntry))
-				if valueManualEntry, err := flattenPlainValue(sourceManualEntry, types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType}}, "manual_entry", "raw response"); err != nil {
-					return err
-				} else {
-					if typedManualEntry, ok := valueManualEntry.(types.Object); ok {
-						state.ManualEntry = typedManualEntry
-						assignedManualEntry = true
-					}
-				}
-			}
-		}
-		if !assignedManualEntry {
-			if !hasRaw {
-				if responseValueManualEntry, ok := plainFromResponseField(obj, "ManualEntry"); ok {
-					sourceManualEntry := applyConfiguredKeyedListShapes(responseValueManualEntry, attrValueToPlain(state.ManualEntry))
-					if valueManualEntry, err := flattenPlainValue(
-						sourceManualEntry,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType}},
-						"manual_entry",
-						"response struct",
-					); err != nil {
-						return err
-					} else {
-						if typedManualEntry, ok := valueManualEntry.(types.Object); ok {
-							state.ManualEntry = typedManualEntry
-							assignedManualEntry = true
-						}
-					}
-				}
-			}
-		}
-		if !assignedManualEntry && hadRawManualEntry {
-			if nullManualEntry, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType}}); ok {
-				if typedManualEntry, ok := nullManualEntry.(types.Object); ok {
-					state.ManualEntry = typedManualEntry
 				}
 			}
 		}
