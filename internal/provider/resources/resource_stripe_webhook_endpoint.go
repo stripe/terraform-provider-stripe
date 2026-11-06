@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"strings"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &WebhookEndpointResource{}
@@ -115,7 +115,7 @@ func webhookEndpointResourceV0Schema() *schema.Schema {
 			"api_version": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "The API version events are rendered as for this webhook endpoint.",
+				Description:   "The API version that events are rendered as for this webhook endpoint. You can't change this value after you create the endpoint.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"application": schema.StringAttribute{
@@ -612,7 +612,7 @@ func (r *WebhookEndpointResource) Schema(_ context.Context, _ resource.SchemaReq
 			"api_version": schema.StringAttribute{
 				Optional:      true,
 				Computed:      true,
-				Description:   "The API version events are rendered as for this webhook endpoint.",
+				Description:   "The API version that events are rendered as for this webhook endpoint. You can't change this value after you create the endpoint.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 			},
 			"application": schema.StringAttribute{
@@ -691,6 +691,11 @@ func (r *WebhookEndpointResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
+	webhookAPIVersion, err := resolveWebhookEndpointCreateAPIVersion(ctx, plan, r.client.V1WebhookEndpoints.B, r.client.V1WebhookEndpoints.Key)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving WebhookEndpoint API version", err.Error())
+		return
+	}
 	obj, err := r.client.V1WebhookEndpoints.Create(ctx, params)
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating WebhookEndpoint", err.Error())
@@ -702,7 +707,7 @@ func (r *WebhookEndpointResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	if err := flattenWebhookEndpoint(obj, &plan); err != nil {
+	if err := flattenWebhookEndpoint(obj, &plan, webhookAPIVersion); err != nil {
 		resp.Diagnostics.AddError("Error flattening WebhookEndpoint create response", err.Error())
 		return
 	}
@@ -733,7 +738,7 @@ func (r *WebhookEndpointResource) Read(ctx context.Context, req resource.ReadReq
 		return
 	}
 
-	if err := flattenWebhookEndpoint(obj, &state); err != nil {
+	if err := r.flattenWebhookEndpoint(ctx, obj, &state); err != nil {
 		resp.Diagnostics.AddError("Error flattening WebhookEndpoint read response", err.Error())
 		return
 	}
@@ -784,7 +789,7 @@ func (r *WebhookEndpointResource) Update(ctx context.Context, req resource.Updat
 		return
 	}
 
-	if err := flattenWebhookEndpoint(obj, &plan); err != nil {
+	if err := r.flattenWebhookEndpoint(ctx, obj, &plan); err != nil {
 		resp.Diagnostics.AddError("Error flattening WebhookEndpoint update response", err.Error())
 		return
 	}
@@ -882,7 +887,8 @@ func expandWebhookEndpointUpdate(plan WebhookEndpointResourceModel, state Webhoo
 	return params, nil
 }
 
-func flattenWebhookEndpoint(obj *stripe.WebhookEndpoint, state *WebhookEndpointResourceModel) error {
+func flattenWebhookEndpoint(obj *stripe.WebhookEndpoint, state *WebhookEndpointResourceModel, effectiveAPIVersion string) error {
+	configuredEnabledEvents := state.EnabledEvents
 	raw, hasRaw := rawResponseToPlain(obj)
 	{
 		if rawValueObject, rawOk := plainValueAtPath(raw, "object"); rawOk {
@@ -1171,5 +1177,136 @@ func flattenWebhookEndpoint(obj *stripe.WebhookEndpoint, state *WebhookEndpointR
 			}
 		}
 	}
+	state.EnabledEvents = preserveWebhookEndpointEventAliases(state.EnabledEvents, configuredEnabledEvents, effectiveAPIVersion)
 	return nil
+}
+
+// flattenWebhookEndpoint resolves the effective version without changing the
+// endpoint's api_version value, which may intentionally follow the account default.
+func (r *WebhookEndpointResource) flattenWebhookEndpoint(ctx context.Context, obj *stripe.WebhookEndpoint, state *WebhookEndpointResourceModel) error {
+	version, err := resolveWebhookEndpointEventAPIVersion(ctx, obj, r.client.V1WebhookEndpoints.B, r.client.V1WebhookEndpoints.Key)
+	if err != nil {
+		return err
+	}
+	return flattenWebhookEndpoint(obj, state, version)
+}
+
+// resolveWebhookEndpointEventAPIVersion avoids guessing about alias equivalence
+// when an endpoint follows the account default. The SDK normally pins its own
+// request version, so an unversioned GET is needed to discover that default.
+func resolveWebhookEndpointEventAPIVersion(ctx context.Context, obj *stripe.WebhookEndpoint, backend stripe.Backend, key string) (string, error) {
+	if obj.APIVersion != "" {
+		return obj.APIVersion, nil
+	}
+	events := make(map[string]bool)
+	for _, event := range obj.EnabledEvents {
+		events[event] = true
+	}
+	if !(events["transfer.reversed"] && events["transfer.canceled"]) &&
+		!(events["payment_method.automatically_updated"] && events["payment_method.card_automatically_updated"]) {
+		return "", nil
+	}
+	return readWebhookEndpointAccountAPIVersion(ctx, backend, key, stripe.FormatURLPath("/v1/webhook_endpoints/%s", obj.ID))
+}
+
+// Resolve before POST so a failed version lookup cannot leave an untracked endpoint.
+func resolveWebhookEndpointCreateAPIVersion(ctx context.Context, plan WebhookEndpointResourceModel, backend stripe.Backend, key string) (string, error) {
+	if version := plan.APIVersion.ValueString(); version != "" {
+		return version, nil
+	}
+	for _, element := range plan.EnabledEvents.Elements() {
+		switch element.(types.String).ValueString() {
+		case "transfer.reversed", "transfer.canceled", "payment_method.automatically_updated", "payment_method.card_automatically_updated":
+			return readWebhookEndpointAccountAPIVersion(ctx, backend, key, "/v1/webhook_endpoints?limit=1")
+		}
+	}
+	return "", nil
+}
+
+func readWebhookEndpointAccountAPIVersion(ctx context.Context, backend stripe.Backend, key, path string) (string, error) {
+	if usage, ok := backend.(*stripe.UsageBackend); ok {
+		backend = usage.B
+	}
+	b, ok := backend.(*stripe.BackendImplementation)
+	if !ok {
+		return "", fmt.Errorf("cannot resolve webhook account API version with this backend; set api_version explicitly")
+	}
+	req, err := b.NewRequest("GET", path, key, "application/x-www-form-urlencoded", &stripe.Params{Context: ctx})
+	if err != nil {
+		return "", err
+	}
+	// Sending an empty version header is rejected; omit it completely.
+	req.Header.Del("Stripe-Version")
+	var response stripe.APIResource
+	if err := b.Do(req, nil, &response); err != nil {
+		return "", fmt.Errorf("reading webhook account API version: %w", err)
+	}
+	if response.LastResponse == nil || response.LastResponse.Header.Get("Stripe-Version") == "" {
+		return "", fmt.Errorf("webhook response is missing its effective API version; set api_version explicitly")
+	}
+	return response.LastResponse.Header.Get("Stripe-Version"), nil
+}
+
+// preserveWebhookEndpointEventAliases keeps the configured spelling and order
+// when Stripe expands renamed events into their equivalent compatibility aliases.
+// A changed subscription must still be returned so Terraform can detect drift.
+func preserveWebhookEndpointEventAliases(observed, configured types.List, apiVersion string) types.List {
+	if observed.IsNull() || observed.IsUnknown() {
+		return observed
+	}
+	observedValues := make(map[string]bool)
+	for _, element := range observed.Elements() {
+		value := element.(types.String)
+		if value.IsNull() || value.IsUnknown() {
+			return observed
+		}
+		observedValues[value.ValueString()] = true
+	}
+	// Older endpoint API versions can give a legacy name a different meaning.
+	// Only newer versions expand these aliases, and both names must actually
+	// be observed before an alias can be considered equivalent.
+	canonicalName := func(name string) string {
+		switch name {
+		case "transfer.canceled":
+			if observedValues[name] && observedValues["transfer.reversed"] && apiVersion >= "2017-04-06" {
+				return "transfer.reversed"
+			}
+		case "payment_method.card_automatically_updated":
+			if observedValues[name] && observedValues["payment_method.automatically_updated"] && apiVersion >= "2020-08-27" {
+				return "payment_method.automatically_updated"
+			}
+		}
+		return name
+	}
+	observedNames := make(map[string]bool)
+	canonicalElements := make([]attr.Value, 0, len(observed.Elements()))
+	for _, element := range observed.Elements() {
+		value := element.(types.String)
+		name := canonicalName(value.ValueString())
+		if !observedNames[name] {
+			canonicalElements = append(canonicalElements, types.StringValue(name))
+			observedNames[name] = true
+		}
+	}
+	if !configured.IsNull() && !configured.IsUnknown() {
+		configuredNames := make(map[string]bool)
+		for _, element := range configured.Elements() {
+			value := element.(types.String)
+			if value.IsNull() || value.IsUnknown() {
+				return types.ListValueMust(types.StringType, canonicalElements)
+			}
+			configuredNames[canonicalName(value.ValueString())] = true
+		}
+		equivalent := len(observedNames) == len(configuredNames)
+		for name := range configuredNames {
+			if !observedNames[name] {
+				equivalent = false
+				break
+			}
+		}
+		if equivalent {
+			return configured
+		}
+	}
+	return types.ListValueMust(types.StringType, canonicalElements)
 }

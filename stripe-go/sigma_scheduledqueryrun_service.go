@@ -10,7 +10,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/stripe/stripe-go/v86/form"
+	"github.com/stripe/stripe-go/v87/form"
 )
 
 // v1SigmaScheduledQueryRunService is used to invoke /v1/sigma/scheduled_query_runs APIs.
@@ -19,7 +19,7 @@ type v1SigmaScheduledQueryRunService struct {
 	Key string
 }
 
-// Retrieves the details of an scheduled query run.
+// Retrieves the details of a scheduled query run.
 func (c v1SigmaScheduledQueryRunService) Retrieve(ctx context.Context, id string, params *SigmaScheduledQueryRunRetrieveParams) (*SigmaScheduledQueryRun, error) {
 	if params == nil {
 		params = &SigmaScheduledQueryRunRetrieveParams{}

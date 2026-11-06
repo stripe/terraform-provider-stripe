@@ -5,9 +5,10 @@ package cases
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 
 	"github.com/stripe/terraform-provider-stripe/internal/acctest/runner"
 )
@@ -198,7 +199,11 @@ func verifyClimateOrder(expect climateOrderExpectations) runner.StateVerifier {
 			}
 			return fmt.Errorf("remote %s.product mismatch: expected %q, got %q", expect.Address, expect.ExpectedProduct, actual)
 		}
-		if err := expectFloat(expect.Address+".metric_tons", order.MetricTons, expect.ExpectedMetricTons); err != nil {
+		metricTons, err := strconv.ParseFloat(fmt.Sprint(order.MetricTons), 64)
+		if err != nil {
+			return fmt.Errorf("parse climate order metric tons: %w", err)
+		}
+		if err := expectFloat(expect.Address+".metric_tons", metricTons, expect.ExpectedMetricTons); err != nil {
 			return err
 		}
 		if order.Beneficiary == nil || order.Beneficiary.PublicName != expect.ExpectedBeneficiary {

@@ -13,6 +13,7 @@ type DisputeEnhancedEligibilityType string
 
 // List of values that DisputeEnhancedEligibilityType can take
 const (
+	DisputeEnhancedEligibilityTypeMastercardCompliance    DisputeEnhancedEligibilityType = "mastercard_compliance"
 	DisputeEnhancedEligibilityTypeVisaCompellingEvidence3 DisputeEnhancedEligibilityType = "visa_compelling_evidence_3"
 	DisputeEnhancedEligibilityTypeVisaCompliance          DisputeEnhancedEligibilityType = "visa_compliance"
 )
@@ -24,6 +25,15 @@ type DisputeEvidenceEnhancedEvidenceVisaCompellingEvidence3DisputedTransactionMe
 const (
 	DisputeEvidenceEnhancedEvidenceVisaCompellingEvidence3DisputedTransactionMerchandiseOrServicesMerchandise DisputeEvidenceEnhancedEvidenceVisaCompellingEvidence3DisputedTransactionMerchandiseOrServices = "merchandise"
 	DisputeEvidenceEnhancedEvidenceVisaCompellingEvidence3DisputedTransactionMerchandiseOrServicesServices    DisputeEvidenceEnhancedEvidenceVisaCompellingEvidence3DisputedTransactionMerchandiseOrServices = "services"
+)
+
+// Mastercard compliance eligibility status.
+type DisputeEvidenceDetailsEnhancedEligibilityMastercardComplianceStatus string
+
+// List of values that DisputeEvidenceDetailsEnhancedEligibilityMastercardComplianceStatus can take
+const (
+	DisputeEvidenceDetailsEnhancedEligibilityMastercardComplianceStatusFeeAcknowledged            DisputeEvidenceDetailsEnhancedEligibilityMastercardComplianceStatus = "fee_acknowledged"
+	DisputeEvidenceDetailsEnhancedEligibilityMastercardComplianceStatusRequiresFeeAcknowledgement DisputeEvidenceDetailsEnhancedEligibilityMastercardComplianceStatus = "requires_fee_acknowledgement"
 )
 
 // List of actions required to qualify dispute for Visa Compelling Evidence 3.0 evidence submission.
@@ -55,6 +65,27 @@ type DisputeEvidenceDetailsEnhancedEligibilityVisaComplianceStatus string
 const (
 	DisputeEvidenceDetailsEnhancedEligibilityVisaComplianceStatusFeeAcknowledged            DisputeEvidenceDetailsEnhancedEligibilityVisaComplianceStatus = "fee_acknowledged"
 	DisputeEvidenceDetailsEnhancedEligibilityVisaComplianceStatusRequiresFeeAcknowledgement DisputeEvidenceDetailsEnhancedEligibilityVisaComplianceStatus = "requires_fee_acknowledgement"
+)
+
+// Whether the dispute was submitted manually, with Smart Disputes, or not submitted.
+type DisputeEvidenceDetailsSubmissionMethod string
+
+// List of values that DisputeEvidenceDetailsSubmissionMethod can take
+const (
+	DisputeEvidenceDetailsSubmissionMethodManual        DisputeEvidenceDetailsSubmissionMethod = "manual"
+	DisputeEvidenceDetailsSubmissionMethodNotSubmitted  DisputeEvidenceDetailsSubmissionMethod = "not_submitted"
+	DisputeEvidenceDetailsSubmissionMethodSmartDisputes DisputeEvidenceDetailsSubmissionMethod = "smart_disputes"
+)
+
+// Intended submission method for the dispute.
+type DisputeIntendedSubmissionMethod string
+
+// List of values that DisputeIntendedSubmissionMethod can take
+const (
+	DisputeIntendedSubmissionMethodManual              DisputeIntendedSubmissionMethod = "manual"
+	DisputeIntendedSubmissionMethodPreferManual        DisputeIntendedSubmissionMethod = "prefer_manual"
+	DisputeIntendedSubmissionMethodPreferSmartDisputes DisputeIntendedSubmissionMethod = "prefer_smart_disputes"
+	DisputeIntendedSubmissionMethodSmartDisputes       DisputeIntendedSubmissionMethod = "smart_disputes"
 )
 
 // The AmazonPay dispute type, chargeback or claim
@@ -111,11 +142,13 @@ const (
 	DisputeReasonUnrecognized            DisputeReason = "unrecognized"
 )
 
-// The current status of a dispute. Possible values include:`warning_needs_response`, `warning_under_review`, `warning_closed`, `needs_response`, `under_review`, `won`, `lost`, or `prevented`.
+// The current status of a dispute. Possible values include:`warning_needs_response`, `warning_under_review`, `warning_closed`, `needs_response`, `under_review`, `appeal_needs_response`, `appeal_under_review`, `won`, `lost`, or `prevented`.
 type DisputeStatus string
 
 // List of values that DisputeStatus can take
 const (
+	DisputeStatusAppealNeedsResponse  DisputeStatus = "appeal_needs_response"
+	DisputeStatusAppealUnderReview    DisputeStatus = "appeal_under_review"
 	DisputeStatusLost                 DisputeStatus = "lost"
 	DisputeStatusNeedsResponse        DisputeStatus = "needs_response"
 	DisputeStatusPrevented            DisputeStatus = "prevented"
@@ -153,6 +186,8 @@ type DisputeParams struct {
 	Evidence *DisputeEvidenceParams `form:"evidence" json:"evidence,omitempty"`
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Intended submission method for the dispute.
+	IntendedSubmissionMethod *string `form:"intended_submission_method" json:"intended_submission_method,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
 	// Whether to immediately submit evidence to the bank. If `false`, evidence is staged on the dispute. Staged evidence is visible in the API and Dashboard, and can be submitted to the bank by making another request with this attribute set to `true` (the default).
@@ -184,6 +219,53 @@ func (p *DisputeParams) AddMetadata(key string, value string) {
 	}
 
 	p.Metadata[key] = value
+}
+
+// Evidence for a card dispute appeal.
+type DisputeEvidenceAppealCardParams struct {
+	// An explanation of the reason for filing the appeal.
+	ReasonForFiling *string `form:"reason_for_filing" json:"reason_for_filing,omitempty"`
+	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `dispute_evidence` to support the appeal.
+	SupportingFiles []*string                                   `form:"supporting_files" json:"supporting_files,omitempty"`
+	UnsetFields     []DisputeEvidenceAppealCardParamsUnsetField `form:"-" json:"-"`
+}
+
+// DisputeEvidenceAppealCardParamsUnsetField is the list of fields that can be cleared/unset on DisputeEvidenceAppealCardParams.
+type DisputeEvidenceAppealCardParamsUnsetField string
+
+const (
+	DisputeEvidenceAppealCardParamsUnsetFieldReasonForFiling DisputeEvidenceAppealCardParamsUnsetField = "reason_for_filing"
+	DisputeEvidenceAppealCardParamsUnsetFieldSupportingFiles DisputeEvidenceAppealCardParamsUnsetField = "supporting_files"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *DisputeEvidenceAppealCardParams) AddUnsetField(field DisputeEvidenceAppealCardParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Evidence to submit when appealing a dispute.
+type DisputeEvidenceAppealParams struct {
+	// Evidence for a card dispute appeal.
+	Card        *DisputeEvidenceAppealCardParams        `form:"card" json:"card,omitempty"`
+	UnsetFields []DisputeEvidenceAppealParamsUnsetField `form:"-" json:"-"`
+}
+
+// DisputeEvidenceAppealParamsUnsetField is the list of fields that can be cleared/unset on DisputeEvidenceAppealParams.
+type DisputeEvidenceAppealParamsUnsetField string
+
+const (
+	DisputeEvidenceAppealParamsUnsetFieldCard DisputeEvidenceAppealParamsUnsetField = "card"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *DisputeEvidenceAppealParams) AddUnsetField(field DisputeEvidenceAppealParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Evidence provided for Mastercard compliance evidence submission.
+type DisputeEvidenceEnhancedEvidenceMastercardComplianceParams struct {
+	// A field acknowledging the fee incurred when countering a Mastercard compliance dispute. If this field is set to true, evidence can be submitted for the compliance dispute.
+	FeeAcknowledged *bool `form:"fee_acknowledged" json:"fee_acknowledged,omitempty"`
 }
 
 // Disputed transaction details for Visa Compelling Evidence 3.0 evidence submission.
@@ -278,6 +360,8 @@ type DisputeEvidenceEnhancedEvidenceVisaComplianceParams struct {
 
 // Additional evidence for qualifying evidence programs.
 type DisputeEvidenceEnhancedEvidenceParams struct {
+	// Evidence provided for Mastercard compliance evidence submission.
+	MastercardCompliance *DisputeEvidenceEnhancedEvidenceMastercardComplianceParams `form:"mastercard_compliance" json:"mastercard_compliance,omitempty"`
 	// Evidence provided for Visa Compelling Evidence 3.0 evidence submission.
 	VisaCompellingEvidence3 *DisputeEvidenceEnhancedEvidenceVisaCompellingEvidence3Params `form:"visa_compelling_evidence_3" json:"visa_compelling_evidence_3,omitempty"`
 	// Evidence provided for Visa compliance evidence submission.
@@ -288,6 +372,8 @@ type DisputeEvidenceEnhancedEvidenceParams struct {
 type DisputeEvidenceParams struct {
 	// Any server or activity logs showing proof that the customer accessed or downloaded the purchased digital product. This information should include IP addresses, corresponding timestamps, and any detailed recorded activity. Has a maximum character count of 20,000.
 	AccessActivityLog *string `form:"access_activity_log" json:"access_activity_log,omitempty"`
+	// Evidence to submit when appealing a dispute.
+	Appeal *DisputeEvidenceAppealParams `form:"appeal" json:"appeal,omitempty"`
 	// The billing address provided by the customer.
 	BillingAddress *string `form:"billing_address" json:"billing_address,omitempty"`
 	// (ID of a [file upload](https://stripe.com/docs/guides/file-upload)) Your subscription cancellation policy, as shown to the customer.
@@ -349,6 +435,7 @@ type DisputeEvidenceParams struct {
 type DisputeEvidenceParamsUnsetField string
 
 const (
+	DisputeEvidenceParamsUnsetFieldAppeal           DisputeEvidenceParamsUnsetField = "appeal"
 	DisputeEvidenceParamsUnsetFieldEnhancedEvidence DisputeEvidenceParamsUnsetField = "enhanced_evidence"
 )
 
@@ -381,6 +468,53 @@ type DisputeRetrieveParams struct {
 // AddExpand appends a new field to expand.
 func (p *DisputeRetrieveParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
+}
+
+// Evidence for a card dispute appeal.
+type DisputeUpdateEvidenceAppealCardParams struct {
+	// An explanation of the reason for filing the appeal.
+	ReasonForFiling *string `form:"reason_for_filing" json:"reason_for_filing,omitempty"`
+	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `dispute_evidence` to support the appeal.
+	SupportingFiles []*string                                         `form:"supporting_files" json:"supporting_files,omitempty"`
+	UnsetFields     []DisputeUpdateEvidenceAppealCardParamsUnsetField `form:"-" json:"-"`
+}
+
+// DisputeUpdateEvidenceAppealCardParamsUnsetField is the list of fields that can be cleared/unset on DisputeUpdateEvidenceAppealCardParams.
+type DisputeUpdateEvidenceAppealCardParamsUnsetField string
+
+const (
+	DisputeUpdateEvidenceAppealCardParamsUnsetFieldReasonForFiling DisputeUpdateEvidenceAppealCardParamsUnsetField = "reason_for_filing"
+	DisputeUpdateEvidenceAppealCardParamsUnsetFieldSupportingFiles DisputeUpdateEvidenceAppealCardParamsUnsetField = "supporting_files"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *DisputeUpdateEvidenceAppealCardParams) AddUnsetField(field DisputeUpdateEvidenceAppealCardParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Evidence to submit when appealing a dispute.
+type DisputeUpdateEvidenceAppealParams struct {
+	// Evidence for a card dispute appeal.
+	Card        *DisputeUpdateEvidenceAppealCardParams        `form:"card" json:"card,omitempty"`
+	UnsetFields []DisputeUpdateEvidenceAppealParamsUnsetField `form:"-" json:"-"`
+}
+
+// DisputeUpdateEvidenceAppealParamsUnsetField is the list of fields that can be cleared/unset on DisputeUpdateEvidenceAppealParams.
+type DisputeUpdateEvidenceAppealParamsUnsetField string
+
+const (
+	DisputeUpdateEvidenceAppealParamsUnsetFieldCard DisputeUpdateEvidenceAppealParamsUnsetField = "card"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *DisputeUpdateEvidenceAppealParams) AddUnsetField(field DisputeUpdateEvidenceAppealParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
+}
+
+// Evidence provided for Mastercard compliance evidence submission.
+type DisputeUpdateEvidenceEnhancedEvidenceMastercardComplianceParams struct {
+	// A field acknowledging the fee incurred when countering a Mastercard compliance dispute. If this field is set to true, evidence can be submitted for the compliance dispute.
+	FeeAcknowledged *bool `form:"fee_acknowledged" json:"fee_acknowledged,omitempty"`
 }
 
 // Disputed transaction details for Visa Compelling Evidence 3.0 evidence submission.
@@ -475,6 +609,8 @@ type DisputeUpdateEvidenceEnhancedEvidenceVisaComplianceParams struct {
 
 // Additional evidence for qualifying evidence programs.
 type DisputeUpdateEvidenceEnhancedEvidenceParams struct {
+	// Evidence provided for Mastercard compliance evidence submission.
+	MastercardCompliance *DisputeUpdateEvidenceEnhancedEvidenceMastercardComplianceParams `form:"mastercard_compliance" json:"mastercard_compliance,omitempty"`
 	// Evidence provided for Visa Compelling Evidence 3.0 evidence submission.
 	VisaCompellingEvidence3 *DisputeUpdateEvidenceEnhancedEvidenceVisaCompellingEvidence3Params `form:"visa_compelling_evidence_3" json:"visa_compelling_evidence_3,omitempty"`
 	// Evidence provided for Visa compliance evidence submission.
@@ -485,6 +621,8 @@ type DisputeUpdateEvidenceEnhancedEvidenceParams struct {
 type DisputeUpdateEvidenceParams struct {
 	// Any server or activity logs showing proof that the customer accessed or downloaded the purchased digital product. This information should include IP addresses, corresponding timestamps, and any detailed recorded activity. Has a maximum character count of 20,000.
 	AccessActivityLog *string `form:"access_activity_log" json:"access_activity_log,omitempty"`
+	// Evidence to submit when appealing a dispute.
+	Appeal *DisputeUpdateEvidenceAppealParams `form:"appeal" json:"appeal,omitempty"`
 	// The billing address provided by the customer.
 	BillingAddress *string `form:"billing_address" json:"billing_address,omitempty"`
 	// (ID of a [file upload](https://stripe.com/docs/guides/file-upload)) Your subscription cancellation policy, as shown to the customer.
@@ -546,6 +684,7 @@ type DisputeUpdateEvidenceParams struct {
 type DisputeUpdateEvidenceParamsUnsetField string
 
 const (
+	DisputeUpdateEvidenceParamsUnsetFieldAppeal           DisputeUpdateEvidenceParamsUnsetField = "appeal"
 	DisputeUpdateEvidenceParamsUnsetFieldEnhancedEvidence DisputeUpdateEvidenceParamsUnsetField = "enhanced_evidence"
 )
 
@@ -563,6 +702,8 @@ type DisputeUpdateParams struct {
 	Evidence *DisputeUpdateEvidenceParams `form:"evidence" json:"evidence,omitempty"`
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
+	// Intended submission method for the dispute.
+	IntendedSubmissionMethod *string `form:"intended_submission_method" json:"intended_submission_method,omitempty"`
 	// Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to `metadata`.
 	Metadata map[string]string `form:"metadata" json:"metadata,omitempty"`
 	// Whether to immediately submit evidence to the bank. If `false`, evidence is staged on the dispute. Staged evidence is visible in the API and Dashboard, and can be submitted to the bank by making another request with this attribute set to `true` (the default).
@@ -594,6 +735,22 @@ func (p *DisputeUpdateParams) AddMetadata(key string, value string) {
 	}
 
 	p.Metadata[key] = value
+}
+
+type DisputeEvidenceAppealCard struct {
+	// The reason for filing the appeal.
+	ReasonForFiling string `json:"reason_for_filing,omitempty"`
+	// One or more document IDs returned by a [file upload](https://docs.stripe.com/api#create_file) with a `purpose` value of `dispute_evidence` to support the appeal.
+	SupportingFiles []string `json:"supporting_files,omitempty"`
+}
+
+// Appeal evidence submitted during the appeal stage.
+type DisputeEvidenceAppeal struct {
+	Card *DisputeEvidenceAppealCard `json:"card,omitempty"`
+}
+type DisputeEvidenceEnhancedEvidenceMastercardCompliance struct {
+	// A field acknowledging the fee incurred when countering a Mastercard compliance dispute. If this field is set to true, evidence can be submitted for the compliance dispute.
+	FeeAcknowledged bool `json:"fee_acknowledged"`
 }
 
 // Disputed transaction details for Visa Compelling Evidence 3.0 evidence submission.
@@ -646,12 +803,15 @@ type DisputeEvidenceEnhancedEvidenceVisaCompliance struct {
 	FeeAcknowledged bool `json:"fee_acknowledged"`
 }
 type DisputeEvidenceEnhancedEvidence struct {
+	MastercardCompliance    *DisputeEvidenceEnhancedEvidenceMastercardCompliance    `json:"mastercard_compliance,omitempty"`
 	VisaCompellingEvidence3 *DisputeEvidenceEnhancedEvidenceVisaCompellingEvidence3 `json:"visa_compelling_evidence_3,omitempty"`
 	VisaCompliance          *DisputeEvidenceEnhancedEvidenceVisaCompliance          `json:"visa_compliance,omitempty"`
 }
 type DisputeEvidence struct {
 	// Any server or activity logs showing proof that the customer accessed or downloaded the purchased digital product. This information should include IP addresses, corresponding timestamps, and any detailed recorded activity.
 	AccessActivityLog string `json:"access_activity_log"`
+	// Appeal evidence submitted during the appeal stage.
+	Appeal *DisputeEvidenceAppeal `json:"appeal,omitempty"`
 	// The billing address provided by the customer.
 	BillingAddress string `json:"billing_address"`
 	// (ID of a [file upload](https://stripe.com/docs/guides/file-upload)) Your subscription cancellation policy, as shown to the customer.
@@ -706,6 +866,10 @@ type DisputeEvidence struct {
 	// Any additional evidence or statements.
 	UncategorizedText string `json:"uncategorized_text"`
 }
+type DisputeEvidenceDetailsEnhancedEligibilityMastercardCompliance struct {
+	// Mastercard compliance eligibility status.
+	Status DisputeEvidenceDetailsEnhancedEligibilityMastercardComplianceStatus `json:"status"`
+}
 type DisputeEvidenceDetailsEnhancedEligibilityVisaCompellingEvidence3 struct {
 	// List of actions required to qualify dispute for Visa Compelling Evidence 3.0 evidence submission.
 	RequiredActions []DisputeEvidenceDetailsEnhancedEligibilityVisaCompellingEvidence3RequiredAction `json:"required_actions"`
@@ -717,6 +881,7 @@ type DisputeEvidenceDetailsEnhancedEligibilityVisaCompliance struct {
 	Status DisputeEvidenceDetailsEnhancedEligibilityVisaComplianceStatus `json:"status"`
 }
 type DisputeEvidenceDetailsEnhancedEligibility struct {
+	MastercardCompliance    *DisputeEvidenceDetailsEnhancedEligibilityMastercardCompliance    `json:"mastercard_compliance,omitempty"`
 	VisaCompellingEvidence3 *DisputeEvidenceDetailsEnhancedEligibilityVisaCompellingEvidence3 `json:"visa_compelling_evidence_3,omitempty"`
 	VisaCompliance          *DisputeEvidenceDetailsEnhancedEligibilityVisaCompliance          `json:"visa_compliance,omitempty"`
 }
@@ -730,6 +895,8 @@ type DisputeEvidenceDetails struct {
 	PastDue bool `json:"past_due"`
 	// The number of times evidence has been submitted. Typically, you may only submit evidence once.
 	SubmissionCount int64 `json:"submission_count"`
+	// Whether the dispute was submitted manually, with Smart Disputes, or not submitted.
+	SubmissionMethod DisputeEvidenceDetailsSubmissionMethod `json:"submission_method"`
 }
 type DisputePaymentMethodDetailsAmazonPay struct {
 	// The AmazonPay dispute type, chargeback or claim
@@ -740,6 +907,8 @@ type DisputePaymentMethodDetailsCard struct {
 	Brand string `json:"brand"`
 	// The type of dispute opened. Different case types may have varying fees and financial impact.
 	CaseType DisputePaymentMethodDetailsCardCaseType `json:"case_type"`
+	// Identifies which network this charge was processed on. Can be `amex`, `cartes_bancaires`, `diners`, `discover`, `eftpos_au`, `interac`, `jcb`, `link`, `mastercard`, `unionpay`, `visa`, or `unknown`.
+	Network string `json:"network"`
 	// The card network's specific dispute reason code, which maps to one of Stripe's primary dispute categories to simplify response guidance. The [Network code map](https://stripe.com/docs/disputes/categories#network-code-map) lists all available dispute reason codes by network.
 	NetworkReasonCode string `json:"network_reason_code"`
 }
@@ -787,6 +956,8 @@ type Dispute struct {
 	EvidenceDetails          *DisputeEvidenceDetails          `json:"evidence_details"`
 	// Unique identifier for the object.
 	ID string `json:"id"`
+	// Intended submission method for the dispute.
+	IntendedSubmissionMethod DisputeIntendedSubmissionMethod `json:"intended_submission_method"`
 	// If true, it's still possible to refund the disputed payment. After the payment has been fully refunded, no further funds are withdrawn from your Stripe account as a result of this dispute.
 	IsChargeRefundable bool `json:"is_charge_refundable"`
 	// If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`.
@@ -802,7 +973,7 @@ type Dispute struct {
 	PaymentMethodDetails *DisputePaymentMethodDetails `json:"payment_method_details,omitempty"`
 	// Reason given by cardholder for dispute. Possible values are `bank_cannot_process`, `check_returned`, `credit_not_processed`, `customer_initiated`, `debit_not_authorized`, `duplicate`, `fraudulent`, `general`, `incorrect_account_details`, `insufficient_funds`, `noncompliant`, `product_not_received`, `product_unacceptable`, `subscription_canceled`, or `unrecognized`. Learn more about [dispute reasons](https://docs.stripe.com/disputes/categories).
 	Reason DisputeReason `json:"reason"`
-	// The current status of a dispute. Possible values include:`warning_needs_response`, `warning_under_review`, `warning_closed`, `needs_response`, `under_review`, `won`, `lost`, or `prevented`.
+	// The current status of a dispute. Possible values include:`warning_needs_response`, `warning_under_review`, `warning_closed`, `needs_response`, `under_review`, `appeal_needs_response`, `appeal_under_review`, `won`, `lost`, or `prevented`.
 	Status DisputeStatus `json:"status"`
 }
 

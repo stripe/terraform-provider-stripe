@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &PaymentMethodResource{}
@@ -47,6 +47,8 @@ type PaymentMethodResourceModel struct {
 	AUBECSDebit    types.Object `tfsdk:"au_becs_debit"`
 	BACSDebit      types.Object `tfsdk:"bacs_debit"`
 	BillingDetails types.Object `tfsdk:"billing_details"`
+	Bizum          types.Object `tfsdk:"bizum"`
+	BLIK           types.Object `tfsdk:"blik"`
 	Boleto         types.Object `tfsdk:"boleto"`
 	Card           types.Object `tfsdk:"card"`
 	CardPresent    types.Object `tfsdk:"card_present"`
@@ -68,6 +70,7 @@ type PaymentMethodResourceModel struct {
 	P24            types.Object `tfsdk:"p24"`
 	Paypal         types.Object `tfsdk:"paypal"`
 	Payto          types.Object `tfsdk:"payto"`
+	Pix            types.Object `tfsdk:"pix"`
 	RadarOptions   types.Object `tfsdk:"radar_options"`
 	SEPADebit      types.Object `tfsdk:"sepa_debit"`
 	Sofort         types.Object `tfsdk:"sofort"`
@@ -279,6 +282,32 @@ func (r *PaymentMethodResource) Schema(_ context.Context, _ resource.SchemaReque
 						Optional:      true,
 						Computed:      true,
 						Description:   "Taxpayer identification number. Used only for transactions between LATAM buyers and non-LATAM sellers.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
+				},
+			},
+			"bizum": schema.SingleNestedAttribute{
+				Optional: true,
+				Computed: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"buyer_id": schema.StringAttribute{
+						Computed:      true,
+						Description:   "A unique identifier for the buyer as determined by the local payment processor.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
+				},
+			},
+			"blik": schema.SingleNestedAttribute{
+				Optional: true,
+				Computed: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"buyer_id": schema.StringAttribute{
+						Computed:      true,
+						Description:   "A unique and immutable identifier assigned by BLIK to every buyer.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 				},
@@ -1065,9 +1094,9 @@ func (r *PaymentMethodResource) Schema(_ context.Context, _ resource.SchemaReque
 					},
 					"bank": schema.StringAttribute{
 						Required:      true,
-						Description:   "The customer's bank, if provided. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bank_rakyat`, `bsn`, `cimb`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `pb_enterprise`, or `bank_of_china`.",
+						Description:   "The customer's bank, if provided. Can be one of `affin_bank`, `agrobank`, `alliance_bank`, `ambank`, `bank_islam`, `bank_muamalat`, `bnp_paribas`, `bank_rakyat`, `bsn`, `cimb`, `citibank`, `hong_leong_bank`, `hsbc`, `kfh`, `maybank2u`, `ocbc`, `public_bank`, `rhb`, `standard_chartered`, `uob`, `deutsche_bank`, `maybank2e`, `mbsb_bank`, `pb_enterprise`, or `bank_of_china`.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-						Validators:    []validator.String{stringvalidator.OneOf("affin_bank", "agrobank", "alliance_bank", "ambank", "bank_islam", "bank_muamalat", "bank_of_china", "bank_rakyat", "bsn", "cimb", "deutsche_bank", "hong_leong_bank", "hsbc", "kfh", "maybank2e", "maybank2u", "ocbc", "pb_enterprise", "public_bank", "rhb", "standard_chartered", "uob")},
+						Validators:    []validator.String{stringvalidator.OneOf("affin_bank", "agrobank", "alliance_bank", "ambank", "bank_islam", "bank_muamalat", "bank_of_china", "bank_rakyat", "bnp_paribas", "bsn", "cimb", "citibank", "deutsche_bank", "hong_leong_bank", "hsbc", "kfh", "maybank2e", "maybank2u", "mbsb_bank", "ocbc", "pb_enterprise", "public_bank", "rhb", "standard_chartered", "uob")},
 					},
 				},
 			},
@@ -1381,13 +1410,13 @@ func (r *PaymentMethodResource) Schema(_ context.Context, _ resource.SchemaReque
 				Optional: true,
 				Computed: true,
 
-				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
 				Attributes: map[string]schema.Attribute{
 					"bsb_number": schema.StringAttribute{
 						Optional:      true,
 						Computed:      true,
 						Description:   "Bank-State-Branch number of the bank account.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 					},
 					"last4": schema.StringAttribute{
 						Computed:      true,
@@ -1398,11 +1427,25 @@ func (r *PaymentMethodResource) Schema(_ context.Context, _ resource.SchemaReque
 						Optional:      true,
 						Computed:      true,
 						Description:   "The PayID alias for the bank account.",
-						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
 					},
 					"account_number": schema.StringAttribute{
-						Optional:    true,
-						Description: "The account number for the bank account.",
+						Optional:      true,
+						Description:   "The account number for the bank account.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+					},
+				},
+			},
+			"pix": schema.SingleNestedAttribute{
+				Optional: true,
+				Computed: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown(), objectplanmodifier.RequiresReplace()},
+				Attributes: map[string]schema.Attribute{
+					"fingerprint": schema.StringAttribute{
+						Computed:      true,
+						Description:   "Uniquely identifies this particular Pix account. You can use this attribute to check whether two Pix accounts are the same.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 					},
 				},
 			},
@@ -1493,7 +1536,7 @@ func (r *PaymentMethodResource) Schema(_ context.Context, _ resource.SchemaReque
 				Computed:      true,
 				Description:   "The type of the PaymentMethod. An additional hash is included on the PaymentMethod with a name matching this value. It contains additional information specific to the PaymentMethod type.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
-				Validators:    []validator.String{stringvalidator.OneOf("acss_debit", "affirm", "afterpay_clearpay", "alipay", "alma", "amazon_pay", "au_becs_debit", "bacs_debit", "bancontact", "billie", "bizum", "blik", "boleto", "card", "card_present", "cashapp", "crypto", "custom", "customer_balance", "eps", "fpx", "giropay", "grabpay", "ideal", "interac_present", "kakao_pay", "klarna", "konbini", "kr_card", "link", "mb_way", "mobilepay", "multibanco", "naver_pay", "nz_bank_account", "oxxo", "p24", "pay_by_bank", "payco", "paynow", "paypal", "payto", "pix", "promptpay", "revolut_pay", "samsung_pay", "satispay", "scalapay", "sepa_debit", "sofort", "sunbit", "swish", "twint", "upi", "us_bank_account", "wechat_pay", "zip")},
+				Validators:    []validator.String{stringvalidator.OneOf("acss_debit", "affirm", "afterpay_clearpay", "alipay", "alma", "amazon_pay", "au_becs_debit", "bacs_debit", "bancontact", "billie", "bizum", "blik", "boleto", "card", "card_present", "cashapp", "crypto", "custom", "customer_balance", "eps", "fpx", "giropay", "grabpay", "ideal", "interac_present", "kakao_pay", "klarna", "konbini", "kr_card", "link", "mb_way", "mobilepay", "multibanco", "naver_pay", "nz_bank_account", "oxxo", "p24", "pay_by_bank", "payco", "paynow", "paypal", "paypay", "payto", "pix", "promptpay", "revolut_pay", "samsung_pay", "satispay", "scalapay", "sepa_debit", "sequra", "sofort", "sunbit", "swish", "twint", "upi", "us_bank_account", "wechat_pay", "zip")},
 			},
 			"upi": schema.SingleNestedAttribute{
 				Optional: true,
@@ -1952,13 +1995,6 @@ func expandPaymentMethodUpdate(plan PaymentMethodResourceModel, state PaymentMet
 			}
 		}
 	}
-	if !plan.Payto.Equal(state.Payto) && !plan.Payto.IsNull() && !plan.Payto.IsUnknown() {
-		if !assignAttrValueToNamedField(params, "Payto", plan.Payto) {
-			if !plan.Payto.Equal(state.Payto) {
-				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "payto", params)
-			}
-		}
-	}
 	if !plan.USBankAccount.Equal(state.USBankAccount) && !plan.USBankAccount.IsNull() && !plan.USBankAccount.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "USBankAccount", plan.USBankAccount) {
 			if !plan.USBankAccount.Equal(state.USBankAccount) {
@@ -2190,6 +2226,96 @@ func flattenPaymentMethod(obj *stripe.PaymentMethod, state *PaymentMethodResourc
 			if nullBillingDetails, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "email": types.StringType, "name": types.StringType, "phone": types.StringType, "tax_id": types.StringType}}); ok {
 				if typedBillingDetails, ok := nullBillingDetails.(types.Object); ok {
 					state.BillingDetails = typedBillingDetails
+				}
+			}
+		}
+	}
+	{
+		assignedBizum := false
+		hadRawBizum := false
+		if rawValueBizum, rawOk := plainValueAtPath(raw, "bizum"); rawOk {
+			hadRawBizum = true
+			if rawValueBizum != nil {
+				sourceBizum := applyConfiguredKeyedListShapes(rawValueBizum, attrValueToPlain(state.Bizum))
+				if valueBizum, err := flattenPlainValue(sourceBizum, types.ObjectType{AttrTypes: map[string]attr.Type{"buyer_id": types.StringType}}, "bizum", "raw response"); err != nil {
+					return err
+				} else {
+					if typedBizum, ok := valueBizum.(types.Object); ok {
+						state.Bizum = typedBizum
+						assignedBizum = true
+					}
+				}
+			}
+		}
+		if !assignedBizum {
+			if !hasRaw {
+				if responseValueBizum, ok := plainFromResponseField(obj, "Bizum"); ok {
+					sourceBizum := applyConfiguredKeyedListShapes(responseValueBizum, attrValueToPlain(state.Bizum))
+					if valueBizum, err := flattenPlainValue(
+						sourceBizum,
+						types.ObjectType{AttrTypes: map[string]attr.Type{"buyer_id": types.StringType}},
+						"bizum",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedBizum, ok := valueBizum.(types.Object); ok {
+							state.Bizum = typedBizum
+							assignedBizum = true
+						}
+					}
+				}
+			}
+		}
+		if !assignedBizum && hadRawBizum {
+			if nullBizum, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"buyer_id": types.StringType}}); ok {
+				if typedBizum, ok := nullBizum.(types.Object); ok {
+					state.Bizum = typedBizum
+				}
+			}
+		}
+	}
+	{
+		assignedBLIK := false
+		hadRawBLIK := false
+		if rawValueBLIK, rawOk := plainValueAtPath(raw, "blik"); rawOk {
+			hadRawBLIK = true
+			if rawValueBLIK != nil {
+				sourceBLIK := applyConfiguredKeyedListShapes(rawValueBLIK, attrValueToPlain(state.BLIK))
+				if valueBLIK, err := flattenPlainValue(sourceBLIK, types.ObjectType{AttrTypes: map[string]attr.Type{"buyer_id": types.StringType}}, "blik", "raw response"); err != nil {
+					return err
+				} else {
+					if typedBLIK, ok := valueBLIK.(types.Object); ok {
+						state.BLIK = typedBLIK
+						assignedBLIK = true
+					}
+				}
+			}
+		}
+		if !assignedBLIK {
+			if !hasRaw {
+				if responseValueBLIK, ok := plainFromResponseField(obj, "BLIK"); ok {
+					sourceBLIK := applyConfiguredKeyedListShapes(responseValueBLIK, attrValueToPlain(state.BLIK))
+					if valueBLIK, err := flattenPlainValue(
+						sourceBLIK,
+						types.ObjectType{AttrTypes: map[string]attr.Type{"buyer_id": types.StringType}},
+						"blik",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedBLIK, ok := valueBLIK.(types.Object); ok {
+							state.BLIK = typedBLIK
+							assignedBLIK = true
+						}
+					}
+				}
+			}
+		}
+		if !assignedBLIK && hadRawBLIK {
+			if nullBLIK, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"buyer_id": types.StringType}}); ok {
+				if typedBLIK, ok := nullBLIK.(types.Object); ok {
+					state.BLIK = typedBLIK
 				}
 			}
 		}
@@ -3014,6 +3140,51 @@ func flattenPaymentMethod(obj *stripe.PaymentMethod, state *PaymentMethodResourc
 			if nullPayto, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"bsb_number": types.StringType, "last4": types.StringType, "pay_id": types.StringType, "account_number": types.StringType}}); ok {
 				if typedPayto, ok := nullPayto.(types.Object); ok {
 					state.Payto = typedPayto
+				}
+			}
+		}
+	}
+	{
+		assignedPix := false
+		hadRawPix := false
+		if rawValuePix, rawOk := plainValueAtPath(raw, "pix"); rawOk {
+			hadRawPix = true
+			if rawValuePix != nil {
+				sourcePix := applyConfiguredKeyedListShapes(rawValuePix, attrValueToPlain(state.Pix))
+				if valuePix, err := flattenPlainValue(sourcePix, types.ObjectType{AttrTypes: map[string]attr.Type{"fingerprint": types.StringType}}, "pix", "raw response"); err != nil {
+					return err
+				} else {
+					if typedPix, ok := valuePix.(types.Object); ok {
+						state.Pix = typedPix
+						assignedPix = true
+					}
+				}
+			}
+		}
+		if !assignedPix {
+			if !hasRaw {
+				if responseValuePix, ok := plainFromResponseField(obj, "Pix"); ok {
+					sourcePix := applyConfiguredKeyedListShapes(responseValuePix, attrValueToPlain(state.Pix))
+					if valuePix, err := flattenPlainValue(
+						sourcePix,
+						types.ObjectType{AttrTypes: map[string]attr.Type{"fingerprint": types.StringType}},
+						"pix",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedPix, ok := valuePix.(types.Object); ok {
+							state.Pix = typedPix
+							assignedPix = true
+						}
+					}
+				}
+			}
+		}
+		if !assignedPix && hadRawPix {
+			if nullPix, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"fingerprint": types.StringType}}); ok {
+				if typedPix, ok := nullPix.(types.Object); ok {
+					state.Pix = typedPix
 				}
 			}
 		}

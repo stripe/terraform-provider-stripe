@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 
 	"github.com/stripe/terraform-provider-stripe/internal/acctest/runner"
 )
@@ -52,6 +52,7 @@ type taxIDExpectations struct {
 }
 
 type billingPortalConfigurationExpectations struct {
+	ExpectedSubscriptionPriceAddress            string
 	Address                                     string
 	ExpectedActive                              bool
 	ExpectedName                                string
@@ -455,6 +456,27 @@ func verifyBillingPortalConfiguration(
 		if err != nil {
 			return err
 		}
+		if expect.ExpectedSubscriptionPriceAddress != "" {
+			if configuration.Features == nil || configuration.Features.SubscriptionUpdate == nil || len(configuration.Features.SubscriptionUpdate.Products) != 1 {
+				return fmt.Errorf("expected one subscription-update product for %s", expect.Address)
+			}
+			product := configuration.Features.SubscriptionUpdate.Products[0]
+			if err := expectRemoteStateString(state, "stripe_product.product", "id", product.Product); err != nil {
+				return err
+			}
+			if len(product.Prices) != 1 {
+				return fmt.Errorf("expected one subscription-update price for %s", expect.Address)
+			}
+			if err := expectRemoteStateString(state, expect.ExpectedSubscriptionPriceAddress, "id", product.Prices[0]); err != nil {
+				return err
+			}
+			if err := expectRemoteStateString(state, expect.Address, "features.subscription_update.products.0.product", product.Product); err != nil {
+				return err
+			}
+			if err := expectRemoteStateString(state, expect.Address, "features.subscription_update.products.0.prices.0", product.Prices[0]); err != nil {
+				return err
+			}
+		}
 		if configuration.Active != expect.ExpectedActive {
 			return fmt.Errorf(
 				"remote %s.active mismatch: expected %t, got %t",
@@ -704,6 +726,9 @@ func verifyPaymentMethodConfiguration(
 			if configuration.ApplePay == nil || configuration.ApplePay.DisplayPreference == nil {
 				return fmt.Errorf("remote %s.apple_pay.display_preference missing", expect.Address)
 			}
+			if err := verifyPaymentMethodComputedState(state, expect.Address, "apple_pay", configuration.ApplePay.Available, string(configuration.ApplePay.DisplayPreference.Value)); err != nil {
+				return err
+			}
 			if string(configuration.ApplePay.DisplayPreference.Preference) != expect.ExpectedApplePayPreference {
 				return fmt.Errorf(
 					"remote %s.apple_pay.display_preference.preference mismatch: expected %q, got %q",
@@ -725,6 +750,9 @@ func verifyPaymentMethodConfiguration(
 			if configuration.Link == nil || configuration.Link.DisplayPreference == nil {
 				return fmt.Errorf("remote %s.link.display_preference missing", expect.Address)
 			}
+			if err := verifyPaymentMethodComputedState(state, expect.Address, "link", configuration.Link.Available, string(configuration.Link.DisplayPreference.Value)); err != nil {
+				return err
+			}
 			if string(configuration.Link.DisplayPreference.Preference) != expect.ExpectedLinkPreference {
 				return fmt.Errorf(
 					"remote %s.link.display_preference.preference mismatch: expected %q, got %q",
@@ -745,6 +773,22 @@ func verifyPaymentMethodConfiguration(
 
 		return nil
 	}
+}
+
+func verifyPaymentMethodComputedState(state *terraform.State, address, method string, available bool, value string) error {
+	for field, expected := range map[string]string{
+		"available":                strconv.FormatBool(available),
+		"display_preference.value": value,
+	} {
+		actual, err := runner.ResourceAttribute(state, address, method+"."+field)
+		if err != nil {
+			return err
+		}
+		if actual != expected {
+			return fmt.Errorf("%s.%s.%s state mismatch: expected %q from API, got %q", address, method, field, expected, actual)
+		}
+	}
+	return nil
 }
 
 func verifyPaymentMethodConfigurationDestroyInactive(
@@ -1110,7 +1154,7 @@ func retrieveBillingPortalConfiguration(
 	configuration, err := client.V1BillingPortalConfigurations.Retrieve(
 		context.Background(),
 		id,
-		nil,
+		&stripe.BillingPortalConfigurationRetrieveParams{Expand: []*string{stripe.String("features.subscription_update.products")}},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("retrieve %s (%s): %w", address, id, err)
