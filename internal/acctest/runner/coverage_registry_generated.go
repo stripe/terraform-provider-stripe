@@ -505,7 +505,7 @@ var CoverageRegistry = []CoverageEntry{
 		Kind:                         "resource",
 		Group:                        "base",
 		Status:                       "limited",
-		CaseNames:                    []string{"product_basic", "product_custom_id", "product_active_toggle", "product_images_url", "product_marketing_features", "product_shippable", "product_statement_descriptor", "product_default_price_data", "product_default_price_data_legacy_upgrade", "product_default_price_data_decimal_amounts", "product_module_legacy_upgrade"},
+		CaseNames:                    []string{"product_basic", "product_tax_code_mirrors", "product_tax_code_top_level_mirrors", "product_custom_id", "product_active_toggle", "product_images_url", "product_marketing_features", "product_shippable", "product_statement_descriptor", "product_default_price_data", "product_default_price_data_legacy_upgrade", "product_default_price_data_decimal_amounts", "product_module_legacy_upgrade"},
 		LegacyUpgradeCaseNames:       []string{"product_default_price_data_legacy_upgrade"},
 		RequiresLegacyModuleUpgrade:  true,
 		LegacyModuleUpgradeCaseNames: []string{"product_module_legacy_upgrade"},
