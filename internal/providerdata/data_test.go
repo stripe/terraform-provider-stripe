@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 	bindingruntime "github.com/stripe/terraform-provider-stripe/internal/terraformruntime"
 )
 

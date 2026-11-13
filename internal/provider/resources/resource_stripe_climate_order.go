@@ -24,7 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &ClimateOrderResource{}
@@ -227,7 +227,7 @@ func (r *ClimateOrderResource) Schema(_ context.Context, _ resource.SchemaReques
 			},
 			"expected_delivery_year": schema.Int64Attribute{
 				Computed:      true,
-				Description:   "The year this order is expected to be delivered.",
+				Description:   "The year this order is expected to be delivered. If the year is in the past, the order is a spot purchase and will be delivered within 30 days of purchase.",
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 			},
 			"id": schema.StringAttribute{
@@ -446,7 +446,9 @@ func expandClimateOrderCreate(plan ClimateOrderResourceModel) (*stripe.ClimateOr
 		}
 	}
 	if !plan.MetricTons.IsNull() && !plan.MetricTons.IsUnknown() {
-		params.MetricTons = stripe.Float64(plan.MetricTons.ValueFloat64())
+		if !assignAttrValueToNamedField(params, "MetricTons", plan.MetricTons) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "metric_tons", params)
+		}
 	}
 	if !plan.Product.IsNull() && !plan.Product.IsUnknown() {
 		if !assignStringToNamedFieldOrMethod(params, "ProductID", "Product", plan.Product.ValueString()) {

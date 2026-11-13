@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	assert "github.com/stretchr/testify/require"
-	stripe "github.com/stripe/stripe-go/v86"
-	_ "github.com/stripe/stripe-go/v86/testing"
+	stripe "github.com/stripe/stripe-go/v87"
+	_ "github.com/stripe/stripe-go/v87/testing"
 )
 
 func TestPaymentIntentCancel(t *testing.T) {
@@ -53,7 +53,7 @@ func TestPaymentIntentNew(t *testing.T) {
 	intent, err := New(&stripe.PaymentIntentParams{
 		Amount:   stripe.Int64(123),
 		Currency: stripe.String(string(stripe.CurrencyUSD)),
-		PaymentMethodTypes: stripe.StringSlice([]string{
+		AllowedPaymentMethodTypes: stripe.StringSlice([]string{
 			"card",
 		}),
 	})

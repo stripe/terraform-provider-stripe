@@ -8,7 +8,8 @@ package stripe
 
 import (
 	"encoding/json"
-	"github.com/stripe/stripe-go/v86/form"
+	"github.com/shopspring/decimal"
+	"github.com/stripe/stripe-go/v87/form"
 )
 
 // Describes how to compute the price per period. Either `per_unit` or `tiered`. `per_unit` indicates that the fixed amount (specified in `unit_amount` or `unit_amount_decimal`) will be charged per unit in `quantity` (for prices with `usage_type=licensed`), or per unit of total usage (for prices with `usage_type=metered`). `tiered` indicates that the unit pricing will be computed using a tiering strategy as defined using the `tiers` and `tiers_mode` attributes.
@@ -142,11 +143,11 @@ type PriceCurrencyOptionsTierParams struct {
 	// The flat billing amount for an entire tier, regardless of the number of units in the tier.
 	FlatAmount *int64 `form:"flat_amount" json:"flat_amount,omitempty"`
 	// Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.
-	FlatAmountDecimal *float64 `form:"flat_amount_decimal,high_precision" json:"flat_amount_decimal,string,omitempty"`
+	FlatAmountDecimal *decimal.Decimal `form:"flat_amount_decimal" json:"flat_amount_decimal,omitempty"`
 	// The per unit billing amount for each individual unit for which this tier applies.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 	// Specifies the upper bound of this tier. The lower bound of a tier is the upper bound of the previous tier adding one. Use `inf` to define a fallback tier.
 	UpTo    *int64 `form:"up_to" json:"up_to"`
 	UpToInf *bool  `form:"-"` // See custom AppendTo
@@ -170,7 +171,7 @@ type PriceCurrencyOptionsParams struct {
 	// A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 }
 
 // When set, provides configuration for the amount to be adjusted by the customer during Checkout Sessions and Payment Links.
@@ -183,6 +184,27 @@ type PriceCustomUnitAmountParams struct {
 	Minimum *int64 `form:"minimum" json:"minimum,omitempty"`
 	// The starting unit amount which can be updated by the customer.
 	Preset *int64 `form:"preset" json:"preset,omitempty"`
+}
+
+// Tax details for this product, including the [tax code](https://docs.stripe.com/tax/tax-codes) and an optional performance location.
+type PriceProductDataTaxDetailsParams struct {
+	// A tax location ID. Depending on the [tax code](https://docs.stripe.com/tax/tax-for-tickets/reference/tax-location-performance), this is required, optional, or not supported.
+	PerformanceLocation *string `form:"performance_location" json:"performance_location,omitempty"`
+	// A [tax code](https://docs.stripe.com/tax/tax-categories) ID.
+	TaxCode     *string                                      `form:"tax_code" json:"tax_code,omitempty"`
+	UnsetFields []PriceProductDataTaxDetailsParamsUnsetField `form:"-" json:"-"`
+}
+
+// PriceProductDataTaxDetailsParamsUnsetField is the list of fields that can be cleared/unset on PriceProductDataTaxDetailsParams.
+type PriceProductDataTaxDetailsParamsUnsetField string
+
+const (
+	PriceProductDataTaxDetailsParamsUnsetFieldTaxCode PriceProductDataTaxDetailsParamsUnsetField = "tax_code"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PriceProductDataTaxDetailsParams) AddUnsetField(field PriceProductDataTaxDetailsParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
 }
 
 // These fields can be used to create a new product that this price will belong to.
@@ -201,6 +223,8 @@ type PriceProductDataParams struct {
 	StatementDescriptor *string `form:"statement_descriptor" json:"statement_descriptor,omitempty"`
 	// A [tax code](https://docs.stripe.com/tax/tax-categories) ID.
 	TaxCode *string `form:"tax_code" json:"tax_code,omitempty"`
+	// Tax details for this product, including the [tax code](https://docs.stripe.com/tax/tax-codes) and an optional performance location.
+	TaxDetails *PriceProductDataTaxDetailsParams `form:"tax_details" json:"tax_details,omitempty"`
 	// A label that represents units of this product. When set, this will be included in customers' receipts, invoices, Checkout, and the customer portal.
 	UnitLabel *string `form:"unit_label" json:"unit_label,omitempty"`
 }
@@ -233,11 +257,11 @@ type PriceTierParams struct {
 	// The flat billing amount for an entire tier, regardless of the number of units in the tier.
 	FlatAmount *int64 `form:"flat_amount" json:"flat_amount,omitempty"`
 	// Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.
-	FlatAmountDecimal *float64 `form:"flat_amount_decimal,high_precision" json:"flat_amount_decimal,string,omitempty"`
+	FlatAmountDecimal *decimal.Decimal `form:"flat_amount_decimal" json:"flat_amount_decimal,omitempty"`
 	// The per unit billing amount for each individual unit for which this tier applies.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 	// Specifies the upper bound of this tier. The lower bound of a tier is the upper bound of the previous tier adding one. Use `inf` to define a fallback tier.
 	UpTo    *int64 `form:"up_to" json:"up_to"`
 	UpToInf *bool  `form:"-"` // See custom AppendTo
@@ -298,7 +322,7 @@ type PriceParams struct {
 	// A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge. One of `unit_amount`, `unit_amount_decimal`, or `custom_unit_amount` is required, unless `billing_scheme=tiered`.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64                `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal        `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 	UnsetFields       []PriceParamsUnsetField `form:"-" json:"-"`
 }
 
@@ -363,11 +387,11 @@ type PriceCreateCurrencyOptionsTierParams struct {
 	// The flat billing amount for an entire tier, regardless of the number of units in the tier.
 	FlatAmount *int64 `form:"flat_amount" json:"flat_amount,omitempty"`
 	// Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.
-	FlatAmountDecimal *float64 `form:"flat_amount_decimal,high_precision" json:"flat_amount_decimal,string,omitempty"`
+	FlatAmountDecimal *decimal.Decimal `form:"flat_amount_decimal" json:"flat_amount_decimal,omitempty"`
 	// The per unit billing amount for each individual unit for which this tier applies.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 	// Specifies the upper bound of this tier. The lower bound of a tier is the upper bound of the previous tier adding one. Use `inf` to define a fallback tier.
 	UpTo    *int64 `form:"up_to" json:"up_to"`
 	UpToInf *bool  `form:"-"` // See custom AppendTo
@@ -391,7 +415,7 @@ type PriceCreateCurrencyOptionsParams struct {
 	// A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 }
 
 // When set, provides configuration for the amount to be adjusted by the customer during Checkout Sessions and Payment Links.
@@ -404,6 +428,27 @@ type PriceCreateCustomUnitAmountParams struct {
 	Minimum *int64 `form:"minimum" json:"minimum,omitempty"`
 	// The starting unit amount which can be updated by the customer.
 	Preset *int64 `form:"preset" json:"preset,omitempty"`
+}
+
+// Tax details for this product, including the [tax code](https://docs.stripe.com/tax/tax-codes) and an optional performance location.
+type PriceCreateProductDataTaxDetailsParams struct {
+	// A tax location ID. Depending on the [tax code](https://docs.stripe.com/tax/tax-for-tickets/reference/tax-location-performance), this is required, optional, or not supported.
+	PerformanceLocation *string `form:"performance_location" json:"performance_location,omitempty"`
+	// A [tax code](https://docs.stripe.com/tax/tax-categories) ID.
+	TaxCode     *string                                            `form:"tax_code" json:"tax_code,omitempty"`
+	UnsetFields []PriceCreateProductDataTaxDetailsParamsUnsetField `form:"-" json:"-"`
+}
+
+// PriceCreateProductDataTaxDetailsParamsUnsetField is the list of fields that can be cleared/unset on PriceCreateProductDataTaxDetailsParams.
+type PriceCreateProductDataTaxDetailsParamsUnsetField string
+
+const (
+	PriceCreateProductDataTaxDetailsParamsUnsetFieldTaxCode PriceCreateProductDataTaxDetailsParamsUnsetField = "tax_code"
+)
+
+// AddUnsetField adds a field to the list of fields to clear/unset on this params object.
+func (p *PriceCreateProductDataTaxDetailsParams) AddUnsetField(field PriceCreateProductDataTaxDetailsParamsUnsetField) {
+	p.UnsetFields = append(p.UnsetFields, field)
 }
 
 // These fields can be used to create a new product that this price will belong to.
@@ -422,6 +467,8 @@ type PriceCreateProductDataParams struct {
 	StatementDescriptor *string `form:"statement_descriptor" json:"statement_descriptor,omitempty"`
 	// A [tax code](https://docs.stripe.com/tax/tax-categories) ID.
 	TaxCode *string `form:"tax_code" json:"tax_code,omitempty"`
+	// Tax details for this product, including the [tax code](https://docs.stripe.com/tax/tax-codes) and an optional performance location.
+	TaxDetails *PriceCreateProductDataTaxDetailsParams `form:"tax_details" json:"tax_details,omitempty"`
 	// A label that represents units of this product. When set, this will be included in customers' receipts, invoices, Checkout, and the customer portal.
 	UnitLabel *string `form:"unit_label" json:"unit_label,omitempty"`
 }
@@ -454,11 +501,11 @@ type PriceCreateTierParams struct {
 	// The flat billing amount for an entire tier, regardless of the number of units in the tier.
 	FlatAmount *int64 `form:"flat_amount" json:"flat_amount,omitempty"`
 	// Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.
-	FlatAmountDecimal *float64 `form:"flat_amount_decimal,high_precision" json:"flat_amount_decimal,string,omitempty"`
+	FlatAmountDecimal *decimal.Decimal `form:"flat_amount_decimal" json:"flat_amount_decimal,omitempty"`
 	// The per unit billing amount for each individual unit for which this tier applies.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 	// Specifies the upper bound of this tier. The lower bound of a tier is the upper bound of the previous tier adding one. Use `inf` to define a fallback tier.
 	UpTo    *int64 `form:"up_to" json:"up_to"`
 	UpToInf *bool  `form:"-"` // See custom AppendTo
@@ -519,7 +566,7 @@ type PriceCreateParams struct {
 	// A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge. One of `unit_amount`, `unit_amount_decimal`, or `custom_unit_amount` is required, unless `billing_scheme=tiered`.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 }
 
 // AddExpand appends a new field to expand.
@@ -565,11 +612,11 @@ type PriceUpdateCurrencyOptionsTierParams struct {
 	// The flat billing amount for an entire tier, regardless of the number of units in the tier.
 	FlatAmount *int64 `form:"flat_amount" json:"flat_amount,omitempty"`
 	// Same as `flat_amount`, but accepts a decimal value representing an integer in the minor units of the currency. Only one of `flat_amount` and `flat_amount_decimal` can be set.
-	FlatAmountDecimal *float64 `form:"flat_amount_decimal,high_precision" json:"flat_amount_decimal,string,omitempty"`
+	FlatAmountDecimal *decimal.Decimal `form:"flat_amount_decimal" json:"flat_amount_decimal,omitempty"`
 	// The per unit billing amount for each individual unit for which this tier applies.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 	// Specifies the upper bound of this tier. The lower bound of a tier is the upper bound of the previous tier adding one. Use `inf` to define a fallback tier.
 	UpTo    *int64 `form:"up_to" json:"up_to"`
 	UpToInf *bool  `form:"-"` // See custom AppendTo
@@ -593,7 +640,7 @@ type PriceUpdateCurrencyOptionsParams struct {
 	// A positive integer in cents (or local equivalent) (or 0 for a free price) representing how much to charge.
 	UnitAmount *int64 `form:"unit_amount" json:"unit_amount,omitempty"`
 	// Same as `unit_amount`, but accepts a decimal value in cents (or local equivalent) with at most 12 decimal places. Only one of `unit_amount` and `unit_amount_decimal` can be set.
-	UnitAmountDecimal *float64 `form:"unit_amount_decimal,high_precision" json:"unit_amount_decimal,string,omitempty"`
+	UnitAmountDecimal *decimal.Decimal `form:"unit_amount_decimal" json:"unit_amount_decimal,omitempty"`
 }
 
 // Updates the specified price by setting the values of the parameters passed. Any parameters not provided are left unchanged.
@@ -660,11 +707,11 @@ type PriceCurrencyOptionsTier struct {
 	// Price for the entire tier.
 	FlatAmount int64 `json:"flat_amount"`
 	// Same as `flat_amount`, but contains a decimal value with at most 12 decimal places.
-	FlatAmountDecimal float64 `json:"flat_amount_decimal,string"`
+	FlatAmountDecimal decimal.Decimal `json:"flat_amount_decimal"`
 	// Per unit price for units relevant to the tier.
 	UnitAmount int64 `json:"unit_amount"`
 	// Same as `unit_amount`, but contains a decimal value with at most 12 decimal places.
-	UnitAmountDecimal float64 `json:"unit_amount_decimal,string"`
+	UnitAmountDecimal decimal.Decimal `json:"unit_amount_decimal"`
 	// Up to and including to this quantity will be contained in the tier.
 	UpTo int64 `json:"up_to"`
 }
@@ -680,7 +727,7 @@ type PriceCurrencyOptions struct {
 	// The unit amount in cents (or local equivalent) to be charged, represented as a whole integer if possible. Only set if `billing_scheme=per_unit`.
 	UnitAmount int64 `json:"unit_amount"`
 	// The unit amount in cents (or local equivalent) to be charged, represented as a decimal string with at most 12 decimal places. Only set if `billing_scheme=per_unit`.
-	UnitAmountDecimal float64 `json:"unit_amount_decimal,string"`
+	UnitAmountDecimal decimal.Decimal `json:"unit_amount_decimal"`
 }
 
 // When set, provides configuration for the amount to be adjusted by the customer during Checkout Sessions and Payment Links.
@@ -712,11 +759,11 @@ type PriceTier struct {
 	// Price for the entire tier.
 	FlatAmount int64 `json:"flat_amount"`
 	// Same as `flat_amount`, but contains a decimal value with at most 12 decimal places.
-	FlatAmountDecimal float64 `json:"flat_amount_decimal,string"`
+	FlatAmountDecimal decimal.Decimal `json:"flat_amount_decimal"`
 	// Per unit price for units relevant to the tier.
 	UnitAmount int64 `json:"unit_amount"`
 	// Same as `unit_amount`, but contains a decimal value with at most 12 decimal places.
-	UnitAmountDecimal float64 `json:"unit_amount_decimal,string"`
+	UnitAmountDecimal decimal.Decimal `json:"unit_amount_decimal"`
 	// Up to and including to this quantity will be contained in the tier.
 	UpTo int64 `json:"up_to"`
 }
@@ -730,7 +777,7 @@ type PriceTransformQuantity struct {
 }
 
 // Prices define the unit cost, currency, and (optional) billing cycle for both recurring and one-time purchases of products.
-// [Products](https://api.stripe.com#products) help you track inventory or provisioning, and prices help you track payment terms. Different physical goods or levels of service should be represented by products, and pricing options should be represented by prices. This approach lets you change prices without having to change your provisioning scheme.
+// [Products](https://docs.stripe.com/api#products) help you track inventory or provisioning, and prices help you track payment terms. Different physical goods or levels of service should be represented by products, and pricing options should be represented by prices. This approach lets you change prices without having to change your provisioning scheme.
 //
 // For example, you might have a single "gold" product that has prices for $10/month, $100/year, and €9 once.
 //
@@ -779,7 +826,7 @@ type Price struct {
 	// The unit amount in cents (or local equivalent) to be charged, represented as a whole integer if possible. Only set if `billing_scheme=per_unit`.
 	UnitAmount int64 `json:"unit_amount"`
 	// The unit amount in cents (or local equivalent) to be charged, represented as a decimal string with at most 12 decimal places. Only set if `billing_scheme=per_unit`.
-	UnitAmountDecimal float64 `json:"unit_amount_decimal,string"`
+	UnitAmountDecimal decimal.Decimal `json:"unit_amount_decimal"`
 }
 
 // PriceList is a list of Prices as retrieved from a list endpoint.

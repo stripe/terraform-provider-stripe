@@ -17,7 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 	metronomeclient "github.com/stripe/terraform-provider-stripe/internal/metronomeclient"
 	original "github.com/stripe/terraform-provider-stripe/internal/provider"
 	"github.com/stripe/terraform-provider-stripe/internal/provider/metronome"
@@ -142,8 +142,10 @@ func (p *Provider) Configure(ctx context.Context, req provider.ConfigureRequest,
 func (p *Provider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{newStripePersonResource,
 		newStripeApplePayDomainResource,
+		newStripeAppsInstallResource,
 		newStripeBillingAlertResource,
 		newStripeBillingCreditGrantResource,
+		newStripeBillingFeedbackOptionResource,
 		newStripeBillingMeterResource,
 		newStripeBillingPortalConfigurationResource,
 		newStripeChargeResource,
@@ -170,6 +172,7 @@ func (p *Provider) Resources(_ context.Context) []func() resource.Resource {
 		newStripePriceResource,
 		newStripeProductResource,
 		newStripeProductFeatureResource,
+		newStripeProductCatalogTrialOfferResource,
 		newStripePromotionCodeResource,
 		newStripeQuoteResource,
 		newStripeRadarValueListResource,
@@ -180,15 +183,25 @@ func (p *Provider) Resources(_ context.Context) []func() resource.Resource {
 		newStripeSubscriptionResource,
 		newStripeSubscriptionItemResource,
 		newStripeSubscriptionScheduleResource,
+		newStripeTaxLocationResource,
 		newStripeTaxRegistrationResource,
 		newStripeTaxIDResource,
 		newStripeTaxRateResource,
 		newStripeTerminalConfigurationResource,
 		newStripeTerminalLocationResource,
 		newStripeTerminalReaderResource,
+		newStripeThreeDSecureAuthenticationResource,
 		newStripeTreasuryFinancialAccountResource,
 		newStripeWebhookEndpointResource,
 		newStripeV2CoreEventDestinationResource,
+		newStripeV2CoreVaultGBBankAccountResource,
+		newStripeV2CoreVaultUSBankAccountResource,
+		newStripeV2MoneyManagementFinancialAddressResource,
+		newStripeV2MoneyManagementInboundTransferResource,
+		newStripeV2MoneyManagementOutboundPaymentResource,
+		newStripeV2MoneyManagementOutboundSetupIntentResource,
+		newStripeV2MoneyManagementPayoutIntentResource,
+		newStripeV2MoneyManagementRecipientVerificationResource,
 		metronome.NewMetronomeProductResource,
 		metronome.NewMetronomeBillableMetricResource,
 		metronome.NewMetronomeCreditTypeResource,

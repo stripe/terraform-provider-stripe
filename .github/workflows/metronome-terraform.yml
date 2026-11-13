@@ -30,7 +30,8 @@ jobs:
           assert re.fullmatch('[0-9a-f]{40}', p['generatorRevision'])
           assert p['generatorWorkingTreeDirty'] is False
           assert p['baselineReproduction']['status'] == 'reproduced'
-          assert p['baselineReproduction']['protectedFileCount'] == 1180
+          baseline = json.load(open('stripe-preservation-manifest.json'))
+          assert p['baselineReproduction']['protectedFileCount'] == len(baseline['protected'])
           PY
 
   offline:

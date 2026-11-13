@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &IssuingCardResource{}
@@ -139,7 +139,7 @@ func (r *IssuingCardResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:      true,
 				Computed:      true,
 				Description:   "The financial account this card is attached to.",
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown(), stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"id": schema.StringAttribute{
 				Computed:      true,
@@ -326,11 +326,17 @@ func (r *IssuingCardResource) Schema(_ context.Context, _ resource.SchemaRequest
 							},
 						},
 					},
+					"business_name": schema.StringAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "The name of the business at the shipping address, used on the shipping label to ensure delivery when the card is shipped to a cardholder's workplace.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
 					"carrier": schema.StringAttribute{
 						Computed:      true,
 						Description:   "The delivery company that shipped a card.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						Validators:    []validator.String{stringvalidator.OneOf("dhl", "fedex", "royal_mail", "usps")},
+						Validators:    []validator.String{stringvalidator.OneOf("correos", "dhl", "fedex", "royal_mail", "usps")},
 					},
 					"customs": schema.SingleNestedAttribute{
 						Optional:      true,
@@ -345,6 +351,11 @@ func (r *IssuingCardResource) Schema(_ context.Context, _ resource.SchemaRequest
 								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 							},
 						},
+					},
+					"delivered_at": schema.Int64Attribute{
+						Computed:      true,
+						Description:   "The time the card was reported as delivered. Null for undelivered or untracked shipments, or if Stripe has not recorded a delivery time.",
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 					},
 					"eta": schema.Int64Attribute{
 						Computed:      true,
@@ -373,6 +384,11 @@ func (r *IssuingCardResource) Schema(_ context.Context, _ resource.SchemaRequest
 						Description:   "Shipment service, such as `standard` or `express`.",
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Validators:    []validator.String{stringvalidator.OneOf("express", "priority", "standard")},
+					},
+					"shipped_at": schema.Int64Attribute{
+						Computed:      true,
+						Description:   "The time the card was reported as shipped. Null if Stripe has not recorded a shipment time.",
+						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 					},
 					"status": schema.StringAttribute{
 						Computed:      true,
@@ -784,6 +800,13 @@ func expandIssuingCardCreate(plan IssuingCardResourceModel) (*stripe.IssuingCard
 func expandIssuingCardUpdate(plan IssuingCardResourceModel, state IssuingCardResourceModel) (*stripe.IssuingCardUpdateParams, error) {
 	params := &stripe.IssuingCardUpdateParams{}
 
+	if !plan.FinancialAccount.Equal(state.FinancialAccount) && !plan.FinancialAccount.IsNull() && !plan.FinancialAccount.IsUnknown() {
+		if !assignStringToNamedFieldOrMethod(params, "FinancialAccount", "FinancialAccount", plan.FinancialAccount.ValueString()) {
+			if !plan.FinancialAccount.Equal(state.FinancialAccount) {
+				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "financial_account", params)
+			}
+		}
+	}
 	if !plan.Metadata.Equal(state.Metadata) && !plan.Metadata.IsNull() && !plan.Metadata.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "Metadata", plan.Metadata) {
 			if !plan.Metadata.Equal(state.Metadata) {
@@ -1288,7 +1311,7 @@ func flattenIssuingCard(obj *stripe.IssuingCard, state *IssuingCardResourceModel
 			hadRawShipping = true
 			if rawValueShipping != nil {
 				sourceShipping := applyConfiguredKeyedListShapes(rawValueShipping, attrValueToPlain(state.Shipping))
-				if valueShipping, err := flattenPlainValue(sourceShipping, types.ObjectType{AttrTypes: map[string]attr.Type{"address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "address_validation": types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType, "normalized_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "result": types.StringType}}, "carrier": types.StringType, "customs": types.ObjectType{AttrTypes: map[string]attr.Type{"eori_number": types.StringType}}, "eta": types.Int64Type, "name": types.StringType, "phone_number": types.StringType, "require_signature": types.BoolType, "service": types.StringType, "status": types.StringType, "tracking_number": types.StringType, "tracking_url": types.StringType, "type": types.StringType}}, "shipping", "raw response"); err != nil {
+				if valueShipping, err := flattenPlainValue(sourceShipping, types.ObjectType{AttrTypes: map[string]attr.Type{"address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "address_validation": types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType, "normalized_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "result": types.StringType}}, "business_name": types.StringType, "carrier": types.StringType, "customs": types.ObjectType{AttrTypes: map[string]attr.Type{"eori_number": types.StringType}}, "delivered_at": types.Int64Type, "eta": types.Int64Type, "name": types.StringType, "phone_number": types.StringType, "require_signature": types.BoolType, "service": types.StringType, "shipped_at": types.Int64Type, "status": types.StringType, "tracking_number": types.StringType, "tracking_url": types.StringType, "type": types.StringType}}, "shipping", "raw response"); err != nil {
 					return err
 				} else {
 					if typedShipping, ok := valueShipping.(types.Object); ok {
@@ -1304,7 +1327,7 @@ func flattenIssuingCard(obj *stripe.IssuingCard, state *IssuingCardResourceModel
 					sourceShipping := applyConfiguredKeyedListShapes(responseValueShipping, attrValueToPlain(state.Shipping))
 					if valueShipping, err := flattenPlainValue(
 						sourceShipping,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "address_validation": types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType, "normalized_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "result": types.StringType}}, "carrier": types.StringType, "customs": types.ObjectType{AttrTypes: map[string]attr.Type{"eori_number": types.StringType}}, "eta": types.Int64Type, "name": types.StringType, "phone_number": types.StringType, "require_signature": types.BoolType, "service": types.StringType, "status": types.StringType, "tracking_number": types.StringType, "tracking_url": types.StringType, "type": types.StringType}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "address_validation": types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType, "normalized_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "result": types.StringType}}, "business_name": types.StringType, "carrier": types.StringType, "customs": types.ObjectType{AttrTypes: map[string]attr.Type{"eori_number": types.StringType}}, "delivered_at": types.Int64Type, "eta": types.Int64Type, "name": types.StringType, "phone_number": types.StringType, "require_signature": types.BoolType, "service": types.StringType, "shipped_at": types.Int64Type, "status": types.StringType, "tracking_number": types.StringType, "tracking_url": types.StringType, "type": types.StringType}},
 						"shipping",
 						"response struct",
 					); err != nil {
@@ -1319,7 +1342,7 @@ func flattenIssuingCard(obj *stripe.IssuingCard, state *IssuingCardResourceModel
 			}
 		}
 		if !assignedShipping && hadRawShipping {
-			if nullShipping, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "address_validation": types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType, "normalized_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "result": types.StringType}}, "carrier": types.StringType, "customs": types.ObjectType{AttrTypes: map[string]attr.Type{"eori_number": types.StringType}}, "eta": types.Int64Type, "name": types.StringType, "phone_number": types.StringType, "require_signature": types.BoolType, "service": types.StringType, "status": types.StringType, "tracking_number": types.StringType, "tracking_url": types.StringType, "type": types.StringType}}); ok {
+			if nullShipping, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "address_validation": types.ObjectType{AttrTypes: map[string]attr.Type{"mode": types.StringType, "normalized_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "result": types.StringType}}, "business_name": types.StringType, "carrier": types.StringType, "customs": types.ObjectType{AttrTypes: map[string]attr.Type{"eori_number": types.StringType}}, "delivered_at": types.Int64Type, "eta": types.Int64Type, "name": types.StringType, "phone_number": types.StringType, "require_signature": types.BoolType, "service": types.StringType, "shipped_at": types.Int64Type, "status": types.StringType, "tracking_number": types.StringType, "tracking_url": types.StringType, "type": types.StringType}}); ok {
 				if typedShipping, ok := nullShipping.(types.Object); ok {
 					state.Shipping = typedShipping
 				}

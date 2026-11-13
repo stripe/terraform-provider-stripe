@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"reflect"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &PaymentMethodConfigurationResource{}
@@ -89,6 +89,7 @@ type PaymentMethodConfigurationResourceModel struct {
 	Payco            types.Object `tfsdk:"payco"`
 	PayNow           types.Object `tfsdk:"paynow"`
 	Paypal           types.Object `tfsdk:"paypal"`
+	Paypay           types.Object `tfsdk:"paypay"`
 	Payto            types.Object `tfsdk:"payto"`
 	Pix              types.Object `tfsdk:"pix"`
 	PromptPay        types.Object `tfsdk:"promptpay"`
@@ -97,6 +98,7 @@ type PaymentMethodConfigurationResourceModel struct {
 	Satispay         types.Object `tfsdk:"satispay"`
 	Scalapay         types.Object `tfsdk:"scalapay"`
 	SEPADebit        types.Object `tfsdk:"sepa_debit"`
+	Sequra           types.Object `tfsdk:"sequra"`
 	Sofort           types.Object `tfsdk:"sofort"`
 	Sunbit           types.Object `tfsdk:"sunbit"`
 	Swish            types.Object `tfsdk:"swish"`
@@ -1801,6 +1803,45 @@ func (r *PaymentMethodConfigurationResource) Schema(_ context.Context, _ resourc
 					},
 				},
 			},
+			"paypay": schema.SingleNestedAttribute{
+				Optional: true,
+				Computed: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Attributes: map[string]schema.Attribute{
+					"available": schema.BoolAttribute{
+						Computed:      true,
+						Description:   "Whether this payment method may be offered at checkout. True if `display_preference` is `on` and the payment method's capability is active.",
+						PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+					},
+					"display_preference": schema.SingleNestedAttribute{
+						Optional: true,
+						Computed: true,
+
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+						Attributes: map[string]schema.Attribute{
+							"overridable": schema.BoolAttribute{
+								Computed:      true,
+								Description:   "For child configs, whether or not the account's preference will be observed. If `false`, the parent configuration's default is used.",
+								PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+							},
+							"preference": schema.StringAttribute{
+								Optional:      true,
+								Computed:      true,
+								Description:   "The account's display preference.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("none", "off", "on")},
+							},
+							"value": schema.StringAttribute{
+								Computed:      true,
+								Description:   "The effective display preference value.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("off", "on")},
+							},
+						},
+					},
+				},
+			},
 			"payto": schema.SingleNestedAttribute{
 				Optional: true,
 				Computed: true,
@@ -2075,6 +2116,45 @@ func (r *PaymentMethodConfigurationResource) Schema(_ context.Context, _ resourc
 				},
 			},
 			"sepa_debit": schema.SingleNestedAttribute{
+				Optional: true,
+				Computed: true,
+
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Attributes: map[string]schema.Attribute{
+					"available": schema.BoolAttribute{
+						Computed:      true,
+						Description:   "Whether this payment method may be offered at checkout. True if `display_preference` is `on` and the payment method's capability is active.",
+						PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+					},
+					"display_preference": schema.SingleNestedAttribute{
+						Optional: true,
+						Computed: true,
+
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+						Attributes: map[string]schema.Attribute{
+							"overridable": schema.BoolAttribute{
+								Computed:      true,
+								Description:   "For child configs, whether or not the account's preference will be observed. If `false`, the parent configuration's default is used.",
+								PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+							},
+							"preference": schema.StringAttribute{
+								Optional:      true,
+								Computed:      true,
+								Description:   "The account's display preference.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("none", "off", "on")},
+							},
+							"value": schema.StringAttribute{
+								Computed:      true,
+								Description:   "The effective display preference value.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("off", "on")},
+							},
+						},
+					},
+				},
+			},
+			"sequra": schema.SingleNestedAttribute{
 				Optional: true,
 				Computed: true,
 
@@ -2445,6 +2525,113 @@ func (r *PaymentMethodConfigurationResource) Schema(_ context.Context, _ resourc
 				},
 			},
 		},
+	}
+}
+
+var _ resource.ResourceWithModifyPlan = &PaymentMethodConfigurationResource{}
+
+// ModifyPlan invalidates computed dependencies after schema state-reuse modifiers.
+func (r *PaymentMethodConfigurationResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	if req.State.Raw.IsNull() || req.Plan.Raw.IsNull() {
+		return
+	}
+	for _, name := range []string{
+		"acss_debit",
+		"affirm",
+		"afterpay_clearpay",
+		"alipay",
+		"alma",
+		"amazon_pay",
+		"apple_pay",
+		"au_becs_debit",
+		"bacs_debit",
+		"bancontact",
+		"billie",
+		"bizum",
+		"blik",
+		"boleto",
+		"cartes_bancaires",
+		"cashapp",
+		"crypto",
+		"customer_balance",
+		"eps",
+		"fpx",
+		"giropay",
+		"google_pay",
+		"grabpay",
+		"ideal",
+		"jcb",
+		"kakao_pay",
+		"klarna",
+		"konbini",
+		"kr_card",
+		"link",
+		"mb_way",
+		"mobilepay",
+		"multibanco",
+		"naver_pay",
+		"nz_bank_account",
+		"oxxo",
+		"p24",
+		"pay_by_bank",
+		"payco",
+		"paynow",
+		"paypal",
+		"paypay",
+		"payto",
+		"pix",
+		"promptpay",
+		"revolut_pay",
+		"samsung_pay",
+		"satispay",
+		"scalapay",
+		"sepa_debit",
+		"sequra",
+		"sofort",
+		"sunbit",
+		"swish",
+		"twint",
+		"upi",
+		"us_bank_account",
+		"wechat_pay",
+		"zip",
+	} {
+		var scope types.Object
+		resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root(name), &scope)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		if scope.IsNull() || scope.IsUnknown() {
+			continue
+		}
+		var sourceParent types.Object
+		resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root(name).AtName("display_preference"), &sourceParent)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		if sourceParent.IsNull() {
+			continue
+		}
+		var prior, planned types.String
+		resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root(name).AtName("display_preference").AtName("preference"), &prior)...)
+		resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root(name).AtName("display_preference").AtName("preference"), &planned)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		if !planned.IsUnknown() && planned.Equal(prior) {
+			continue
+		}
+		resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root(name).AtName("available"), types.BoolUnknown())...)
+		{
+			var parent types.Object
+			resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root(name).AtName("display_preference"), &parent)...)
+			if resp.Diagnostics.HasError() {
+				return
+			}
+			if !parent.IsNull() && !parent.IsUnknown() {
+				resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root(name).AtName("display_preference").AtName("value"), types.StringUnknown())...)
+			}
+		}
 	}
 }
 
@@ -2862,6 +3049,11 @@ func expandPaymentMethodConfigurationCreate(plan PaymentMethodConfigurationResou
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "paypal", params)
 		}
 	}
+	if !plan.Paypay.IsNull() && !plan.Paypay.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "Paypay", plan.Paypay) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "paypay", params)
+		}
+	}
 	if !plan.Payto.IsNull() && !plan.Payto.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "Payto", plan.Payto) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "payto", params)
@@ -2900,6 +3092,11 @@ func expandPaymentMethodConfigurationCreate(plan PaymentMethodConfigurationResou
 	if !plan.SEPADebit.IsNull() && !plan.SEPADebit.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "SEPADebit", plan.SEPADebit) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "sepa_debit", params)
+		}
+	}
+	if !plan.Sequra.IsNull() && !plan.Sequra.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "Sequra", plan.Sequra) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "sequra", params)
 		}
 	}
 	if !plan.Sofort.IsNull() && !plan.Sofort.IsUnknown() {
@@ -3258,6 +3455,13 @@ func expandPaymentMethodConfigurationUpdate(plan PaymentMethodConfigurationResou
 			}
 		}
 	}
+	if !plan.Paypay.Equal(state.Paypay) && !plan.Paypay.IsNull() && !plan.Paypay.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "Paypay", plan.Paypay) {
+			if !plan.Paypay.Equal(state.Paypay) {
+				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "paypay", params)
+			}
+		}
+	}
 	if !plan.Payto.Equal(state.Payto) && !plan.Payto.IsNull() && !plan.Payto.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "Payto", plan.Payto) {
 			if !plan.Payto.Equal(state.Payto) {
@@ -3311,6 +3515,13 @@ func expandPaymentMethodConfigurationUpdate(plan PaymentMethodConfigurationResou
 		if !assignAttrValueToNamedField(params, "SEPADebit", plan.SEPADebit) {
 			if !plan.SEPADebit.Equal(state.SEPADebit) {
 				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "sepa_debit", params)
+			}
+		}
+	}
+	if !plan.Sequra.Equal(state.Sequra) && !plan.Sequra.IsNull() && !plan.Sequra.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "Sequra", plan.Sequra) {
+			if !plan.Sequra.Equal(state.Sequra) {
+				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "sequra", params)
 			}
 		}
 	}
@@ -5452,6 +5663,51 @@ func flattenPaymentMethodConfiguration(obj *stripe.PaymentMethodConfiguration, s
 		}
 	}
 	{
+		assignedPaypay := false
+		hadRawPaypay := false
+		if rawValuePaypay, rawOk := plainValueAtPath(raw, "paypay"); rawOk {
+			hadRawPaypay = true
+			if rawValuePaypay != nil {
+				sourcePaypay := applyConfiguredKeyedListShapes(rawValuePaypay, attrValueToPlain(state.Paypay))
+				if valuePaypay, err := flattenPlainValue(sourcePaypay, types.ObjectType{AttrTypes: map[string]attr.Type{"available": types.BoolType, "display_preference": types.ObjectType{AttrTypes: map[string]attr.Type{"overridable": types.BoolType, "preference": types.StringType, "value": types.StringType}}}}, "paypay", "raw response"); err != nil {
+					return err
+				} else {
+					if typedPaypay, ok := valuePaypay.(types.Object); ok {
+						state.Paypay = typedPaypay
+						assignedPaypay = true
+					}
+				}
+			}
+		}
+		if !assignedPaypay {
+			if !hasRaw {
+				if responseValuePaypay, ok := plainFromResponseField(obj, "Paypay"); ok {
+					sourcePaypay := applyConfiguredKeyedListShapes(responseValuePaypay, attrValueToPlain(state.Paypay))
+					if valuePaypay, err := flattenPlainValue(
+						sourcePaypay,
+						types.ObjectType{AttrTypes: map[string]attr.Type{"available": types.BoolType, "display_preference": types.ObjectType{AttrTypes: map[string]attr.Type{"overridable": types.BoolType, "preference": types.StringType, "value": types.StringType}}}},
+						"paypay",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedPaypay, ok := valuePaypay.(types.Object); ok {
+							state.Paypay = typedPaypay
+							assignedPaypay = true
+						}
+					}
+				}
+			}
+		}
+		if !assignedPaypay && hadRawPaypay {
+			if nullPaypay, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"available": types.BoolType, "display_preference": types.ObjectType{AttrTypes: map[string]attr.Type{"overridable": types.BoolType, "preference": types.StringType, "value": types.StringType}}}}); ok {
+				if typedPaypay, ok := nullPaypay.(types.Object); ok {
+					state.Paypay = typedPaypay
+				}
+			}
+		}
+	}
+	{
 		assignedPayto := false
 		hadRawPayto := false
 		if rawValuePayto, rawOk := plainValueAtPath(raw, "payto"); rawOk {
@@ -5807,6 +6063,51 @@ func flattenPaymentMethodConfiguration(obj *stripe.PaymentMethodConfiguration, s
 			if nullSEPADebit, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"available": types.BoolType, "display_preference": types.ObjectType{AttrTypes: map[string]attr.Type{"overridable": types.BoolType, "preference": types.StringType, "value": types.StringType}}}}); ok {
 				if typedSEPADebit, ok := nullSEPADebit.(types.Object); ok {
 					state.SEPADebit = typedSEPADebit
+				}
+			}
+		}
+	}
+	{
+		assignedSequra := false
+		hadRawSequra := false
+		if rawValueSequra, rawOk := plainValueAtPath(raw, "sequra"); rawOk {
+			hadRawSequra = true
+			if rawValueSequra != nil {
+				sourceSequra := applyConfiguredKeyedListShapes(rawValueSequra, attrValueToPlain(state.Sequra))
+				if valueSequra, err := flattenPlainValue(sourceSequra, types.ObjectType{AttrTypes: map[string]attr.Type{"available": types.BoolType, "display_preference": types.ObjectType{AttrTypes: map[string]attr.Type{"overridable": types.BoolType, "preference": types.StringType, "value": types.StringType}}}}, "sequra", "raw response"); err != nil {
+					return err
+				} else {
+					if typedSequra, ok := valueSequra.(types.Object); ok {
+						state.Sequra = typedSequra
+						assignedSequra = true
+					}
+				}
+			}
+		}
+		if !assignedSequra {
+			if !hasRaw {
+				if responseValueSequra, ok := plainFromResponseField(obj, "Sequra"); ok {
+					sourceSequra := applyConfiguredKeyedListShapes(responseValueSequra, attrValueToPlain(state.Sequra))
+					if valueSequra, err := flattenPlainValue(
+						sourceSequra,
+						types.ObjectType{AttrTypes: map[string]attr.Type{"available": types.BoolType, "display_preference": types.ObjectType{AttrTypes: map[string]attr.Type{"overridable": types.BoolType, "preference": types.StringType, "value": types.StringType}}}},
+						"sequra",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedSequra, ok := valueSequra.(types.Object); ok {
+							state.Sequra = typedSequra
+							assignedSequra = true
+						}
+					}
+				}
+			}
+		}
+		if !assignedSequra && hadRawSequra {
+			if nullSequra, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"available": types.BoolType, "display_preference": types.ObjectType{AttrTypes: map[string]attr.Type{"overridable": types.BoolType, "preference": types.StringType, "value": types.StringType}}}}); ok {
+				if typedSequra, ok := nullSequra.(types.Object); ok {
+					state.Sequra = typedSequra
 				}
 			}
 		}

@@ -15,7 +15,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 
 	"github.com/stripe/terraform-provider-stripe/internal/acctest/runner"
 )
@@ -976,19 +976,17 @@ func verifyCoupon(expect couponExpectations) runner.StateVerifier {
 			)
 		}
 		if expect.CheckAppliesToProduct {
-			expectedProductID, err := runner.ResourceAttribute(
-				state,
-				expect.Address,
-				"applies_to.0.products.0",
-			)
-			if err != nil {
+			if coupon.AppliesTo == nil || len(coupon.AppliesTo.Products) != 1 {
+				return fmt.Errorf("remote %s.applies_to must contain exactly one product", expect.Address)
+			}
+			if err := expectRemoteStateString(state, expect.Address, "applies_to.0.products.#", "1"); err != nil {
 				return err
 			}
 			if err := expectRemoteStateString(
 				state,
 				expect.Address,
 				"applies_to.0.products.0",
-				expectedProductID,
+				coupon.AppliesTo.Products[0],
 			); err != nil {
 				return err
 			}
@@ -1461,7 +1459,9 @@ func retrieveCoupon(
 		return nil, err
 	}
 
-	coupon, err := client.V1Coupons.Retrieve(context.Background(), id, nil)
+	params := &stripe.CouponRetrieveParams{}
+	params.AddExpand("applies_to")
+	coupon, err := client.V1Coupons.Retrieve(context.Background(), id, params)
 	if err != nil {
 		return nil, fmt.Errorf("retrieve %s (%s): %w", address, id, err)
 	}
@@ -1796,8 +1796,12 @@ func remotePriceString(price *stripe.Price, attribute string) (string, error) {
 	}
 }
 
-func formatDecimalFloat(value float64) string {
-	return strconv.FormatFloat(value, 'f', -1, 64)
+func formatDecimalFloat(value interface{}) string {
+	// SDK versions before decimal.Decimal represented these fields as float64.
+	if decimal, ok := value.(fmt.Stringer); ok {
+		return decimal.String()
+	}
+	return strconv.FormatFloat(value.(float64), 'f', -1, 64)
 }
 
 func remotePriceDecimalString(price *stripe.Price, attribute string) (string, error) {

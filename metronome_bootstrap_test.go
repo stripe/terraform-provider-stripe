@@ -25,7 +25,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 	"github.com/stripe/terraform-provider-stripe/internal/combinedprovider"
 	"github.com/stripe/terraform-provider-stripe/internal/providerdata"
 )

@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 	metronomeclient "github.com/stripe/terraform-provider-stripe/internal/metronomeclient"
 	bindingruntime "github.com/stripe/terraform-provider-stripe/internal/terraformruntime"
 	"io"

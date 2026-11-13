@@ -86,6 +86,29 @@ func (r *stripeFeeRefundAction) Configure(ctx context.Context, req action.Config
 	r.FeeRefundAction.Configure(ctx, req, resp)
 }
 
+type stripeAppsInstallResource struct{ *resources.AppsInstallResource }
+
+func newStripeAppsInstallResource() resource.Resource {
+	return &stripeAppsInstallResource{AppsInstallResource: resources.NewAppsInstallResource().(*resources.AppsInstallResource)}
+}
+func (r *stripeAppsInstallResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.AppsInstallResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.AppsInstallResource.Configure(ctx, req, resp)
+}
+
 type stripeBillingAlertResource struct {
 	*resources.BillingAlertResource
 }
@@ -134,6 +157,31 @@ func (r *stripeBillingCreditGrantResource) Configure(ctx context.Context, req re
 	}
 	req.ProviderData = data.Stripe
 	r.BillingCreditGrantResource.Configure(ctx, req, resp)
+}
+
+type stripeBillingFeedbackOptionResource struct {
+	*resources.BillingFeedbackOptionResource
+}
+
+func newStripeBillingFeedbackOptionResource() resource.Resource {
+	return &stripeBillingFeedbackOptionResource{BillingFeedbackOptionResource: resources.NewBillingFeedbackOptionResource().(*resources.BillingFeedbackOptionResource)}
+}
+func (r *stripeBillingFeedbackOptionResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.BillingFeedbackOptionResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.BillingFeedbackOptionResource.Configure(ctx, req, resp)
 }
 
 type stripeBillingMeterResource struct {
@@ -883,6 +931,31 @@ func (r *stripeProductFeatureResource) Configure(ctx context.Context, req resour
 	r.ProductFeatureResource.Configure(ctx, req, resp)
 }
 
+type stripeProductCatalogTrialOfferResource struct {
+	*resources.ProductCatalogTrialOfferResource
+}
+
+func newStripeProductCatalogTrialOfferResource() resource.Resource {
+	return &stripeProductCatalogTrialOfferResource{ProductCatalogTrialOfferResource: resources.NewProductCatalogTrialOfferResource().(*resources.ProductCatalogTrialOfferResource)}
+}
+func (r *stripeProductCatalogTrialOfferResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.ProductCatalogTrialOfferResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.ProductCatalogTrialOfferResource.Configure(ctx, req, resp)
+}
+
 type stripePromotionCodeResource struct {
 	*resources.PromotionCodeResource
 }
@@ -1200,6 +1273,29 @@ func (r *stripeTaxCalculationEphemeralResource) Configure(ctx context.Context, r
 	r.TaxCalculationEphemeralResource.Configure(ctx, req, resp)
 }
 
+type stripeTaxLocationResource struct{ *resources.TaxLocationResource }
+
+func newStripeTaxLocationResource() resource.Resource {
+	return &stripeTaxLocationResource{TaxLocationResource: resources.NewTaxLocationResource().(*resources.TaxLocationResource)}
+}
+func (r *stripeTaxLocationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.TaxLocationResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.TaxLocationResource.Configure(ctx, req, resp)
+}
+
 type stripeTaxRegistrationResource struct {
 	*resources.TaxRegistrationResource
 }
@@ -1344,6 +1440,31 @@ func (r *stripeTerminalReaderResource) Configure(ctx context.Context, req resour
 	}
 	req.ProviderData = data.Stripe
 	r.TerminalReaderResource.Configure(ctx, req, resp)
+}
+
+type stripeThreeDSecureAuthenticationResource struct {
+	*resources.ThreeDSecureAuthenticationResource
+}
+
+func newStripeThreeDSecureAuthenticationResource() resource.Resource {
+	return &stripeThreeDSecureAuthenticationResource{ThreeDSecureAuthenticationResource: resources.NewThreeDSecureAuthenticationResource().(*resources.ThreeDSecureAuthenticationResource)}
+}
+func (r *stripeThreeDSecureAuthenticationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.ThreeDSecureAuthenticationResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.ThreeDSecureAuthenticationResource.Configure(ctx, req, resp)
 }
 
 type stripeTokenEphemeralResource struct {
@@ -1640,4 +1761,204 @@ func (r *stripeV2CoreEventDestinationResource) Configure(ctx context.Context, re
 	}
 	req.ProviderData = data.Stripe
 	r.V2CoreEventDestinationResource.Configure(ctx, req, resp)
+}
+
+type stripeV2CoreVaultGBBankAccountResource struct {
+	*resources.V2CoreVaultGBBankAccountResource
+}
+
+func newStripeV2CoreVaultGBBankAccountResource() resource.Resource {
+	return &stripeV2CoreVaultGBBankAccountResource{V2CoreVaultGBBankAccountResource: resources.NewV2CoreVaultGBBankAccountResource().(*resources.V2CoreVaultGBBankAccountResource)}
+}
+func (r *stripeV2CoreVaultGBBankAccountResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.V2CoreVaultGBBankAccountResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.V2CoreVaultGBBankAccountResource.Configure(ctx, req, resp)
+}
+
+type stripeV2CoreVaultUSBankAccountResource struct {
+	*resources.V2CoreVaultUSBankAccountResource
+}
+
+func newStripeV2CoreVaultUSBankAccountResource() resource.Resource {
+	return &stripeV2CoreVaultUSBankAccountResource{V2CoreVaultUSBankAccountResource: resources.NewV2CoreVaultUSBankAccountResource().(*resources.V2CoreVaultUSBankAccountResource)}
+}
+func (r *stripeV2CoreVaultUSBankAccountResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.V2CoreVaultUSBankAccountResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.V2CoreVaultUSBankAccountResource.Configure(ctx, req, resp)
+}
+
+type stripeV2MoneyManagementFinancialAddressResource struct {
+	*resources.V2MoneyManagementFinancialAddressResource
+}
+
+func newStripeV2MoneyManagementFinancialAddressResource() resource.Resource {
+	return &stripeV2MoneyManagementFinancialAddressResource{V2MoneyManagementFinancialAddressResource: resources.NewV2MoneyManagementFinancialAddressResource().(*resources.V2MoneyManagementFinancialAddressResource)}
+}
+func (r *stripeV2MoneyManagementFinancialAddressResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.V2MoneyManagementFinancialAddressResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.V2MoneyManagementFinancialAddressResource.Configure(ctx, req, resp)
+}
+
+type stripeV2MoneyManagementInboundTransferResource struct {
+	*resources.V2MoneyManagementInboundTransferResource
+}
+
+func newStripeV2MoneyManagementInboundTransferResource() resource.Resource {
+	return &stripeV2MoneyManagementInboundTransferResource{V2MoneyManagementInboundTransferResource: resources.NewV2MoneyManagementInboundTransferResource().(*resources.V2MoneyManagementInboundTransferResource)}
+}
+func (r *stripeV2MoneyManagementInboundTransferResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.V2MoneyManagementInboundTransferResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.V2MoneyManagementInboundTransferResource.Configure(ctx, req, resp)
+}
+
+type stripeV2MoneyManagementOutboundPaymentResource struct {
+	*resources.V2MoneyManagementOutboundPaymentResource
+}
+
+func newStripeV2MoneyManagementOutboundPaymentResource() resource.Resource {
+	return &stripeV2MoneyManagementOutboundPaymentResource{V2MoneyManagementOutboundPaymentResource: resources.NewV2MoneyManagementOutboundPaymentResource().(*resources.V2MoneyManagementOutboundPaymentResource)}
+}
+func (r *stripeV2MoneyManagementOutboundPaymentResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.V2MoneyManagementOutboundPaymentResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.V2MoneyManagementOutboundPaymentResource.Configure(ctx, req, resp)
+}
+
+type stripeV2MoneyManagementOutboundSetupIntentResource struct {
+	*resources.V2MoneyManagementOutboundSetupIntentResource
+}
+
+func newStripeV2MoneyManagementOutboundSetupIntentResource() resource.Resource {
+	return &stripeV2MoneyManagementOutboundSetupIntentResource{V2MoneyManagementOutboundSetupIntentResource: resources.NewV2MoneyManagementOutboundSetupIntentResource().(*resources.V2MoneyManagementOutboundSetupIntentResource)}
+}
+func (r *stripeV2MoneyManagementOutboundSetupIntentResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.V2MoneyManagementOutboundSetupIntentResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.V2MoneyManagementOutboundSetupIntentResource.Configure(ctx, req, resp)
+}
+
+type stripeV2MoneyManagementPayoutIntentResource struct {
+	*resources.V2MoneyManagementPayoutIntentResource
+}
+
+func newStripeV2MoneyManagementPayoutIntentResource() resource.Resource {
+	return &stripeV2MoneyManagementPayoutIntentResource{V2MoneyManagementPayoutIntentResource: resources.NewV2MoneyManagementPayoutIntentResource().(*resources.V2MoneyManagementPayoutIntentResource)}
+}
+func (r *stripeV2MoneyManagementPayoutIntentResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.V2MoneyManagementPayoutIntentResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.V2MoneyManagementPayoutIntentResource.Configure(ctx, req, resp)
+}
+
+type stripeV2MoneyManagementRecipientVerificationResource struct {
+	*resources.V2MoneyManagementRecipientVerificationResource
+}
+
+func newStripeV2MoneyManagementRecipientVerificationResource() resource.Resource {
+	return &stripeV2MoneyManagementRecipientVerificationResource{V2MoneyManagementRecipientVerificationResource: resources.NewV2MoneyManagementRecipientVerificationResource().(*resources.V2MoneyManagementRecipientVerificationResource)}
+}
+func (r *stripeV2MoneyManagementRecipientVerificationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		r.V2MoneyManagementRecipientVerificationResource.Configure(ctx, req, resp)
+		return
+	}
+	data, ok := req.ProviderData.(*providerdata.Data)
+	if !ok {
+		resp.Diagnostics.AddError("Unexpected provider data", "Expected combined Stripe service clients.")
+		return
+	}
+	if err := data.StripeStatus.Err("Stripe"); err != nil {
+		resp.Diagnostics.AddError("Stripe client unavailable", err.Error())
+		return
+	}
+	req.ProviderData = data.Stripe
+	r.V2MoneyManagementRecipientVerificationResource.Configure(ctx, req, resp)
 }

@@ -16,6 +16,8 @@ type Client struct {
 	V1ApplePayDomains *v1ApplePayDomainService
 	// V1ApplicationFees is the service used to invoke /v1/application_fees APIs.
 	V1ApplicationFees *v1ApplicationFeeService
+	// V1AppsInstalls is the service used to invoke /v1/apps/installs APIs.
+	V1AppsInstalls *v1AppsInstallService
 	// V1AppsSecrets is the service used to invoke /v1/apps/secrets APIs.
 	V1AppsSecrets *v1AppsSecretService
 	// V1Balance is the service used to invoke /v1/balance APIs.
@@ -34,6 +36,8 @@ type Client struct {
 	V1BillingCreditBalanceTransactions *v1BillingCreditBalanceTransactionService
 	// V1BillingCreditGrants is the service used to invoke /v1/billing/credit_grants APIs.
 	V1BillingCreditGrants *v1BillingCreditGrantService
+	// V1BillingFeedbackOptions is the service used to invoke /v1/billing/feedback_options APIs.
+	V1BillingFeedbackOptions *v1BillingFeedbackOptionService
 	// V1BillingMeterEventAdjustments is the service used to invoke /v1/billing/meter_event_adjustments APIs.
 	V1BillingMeterEventAdjustments *v1BillingMeterEventAdjustmentService
 	// V1BillingMeterEvents is the service used to invoke /v1/billing/meter_events APIs.
@@ -162,6 +166,8 @@ type Client struct {
 	V1Plans *v1PlanService
 	// V1Prices is the service used to invoke /v1/prices APIs.
 	V1Prices *v1PriceService
+	// V1ProductCatalogTrialOffers is the service used to invoke /v1/product_catalog/trial_offers APIs.
+	V1ProductCatalogTrialOffers *v1ProductCatalogTrialOfferService
 	// V1ProductFeatures is the service used to invoke /v1/products/{product}/features APIs.
 	V1ProductFeatures *v1ProductFeatureService
 	// V1Products is the service used to invoke /v1/products APIs.
@@ -212,6 +218,8 @@ type Client struct {
 	V1TaxCodes *v1TaxCodeService
 	// V1TaxIDs is the service used to invoke /v1/tax_ids APIs.
 	V1TaxIDs *v1TaxIDService
+	// V1TaxLocations is the service used to invoke /v1/tax/locations APIs.
+	V1TaxLocations *v1TaxLocationService
 	// V1TaxRates is the service used to invoke /v1/tax_rates APIs.
 	V1TaxRates *v1TaxRateService
 	// V1TaxRegistrations is the service used to invoke /v1/tax/registrations APIs.
@@ -258,6 +266,8 @@ type Client struct {
 	V1TestHelpersTreasuryReceivedCredits *v1TestHelpersTreasuryReceivedCreditService
 	// V1TestHelpersTreasuryReceivedDebits is the service used to invoke /v1/treasury/received_debits APIs.
 	V1TestHelpersTreasuryReceivedDebits *v1TestHelpersTreasuryReceivedDebitService
+	// V1ThreeDSecureAuthentications is the service used to invoke /v1/three_d_secure/authentications APIs.
+	V1ThreeDSecureAuthentications *v1ThreeDSecureAuthenticationService
 	// V1Tokens is the service used to invoke /v1/tokens APIs.
 	V1Tokens *v1TokenService
 	// V1Topups is the service used to invoke /v1/topups APIs.
@@ -312,10 +322,44 @@ type Client struct {
 	V2CoreEventDestinations *v2CoreEventDestinationService
 	// V2CoreEvents is the service used to invoke /v2/core/events APIs.
 	V2CoreEvents *v2CoreEventService
+	// V2CoreVaultGBBankAccounts is the service used to invoke /v2/core/vault/gb_bank_accounts APIs.
+	V2CoreVaultGBBankAccounts *v2CoreVaultGBBankAccountService
+	// V2CoreVaultUSBankAccounts is the service used to invoke /v2/core/vault/us_bank_accounts APIs.
+	V2CoreVaultUSBankAccounts *v2CoreVaultUSBankAccountService
+	// V2MoneyManagementAdjustments is the service used to invoke /v2/money_management/adjustments APIs.
+	V2MoneyManagementAdjustments *v2MoneyManagementAdjustmentService
+	// V2MoneyManagementFinancialAccounts is the service used to invoke /v2/money_management/financial_accounts APIs.
+	V2MoneyManagementFinancialAccounts *v2MoneyManagementFinancialAccountService
+	// V2MoneyManagementFinancialAddresses is the service used to invoke /v2/money_management/financial_addresses APIs.
+	V2MoneyManagementFinancialAddresses *v2MoneyManagementFinancialAddressService
+	// V2MoneyManagementInboundTransfers is the service used to invoke /v2/money_management/inbound_transfers APIs.
+	V2MoneyManagementInboundTransfers *v2MoneyManagementInboundTransferService
+	// V2MoneyManagementOutboundPayments is the service used to invoke /v2/money_management/outbound_payments APIs.
+	V2MoneyManagementOutboundPayments *v2MoneyManagementOutboundPaymentService
+	// V2MoneyManagementOutboundSetupIntents is the service used to invoke /v2/money_management/outbound_setup_intents APIs.
+	V2MoneyManagementOutboundSetupIntents *v2MoneyManagementOutboundSetupIntentService
+	// V2MoneyManagementPayoutIntents is the service used to invoke /v2/money_management/payout_intents APIs.
+	V2MoneyManagementPayoutIntents *v2MoneyManagementPayoutIntentService
+	// V2MoneyManagementPayoutMethods is the service used to invoke /v2/money_management/payout_methods APIs.
+	V2MoneyManagementPayoutMethods *v2MoneyManagementPayoutMethodService
+	// V2MoneyManagementPayoutMethodsBankAccountSpecs is the service used to invoke payoutmethodsbankaccountspec related APIs.
+	V2MoneyManagementPayoutMethodsBankAccountSpecs *v2MoneyManagementPayoutMethodsBankAccountSpecService
+	// V2MoneyManagementReceivedCredits is the service used to invoke /v2/money_management/received_credits APIs.
+	V2MoneyManagementReceivedCredits *v2MoneyManagementReceivedCreditService
+	// V2MoneyManagementRecipientVerifications is the service used to invoke /v2/money_management/recipient_verifications APIs.
+	V2MoneyManagementRecipientVerifications *v2MoneyManagementRecipientVerificationService
+	// V2MoneyManagementTestHelpersFinancialAddresses is the service used to invoke financialaddress related APIs.
+	V2MoneyManagementTestHelpersFinancialAddresses *v2MoneyManagementTestHelpersFinancialAddressService
+	// V2MoneyManagementTransactionEntries is the service used to invoke /v2/money_management/transaction_entries APIs.
+	V2MoneyManagementTransactionEntries *v2MoneyManagementTransactionEntryService
+	// V2MoneyManagementTransactions is the service used to invoke /v2/money_management/transactions APIs.
+	V2MoneyManagementTransactions *v2MoneyManagementTransactionService
+	// V2TestHelpersMoneyManagements is the service used to invoke moneymanagement related APIs.
+	V2TestHelpersMoneyManagements *v2TestHelpersMoneyManagementService
 	// stripeClientStruct: The end of the section generated from our OpenAPI spec
 
-	backend Backend
-	key     string
+	backends *Backends
+	key      string
 }
 
 // NewClient creates a new Stripe [Client] with the given API key.
@@ -340,12 +384,12 @@ func initClient(client *Client, cfg clientConfig) {
 			Connect:     &UsageBackend{B: GetBackend(ConnectBackend), Usage: cfg.usage},
 			Uploads:     &UsageBackend{B: GetBackend(UploadsBackend), Usage: cfg.usage},
 			MeterEvents: &UsageBackend{B: GetBackend(MeterEventsBackend), Usage: cfg.usage},
+			config:      &BackendConfig{},
 		}
 	}
 	backends := cfg.backends
 	key := cfg.key
-	// enough information on the Client to make API calls
-	client.backend = backends.API
+	client.backends = backends
 	client.key = key
 
 	// stripeClientInit: The beginning of the section generated from our OpenAPI spec
@@ -355,6 +399,7 @@ func initClient(client *Client, cfg clientConfig) {
 	client.V1AccountSessions = &v1AccountSessionService{B: backends.API, Key: key}
 	client.V1ApplePayDomains = &v1ApplePayDomainService{B: backends.API, Key: key}
 	client.V1ApplicationFees = &v1ApplicationFeeService{B: backends.API, Key: key}
+	client.V1AppsInstalls = &v1AppsInstallService{B: backends.API, Key: key}
 	client.V1AppsSecrets = &v1AppsSecretService{B: backends.API, Key: key}
 	client.V1Balance = &v1BalanceService{B: backends.API, Key: key}
 	client.V1BalanceSettings = &v1BalanceSettingsService{B: backends.API, Key: key}
@@ -364,6 +409,7 @@ func initClient(client *Client, cfg clientConfig) {
 	client.V1BillingCreditBalanceSummary = &v1BillingCreditBalanceSummaryService{B: backends.API, Key: key}
 	client.V1BillingCreditBalanceTransactions = &v1BillingCreditBalanceTransactionService{B: backends.API, Key: key}
 	client.V1BillingCreditGrants = &v1BillingCreditGrantService{B: backends.API, Key: key}
+	client.V1BillingFeedbackOptions = &v1BillingFeedbackOptionService{B: backends.API, Key: key}
 	client.V1BillingMeterEventAdjustments = &v1BillingMeterEventAdjustmentService{B: backends.API, Key: key}
 	client.V1BillingMeterEvents = &v1BillingMeterEventService{B: backends.API, Key: key}
 	client.V1BillingMeterEventSummaries = &v1BillingMeterEventSummaryService{B: backends.API, Key: key}
@@ -428,6 +474,7 @@ func initClient(client *Client, cfg clientConfig) {
 	client.V1Persons = &v1PersonService{B: backends.API, Key: key}
 	client.V1Plans = &v1PlanService{B: backends.API, Key: key}
 	client.V1Prices = &v1PriceService{B: backends.API, Key: key}
+	client.V1ProductCatalogTrialOffers = &v1ProductCatalogTrialOfferService{B: backends.API, Key: key}
 	client.V1ProductFeatures = &v1ProductFeatureService{B: backends.API, Key: key}
 	client.V1Products = &v1ProductService{B: backends.API, Key: key}
 	client.V1PromotionCodes = &v1PromotionCodeService{B: backends.API, Key: key}
@@ -453,6 +500,7 @@ func initClient(client *Client, cfg clientConfig) {
 	client.V1TaxCalculations = &v1TaxCalculationService{B: backends.API, Key: key}
 	client.V1TaxCodes = &v1TaxCodeService{B: backends.API, Key: key}
 	client.V1TaxIDs = &v1TaxIDService{B: backends.API, Key: key}
+	client.V1TaxLocations = &v1TaxLocationService{B: backends.API, Key: key}
 	client.V1TaxRates = &v1TaxRateService{B: backends.API, Key: key}
 	client.V1TaxRegistrations = &v1TaxRegistrationService{B: backends.API, Key: key}
 	client.V1TaxSettings = &v1TaxSettingsService{B: backends.API, Key: key}
@@ -476,6 +524,7 @@ func initClient(client *Client, cfg clientConfig) {
 	client.V1TestHelpersTreasuryOutboundTransfers = &v1TestHelpersTreasuryOutboundTransferService{B: backends.API, Key: key}
 	client.V1TestHelpersTreasuryReceivedCredits = &v1TestHelpersTreasuryReceivedCreditService{B: backends.API, Key: key}
 	client.V1TestHelpersTreasuryReceivedDebits = &v1TestHelpersTreasuryReceivedDebitService{B: backends.API, Key: key}
+	client.V1ThreeDSecureAuthentications = &v1ThreeDSecureAuthenticationService{B: backends.API, Key: key}
 	client.V1Tokens = &v1TokenService{B: backends.API, Key: key}
 	client.V1Topups = &v1TopupService{B: backends.API, Key: key}
 	client.V1TransferReversals = &v1TransferReversalService{B: backends.API, Key: key}
@@ -503,6 +552,23 @@ func initClient(client *Client, cfg clientConfig) {
 	client.V2CoreAccountTokens = &v2CoreAccountTokenService{B: backends.API, Key: key}
 	client.V2CoreEventDestinations = &v2CoreEventDestinationService{B: backends.API, Key: key}
 	client.V2CoreEvents = &v2CoreEventService{B: backends.API, Key: key}
+	client.V2CoreVaultGBBankAccounts = &v2CoreVaultGBBankAccountService{B: backends.API, Key: key}
+	client.V2CoreVaultUSBankAccounts = &v2CoreVaultUSBankAccountService{B: backends.API, Key: key}
+	client.V2MoneyManagementAdjustments = &v2MoneyManagementAdjustmentService{B: backends.API, Key: key}
+	client.V2MoneyManagementFinancialAccounts = &v2MoneyManagementFinancialAccountService{B: backends.API, Key: key}
+	client.V2MoneyManagementFinancialAddresses = &v2MoneyManagementFinancialAddressService{B: backends.API, Key: key}
+	client.V2MoneyManagementInboundTransfers = &v2MoneyManagementInboundTransferService{B: backends.API, Key: key}
+	client.V2MoneyManagementOutboundPayments = &v2MoneyManagementOutboundPaymentService{B: backends.API, Key: key}
+	client.V2MoneyManagementOutboundSetupIntents = &v2MoneyManagementOutboundSetupIntentService{B: backends.API, Key: key}
+	client.V2MoneyManagementPayoutIntents = &v2MoneyManagementPayoutIntentService{B: backends.API, Key: key}
+	client.V2MoneyManagementPayoutMethods = &v2MoneyManagementPayoutMethodService{B: backends.API, Key: key}
+	client.V2MoneyManagementPayoutMethodsBankAccountSpecs = &v2MoneyManagementPayoutMethodsBankAccountSpecService{B: backends.API, Key: key}
+	client.V2MoneyManagementReceivedCredits = &v2MoneyManagementReceivedCreditService{B: backends.API, Key: key}
+	client.V2MoneyManagementRecipientVerifications = &v2MoneyManagementRecipientVerificationService{B: backends.API, Key: key}
+	client.V2MoneyManagementTestHelpersFinancialAddresses = &v2MoneyManagementTestHelpersFinancialAddressService{B: backends.API, Key: key}
+	client.V2MoneyManagementTransactionEntries = &v2MoneyManagementTransactionEntryService{B: backends.API, Key: key}
+	client.V2MoneyManagementTransactions = &v2MoneyManagementTransactionService{B: backends.API, Key: key}
+	client.V2TestHelpersMoneyManagements = &v2TestHelpersMoneyManagementService{B: backends.API, Key: key}
 	// stripeClientInit: The end of the section generated from our OpenAPI spec
 }
 

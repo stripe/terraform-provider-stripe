@@ -17,6 +17,16 @@ const (
 	ReserveHoldCreatedByStripe      ReserveHoldCreatedBy = "stripe"
 )
 
+// The balance destination to which the reserved funds are sent.
+type ReserveHoldDestination string
+
+// List of values that ReserveHoldDestination can take
+const (
+	ReserveHoldDestinationOther              ReserveHoldDestination = "other"
+	ReserveHoldDestinationRiskReserved       ReserveHoldDestination = "risk_reserved"
+	ReserveHoldDestinationSettlementReserved ReserveHoldDestination = "settlement_reserved"
+)
+
 // The reason for the ReserveHold.
 type ReserveHoldReason string
 
@@ -36,6 +46,13 @@ const (
 	ReserveHoldSourceTypeFPX         ReserveHoldSourceType = "fpx"
 )
 
+// List of ReserveReleases and the amounts released from this ReserveHold.
+type ReserveHoldReleaseDetail struct {
+	// The amount released by the ReserveRelease from this ReserveHold. A positive integer representing how much is released in the [smallest currency unit](https://docs.stripe.com/currencies#zero-decimal).
+	Amount int64 `json:"amount"`
+	// The ReserveRelease which released funds from this ReserveHold (e.g., resrel_123).
+	ReserveRelease string `json:"reserve_release"`
+}
 type ReserveHoldReleaseSchedule struct {
 	// The time after which the ReserveHold is requested to be released.
 	ReleaseAfter int64 `json:"release_after"`
@@ -55,6 +72,8 @@ type ReserveHold struct {
 	CreatedBy ReserveHoldCreatedBy `json:"created_by"`
 	// Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html), in lowercase. Must be a [supported currency](https://stripe.com/docs/currencies).
 	Currency Currency `json:"currency"`
+	// The balance destination to which the reserved funds are sent.
+	Destination ReserveHoldDestination `json:"destination"`
 	// Unique identifier for the object.
 	ID string `json:"id"`
 	// Whether there are any funds available to release on this ReserveHold. Note that if the ReserveHold is in the process of being released, this could be false, even though the funds haven't been fully released yet.
@@ -66,7 +85,9 @@ type ReserveHold struct {
 	// String representing the object's type. Objects of the same type share the same value.
 	Object string `json:"object"`
 	// The reason for the ReserveHold.
-	Reason          ReserveHoldReason           `json:"reason"`
+	Reason ReserveHoldReason `json:"reason"`
+	// List of ReserveReleases and the amounts released from this ReserveHold.
+	ReleaseDetails  []*ReserveHoldReleaseDetail `json:"release_details,omitempty"`
 	ReleaseSchedule *ReserveHoldReleaseSchedule `json:"release_schedule"`
 	// The ReservePlan which produced this ReserveHold (i.e., resplan_123)
 	ReservePlan *ReservePlan `json:"reserve_plan"`

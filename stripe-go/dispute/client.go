@@ -10,8 +10,8 @@ package dispute
 import (
 	"net/http"
 
-	stripe "github.com/stripe/stripe-go/v86"
-	"github.com/stripe/stripe-go/v86/form"
+	stripe "github.com/stripe/stripe-go/v87"
+	"github.com/stripe/stripe-go/v87/form"
 )
 
 // Client is used to invoke /v1/disputes APIs.
@@ -61,14 +61,14 @@ func (c Client) Update(id string, params *stripe.DisputeParams) (*stripe.Dispute
 	return dispute, err
 }
 
-// Closing the dispute for a charge indicates that you do not have any evidence to submit and are essentially dismissing the dispute, acknowledging it as lost.
+// Closing the dispute for a charge indicates that you do not have any evidence to submit and are essentially dismissing the dispute (accepting it), acknowledging it as lost.
 //
 // The status of the dispute will change from needs_response to lost. Closing a dispute is irreversible.
 func Close(id string, params *stripe.DisputeParams) (*stripe.Dispute, error) {
 	return getC().Close(id, params)
 }
 
-// Closing the dispute for a charge indicates that you do not have any evidence to submit and are essentially dismissing the dispute, acknowledging it as lost.
+// Closing the dispute for a charge indicates that you do not have any evidence to submit and are essentially dismissing the dispute (accepting it), acknowledging it as lost.
 //
 // The status of the dispute will change from needs_response to lost. Closing a dispute is irreversible.
 //
