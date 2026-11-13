@@ -1,0 +1,709 @@
+{
+  "owner": "terraform-metronome",
+  "files": [
+    {
+      "path": ".github/workflows/metronome-terraform.yml",
+      "sha256": "ceb394a65cd4bf4ccd2988c76ddc57c3f03f5b73d8ffd5219f56f1f20423e5de"
+    },
+    {
+      "path": "docs/actions/metronome_add_custom_field_key_v1.md",
+      "sha256": "54149a6a291dd9384a42b939bf123c752eb844ba0cdc8f09fd39ef56b3df5822"
+    },
+    {
+      "path": "docs/actions/metronome_add_manual_balance_ledger_entry_v1.md",
+      "sha256": "e4f11c376196e077b2f8a22613018a87579abe17065ec9db9677e0fc5c72e353"
+    },
+    {
+      "path": "docs/actions/metronome_add_rate_v1.md",
+      "sha256": "a41f31d4f809d841eafdf6e3ff2905c83ebe4bd48a4b6fa872454440f1e4dcbe"
+    },
+    {
+      "path": "docs/actions/metronome_add_rates_v1.md",
+      "sha256": "f3149b5db478321543fd33d134bb6a74a7e1578397334356b9123d8e2f57c409"
+    },
+    {
+      "path": "docs/actions/metronome_amend_contract_v1.md",
+      "sha256": "f384b7b25ed0fe3fd2efee4c84444888ac426321afe2b6cc6deb07536cc5e81e"
+    },
+    {
+      "path": "docs/actions/metronome_approve_approval_request_v1.md",
+      "sha256": "8ac10dbdb74d74f8b3e30f71b804ad783074a7cad589ebdbf8e2928a9d0afce6"
+    },
+    {
+      "path": "docs/actions/metronome_archive_alert_v1.md",
+      "sha256": "62873da835d3581ccfed1f1b208d39a64b1d3630a3b24eaa95d8138efd4c1c17"
+    },
+    {
+      "path": "docs/actions/metronome_archive_billable_metric_v1.md",
+      "sha256": "7b63484817026133a5fa77f691978ca534b2293c90b5b088171e30dc9256ee84"
+    },
+    {
+      "path": "docs/actions/metronome_archive_commit_v2.md",
+      "sha256": "5aa12b64886a4440f42592032174031a6b5dc56483f802311e8dc2efb145bbf2"
+    },
+    {
+      "path": "docs/actions/metronome_archive_contract_v1.md",
+      "sha256": "2f63bdc350146542f787c1e54a0ff0f0ae2591183da1058099e60d0a04e3918a"
+    },
+    {
+      "path": "docs/actions/metronome_archive_credit_type_v1.md",
+      "sha256": "8a0b9b8f3120f3c35477435b9486e753d841ccd92b3971f8682029f22d8a1fa7"
+    },
+    {
+      "path": "docs/actions/metronome_archive_credit_v2.md",
+      "sha256": "4b08ad8a11f083be2524aa85b49f7827381fc930e578276e176f7433bd651d5d"
+    },
+    {
+      "path": "docs/actions/metronome_archive_customer_billing_provider_configurations_v1.md",
+      "sha256": "e01d9e318bc57fab2370df667a53821cd77232e11b8667f0c0c9a08746ac1009"
+    },
+    {
+      "path": "docs/actions/metronome_archive_customer_revenue_system_configurations_v1.md",
+      "sha256": "455a968c7c76bcf8ea8483df468497ed5b516501ccd69ca248f373dc1b80e96c"
+    },
+    {
+      "path": "docs/actions/metronome_archive_customer_v1.md",
+      "sha256": "d67854920bb7a084a0b1da98bbf5cf2b0ea238f932d795bdf31402843985f30a"
+    },
+    {
+      "path": "docs/actions/metronome_archive_notification_config_v2.md",
+      "sha256": "3d176077de7cc2bcefbaf0570def000aeabf48a8314b249a9ba1af3a62a7abcc"
+    },
+    {
+      "path": "docs/actions/metronome_archive_package_v1.md",
+      "sha256": "58ce5d6b4f72dd43542f34f64676253102980de55700d8c5874dd4fd26b581fe"
+    },
+    {
+      "path": "docs/actions/metronome_archive_product_list_item_v1.md",
+      "sha256": "695b6fda85cd8faa479e5982a4a5a6c9b0d2a4af7137589adef595e113dc7fa7"
+    },
+    {
+      "path": "docs/actions/metronome_archive_rate_card_v1.md",
+      "sha256": "a64a90858cc6d86cf8b67f168c8755ad251caa9fb16c6baca0921d33d98b4baf"
+    },
+    {
+      "path": "docs/actions/metronome_charge_seats_v1.md",
+      "sha256": "8ed1f69e8c86f24dcb2c10aebb256dc756afd0df7c6a837046ac020aa2b9a589"
+    },
+    {
+      "path": "docs/actions/metronome_create_alert_v1.md",
+      "sha256": "7d24ea45591e69196460f2a968491b46c42b95c1930b5b33312ac04b104ed7af"
+    },
+    {
+      "path": "docs/actions/metronome_create_billable_metric_v1_v1.md",
+      "sha256": "219ae7130a1000f87f87bcf5836449fe31cd708f985f99a8fa450ff081832e36"
+    },
+    {
+      "path": "docs/actions/metronome_create_billable_metric_v1.md",
+      "sha256": "39c23a46bbb3233b9e78f54f3b6583f56fc0841913a661b6c6644dfcc99e512d"
+    },
+    {
+      "path": "docs/actions/metronome_create_contract_v1.md",
+      "sha256": "2ed29ef60cb6a78dd365a33313d168d1824376afa08087718dcac1597cf424be"
+    },
+    {
+      "path": "docs/actions/metronome_create_credit_type_v1.md",
+      "sha256": "213bd51664007c3e6f71b47756d2648aeb096e324b11447c00a4cf1c4d1030f5"
+    },
+    {
+      "path": "docs/actions/metronome_create_customer_commit_v1.md",
+      "sha256": "808afa9d9d653860013c088e4f5e633c66b2adaa6b4192ba4c7b35b517f7d6e8"
+    },
+    {
+      "path": "docs/actions/metronome_create_customer_credit_v1.md",
+      "sha256": "b6d7b052099767261002b155a5388f2d8395ccef8f7213511d112140df504455"
+    },
+    {
+      "path": "docs/actions/metronome_create_customer_v1.md",
+      "sha256": "c3fa8d0fba163fcbb97bd30ab4fa030d878db63423069573200bf1b98ec18fa4"
+    },
+    {
+      "path": "docs/actions/metronome_create_customer_with_contract_v1.md",
+      "sha256": "1d7233ef642ab885e39ef99c78181534f1651371ecfe308df095b227e469cdc8"
+    },
+    {
+      "path": "docs/actions/metronome_create_historical_contract_usage_invoices_v1.md",
+      "sha256": "6084ab2b20f30535ff32e6e891f1125e436035cda53870e95be8716ab9dd4deb"
+    },
+    {
+      "path": "docs/actions/metronome_create_notification_config_v2.md",
+      "sha256": "b296f25ae88401234147db975d54aea7935adb7bfda5c86ded4ebc0aa3343311"
+    },
+    {
+      "path": "docs/actions/metronome_create_package_v1.md",
+      "sha256": "a9dc588a5e59f1ce8e226f0ef51612a78e336feca56f4b14a274c4dbee7a4875"
+    },
+    {
+      "path": "docs/actions/metronome_create_product_v1.md",
+      "sha256": "1bae4a49f5a8c41c7d591ea2b72efaa9c66ae52f0867c44b41638d22e8138507"
+    },
+    {
+      "path": "docs/actions/metronome_create_rate_card_v1.md",
+      "sha256": "b3810ff486378ce8ac9d5624abb3c0c5e68848c8784107f60d5d01041f964cec"
+    },
+    {
+      "path": "docs/actions/metronome_delete_custom_fields_v1.md",
+      "sha256": "0cfeb29dfb58a5f1a41f1741df692f7c0a32035db152cdef590a969049a99c7d"
+    },
+    {
+      "path": "docs/actions/metronome_delete_stripe_billing_settings_v1.md",
+      "sha256": "bc5e590a511d13e30edd81226354e8cf32ed2719c23b4854ac7813eefb1dc5f4"
+    },
+    {
+      "path": "docs/actions/metronome_deny_approval_request_v1.md",
+      "sha256": "bd7800b2082c36b8be0143d004449be4933b5ff0d97dfbe41ed6cabfbf164399"
+    },
+    {
+      "path": "docs/actions/metronome_disable_commit_trueup_v1.md",
+      "sha256": "c2a0ec680bffb8dfe6e91e1368d1e4204794c1a040ad02abbcfa31a92f50ebe2"
+    },
+    {
+      "path": "docs/actions/metronome_disable_custom_field_key_v1.md",
+      "sha256": "e8692c8bf5617440d710fb558a6e6a1c703d2cde937a53a78e0471f089be895f"
+    },
+    {
+      "path": "docs/actions/metronome_edit_commit_v2.md",
+      "sha256": "acefe8ae28090da302dc95a56da8aafb90bb29463aaa5fd5ad11e6cea1374067"
+    },
+    {
+      "path": "docs/actions/metronome_edit_contract_v2.md",
+      "sha256": "ad211002ceb4bef379774ce3e18b3414501fbbf60f05edb1b1c3485c4c719c19"
+    },
+    {
+      "path": "docs/actions/metronome_edit_credit_v2.md",
+      "sha256": "6b79b24c547a4a494671f9b1db8bedcf16ec7519d1c7f725dac0efd3aa910fa5"
+    },
+    {
+      "path": "docs/actions/metronome_edit_notification_config_v2.md",
+      "sha256": "bfa4044ccbcc1a89d7bde33a3bb9fa1f2647be258b9759ad5c3b86496024461a"
+    },
+    {
+      "path": "docs/actions/metronome_embeddable_dashboard_v1.md",
+      "sha256": "1736c4cdf27041724d427c6aaa1bab57764ab151062ce7bf6aa052b03893aa73"
+    },
+    {
+      "path": "docs/actions/metronome_ingest_v1.md",
+      "sha256": "14f5dad3c806db69ac7ae7cef0ff148ce0b94bfd623e46d62234a5f7027fe213"
+    },
+    {
+      "path": "docs/actions/metronome_integration_cloudwatch_logger_v1.md",
+      "sha256": "0a73e4e083a3f46ec2d1433fba9e6270f149e1b03e55b61451102ebe8010e3c2"
+    },
+    {
+      "path": "docs/actions/metronome_move_rate_card_products_v1.md",
+      "sha256": "a74413e75579a1d68c4e6535d37073247caef85c3c6f3e9f8a99e72298b1f623"
+    },
+    {
+      "path": "docs/actions/metronome_move_to_history_v2.md",
+      "sha256": "3e133263b285c92f92f1fe4a9b0b45daa5c6d858b64bcd882700eb6cda294f7e"
+    },
+    {
+      "path": "docs/actions/metronome_regenerate_invoice_v1.md",
+      "sha256": "a5006885551a2d5a72abd97c9664d3e80cf1ecab1fc1460f7bf47dea5a9375c4"
+    },
+    {
+      "path": "docs/actions/metronome_release_external_payment_gate_threshold_commit_v1.md",
+      "sha256": "3ad20399af6e2a2d7237128a873c9faf101e49957dcd39cd5c47c106dc443d3c"
+    },
+    {
+      "path": "docs/actions/metronome_reset_customer_alerts_v1.md",
+      "sha256": "53518f33002dc4fc69045201720aaf4f56f91f24c595b54a0e8b02b8b46fba90"
+    },
+    {
+      "path": "docs/actions/metronome_schedule_pro_services_invoice_v1.md",
+      "sha256": "3db73458c25a9490cf083250f276b1a4cb3e49cc4d8c2ce666ce21dfb83ccf09"
+    },
+    {
+      "path": "docs/actions/metronome_set_custom_fields_v1.md",
+      "sha256": "4c603da2d779a7730b91aa192f89b071686e92686ba71d4d69cbc7252b62ea4c"
+    },
+    {
+      "path": "docs/actions/metronome_set_customer_billable_status_v1.md",
+      "sha256": "e08265632a73c0a497014eeb5b910e9e823d463262760d87783c2d210a899a3d"
+    },
+    {
+      "path": "docs/actions/metronome_set_customer_name_v1.md",
+      "sha256": "c692ad4ff0e4e895311f1dc5915d2c0815ce06e691bee39c69215a5be161c0fa"
+    },
+    {
+      "path": "docs/actions/metronome_set_ingest_aliases_v1.md",
+      "sha256": "562a67bf1368919e251c890e2598464b8259e49152a5cf8279d62bf2baee4f69"
+    },
+    {
+      "path": "docs/actions/metronome_set_rate_card_products_order_v1.md",
+      "sha256": "c85fff3367a5c7f9181236587c653f00069d8bc9b39f22a016d0de4811420a1c"
+    },
+    {
+      "path": "docs/actions/metronome_set_up_billing_provider_v1.md",
+      "sha256": "fb8b047901e4546d51382d9cc2de0b791eb8fcaa4ea26f35f3ee8c0d152849c4"
+    },
+    {
+      "path": "docs/actions/metronome_set_usage_filter_v1.md",
+      "sha256": "deecf8bbf11a7ee48195628ae551fa433292f6e74207854a4511791d1d112cb6"
+    },
+    {
+      "path": "docs/actions/metronome_submit_approval_requests_v1.md",
+      "sha256": "fd15377c27448db00ab20b269eac08c07b291b60710f55aa4cb460313149dc3f"
+    },
+    {
+      "path": "docs/actions/metronome_update_active_recharge_config_v1.md",
+      "sha256": "fb0990ff781d268c0e75067f9d7f0fc5ea75d6c1d6aea0d947390e3efd9ab526"
+    },
+    {
+      "path": "docs/actions/metronome_update_billable_metric_v1.md",
+      "sha256": "a2838168776846fdc4b9b4fdaad9e7e82d8b1142f8ef896fc503acdcb451a535"
+    },
+    {
+      "path": "docs/actions/metronome_update_commit_end_date_v1.md",
+      "sha256": "89a876ae7aeec33c8c28020bbaaf30224086332dfa92d411ea67504c22a3937d"
+    },
+    {
+      "path": "docs/actions/metronome_update_contract_end_date_v1.md",
+      "sha256": "9e259f9bfe8f3a980af897f5cb1263ca48d52f550124e97214e2168292b614ed"
+    },
+    {
+      "path": "docs/actions/metronome_update_contract_named_schedule_v1.md",
+      "sha256": "219a0df4354d70a66c0862322ae56b67807c3c1d584daed3ece5f993187144e6"
+    },
+    {
+      "path": "docs/actions/metronome_update_credit_end_date_v1.md",
+      "sha256": "430db66ae81ea80e7a760e16566ae93bed529c75d24f2b0787ac290b4dbca311"
+    },
+    {
+      "path": "docs/actions/metronome_update_customer_config_v1.md",
+      "sha256": "cbc43da2377c5b2e0233fad00ddae28440ea2abc7158791a2c3cf1eb3ff0f6f6"
+    },
+    {
+      "path": "docs/actions/metronome_update_customer_named_schedule_v1.md",
+      "sha256": "6a1b6b4912cd475d80c9a9c172e797cb870c347b320e2e78924bb6a12cf308ac"
+    },
+    {
+      "path": "docs/actions/metronome_update_invoice_issue_date_v1.md",
+      "sha256": "09a3f682cf316051f80d93f4596a096ff0b6e9b976ad794aa44a8cfbb7eccccb"
+    },
+    {
+      "path": "docs/actions/metronome_update_product_v1.md",
+      "sha256": "1ffdffe7657b9f5f3f81d9025e05b481242d07e9dca3c1ef64678fde1d6d423a"
+    },
+    {
+      "path": "docs/actions/metronome_update_rate_card_named_schedule_v1.md",
+      "sha256": "33d40c609be00a61d0db38571939fb6408a60bafc3f052dcc840517272ed39fc"
+    },
+    {
+      "path": "docs/actions/metronome_update_rate_card_v1.md",
+      "sha256": "e3f405c1422a8a0a0f0e8a76555e33a1d3351fa31e14d7b5b97424c2cf30bad5"
+    },
+    {
+      "path": "docs/actions/metronome_void_invoice_v1.md",
+      "sha256": "81db030c888e765cc79af628b3a124c32fb8229f66a830c19ba2617a294e2802"
+    },
+    {
+      "path": "docs/data-sources/metronome_billable_metrics.md",
+      "sha256": "77005c87ec0f95bef8586844e16cd259ab55ba31a1d1b102e71cefcca511440b"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_approval_request_v1.md",
+      "sha256": "6b27a77a1ea4d1e90c0b316c1e23b01df547348d4fb420f1df671648f5701d4d"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_audit_logs_v1.md",
+      "sha256": "e4fbdf12b0a8b99fc7abf39d32a3b2fd9b6a9a4ea7febcb84ab9fcd31f1bd809"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_billable_metric_v1.md",
+      "sha256": "22a14470e50ec5aa3d2c261e550f27fa4d6ffae6d9c5bfb3c6df4c2c5697d342"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_contract_edit_history_v2.md",
+      "sha256": "712c2ab8768cc60f9654a0f34b10d5fbbfbf4dac01289e57093b1820340bebb0"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_contract_named_schedule_v1.md",
+      "sha256": "a2da42f2639eef230318c7121fb209f0a27328d703f9fe9d3745ab800211203c"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_contract_rate_schedule_v1.md",
+      "sha256": "c12c687d2ea8d41406798157c3e4d29d31af6fd108ab80ddef2f38d05fa7a93a"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_contract_v1.md",
+      "sha256": "b180054ec78d1fc6a2880636368c9313c4570896f87ec054a8dcd0c981f47f0c"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_contract_v2.md",
+      "sha256": "9b94a52c3387cb5a4ea7450dbf11f79861cc7daddb0797e2648de3ffe37e93a3"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_customer_alert_v1.md",
+      "sha256": "6677e0f4484f8c66fa56ddebfb9c89a5587505a5a3969c874d994714f8b1c149"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_customer_named_schedule_v1.md",
+      "sha256": "6f458018973253e2cfed47354b995af1a58208376011c8c59352fc2323586952"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_customer_v1.md",
+      "sha256": "6364cd4df767d4626dc001c1a3fa7eb592f080dc7366052da1da2a4ab4f6a471"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_invoice_pdf_v1.md",
+      "sha256": "24446f7f4224c1efc29b259b432d4a2d54b1cef65f7a6f7551804ae871764300"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_invoice_v1.md",
+      "sha256": "bc172801b7245b0126986c8853386a3748a3fbfd98cbccc6eb94db56f80da27a"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_net_balance_v1.md",
+      "sha256": "eaab603cea7cd7a5144fafe28a76996b0bed77d6cfa56492b1f43194d1eae97c"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_notification_config_v2.md",
+      "sha256": "9183fc43365d125aa9915274d88d7767ee2d4e679217d77060522c2f2f693e3a"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_package_v1.md",
+      "sha256": "3f7b116753231950dc0dd480dc0ba8577b36e9d5b359a2d60bc468b20c8fb7fd"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_paged_usage_v1.md",
+      "sha256": "97869e1371c2c0b4e9e80613e73c45a9808b19155024eab51fb10b7c53229abc"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_product_v1.md",
+      "sha256": "42517aa9759a34eab22e39bb1ebabb8f88c95c35686c051c0a3322d925f64bb9"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_purchased_seats_v1.md",
+      "sha256": "dc26e25431fd55f916492d0aa5d59b004d0737402020bb95458f9fde94cbc1b5"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_rate_card_named_schedule_v1.md",
+      "sha256": "6774e429e83c254eaa07d68efec0f24af1e37d57f262da6a3f78eae0736679db"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_rate_card_v1.md",
+      "sha256": "8b6edc0d4ef550a1e01c071a7ca4b4474fe4bda093e5900c24ddb2b1c81600ad"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_rate_schedule_v1.md",
+      "sha256": "27c773eab5584e5a1d19bbbcf5519554a2a86a4b3d8faa128acb6654e7d82d40"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_rates_v1.md",
+      "sha256": "e4146973009d99e855485955210412d8f78b6b95f30a6ee62e59eada8949a7f4"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_seats_usage_v1.md",
+      "sha256": "1b12b0c17a4f008edbe8e965682fa4515f492415b57726cc5f8f999c39ca660d"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_services_v1.md",
+      "sha256": "eba3d1b93485bfd3d3b8b81130e00f55bc2b21a6fc1246f8919c197342e678be"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_subscription_quantity_history_v1.md",
+      "sha256": "84bf7d1e8309d5449b7b694f6a136325698c10ce9cec6b9fca51356729d2d6c0"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_subscription_seats_history_v1.md",
+      "sha256": "41c616696f0f1e46915819f99258364ba3bc7551264d604ff13bd458c88673b4"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_subscription_status_v1.md",
+      "sha256": "ef1e2646f1beefd3f7e5b0306eb5b3662be0a96594ff197e08906beaf9baa422"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_usage_batch_v1.md",
+      "sha256": "1c19f30642c1448842a894ac9095b0bd7a7b6eb2f6f8f0ce46bd10a8f740120d"
+    },
+    {
+      "path": "docs/data-sources/metronome_get_webhook_delivery_v1.md",
+      "sha256": "cbba4a14960a9312171faa459cd474a40f06dbb7e1904d1681222a3f12e37aa5"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_all_billable_metrics_v1.md",
+      "sha256": "2654f2684873d3691e197ec28d09872fef127261b003d6b152e65301df13e03e"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_approval_requests_v1.md",
+      "sha256": "3cab8e4e3799fba45edde576b9528a23fe3af0b836e0890c0ad316e25e526ca7"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_billable_metrics_v1.md",
+      "sha256": "bc90081f48f1afff7296871cc97c27485b8bd1afa5f77f4f69e47016c12d4c89"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_breakdown_invoices_v1.md",
+      "sha256": "66f115cae3212a11812b394fc601b3df73b31a88a05bb6d5791a5292253f41aa"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_contracts_named_schedules_v1.md",
+      "sha256": "230c80060fc52297d69e7f3114da9c18a9dcfadcb41f884be18f61a475cfe4b9"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_contracts_on_package_v1.md",
+      "sha256": "8ffe995ef5219900c1db6a7446ab0a40f98cddfc4324f04b53debc5343a9f5fd"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_contracts_v1.md",
+      "sha256": "c2673f7a13468037591cc68adc7a0f80ceeb41fea49eb33b1eeeb06e59e7c405"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_contracts_v2.md",
+      "sha256": "ed6ebec735c2b7de3afa9317e5a2da1f8d9d5e39920b64de401bfe421d48f2c9"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_credit_types_v1.md",
+      "sha256": "722dab5757ff76025b7b9d1de4bfd29640bf0c7096c0004cc034884bdf8e9857"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_custom_field_keys_v1.md",
+      "sha256": "95439a570ba7e6c1411977fe717aa367216deec54af2127c2ebcfd70f3f7a2e6"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_customer_alerts_v1.md",
+      "sha256": "c5ef1a47c87ec47f3cccc1d73a46c95b6080cce555c287fb3c636ac8ea88a4b1"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_customer_balances_v1.md",
+      "sha256": "15cffb3a79b83f31e4ba08aae611cb7aad07611a006b1b627896215711d39c9a"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_customer_commits_v1.md",
+      "sha256": "e4b2c83f61814148bc3cfbd7bacb7d3fd9d744a7065a39a8ce0e66af07da5319"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_customer_credits_v1.md",
+      "sha256": "fee6e9b6efb5297ca3e85944511fa24fe94e6261e0fb0715f81416d0e2097be8"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_customers_v1.md",
+      "sha256": "8b48cb4d46e99b938a92e8e8df03bd1932db254b35250521882eb6fbfb39ba2f"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_historical_balances_v1.md",
+      "sha256": "5a4253641333e0b3edef2603285c682063a23883898c16c34b9daf30968063db"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_invoices_v1.md",
+      "sha256": "7157135113d2cdb5c35312d500e6981c78443c248d9227373429f2fb29f02201"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_offset_notification_configs_v2.md",
+      "sha256": "b9126af5d664cdc99bf43d67a3b98241b7f5a159fb21cda1dbdbae744d071846"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_packages_v1.md",
+      "sha256": "e197a24992ebec7c257e7b5ca736c7d69a6bd11b9a05fbdef451aa52da69a700"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_products_v1.md",
+      "sha256": "59e19053848676fbbe26bc433a33828aa8e2d0b687e5b3d16ed9ad168fcf8391"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_rate_cards_v1.md",
+      "sha256": "a55caa914c7accad755e25ff2977fbe3a28ab663f62b1af74a434200f99a1742"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_seat_balances_v1.md",
+      "sha256": "f9221c0fe5ee6eac8c28f22195cfd7ba4c5905c413f7a4e60d936567c2acebd3"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_spend_breakdown_invoices_v1.md",
+      "sha256": "1ee66b730c3ba3f47b67f5cd74427b12b7ee9ad8f26d0670c6857ff7c3002b53"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_system_notification_configs_v2.md",
+      "sha256": "51ecfe1dbf2dc58c6d9bb0cd9355718774824cff16620fb6c03efc9480a4a915"
+    },
+    {
+      "path": "docs/data-sources/metronome_list_webhook_deliveries_v1.md",
+      "sha256": "2a39bca0533612d304b536af93eca47431a63687fc48565ff57a1d4e0de65b6a"
+    },
+    {
+      "path": "docs/data-sources/metronome_preview_customer_events_v1.md",
+      "sha256": "ad7514dc23955ef836338a3ef18ac1f5995f4d8ffe776823c2c0aaac1f5ece15"
+    },
+    {
+      "path": "docs/data-sources/metronome_search_events_v1.md",
+      "sha256": "bf8216052dd194bf8194b5f11f408afaaba6232a76d9681c2d8b25a2e44abaca"
+    },
+    {
+      "path": "docs/data-sources/metronome_stripe_billing_provider.md",
+      "sha256": "4d67f5cf2c8c30e8a8764a449db6530b365880d9ed58b8f6bfe0f7850ea0a584"
+    },
+    {
+      "path": "docs/guides/metronome.md",
+      "sha256": "5722d812b56d619191c4e1fd6d96d524f0a1b271d857021718add7b5b24df960"
+    },
+    {
+      "path": "docs/index.md",
+      "sha256": "c6bb198fdca0b13cfaf091519b297df2b67214dee74a2ba21697b9ebaca1821b"
+    },
+    {
+      "path": "docs/resources/metronome_account_bridge.md",
+      "sha256": "0e8ba03fb16dfdd2686bb20c205ecaab28a69317b73e43a613dcf234ef0ef519"
+    },
+    {
+      "path": "docs/resources/metronome_billable_metric.md",
+      "sha256": "02dfb2e9a37ae052c795b2ff791c2e00e5e3de33dddd856ad3086ee9431f8d55"
+    },
+    {
+      "path": "docs/resources/metronome_contract.md",
+      "sha256": "a1f75cddbecac65bc2cbf72d5fc4068e97bf7d7ce8ec7fe30930bdb9f6f3bd95"
+    },
+    {
+      "path": "docs/resources/metronome_credit_type.md",
+      "sha256": "ab398a8b89fbe5f5720e9fb963a7eec0ddf61d723015852f09493732b940197d"
+    },
+    {
+      "path": "docs/resources/metronome_custom_field_key.md",
+      "sha256": "3ceb4674a28193e7c28d5520943f67a686a1886b030e6a578edc88ccb95c2caf"
+    },
+    {
+      "path": "docs/resources/metronome_customer_alert.md",
+      "sha256": "aac4bbdb5dad6f64ef8f6e771c3d27e04a30f206bb4582232123ed66751620ce"
+    },
+    {
+      "path": "docs/resources/metronome_customer_billing_configuration.md",
+      "sha256": "9ec026c03105c05007a6f8f84ff9bccef09d52548801304d2598d0a5ca6d0aa9"
+    },
+    {
+      "path": "docs/resources/metronome_customer_commit.md",
+      "sha256": "c2b251ba800fa37768acf066736f8c15dd38ec945ba91afea35eaf961f15cab7"
+    },
+    {
+      "path": "docs/resources/metronome_customer_credit.md",
+      "sha256": "a65f27f9e9491b24cb7bd3a2e4765e3e4708bb46c22fd25875cd2317e0e6a51d"
+    },
+    {
+      "path": "docs/resources/metronome_customer_revenue_configuration.md",
+      "sha256": "988a90c208e7b9e08fd0692da9851587197e85b63f84c81f9fd72164fef50d8c"
+    },
+    {
+      "path": "docs/resources/metronome_customer.md",
+      "sha256": "7d71d9c2f055afa202260e33e97351fcaa7bfd120a1d8c5b6388797dc999c825"
+    },
+    {
+      "path": "docs/resources/metronome_offset_notification.md",
+      "sha256": "659c945c01ac472af4427c206d8f1b5c88107f9cb8631b7b4136d960c2e57e33"
+    },
+    {
+      "path": "docs/resources/metronome_package.md",
+      "sha256": "6486add7f9add63a7404d41ef350820a972e67b5f85ba157ae419f650f95a87c"
+    },
+    {
+      "path": "docs/resources/metronome_product.md",
+      "sha256": "13428742a4f0a925098c0c5639fb35c472ac51a0f5342614ee1e3984bd973bb7"
+    },
+    {
+      "path": "docs/resources/metronome_rate_card.md",
+      "sha256": "d06664434ada2e502f05a876b33a5e21e1421b552780ddc5ddfca2903d52a731"
+    },
+    {
+      "path": "LICENSE.metronome",
+      "sha256": "f2f05e8a4356d9463f79d1136348dfc771a3ffdfedfca20ddc6f64e3b6cef211"
+    },
+    {
+      "path": "LICENSE.metronome-sdk",
+      "sha256": "0bc0d566cc9469c66caaff773a960cf926e15f26e670f05444b26510fa41a826"
+    },
+    {
+      "path": "scripts/metronome_offline.py",
+      "sha256": "b84eb58399e546d54f01ee9e4541c429ee979391f2790bfaaa3c0b85c990c0ce"
+    },
+    {
+      "path": "scripts/metronome_preservation.py",
+      "sha256": "df158a228910296c48d40cf78d780da372e58869390b19185be1e928157893aa"
+    },
+    {
+      "path": "stripe-preservation-manifest.json",
+      "sha256": "34fe6b31b61a8a2edfceb8a290457d7eb4b935c8f908b9f27cec0da6653daf0a"
+    },
+    {
+      "path": "testdata/metronome/legacy_provider/schema.json",
+      "sha256": "37a89b35d319bdae585cf59ac49060558275342fca8df1f10740f965d9278fc5"
+    },
+    {
+      "path": "testdata/metronome/migration/alert.json",
+      "sha256": "98dec58206bd96d0a2c797ad61049ce5e9fb64241c19bd5762b64e3bf50587f9"
+    },
+    {
+      "path": "testdata/metronome/migration/billing.json",
+      "sha256": "3649f4beffb256702cbbe562a85a1e8a1dcb0f83fd8b2111c3777d2c03ae3030"
+    },
+    {
+      "path": "testdata/metronome/migration/card_rates.json",
+      "sha256": "ac8f19c32ce3ae5c13a41becb4fc8e71fcfe3e3103781f8ff237b5139a7b53d1"
+    },
+    {
+      "path": "testdata/metronome/migration/card.json",
+      "sha256": "27eb7b142ae3d93830370580bc7d1272d3ebb2b1db2c6b6131837d1ce8f360d8"
+    },
+    {
+      "path": "testdata/metronome/migration/cases.json",
+      "sha256": "7b71f8696a054cc866610074fa8507658630db81eced6d76df6110e955fc96b1"
+    },
+    {
+      "path": "testdata/metronome/migration/commit.json",
+      "sha256": "9e3e4fd478d1d51377a14a1a9367b31a77b050620695fd8f3577f14eb6a7490d"
+    },
+    {
+      "path": "testdata/metronome/migration/contract.json",
+      "sha256": "d254005ddf847287de38343a723db4c925edc5b6b0b32f3d83f9ef7b01cbe05a"
+    },
+    {
+      "path": "testdata/metronome/migration/credit.json",
+      "sha256": "75419206e0a9f9d9621350622731401c08b860d41e61869ba8d898afa144d460"
+    },
+    {
+      "path": "testdata/metronome/migration/customer.json",
+      "sha256": "abad84f3019ee7c36f31bc4135b50fc81a355e4197566d7f00036bcbebc15cf7"
+    },
+    {
+      "path": "testdata/metronome/migration/field.json",
+      "sha256": "0407f950529e7de77a10e4b9867e186886bae8185064c494c70adea3bc754367"
+    },
+    {
+      "path": "testdata/metronome/migration/metric.json",
+      "sha256": "3b4e41c6ecb0779daa91d700553867cf5f1b25822e4e7c4d11b39e2911329457"
+    },
+    {
+      "path": "testdata/metronome/migration/notification.json",
+      "sha256": "110b9cce2b081ad7da3bd713c70e34a2484463dc229ecd2858d254347103039e"
+    },
+    {
+      "path": "testdata/metronome/migration/package_legacy.json",
+      "sha256": "09392f109f39672edce2fe3dce8fbaac63ff70cd97646cc58986bd96bb1c74d7"
+    },
+    {
+      "path": "testdata/metronome/migration/package_package.json",
+      "sha256": "cda9df44ed74fcd7f1f801a9db389c7c2942407fb208f63a30416dc749195327"
+    },
+    {
+      "path": "testdata/metronome/migration/package_request_json.json",
+      "sha256": "706aad295ba9104dc8999adad74c5973115bbd417068dcecde9eaa76a91fdcb3"
+    },
+    {
+      "path": "testdata/metronome/migration/package_request.json",
+      "sha256": "72973f9a2bc15c4cd3c428e7608c8819d4bd7b926bb943a989c6ee45363e70f1"
+    },
+    {
+      "path": "testdata/metronome/migration/product.json",
+      "sha256": "b6e854f0736f8ec4cb73833b743cbb120fa54e724793714a11b40c2032bdd707"
+    },
+    {
+      "path": "testdata/metronome/migration/provenance.json",
+      "sha256": "247c85e7d249a54435112d58a5604f5cee4ffb59e885d2456707682e87a95334"
+    },
+    {
+      "path": "testdata/metronome/migration/revenue.json",
+      "sha256": "6364601263bbe4856d3bd10917bc59a6896c94a53a64cb2c750bc8c9d95f70c7"
+    },
+    {
+      "path": "testdata/metronome/migration/unit.json",
+      "sha256": "968650c84522df6cae8a54583914b3ba32f0111fe9c0af6dd0207054d6a4fbe7"
+    }
+  ]
+}

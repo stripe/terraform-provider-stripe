@@ -1,0 +1,31 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "a7b7d019-3e90-892f-670e-3af5a1d74435",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "metronome_customer",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "deletion_protection": true,
+            "id": "customer",
+            "ingest_aliases": [
+              "alias"
+            ],
+            "name": "fixture"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

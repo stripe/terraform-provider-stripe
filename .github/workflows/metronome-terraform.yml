@@ -1,0 +1,68 @@
+name: Metronome integration
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stripe-bytes:
+    name: Frozen Stripe bytes (companion commit)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Compare every protected path in this exact commit
+        run: |
+          candidate_revision=$(git rev-parse HEAD)
+          python3 scripts/metronome_preservation.py diagnose \
+            --manifest stripe-preservation-manifest.json \
+            --baseline-repo . --candidate-revision "$candidate_revision"
+      - name: Check immutable generator provenance is present
+        run: |
+          python3 - <<'PY'
+          import json, re
+          p = json.load(open('generation-provenance.json'))
+          assert re.fullmatch('[0-9a-f]{40}', p['generatorRevision'])
+          assert p['generatorWorkingTreeDirty'] is False
+          assert p['baselineReproduction']['status'] == 'reproduced'
+          baseline = json.load(open('stripe-preservation-manifest.json'))
+          assert p['baselineReproduction']['protectedFileCount'] == len(baseline['protected'])
+          PY
+
+  offline:
+    name: Provider runtime and Terraform offline (${{ matrix.go }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.25.0', '1.26.4']
+    env:
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
+        with:
+          terraform_version: '1.16.5'
+          terraform_wrapper: false
+      - name: Go runtime regression and vet
+        run: |
+          go test -count=1 ./internal/...
+          go vet ./...
+      - name: Require every offline lifecycle, bridge, installation, action, and migration suite
+        run: python3 scripts/metronome_offline.py
+      - name: Verify Terraform example formatting and license input
+        run: |
+          terraform fmt -check -recursive examples/metronome
+          test -s LICENSE.metronome
+          test -s LICENSE.metronome-sdk

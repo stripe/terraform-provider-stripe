@@ -1,0 +1,25 @@
+{
+  "files": {
+    "alert.json": "98dec58206bd96d0a2c797ad61049ce5e9fb64241c19bd5762b64e3bf50587f9",
+    "billing.json": "3649f4beffb256702cbbe562a85a1e8a1dcb0f83fd8b2111c3777d2c03ae3030",
+    "card.json": "27eb7b142ae3d93830370580bc7d1272d3ebb2b1db2c6b6131837d1ce8f360d8",
+    "card_rates.json": "ac8f19c32ce3ae5c13a41becb4fc8e71fcfe3e3103781f8ff237b5139a7b53d1",
+    "commit.json": "9e3e4fd478d1d51377a14a1a9367b31a77b050620695fd8f3577f14eb6a7490d",
+    "contract.json": "d254005ddf847287de38343a723db4c925edc5b6b0b32f3d83f9ef7b01cbe05a",
+    "credit.json": "75419206e0a9f9d9621350622731401c08b860d41e61869ba8d898afa144d460",
+    "customer.json": "abad84f3019ee7c36f31bc4135b50fc81a355e4197566d7f00036bcbebc15cf7",
+    "field.json": "0407f950529e7de77a10e4b9867e186886bae8185064c494c70adea3bc754367",
+    "metric.json": "3b4e41c6ecb0779daa91d700553867cf5f1b25822e4e7c4d11b39e2911329457",
+    "notification.json": "110b9cce2b081ad7da3bd713c70e34a2484463dc229ecd2858d254347103039e",
+    "package_legacy.json": "09392f109f39672edce2fe3dce8fbaac63ff70cd97646cc58986bd96bb1c74d7",
+    "package_package.json": "cda9df44ed74fcd7f1f801a9db389c7c2942407fb208f63a30416dc749195327",
+    "package_request.json": "72973f9a2bc15c4cd3c428e7608c8819d4bd7b926bb943a989c6ee45363e70f1",
+    "package_request_json.json": "706aad295ba9104dc8999adad74c5973115bbd417068dcecde9eaa76a91fdcb3",
+    "product.json": "b6e854f0736f8ec4cb73833b743cbb120fa54e724793714a11b40c2032bdd707",
+    "revenue.json": "6364601263bbe4856d3bd10917bc59a6896c94a53a64cb2c750bc8c9d95f70c7",
+    "unit.json": "968650c84522df6cae8a54583914b3ba32f0111fe9c0af6dd0207054d6a4fbe7"
+  },
+  "method": "Terraform import or alert apply, followed by a zero-diff plan against local HTTPS fixtures",
+  "sourceRevision": "4abb7576cbf86763322a5aa1c33e89b4ee6c67e6",
+  "terraformVersion": "1.5.7"
+}

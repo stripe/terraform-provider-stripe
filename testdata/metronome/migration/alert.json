@@ -1,0 +1,37 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "d8ad64f3-8bd7-9e35-e808-2f09a9f5201b",
+  "outputs": {},
+  "resources": [
+    {
+      "module": "module.billing",
+      "mode": "managed",
+      "type": "metronome_customer_alert",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "alert_type": "low_remaining_contract_credit_balance_reached",
+            "billable_metric_id": null,
+            "credit_type_id": "unit",
+            "customer_id": "customer",
+            "deletion_protection": false,
+            "evaluate_on_create": false,
+            "id": "alert",
+            "name": "fixture",
+            "status": "enabled",
+            "threshold": 9007199254740993.125,
+            "uniqueness_key": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

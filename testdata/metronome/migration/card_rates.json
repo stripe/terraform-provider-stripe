@@ -1,0 +1,45 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "cc6691c3-afac-7e16-13da-84617d4605de",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "metronome_rate_card",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "credit_type_conversions": null,
+            "credit_type_id": "usd",
+            "description": null,
+            "id": "card",
+            "name": "fixture",
+            "price_cents": null,
+            "rate_mode": "list",
+            "rates": [
+              {
+                "billing_frequency": null,
+                "credit_type_id": null,
+                "entitled": true,
+                "price": 1.125,
+                "product_id": "product",
+                "rate_type": "FLAT",
+                "starting_at": "2026-11-01T00:00:00Z"
+              }
+            ],
+            "starting_at": null,
+            "usage_product_id": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

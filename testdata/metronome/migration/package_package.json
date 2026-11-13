@@ -1,0 +1,63 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "4427a1f4-5ee9-f741-78e5-bdf1a8cda868",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "metronome_package",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "contract_name": null,
+            "id": "package",
+            "name": null,
+            "package": {
+              "aliases": null,
+              "billing_provider": "stripe",
+              "commits": null,
+              "contract_name": "contract",
+              "credits": null,
+              "delivery_method": "direct_to_billing_provider",
+              "duration": null,
+              "multiplier_override_prioritization": null,
+              "name": "fixture",
+              "net_payment_terms_days": null,
+              "overrides": null,
+              "prepaid_balance_threshold_configuration": null,
+              "rate_card_alias": null,
+              "rate_card_id": "card",
+              "recurring_commits": null,
+              "recurring_credits": null,
+              "scheduled_charges": null,
+              "scheduled_charges_on_usage_invoices": null,
+              "spend_threshold_configuration": null,
+              "spend_trackers": null,
+              "subscriptions": null,
+              "uniqueness_key": null,
+              "usage_statement_schedule": {
+                "day": "CONTRACT_START",
+                "frequency": "MONTHLY",
+                "invoice_generation_starting_at_offset": null
+              }
+            },
+            "rate_card_id": null,
+            "recurring_commit": null,
+            "request": null,
+            "request_json": null,
+            "stripe_billing": null,
+            "uniqueness_key": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "channel": "ga",
+  "generatorRevision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+  "generatorWorkingTreeDirty": false,
+  "generatorBaseRevision": "888f051862072fd10cf22a9d521598ca00aff663",
+  "providerBaseRevision": "88cd2999f6049d62c351cabc8740fdaa9589577b",
+  "stripeGoBaseRevision": "9ecb8e65e3f77dd12fdd49bc2d68d44935b57ae1",
+  "metronomeSourceRevision": "4abb7576cbf86763322a5aa1c33e89b4ee6c67e6",
+  "metronomeGoSourceRevision": "09e24603469dd6a4e678cde80b2be3aff5036353",
+  "metronomeGoModuleVersion": "v3.13.0",
+  "metronomeGoModuleChecksum": "h1:tESzDYrd/l4t8qllAqjr9AMMXJWykYKTo/siKGbGNkw=",
+  "metronomeGoModChecksum": "h1:av/XmTcRvtWg9zuNMmEE+nH82e3sjS0aRS2n3Ri/Fzs=",
+  "toolchain": {
+    "node": "v26.10.0",
+    "yarn": "1.22.19",
+    "go": "go version go1.26.4 darwin/arm64",
+    "gofmt": "go version go1.26.4 darwin/arm64",
+    "terraformPluginDocs": "v0.24.0",
+    "terraform": "1.16.5"
+  },
+  "inputs": {
+    "stripeV1": {
+      "path": "openapi/cache/metronome-terraform/0.3.1/stripe-v1.sdk.yaml",
+      "revision": "v2596",
+      "sha256": "44e1e43caad8c8ef8184a0511e2664314eb68f6612402ebb90f39d010e297579"
+    },
+    "stripeV2": {
+      "path": "openapi/cache/metronome-terraform/0.3.1/stripe-v2.sdk.yaml",
+      "revision": "fcd36ef9298b7a9e8a2a18bc4f6162b100aa8bbc",
+      "sha256": "df994160e0703b33d44ffb4b9864b767a728cc68ace481175eaa6180d184cf20"
+    },
+    "metronomeSpec": {
+      "path": "packages/terraform/src/metronome/api/metronome-openapi.json",
+      "revision": "4abb7576cbf86763322a5aa1c33e89b4ee6c67e6",
+      "sha256": "3413bbf41c1cdc005f335094f92d3da28a3e1e6e84c5cfd277073d328eb471f8"
+    },
+    "metronomePolicies": {
+      "path": "packages/terraform/src/metronome/sdk-bindings.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "8012c845f29209d210b8741a5b99306a742eb5002c8140b49041f5753e29a38d"
+    },
+    "generatorLockfile": {
+      "path": "yarn.lock",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "7d19c3fad9dc432d70656524249b6dee85da7c98229118719b17364c0868554d"
+    }
+  },
+  "allMetronomeInputs": [
+    {
+      "path": "packages/terraform/src/metronome/api/credential-mapping-exceptions.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "16e55e09414f8c3be312df0b90a870d2210eae8f66eab9d2296fd659f97ff64a"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/credential-operations.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "226955c1ad41bef4eba38813649c33c8759cdedec9ce8f87aed0d847f0f46cf3"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/lifecycle-schema-policy.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "b3637f633f6efd4696c5e9511d4a5f71de8437fb9cbd954f76fc7fce9b060c4b"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/managed-resources.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "77df0ad476e98ff8f40e281a224277d6a11077f1ecae651b6559d1fbfe299f7e"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/managed-schema-policy.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "d561aaed593dda66af4999b87111526ae5a84896988b6594737ba5bc77284de1"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/metronome-openapi.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "3413bbf41c1cdc005f335094f92d3da28a3e1e6e84c5cfd277073d328eb471f8"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/operation-inventory.generated.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "3fac6c4250eb17215ac5092a651739a52793232fc5510aca8670fe657d3037ca"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/read-operations.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "ba338a42565b26e100d7f0cf183eba94c8c020395ee099d98542928ea599245c"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/security-review.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "fa93e8414281cb3e327716160f98d833a4507145e255a99630162a382ee81857"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/terraform-mapping.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "ae6e753d13f9e213232e58aa983f8aae3b5a634a9a332655af58a62920e5f94b"
+    },
+    {
+      "path": "packages/terraform/src/metronome/sdk-bindings.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "8012c845f29209d210b8741a5b99306a742eb5002c8140b49041f5753e29a38d"
+    },
+    {
+      "path": "packages/terraform/src/metronome/sdk-endpoints.json",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "753b60cbcb9616a95a836a61a4227cd968caa0e9487dacea45487a051945463f"
+    },
+    {
+      "path": "packages/terraform/src/metronome/LICENSE",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "f2f05e8a4356d9463f79d1136348dfc771a3ffdfedfca20ddc6f64e3b6cef211"
+    },
+    {
+      "path": "packages/terraform/src/metronome/SDK-LICENSE",
+      "revision": "2ba349efc1769cdd8b079880bff5638a2c14c481",
+      "sha256": "0bc0d566cc9469c66caaff773a960cf926e15f26e670f05444b26510fa41a826"
+    }
+  ],
+  "baselineReproduction": {
+    "status": "reproduced",
+    "protectedFileCount": 2614,
+    "evidence": {
+      "path": "packages/terraform/src/metronome/preservation/0.3.1/baseline-reproduction.json",
+      "revision": "888f051862072fd10cf22a9d521598ca00aff663",
+      "sha256": "70fdc1171c61b83bd1d7692835ed5640e196a4120d4bd779615a8d363a461c00"
+    }
+  },
+  "documentation": {
+    "tool": "tfplugindocs v0.24.0",
+    "scope": "Metronome surfaces and combined provider overview; frozen Stripe pages retained"
+  },
+  "liveSandbox": {
+    "executed": false,
+    "activationExecuted": false
+  }
+}

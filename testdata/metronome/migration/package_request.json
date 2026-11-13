@@ -1,0 +1,64 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "fbce907e-d1c3-99fa-748b-4dae0fc15c9f",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "metronome_package",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "contract_name": null,
+            "id": "package",
+            "name": null,
+            "package": null,
+            "rate_card_id": null,
+            "recurring_commit": null,
+            "request": {
+              "value": {
+                "billing_provider": "stripe",
+                "contract_name": "contract",
+                "delivery_method": "direct_to_billing_provider",
+                "name": "fixture",
+                "rate_card_id": "card",
+                "usage_statement_schedule": {
+                  "day": "CONTRACT_START",
+                  "frequency": "MONTHLY"
+                }
+              },
+              "type": [
+                "object",
+                {
+                  "billing_provider": "string",
+                  "contract_name": "string",
+                  "delivery_method": "string",
+                  "name": "string",
+                  "rate_card_id": "string",
+                  "usage_statement_schedule": [
+                    "object",
+                    {
+                      "day": "string",
+                      "frequency": "string"
+                    }
+                  ]
+                }
+              ]
+            },
+            "request_json": null,
+            "stripe_billing": null,
+            "uniqueness_key": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
