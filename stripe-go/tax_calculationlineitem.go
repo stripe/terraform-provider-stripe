@@ -34,6 +34,7 @@ type TaxCalculationLineItemTaxBreakdownSourcing string
 const (
 	TaxCalculationLineItemTaxBreakdownSourcingDestination TaxCalculationLineItemTaxBreakdownSourcing = "destination"
 	TaxCalculationLineItemTaxBreakdownSourcingOrigin      TaxCalculationLineItemTaxBreakdownSourcing = "origin"
+	TaxCalculationLineItemTaxBreakdownSourcingPerformance TaxCalculationLineItemTaxBreakdownSourcing = "performance"
 )
 
 // The tax type, such as `vat` or `sales_tax`.
@@ -41,20 +42,35 @@ type TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType string
 
 // List of values that TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType can take
 const (
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeAmusementTax      TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "amusement_tax"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeCommunicationsTax TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "communications_tax"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeGST               TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "gst"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeHST               TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "hst"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeIGST              TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "igst"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeJCT               TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "jct"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeLeaseTax          TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "lease_tax"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypePST               TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "pst"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeQST               TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "qst"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeRetailDeliveryFee TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "retail_delivery_fee"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeRST               TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "rst"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeSalesTax          TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "sales_tax"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeServiceTax        TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "service_tax"
-	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeVAT               TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "vat"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeAdmissionsTax         TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "admissions_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeAmusementTax          TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "amusement_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeAttendanceTax         TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "attendance_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeCommunicationsTax     TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "communications_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeDigitalExciseTax      TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "digital_excise_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeEntertainmentTax      TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "entertainment_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeGetFund               TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "get_fund"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeGrossReceiptsTax      TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "gross_receipts_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeGST                   TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "gst"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeHospitalityTax        TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "hospitality_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeHST                   TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "hst"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeIGST                  TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "igst"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeJCT                   TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "jct"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeLeaseTax              TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "lease_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeLuxuryTax             TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "luxury_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeMassTransitParkingTax TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "mass_transit_parking_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeNhil                  TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "nhil"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeParkingTax            TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "parking_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypePST                   TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "pst"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeQST                   TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "qst"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeRecyclingFee          TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "recycling_fee"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeResortTax             TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "resort_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeRetailDeliveryFee     TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "retail_delivery_fee"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeRST                   TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "rst"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeSalesTax              TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "sales_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeServiceTax            TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "service_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeTourismTax            TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "tourism_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeUtilityUsersTax       TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "utility_users_tax"
+	TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxTypeVAT                   TaxCalculationLineItemTaxBreakdownTaxRateDetailsTaxType = "vat"
 )
 
 // The reasoning behind this tax, for example, if the product is tax exempt. The possible values for this field may be extended as new tax rules are supported.
@@ -114,6 +130,8 @@ type TaxCalculationLineItemTaxBreakdown struct {
 	// Details regarding the rate for this tax. This field will be `null` when the tax is not imposed, for example if the product is exempt from tax.
 	TaxRateDetails *TaxCalculationLineItemTaxBreakdownTaxRateDetails `json:"tax_rate_details"`
 }
+
+// A Tax Calculation Line Item represents a single item in a tax calculation.
 type TaxCalculationLineItem struct {
 	// The line item amount in the [smallest currency unit](https://docs.stripe.com/currencies#minor-units). If `tax_behavior=inclusive`, then this amount includes taxes. Otherwise, taxes were calculated on top of this amount.
 	Amount int64 `json:"amount"`
@@ -127,6 +145,8 @@ type TaxCalculationLineItem struct {
 	Metadata map[string]string `json:"metadata"`
 	// String representing the object's type. Objects of the same type share the same value.
 	Object string `json:"object"`
+	// Indicates the line item represents a performance where the venue location might determine the tax, not the customer address. Leave empty if the tax code doesn't require a tax location. If you provide this value for tax codes with an `optional` location requirement, it overrides the customer address.
+	PerformanceLocation string `json:"performance_location"`
 	// The ID of an existing [Product](https://docs.stripe.com/api/products/object).
 	Product string `json:"product"`
 	// The number of units of the item being purchased. For reversals, this is the quantity reversed.

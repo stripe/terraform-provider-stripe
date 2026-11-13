@@ -30,6 +30,8 @@ type FinancialConnectionsAccountAccountNumberStatus string
 // List of values that FinancialConnectionsAccountAccountNumberStatus can take
 const (
 	FinancialConnectionsAccountAccountNumberStatusDeactivated  FinancialConnectionsAccountAccountNumberStatus = "deactivated"
+	FinancialConnectionsAccountAccountNumberStatusExpired      FinancialConnectionsAccountAccountNumberStatus = "expired"
+	FinancialConnectionsAccountAccountNumberStatusPending      FinancialConnectionsAccountAccountNumberStatus = "pending"
 	FinancialConnectionsAccountAccountNumberStatusTransactable FinancialConnectionsAccountAccountNumberStatus = "transactable"
 )
 
@@ -100,6 +102,25 @@ const (
 	FinancialConnectionsAccountStatusActive       FinancialConnectionsAccountStatus = "active"
 	FinancialConnectionsAccountStatusDisconnected FinancialConnectionsAccountStatus = "disconnected"
 	FinancialConnectionsAccountStatusInactive     FinancialConnectionsAccountStatus = "inactive"
+)
+
+// The action (if any) to proactively relink the Account.
+type FinancialConnectionsAccountStatusDetailsActiveAction string
+
+// List of values that FinancialConnectionsAccountStatusDetailsActiveAction can take
+const (
+	FinancialConnectionsAccountStatusDetailsActiveActionNone           FinancialConnectionsAccountStatusDetailsActiveAction = "none"
+	FinancialConnectionsAccountStatusDetailsActiveActionRelinkRequired FinancialConnectionsAccountStatusDetailsActiveAction = "relink_required"
+)
+
+// The underlying cause of the Account becoming inactive.
+type FinancialConnectionsAccountStatusDetailsActiveCause string
+
+// List of values that FinancialConnectionsAccountStatusDetailsActiveCause can take
+const (
+	FinancialConnectionsAccountStatusDetailsActiveCauseAccessExpired          FinancialConnectionsAccountStatusDetailsActiveCause = "access_expired"
+	FinancialConnectionsAccountStatusDetailsActiveCauseInstitutionRequirement FinancialConnectionsAccountStatusDetailsActiveCause = "institution_requirement"
+	FinancialConnectionsAccountStatusDetailsActiveCauseUnspecified            FinancialConnectionsAccountStatusDetailsActiveCause = "unspecified"
 )
 
 // If `category` is `cash`, one of:
@@ -181,7 +202,7 @@ func (p *FinancialConnectionsAccountListParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
 }
 
-// Retrieves the details of an Financial Connections Account.
+// Retrieves the details of a Financial Connections Account.
 type FinancialConnectionsAccountParams struct {
 	Params `form:"*"`
 	// Specifies which fields in the response should be expanded.
@@ -196,7 +217,8 @@ func (p *FinancialConnectionsAccountParams) AddExpand(f string) {
 // Lists all owners for a given Account
 type FinancialConnectionsAccountListOwnersParams struct {
 	ListParams `form:"*"`
-	Account    *string `form:"-"` // Included in URL
+	// Unique identifier for the object.
+	Account *string `form:"-"` // Included in URL
 	// Specifies which fields in the response should be expanded.
 	Expand []*string `form:"expand" json:"expand,omitempty"`
 	// The ID of the ownership object to fetch owners from.
@@ -262,7 +284,7 @@ func (p *FinancialConnectionsAccountUnsubscribeParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
 }
 
-// Retrieves the details of an Financial Connections Account.
+// Retrieves the details of a Financial Connections Account.
 type FinancialConnectionsAccountRetrieveParams struct {
 	Params `form:"*"`
 	// Specifies which fields in the response should be expanded.
@@ -348,6 +370,17 @@ type FinancialConnectionsAccountOwnershipRefresh struct {
 	// The status of the last refresh attempt.
 	Status FinancialConnectionsAccountOwnershipRefreshStatus `json:"status"`
 }
+type FinancialConnectionsAccountStatusDetailsActive struct {
+	// The action (if any) to proactively relink the Account.
+	Action FinancialConnectionsAccountStatusDetailsActiveAction `json:"action"`
+	// The underlying cause of the Account becoming inactive.
+	Cause FinancialConnectionsAccountStatusDetailsActiveCause `json:"cause"`
+	// When the Account is expected to become inactive, if applicable.
+	ExpectedDeactivationDate int64 `json:"expected_deactivation_date"`
+}
+type FinancialConnectionsAccountStatusDetails struct {
+	Active *FinancialConnectionsAccountStatusDetailsActive `json:"active,omitempty"`
+}
 
 // The state of the most recent attempt to refresh the account transactions.
 type FinancialConnectionsAccountTransactionRefresh struct {
@@ -388,14 +421,15 @@ type FinancialConnectionsAccount struct {
 	Livemode bool `json:"livemode"`
 	// String representing the object's type. Objects of the same type share the same value.
 	Object string `json:"object"`
-	// The most recent information about the account's owners.
+	// The ID of the [Financial Connections Account Ownership](https://docs.stripe.com/api/financial_connections/ownership) object associated with this account.
 	Ownership *FinancialConnectionsAccountOwnership `json:"ownership"`
 	// The state of the most recent attempt to refresh the account owners.
 	OwnershipRefresh *FinancialConnectionsAccountOwnershipRefresh `json:"ownership_refresh"`
 	// The list of permissions granted by this account.
 	Permissions []FinancialConnectionsAccountPermission `json:"permissions"`
 	// The status of the link to the account.
-	Status FinancialConnectionsAccountStatus `json:"status"`
+	Status        FinancialConnectionsAccountStatus         `json:"status"`
+	StatusDetails *FinancialConnectionsAccountStatusDetails `json:"status_details,omitempty"`
 	// If `category` is `cash`, one of:
 	//
 	//  - `checking`

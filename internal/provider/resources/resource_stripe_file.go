@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &FileResource{}
@@ -73,7 +73,7 @@ func (r *FileResource) Metadata(_ context.Context, req resource.MetadataRequest,
 
 func (r *FileResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "This object represents files hosted on Stripe's servers. You can upload\nfiles with the [create file](https://api.stripe.com#create_file) request\n(for example, when uploading dispute evidence). Stripe also\ncreates files independently (for example, the results of a [Sigma scheduled\nquery](#scheduled_queries)).\n\nRelated guide: [File upload guide](https://docs.stripe.com/file-upload)",
+		Description: "This object represents files hosted on Stripe's servers. You can upload\nfiles with the [create file](https://docs.stripe.com/api#create_file) request\n(for example, when uploading dispute evidence). Stripe also\ncreates files independently (for example, the results of a [Sigma scheduled\nquery](#scheduled_queries)).\n\nRelated guide: [File upload guide](https://docs.stripe.com/file-upload)",
 		Attributes: map[string]schema.Attribute{
 			"object": schema.StringAttribute{
 				Computed:      true,
@@ -135,7 +135,7 @@ func (r *FileResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 			},
 			"file_link_data": schema.SingleNestedAttribute{
 				Optional:      true,
-				Description:   "Optional parameters that automatically create a [file link](https://api.stripe.com#file_links) for the newly created file.",
+				Description:   "Optional parameters that automatically create a [file link](https://docs.stripe.com/api#file_links) for the newly created file.",
 				PlanModifiers: []planmodifier.Object{objectplanmodifier.RequiresReplace()},
 				WriteOnly:     true,
 				Attributes: map[string]schema.Attribute{

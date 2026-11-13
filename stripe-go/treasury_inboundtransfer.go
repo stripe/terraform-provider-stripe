@@ -181,7 +181,7 @@ func (p *TreasuryInboundTransferRetrieveParams) AddExpand(f string) {
 	p.Expand = append(p.Expand, &f)
 }
 
-// Details about this InboundTransfer's failure. Only set when status is `failed`.
+// Details about this InboundTransfer's failure. Will be set when `status=failed` or `returned=true`.
 type TreasuryInboundTransferFailureDetails struct {
 	// Reason for the failure.
 	Code TreasuryInboundTransferFailureDetailsCode `json:"code"`
@@ -232,7 +232,9 @@ type TreasuryInboundTransferStatusTransitions struct {
 	SucceededAt int64 `json:"succeeded_at"`
 }
 
-// Use [InboundTransfers](https://docs.stripe.com/docs/treasury/moving-money/financial-accounts/into/inbound-transfers) to add funds to your [FinancialAccount](https://api.stripe.com#financial_accounts) via a PaymentMethod that is owned by you. The funds will be transferred via an ACH debit.
+// Legacy InboundTransfers are part of the v1 version of Treasury for platforms and do not support many of the features introduced in [Treasury for platforms v2](https://docs.stripe.com/treasury/connect). Use [Inbound Transfers](https://docs.stripe.com/api/v2/money-management/inbound-transfers) instead of building a new v1 integration.
+//
+// Use [InboundTransfers](https://docs.stripe.com/docs/treasury/moving-money/financial-accounts/into/inbound-transfers) to add funds to your [FinancialAccount](https://docs.stripe.com/api#financial_accounts) via a PaymentMethod that is owned by you. The funds will be transferred via an ACH debit.
 //
 // Related guide: [Moving money with Treasury using InboundTransfer objects](https://docs.stripe.com/docs/treasury/moving-money/financial-accounts/into/inbound-transfers)
 type TreasuryInboundTransfer struct {
@@ -247,7 +249,7 @@ type TreasuryInboundTransfer struct {
 	Currency Currency `json:"currency"`
 	// An arbitrary string attached to the object. Often useful for displaying to users.
 	Description string `json:"description"`
-	// Details about this InboundTransfer's failure. Only set when status is `failed`.
+	// Details about this InboundTransfer's failure. Will be set when `status=failed` or `returned=true`.
 	FailureDetails *TreasuryInboundTransferFailureDetails `json:"failure_details"`
 	// The FinancialAccount that received the funds.
 	FinancialAccount string `json:"financial_account"`

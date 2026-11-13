@@ -81,6 +81,8 @@ type AccountSessionComponentsDisputesListFeaturesParams struct {
 	DisputeManagement *bool `form:"dispute_management" json:"dispute_management,omitempty"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement *bool `form:"refund_management" json:"refund_management,omitempty"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement *bool `form:"smart_disputes_management" json:"smart_disputes_management,omitempty"`
 }
 
 // Configuration for the [disputes list](https://docs.stripe.com/connect/supported-embedded-components/disputes-list/) embedded component.
@@ -222,6 +224,8 @@ type AccountSessionComponentsPaymentDetailsFeaturesParams struct {
 	DisputeManagement *bool `form:"dispute_management" json:"dispute_management,omitempty"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement *bool `form:"refund_management" json:"refund_management,omitempty"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement *bool `form:"smart_disputes_management" json:"smart_disputes_management,omitempty"`
 }
 
 // Configuration for the [payment details](https://docs.stripe.com/connect/supported-embedded-components/payment-details/) embedded component.
@@ -240,6 +244,8 @@ type AccountSessionComponentsPaymentDisputesFeaturesParams struct {
 	DisputeManagement *bool `form:"dispute_management" json:"dispute_management,omitempty"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement *bool `form:"refund_management" json:"refund_management,omitempty"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement *bool `form:"smart_disputes_management" json:"smart_disputes_management,omitempty"`
 }
 
 // Configuration for the [payment disputes](https://docs.stripe.com/connect/supported-embedded-components/payment-disputes/) embedded component.
@@ -248,6 +254,20 @@ type AccountSessionComponentsPaymentDisputesParams struct {
 	Enabled *bool `form:"enabled" json:"enabled"`
 	// The list of features enabled in the embedded component.
 	Features *AccountSessionComponentsPaymentDisputesFeaturesParams `form:"features" json:"features,omitempty"`
+}
+
+// The list of features enabled in the embedded component.
+type AccountSessionComponentsPaymentMethodSettingsFeaturesParams struct {
+	// Whether Stripe user authentication is disabled. This value can only be `true` for accounts where `controller.requirement_collection` is `application` for the account. This is `false` by default.
+	DisableStripeUserAuthentication *bool `form:"disable_stripe_user_authentication" json:"disable_stripe_user_authentication,omitempty"`
+}
+
+// Configuration for the [payment method settings](https://docs.stripe.com/connect/supported-embedded-components/payment-method-settings/) embedded component.
+type AccountSessionComponentsPaymentMethodSettingsParams struct {
+	// Whether the embedded component is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The list of features enabled in the embedded component.
+	Features *AccountSessionComponentsPaymentMethodSettingsFeaturesParams `form:"features" json:"features,omitempty"`
 }
 
 // The list of features enabled in the embedded component.
@@ -260,6 +280,8 @@ type AccountSessionComponentsPaymentsFeaturesParams struct {
 	DisputeManagement *bool `form:"dispute_management" json:"dispute_management,omitempty"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement *bool `form:"refund_management" json:"refund_management,omitempty"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement *bool `form:"smart_disputes_management" json:"smart_disputes_management,omitempty"`
 }
 
 // Configuration for the [payments](https://docs.stripe.com/connect/supported-embedded-components/payments/) embedded component.
@@ -326,6 +348,17 @@ type AccountSessionComponentsPayoutsListParams struct {
 }
 
 // An empty list, because this embedded component has no features.
+type AccountSessionComponentsReportingChartFeaturesParams struct{}
+
+// Configuration for the [reporting chart](https://docs.stripe.com/connect/supported-embedded-components/reporting-chart/) embedded component.
+type AccountSessionComponentsReportingChartParams struct {
+	// Whether the embedded component is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// An empty list, because this embedded component has no features.
+	Features *AccountSessionComponentsReportingChartFeaturesParams `form:"features" json:"features,omitempty"`
+}
+
+// An empty list, because this embedded component has no features.
 type AccountSessionComponentsTaxRegistrationsFeaturesParams struct{}
 
 // Configuration for the [tax registrations](https://docs.stripe.com/connect/supported-embedded-components/tax-registrations/) embedded component.
@@ -345,6 +378,28 @@ type AccountSessionComponentsTaxSettingsParams struct {
 	Enabled *bool `form:"enabled" json:"enabled"`
 	// An empty list, because this embedded component has no features.
 	Features *AccountSessionComponentsTaxSettingsFeaturesParams `form:"features" json:"features,omitempty"`
+}
+
+// An empty list, because this embedded component has no features.
+type AccountSessionComponentsTerminalHardwareOrdersFeaturesParams struct{}
+
+// Configuration for the [Terminal hardware orders](https://docs.stripe.com/connect/supported-embedded-components/terminal-hardware-orders/) embedded component.
+type AccountSessionComponentsTerminalHardwareOrdersParams struct {
+	// Whether the embedded component is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// An empty list, because this embedded component has no features.
+	Features *AccountSessionComponentsTerminalHardwareOrdersFeaturesParams `form:"features" json:"features,omitempty"`
+}
+
+// An empty list, because this embedded component has no features.
+type AccountSessionComponentsTerminalHardwareShopFeaturesParams struct{}
+
+// Configuration for the [Terminal hardware shop](https://docs.stripe.com/connect/supported-embedded-components/terminal-hardware-shop/) embedded component.
+type AccountSessionComponentsTerminalHardwareShopParams struct {
+	// Whether the embedded component is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// An empty list, because this embedded component has no features.
+	Features *AccountSessionComponentsTerminalHardwareShopFeaturesParams `form:"features" json:"features,omitempty"`
 }
 
 // Each key of the dictionary represents an embedded component, and each embedded component maps to its configuration (e.g. whether it has been enabled or not).
@@ -377,6 +432,8 @@ type AccountSessionComponentsParams struct {
 	PaymentDetails *AccountSessionComponentsPaymentDetailsParams `form:"payment_details" json:"payment_details,omitempty"`
 	// Configuration for the [payment disputes](https://docs.stripe.com/connect/supported-embedded-components/payment-disputes/) embedded component.
 	PaymentDisputes *AccountSessionComponentsPaymentDisputesParams `form:"payment_disputes" json:"payment_disputes,omitempty"`
+	// Configuration for the [payment method settings](https://docs.stripe.com/connect/supported-embedded-components/payment-method-settings/) embedded component.
+	PaymentMethodSettings *AccountSessionComponentsPaymentMethodSettingsParams `form:"payment_method_settings" json:"payment_method_settings,omitempty"`
 	// Configuration for the [payments](https://docs.stripe.com/connect/supported-embedded-components/payments/) embedded component.
 	Payments *AccountSessionComponentsPaymentsParams `form:"payments" json:"payments,omitempty"`
 	// Configuration for the [payout details](https://docs.stripe.com/connect/supported-embedded-components/payout-details/) embedded component.
@@ -387,13 +444,19 @@ type AccountSessionComponentsParams struct {
 	Payouts *AccountSessionComponentsPayoutsParams `form:"payouts" json:"payouts,omitempty"`
 	// Configuration for the [payouts list](https://docs.stripe.com/connect/supported-embedded-components/payouts-list/) embedded component.
 	PayoutsList *AccountSessionComponentsPayoutsListParams `form:"payouts_list" json:"payouts_list,omitempty"`
+	// Configuration for the [reporting chart](https://docs.stripe.com/connect/supported-embedded-components/reporting-chart/) embedded component.
+	ReportingChart *AccountSessionComponentsReportingChartParams `form:"reporting_chart" json:"reporting_chart,omitempty"`
 	// Configuration for the [tax registrations](https://docs.stripe.com/connect/supported-embedded-components/tax-registrations/) embedded component.
 	TaxRegistrations *AccountSessionComponentsTaxRegistrationsParams `form:"tax_registrations" json:"tax_registrations,omitempty"`
 	// Configuration for the [tax settings](https://docs.stripe.com/connect/supported-embedded-components/tax-settings/) embedded component.
 	TaxSettings *AccountSessionComponentsTaxSettingsParams `form:"tax_settings" json:"tax_settings,omitempty"`
+	// Configuration for the [Terminal hardware orders](https://docs.stripe.com/connect/supported-embedded-components/terminal-hardware-orders/) embedded component.
+	TerminalHardwareOrders *AccountSessionComponentsTerminalHardwareOrdersParams `form:"terminal_hardware_orders" json:"terminal_hardware_orders,omitempty"`
+	// Configuration for the [Terminal hardware shop](https://docs.stripe.com/connect/supported-embedded-components/terminal-hardware-shop/) embedded component.
+	TerminalHardwareShop *AccountSessionComponentsTerminalHardwareShopParams `form:"terminal_hardware_shop" json:"terminal_hardware_shop,omitempty"`
 }
 
-// Creates a AccountSession object that includes a single-use token that the platform can use on their front-end to grant client-side API access.
+// Creates an AccountSession object that includes a single-use token that the platform can use on their front-end to grant client-side API access.
 type AccountSessionParams struct {
 	Params `form:"*"`
 	// The identifier of the account to create an Account Session for.
@@ -484,6 +547,8 @@ type AccountSessionCreateComponentsDisputesListFeaturesParams struct {
 	DisputeManagement *bool `form:"dispute_management" json:"dispute_management,omitempty"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement *bool `form:"refund_management" json:"refund_management,omitempty"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement *bool `form:"smart_disputes_management" json:"smart_disputes_management,omitempty"`
 }
 
 // Configuration for the [disputes list](https://docs.stripe.com/connect/supported-embedded-components/disputes-list/) embedded component.
@@ -625,6 +690,8 @@ type AccountSessionCreateComponentsPaymentDetailsFeaturesParams struct {
 	DisputeManagement *bool `form:"dispute_management" json:"dispute_management,omitempty"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement *bool `form:"refund_management" json:"refund_management,omitempty"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement *bool `form:"smart_disputes_management" json:"smart_disputes_management,omitempty"`
 }
 
 // Configuration for the [payment details](https://docs.stripe.com/connect/supported-embedded-components/payment-details/) embedded component.
@@ -643,6 +710,8 @@ type AccountSessionCreateComponentsPaymentDisputesFeaturesParams struct {
 	DisputeManagement *bool `form:"dispute_management" json:"dispute_management,omitempty"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement *bool `form:"refund_management" json:"refund_management,omitempty"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement *bool `form:"smart_disputes_management" json:"smart_disputes_management,omitempty"`
 }
 
 // Configuration for the [payment disputes](https://docs.stripe.com/connect/supported-embedded-components/payment-disputes/) embedded component.
@@ -651,6 +720,20 @@ type AccountSessionCreateComponentsPaymentDisputesParams struct {
 	Enabled *bool `form:"enabled" json:"enabled"`
 	// The list of features enabled in the embedded component.
 	Features *AccountSessionCreateComponentsPaymentDisputesFeaturesParams `form:"features" json:"features,omitempty"`
+}
+
+// The list of features enabled in the embedded component.
+type AccountSessionCreateComponentsPaymentMethodSettingsFeaturesParams struct {
+	// Whether Stripe user authentication is disabled. This value can only be `true` for accounts where `controller.requirement_collection` is `application` for the account. This is `false` by default.
+	DisableStripeUserAuthentication *bool `form:"disable_stripe_user_authentication" json:"disable_stripe_user_authentication,omitempty"`
+}
+
+// Configuration for the [payment method settings](https://docs.stripe.com/connect/supported-embedded-components/payment-method-settings/) embedded component.
+type AccountSessionCreateComponentsPaymentMethodSettingsParams struct {
+	// Whether the embedded component is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// The list of features enabled in the embedded component.
+	Features *AccountSessionCreateComponentsPaymentMethodSettingsFeaturesParams `form:"features" json:"features,omitempty"`
 }
 
 // The list of features enabled in the embedded component.
@@ -663,6 +746,8 @@ type AccountSessionCreateComponentsPaymentsFeaturesParams struct {
 	DisputeManagement *bool `form:"dispute_management" json:"dispute_management,omitempty"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement *bool `form:"refund_management" json:"refund_management,omitempty"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement *bool `form:"smart_disputes_management" json:"smart_disputes_management,omitempty"`
 }
 
 // Configuration for the [payments](https://docs.stripe.com/connect/supported-embedded-components/payments/) embedded component.
@@ -729,6 +814,17 @@ type AccountSessionCreateComponentsPayoutsListParams struct {
 }
 
 // An empty list, because this embedded component has no features.
+type AccountSessionCreateComponentsReportingChartFeaturesParams struct{}
+
+// Configuration for the [reporting chart](https://docs.stripe.com/connect/supported-embedded-components/reporting-chart/) embedded component.
+type AccountSessionCreateComponentsReportingChartParams struct {
+	// Whether the embedded component is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// An empty list, because this embedded component has no features.
+	Features *AccountSessionCreateComponentsReportingChartFeaturesParams `form:"features" json:"features,omitempty"`
+}
+
+// An empty list, because this embedded component has no features.
 type AccountSessionCreateComponentsTaxRegistrationsFeaturesParams struct{}
 
 // Configuration for the [tax registrations](https://docs.stripe.com/connect/supported-embedded-components/tax-registrations/) embedded component.
@@ -748,6 +844,28 @@ type AccountSessionCreateComponentsTaxSettingsParams struct {
 	Enabled *bool `form:"enabled" json:"enabled"`
 	// An empty list, because this embedded component has no features.
 	Features *AccountSessionCreateComponentsTaxSettingsFeaturesParams `form:"features" json:"features,omitempty"`
+}
+
+// An empty list, because this embedded component has no features.
+type AccountSessionCreateComponentsTerminalHardwareOrdersFeaturesParams struct{}
+
+// Configuration for the [Terminal hardware orders](https://docs.stripe.com/connect/supported-embedded-components/terminal-hardware-orders/) embedded component.
+type AccountSessionCreateComponentsTerminalHardwareOrdersParams struct {
+	// Whether the embedded component is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// An empty list, because this embedded component has no features.
+	Features *AccountSessionCreateComponentsTerminalHardwareOrdersFeaturesParams `form:"features" json:"features,omitempty"`
+}
+
+// An empty list, because this embedded component has no features.
+type AccountSessionCreateComponentsTerminalHardwareShopFeaturesParams struct{}
+
+// Configuration for the [Terminal hardware shop](https://docs.stripe.com/connect/supported-embedded-components/terminal-hardware-shop/) embedded component.
+type AccountSessionCreateComponentsTerminalHardwareShopParams struct {
+	// Whether the embedded component is enabled.
+	Enabled *bool `form:"enabled" json:"enabled"`
+	// An empty list, because this embedded component has no features.
+	Features *AccountSessionCreateComponentsTerminalHardwareShopFeaturesParams `form:"features" json:"features,omitempty"`
 }
 
 // Each key of the dictionary represents an embedded component, and each embedded component maps to its configuration (e.g. whether it has been enabled or not).
@@ -780,6 +898,8 @@ type AccountSessionCreateComponentsParams struct {
 	PaymentDetails *AccountSessionCreateComponentsPaymentDetailsParams `form:"payment_details" json:"payment_details,omitempty"`
 	// Configuration for the [payment disputes](https://docs.stripe.com/connect/supported-embedded-components/payment-disputes/) embedded component.
 	PaymentDisputes *AccountSessionCreateComponentsPaymentDisputesParams `form:"payment_disputes" json:"payment_disputes,omitempty"`
+	// Configuration for the [payment method settings](https://docs.stripe.com/connect/supported-embedded-components/payment-method-settings/) embedded component.
+	PaymentMethodSettings *AccountSessionCreateComponentsPaymentMethodSettingsParams `form:"payment_method_settings" json:"payment_method_settings,omitempty"`
 	// Configuration for the [payments](https://docs.stripe.com/connect/supported-embedded-components/payments/) embedded component.
 	Payments *AccountSessionCreateComponentsPaymentsParams `form:"payments" json:"payments,omitempty"`
 	// Configuration for the [payout details](https://docs.stripe.com/connect/supported-embedded-components/payout-details/) embedded component.
@@ -790,13 +910,19 @@ type AccountSessionCreateComponentsParams struct {
 	Payouts *AccountSessionCreateComponentsPayoutsParams `form:"payouts" json:"payouts,omitempty"`
 	// Configuration for the [payouts list](https://docs.stripe.com/connect/supported-embedded-components/payouts-list/) embedded component.
 	PayoutsList *AccountSessionCreateComponentsPayoutsListParams `form:"payouts_list" json:"payouts_list,omitempty"`
+	// Configuration for the [reporting chart](https://docs.stripe.com/connect/supported-embedded-components/reporting-chart/) embedded component.
+	ReportingChart *AccountSessionCreateComponentsReportingChartParams `form:"reporting_chart" json:"reporting_chart,omitempty"`
 	// Configuration for the [tax registrations](https://docs.stripe.com/connect/supported-embedded-components/tax-registrations/) embedded component.
 	TaxRegistrations *AccountSessionCreateComponentsTaxRegistrationsParams `form:"tax_registrations" json:"tax_registrations,omitempty"`
 	// Configuration for the [tax settings](https://docs.stripe.com/connect/supported-embedded-components/tax-settings/) embedded component.
 	TaxSettings *AccountSessionCreateComponentsTaxSettingsParams `form:"tax_settings" json:"tax_settings,omitempty"`
+	// Configuration for the [Terminal hardware orders](https://docs.stripe.com/connect/supported-embedded-components/terminal-hardware-orders/) embedded component.
+	TerminalHardwareOrders *AccountSessionCreateComponentsTerminalHardwareOrdersParams `form:"terminal_hardware_orders" json:"terminal_hardware_orders,omitempty"`
+	// Configuration for the [Terminal hardware shop](https://docs.stripe.com/connect/supported-embedded-components/terminal-hardware-shop/) embedded component.
+	TerminalHardwareShop *AccountSessionCreateComponentsTerminalHardwareShopParams `form:"terminal_hardware_shop" json:"terminal_hardware_shop,omitempty"`
 }
 
-// Creates a AccountSession object that includes a single-use token that the platform can use on their front-end to grant client-side API access.
+// Creates an AccountSession object that includes a single-use token that the platform can use on their front-end to grant client-side API access.
 type AccountSessionCreateParams struct {
 	Params `form:"*"`
 	// The identifier of the account to create an Account Session for.
@@ -866,6 +992,8 @@ type AccountSessionComponentsDisputesListFeatures struct {
 	DisputeManagement bool `json:"dispute_management"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement bool `json:"refund_management"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement bool `json:"smart_disputes_management"`
 }
 type AccountSessionComponentsDisputesList struct {
 	// Whether the embedded component is enabled.
@@ -967,6 +1095,8 @@ type AccountSessionComponentsPaymentDetailsFeatures struct {
 	DisputeManagement bool `json:"dispute_management"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement bool `json:"refund_management"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement bool `json:"smart_disputes_management"`
 }
 type AccountSessionComponentsPaymentDetails struct {
 	// Whether the embedded component is enabled.
@@ -980,11 +1110,22 @@ type AccountSessionComponentsPaymentDisputesFeatures struct {
 	DisputeManagement bool `json:"dispute_management"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement bool `json:"refund_management"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement bool `json:"smart_disputes_management"`
 }
 type AccountSessionComponentsPaymentDisputes struct {
 	// Whether the embedded component is enabled.
 	Enabled  bool                                             `json:"enabled"`
 	Features *AccountSessionComponentsPaymentDisputesFeatures `json:"features"`
+}
+type AccountSessionComponentsPaymentMethodSettingsFeatures struct {
+	// Whether Stripe user authentication is disabled. This value can only be `true` for accounts where `controller.requirement_collection` is `application` for the account. This is `false` by default.
+	DisableStripeUserAuthentication bool `json:"disable_stripe_user_authentication"`
+}
+type AccountSessionComponentsPaymentMethodSettings struct {
+	// Whether the embedded component is enabled.
+	Enabled  bool                                                   `json:"enabled"`
+	Features *AccountSessionComponentsPaymentMethodSettingsFeatures `json:"features"`
 }
 type AccountSessionComponentsPaymentsFeatures struct {
 	// Whether to allow capturing and cancelling payment intents. This is `true` by default.
@@ -995,6 +1136,8 @@ type AccountSessionComponentsPaymentsFeatures struct {
 	DisputeManagement bool `json:"dispute_management"`
 	// Whether sending refunds is enabled. This is `true` by default.
 	RefundManagement bool `json:"refund_management"`
+	// Whether to allow connected accounts to submit disputes using Smart Disputes. Defaults to the value of `dispute_management`.
+	SmartDisputesManagement bool `json:"smart_disputes_management"`
 }
 type AccountSessionComponentsPayments struct {
 	// Whether the embedded component is enabled.
@@ -1036,6 +1179,12 @@ type AccountSessionComponentsPayoutsList struct {
 	Enabled  bool                                         `json:"enabled"`
 	Features *AccountSessionComponentsPayoutsListFeatures `json:"features"`
 }
+type AccountSessionComponentsReportingChartFeatures struct{}
+type AccountSessionComponentsReportingChart struct {
+	// Whether the embedded component is enabled.
+	Enabled  bool                                            `json:"enabled"`
+	Features *AccountSessionComponentsReportingChartFeatures `json:"features"`
+}
 type AccountSessionComponentsTaxRegistrationsFeatures struct{}
 type AccountSessionComponentsTaxRegistrations struct {
 	// Whether the embedded component is enabled.
@@ -1047,6 +1196,18 @@ type AccountSessionComponentsTaxSettings struct {
 	// Whether the embedded component is enabled.
 	Enabled  bool                                         `json:"enabled"`
 	Features *AccountSessionComponentsTaxSettingsFeatures `json:"features"`
+}
+type AccountSessionComponentsTerminalHardwareOrdersFeatures struct{}
+type AccountSessionComponentsTerminalHardwareOrders struct {
+	// Whether the embedded component is enabled.
+	Enabled  bool                                                    `json:"enabled"`
+	Features *AccountSessionComponentsTerminalHardwareOrdersFeatures `json:"features"`
+}
+type AccountSessionComponentsTerminalHardwareShopFeatures struct{}
+type AccountSessionComponentsTerminalHardwareShop struct {
+	// Whether the embedded component is enabled.
+	Enabled  bool                                                  `json:"enabled"`
+	Features *AccountSessionComponentsTerminalHardwareShopFeatures `json:"features"`
 }
 type AccountSessionComponents struct {
 	AccountManagement            *AccountSessionComponentsAccountManagement            `json:"account_management"`
@@ -1063,13 +1224,17 @@ type AccountSessionComponents struct {
 	NotificationBanner           *AccountSessionComponentsNotificationBanner           `json:"notification_banner"`
 	PaymentDetails               *AccountSessionComponentsPaymentDetails               `json:"payment_details"`
 	PaymentDisputes              *AccountSessionComponentsPaymentDisputes              `json:"payment_disputes"`
+	PaymentMethodSettings        *AccountSessionComponentsPaymentMethodSettings        `json:"payment_method_settings"`
 	Payments                     *AccountSessionComponentsPayments                     `json:"payments"`
 	PayoutDetails                *AccountSessionComponentsPayoutDetails                `json:"payout_details"`
 	PayoutReconciliationReport   *AccountSessionComponentsPayoutReconciliationReport   `json:"payout_reconciliation_report"`
 	Payouts                      *AccountSessionComponentsPayouts                      `json:"payouts"`
 	PayoutsList                  *AccountSessionComponentsPayoutsList                  `json:"payouts_list"`
+	ReportingChart               *AccountSessionComponentsReportingChart               `json:"reporting_chart"`
 	TaxRegistrations             *AccountSessionComponentsTaxRegistrations             `json:"tax_registrations"`
 	TaxSettings                  *AccountSessionComponentsTaxSettings                  `json:"tax_settings"`
+	TerminalHardwareOrders       *AccountSessionComponentsTerminalHardwareOrders       `json:"terminal_hardware_orders"`
+	TerminalHardwareShop         *AccountSessionComponentsTerminalHardwareShop         `json:"terminal_hardware_shop"`
 }
 
 // An AccountSession allows a Connect platform to grant access to a connected account in Connect embedded components.

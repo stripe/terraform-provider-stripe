@@ -12,6 +12,7 @@ import (
 type TestEnv struct {
 	APIKey                                   string
 	StripeAccount                            string
+	TransferDestinationAccount               string
 	IssuingAccount                           string
 	IssuingFinancialAccount                  string
 	TreasuryAccount                          string
@@ -46,6 +47,7 @@ func ResolveTestEnv(t *testing.T, group string, requiredEnv []string) TestEnv {
 	env := TestEnv{
 		APIKey:                                   os.Getenv("STRIPE_API_KEY"),
 		StripeAccount:                            os.Getenv("STRIPE_ACCOUNT"),
+		TransferDestinationAccount:               os.Getenv("STRIPE_TRANSFER_DESTINATION"),
 		IssuingAccount:                           os.Getenv("STRIPE_ISSUING_ACCOUNT"),
 		IssuingFinancialAccount:                  os.Getenv("STRIPE_ISSUING_FINANCIAL_ACCOUNT"),
 		TreasuryAccount:                          os.Getenv("STRIPE_TREASURY_ACCOUNT"),
@@ -147,6 +149,8 @@ func envValue(env TestEnv, envKey string) string {
 		return env.APIKey
 	case "STRIPE_ACCOUNT":
 		return env.StripeAccount
+	case "STRIPE_TRANSFER_DESTINATION":
+		return env.TransferDestinationAccount
 	case "STRIPE_ISSUING_ACCOUNT":
 		return env.IssuingAccount
 	case "STRIPE_ISSUING_FINANCIAL_ACCOUNT":

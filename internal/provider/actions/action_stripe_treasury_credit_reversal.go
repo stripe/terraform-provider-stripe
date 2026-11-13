@@ -12,7 +12,7 @@ import (
 	actionSchema "github.com/hashicorp/terraform-plugin-framework/action/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ action.Action = &TreasuryCreditReversalAction{}
@@ -37,7 +37,7 @@ func (r *TreasuryCreditReversalAction) Metadata(_ context.Context, req action.Me
 
 func (r *TreasuryCreditReversalAction) Schema(_ context.Context, _ action.SchemaRequest, resp *action.SchemaResponse) {
 	resp.Schema = actionSchema.Schema{
-		Description: "You can reverse some [ReceivedCredits](https://api.stripe.com#received_credits) depending on their network and source flow. Reversing a ReceivedCredit leads to the creation of a new object known as a CreditReversal.",
+		Description: "Legacy CreditReversals are part of the v1 version of Treasury for platforms and do not support many of the features introduced in [Treasury for platforms v2](https://docs.stripe.com/treasury/connect). Use [Received Credits](https://docs.stripe.com/api/v2/money-management/received-credits?api-version=preview) instead of building a new v1 integration.\n\nYou can reverse some [ReceivedCredits](https://docs.stripe.com/api#received_credits) depending on their network and source flow. Reversing a ReceivedCredit leads to the creation of a new object known as a CreditReversal.",
 		Attributes: map[string]actionSchema.Attribute{
 			"metadata": actionSchema.MapAttribute{
 				Optional:    true,

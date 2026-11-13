@@ -8,11 +8,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/action"
 	actionSchema "github.com/hashicorp/terraform-plugin-framework/action/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ action.Action = &TopupAction{}
@@ -27,13 +29,15 @@ type TopupAction struct {
 }
 
 type TopupResourceModel struct {
-	Amount              types.Int64  `tfsdk:"amount"`
-	Currency            types.String `tfsdk:"currency"`
-	Description         types.String `tfsdk:"description"`
-	Metadata            types.Map    `tfsdk:"metadata"`
-	Source              types.String `tfsdk:"source"`
-	StatementDescriptor types.String `tfsdk:"statement_descriptor"`
-	TransferGroup       types.String `tfsdk:"transfer_group"`
+	Amount               types.Int64  `tfsdk:"amount"`
+	Currency             types.String `tfsdk:"currency"`
+	Description          types.String `tfsdk:"description"`
+	Metadata             types.Map    `tfsdk:"metadata"`
+	PaymentMethod        types.String `tfsdk:"payment_method"`
+	PaymentMethodOptions types.Object `tfsdk:"payment_method_options"`
+	Source               types.String `tfsdk:"source"`
+	StatementDescriptor  types.String `tfsdk:"statement_descriptor"`
+	TransferGroup        types.String `tfsdk:"transfer_group"`
 }
 
 func (r *TopupAction) Metadata(_ context.Context, req action.MetadataRequest, resp *action.MetadataResponse) {
@@ -60,6 +64,27 @@ func (r *TopupAction) Schema(_ context.Context, _ action.SchemaRequest, resp *ac
 				Optional:    true,
 				Description: "Set of [key-value pairs](https://docs.stripe.com/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.",
 				ElementType: types.StringType,
+			},
+			"payment_method": actionSchema.StringAttribute{
+				Optional:    true,
+				Description: "The ID of a PaymentMethod representing the payment method used for the top-up. A PaymentMethod of type `us_bank_account` can be used.",
+			},
+			"payment_method_options": actionSchema.SingleNestedAttribute{
+				Optional:    true,
+				Description: "Payment-method-specific configuration for this top-up.",
+				Attributes: map[string]actionSchema.Attribute{
+					"us_bank_account": actionSchema.SingleNestedAttribute{
+						Optional:    true,
+						Description: "If this top-up is to be used with a `us_bank_account` payment method, this sub-hash contains configuration for it.",
+						Attributes: map[string]actionSchema.Attribute{
+							"network": actionSchema.StringAttribute{
+								Required:    true,
+								Description: "The US bank transfer network used for this top-up. The default is `ach`.",
+								Validators:  []validator.String{stringvalidator.OneOf("ach")},
+							},
+						},
+					},
+				},
 			},
 			"source": actionSchema.StringAttribute{
 				Optional:    true,
@@ -110,6 +135,16 @@ func expandTopupCreate(plan TopupResourceModel) (*stripe.TopupCreateParams, erro
 	if !plan.Metadata.IsNull() && !plan.Metadata.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "Metadata", plan.Metadata) {
 			return nil, fmt.Errorf("failed to assign attribute %q on %T", "metadata", params)
+		}
+	}
+	if !plan.PaymentMethod.IsNull() && !plan.PaymentMethod.IsUnknown() {
+		if !assignStringToNamedFieldOrMethod(params, "PaymentMethodID", "PaymentMethod", plan.PaymentMethod.ValueString()) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "payment_method", params)
+		}
+	}
+	if !plan.PaymentMethodOptions.IsNull() && !plan.PaymentMethodOptions.IsUnknown() {
+		if !assignAttrValueToNamedField(params, "PaymentMethodOptions", plan.PaymentMethodOptions) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "payment_method_options", params)
 		}
 	}
 	if !plan.Source.IsNull() && !plan.Source.IsUnknown() {

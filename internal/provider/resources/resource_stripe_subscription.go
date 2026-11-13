@@ -24,7 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	stripe "github.com/stripe/stripe-go/v86"
+	stripe "github.com/stripe/stripe-go/v87"
 )
 
 var _ resource.Resource = &SubscriptionResource{}
@@ -84,6 +84,7 @@ type SubscriptionResourceModel struct {
 	Schedule                      types.String  `tfsdk:"schedule"`
 	StartDate                     types.Int64   `tfsdk:"start_date"`
 	Status                        types.String  `tfsdk:"status"`
+	StatusDetails                 types.Object  `tfsdk:"status_details"`
 	TestClock                     types.String  `tfsdk:"test_clock"`
 	TransferData                  types.Object  `tfsdk:"transfer_data"`
 	TrialEnd                      types.Int64   `tfsdk:"trial_end"`
@@ -385,6 +386,12 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Validators:    []validator.String{stringvalidator.OneOf("customer_service", "low_quality", "missing_features", "other", "switched_service", "too_complex", "too_expensive", "unused")},
 					},
+					"feedback_option": schema.StringAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "Customized feedback options that provide deeper insight into why the subscription was canceled, if the subscription was canceled explicitly by the user.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
 					"reason": schema.StringAttribute{
 						Computed:      true,
 						Description:   "Why this subscription was canceled.",
@@ -499,6 +506,36 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 						PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
 						ElementType:   types.StringType,
 					},
+					"custom_fields": schema.ListNestedAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "A list of up to 4 custom fields to be displayed on the invoice.",
+						PlanModifiers: []planmodifier.List{listplanmodifier.UseStateForUnknown()},
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"name": schema.StringAttribute{
+									Required:    true,
+									Description: "The name of the custom field.",
+								},
+								"value": schema.StringAttribute{
+									Required:    true,
+									Description: "The value of the custom field.",
+								},
+							},
+						},
+					},
+					"description": schema.StringAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "An arbitrary string attached to the object. Often useful for displaying to users.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
+					"footer": schema.StringAttribute{
+						Optional:      true,
+						Computed:      true,
+						Description:   "Footer to be displayed on the invoice.",
+						PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+					},
 					"issuer": schema.SingleNestedAttribute{
 						Optional: true,
 						Computed: true,
@@ -541,6 +578,18 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 								"usage_gte": schema.Int64Attribute{
 									Required:    true,
 									Description: "Number of units that meets the billing threshold to advance the subscription to a new billing period (e.g., it takes 10 $5 units to meet a $50 [monetary threshold](https://docs.stripe.com/api/subscriptions/update#update_subscription-billing_thresholds-amount_gte))",
+								},
+							},
+						},
+						"current_trial": schema.SingleNestedAttribute{
+							Optional:      true,
+							Computed:      true,
+							Description:   "The trial offer to apply to this subscription item.",
+							PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+							Attributes: map[string]schema.Attribute{
+								"trial_offer": schema.StringAttribute{
+									Required:    true,
+									Description: "The ID of the trial offer to apply to the subscription item.",
 								},
 							},
 						},
@@ -764,6 +813,113 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 									},
 								},
 							},
+							"billie": schema.SingleNestedAttribute{
+								Optional:      true,
+								Computed:      true,
+								Description:   "This sub-hash contains details about the Billie payment method options to pass to invoices created by the subscription.",
+								PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+								Attributes: map[string]schema.Attribute{
+									"company_details": schema.SingleNestedAttribute{
+										Optional: true,
+										Computed: true,
+
+										PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+										Attributes: map[string]schema.Attribute{
+											"registered_address": schema.SingleNestedAttribute{
+												Optional: true,
+												Computed: true,
+
+												PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+												Attributes: map[string]schema.Attribute{
+													"city": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "City, district, suburb, town, or village.",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"country": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "Two-letter country code.",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"line1": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "Address line 1 (for example, street, PO Box, or company name).",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"line2": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "Address line 2 (for example, apartment, suite, unit, or building).",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"postal_code": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "ZIP or postal code.",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+													"state": schema.StringAttribute{
+														Optional:      true,
+														Computed:      true,
+														Description:   "State, county, province, or region.",
+														PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+													},
+												},
+											},
+											"registered_name": schema.StringAttribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "Company or entity name.",
+												PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+											},
+											"registration_number": schema.StringAttribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "The official registration number for the given registration type.",
+												PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+											},
+											"registration_type": schema.StringAttribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "Type of registration the company or entity holds in their registered country.",
+												PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+												Validators:    []validator.String{stringvalidator.OneOf("ch_ein", "de_hrb", "dk_cvr", "es_cif", "fi_tunnus", "fr_siren", "fr_siret", "it_rea", "nl_kvk", "no_org_number", "no_pno", "se_org_number", "se_pno", "uk_crn")},
+											},
+											"vat": schema.StringAttribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "VAT ID number.",
+												PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+											},
+										},
+									},
+								},
+							},
+							"blik": schema.SingleNestedAttribute{
+								Optional:      true,
+								Computed:      true,
+								Description:   "This sub-hash contains details about the Blik payment method options to pass to invoices created by the subscription.",
+								PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+								Attributes: map[string]schema.Attribute{
+									"mandate_options": schema.SingleNestedAttribute{
+										Optional: true,
+										Computed: true,
+
+										PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+										Attributes: map[string]schema.Attribute{
+											"expires_at": schema.Int64Attribute{
+												Optional:      true,
+												Computed:      true,
+												Description:   "Date when the mandate expires and no further payments will be charged. If not provided, the mandate will be set to be indefinite.",
+												PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+											},
+										},
+									},
+								},
+							},
 							"card": schema.SingleNestedAttribute{
 								Optional:      true,
 								Computed:      true,
@@ -899,7 +1055,7 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 									"expires_after_seconds": schema.Int64Attribute{
 										Optional:      true,
 										Computed:      true,
-										Description:   "The number of seconds (between 10 and 1209600) after which Pix payment will expire. Defaults to 86400 seconds.",
+										Description:   "The number of seconds after PaymentIntent confirmation when the Pix expires (between 60 and 1209600, inclusive). If unspecified, defaults to 14400 seconds (4 hours).",
 										PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 									},
 									"mandate_options": schema.SingleNestedAttribute{
@@ -1083,6 +1239,11 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 						Description:   "If the update is applied, determines the date of the first full invoice, and, for plans with `month` or `year` intervals, the day of the month for subsequent invoices. The timestamp is in UTC format.",
 						PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
 					},
+					"cancel_at_period_end": schema.BoolAttribute{
+						Computed:      true,
+						Description:   "Indicates whether this subscription should cancel at the end of the current period if the update is applied.",
+						PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+					},
 					"discount": schema.StringAttribute{
 						Computed:      true,
 						Description:   "The pending subscription-level discount that will be applied when the pending update is applied.",
@@ -1106,7 +1267,7 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 					},
 					"trial_from_plan": schema.BoolAttribute{
 						Computed:      true,
-						Description:   "Indicates if a plan's `trial_period_days` should be applied to the subscription. Setting `trial_end` per subscription is preferred, and this defaults to `false`. Setting this flag to `true` together with `trial_end` is not allowed. See [Using trial periods on subscriptions](https://docs.stripe.com/billing/subscriptions/trials) to learn more.",
+						Description:   "Indicates if a plan's `trial_period_days` should be applied to the subscription. Setting `trial_end` per subscription is preferred, and this defaults to `false`. Setting this flag to `true` together with `trial_end` is not allowed. See [Using trial periods on subscriptions](https://docs.stripe.com/billing/subscriptions/trials/free-trials) to learn more.",
 						PlanModifiers: []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 					},
 				},
@@ -1135,9 +1296,47 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 			},
 			"status": schema.StringAttribute{
 				Computed:      true,
-				Description:   "Possible values are `incomplete`, `incomplete_expired`, `trialing`, `active`, `past_due`, `canceled`, `unpaid`, or `paused`. \n\nFor `collection_method=charge_automatically` a subscription moves into `incomplete` if the initial payment attempt fails. A subscription in this status can only have metadata and default_source updated. Once the first invoice is paid, the subscription moves into an `active` status. If the first invoice is not paid within 23 hours, the subscription transitions to `incomplete_expired`. This is a terminal status, the open invoice will be voided and no further invoices will be generated. \n\nA subscription that is currently in a trial period is `trialing` and moves to `active` when the trial period is over. \n\nA subscription can only enter a `paused` status [when a trial ends without a payment method](https://docs.stripe.com/billing/subscriptions/trials#create-free-trials-without-payment). A `paused` subscription doesn't generate invoices and can be resumed after your customer adds their payment method. The `paused` status is different from [pausing collection](https://docs.stripe.com/billing/subscriptions/pause-payment), which still generates invoices and leaves the subscription's status unchanged. \n\nIf subscription `collection_method=charge_automatically`, it becomes `past_due` when payment is required but cannot be paid (due to failed payment or awaiting additional user actions). Once Stripe has exhausted all payment retry attempts, the subscription will become `canceled` or `unpaid` (depending on your subscriptions settings). \n\nIf subscription `collection_method=send_invoice` it becomes `past_due` when its invoice is not paid by the due date, and `canceled` or `unpaid` if it is still not paid by an additional deadline after that. Note that when a subscription has a status of `unpaid`, no subsequent invoices will be attempted (invoices will be created, but then immediately automatically closed). After receiving updated payment information from a customer, you may choose to reopen and pay their closed invoices.",
+				Description:   "Possible values are `incomplete`, `incomplete_expired`, `trialing`, `active`, `past_due`, `canceled`, `unpaid`, or `paused`. \n\nFor `collection_method=charge_automatically` a subscription moves into `incomplete` if the initial payment attempt fails. A subscription in this status can only have metadata and default_source updated. Once the first invoice is paid, the subscription moves into an `active` status. If the first invoice is not paid within 23 hours, the subscription transitions to `incomplete_expired`. This is a terminal status, the open invoice will be voided and no further invoices will be generated. \n\nA subscription that is currently in a trial period is `trialing` and moves to `active` when the trial period is over. \n\nA subscription can enter a `paused` status in several ways, including [when a trial ends without a payment method](https://docs.stripe.com/billing/subscriptions/trials/free-trials#create-free-trials-without-payment) or when you pause it using the [pause endpoint](https://docs.stripe.com/api/subscriptions/pause). A `paused` subscription doesn't advance to a new billing period or generate invoices until it resumes. The `paused` status is different from [pausing collection](https://docs.stripe.com/billing/subscriptions/pause-payment), which still generates invoices and leaves the subscription's status unchanged. \n\nIf subscription `collection_method=charge_automatically`, it becomes `past_due` when payment is required but cannot be paid (due to failed payment or awaiting additional user actions). Once Stripe has exhausted all payment retry attempts, the subscription will become `canceled` or `unpaid` (depending on your subscriptions settings). \n\nIf subscription `collection_method=send_invoice` it becomes `past_due` when its invoice is not paid by the due date, and `canceled` or `unpaid` if it is still not paid by an additional deadline after that. Note that when a subscription has a status of `unpaid`, no subsequent invoices will be attempted (invoices will be created, but then immediately automatically closed). After receiving updated payment information from a customer, you may choose to reopen and pay their closed invoices.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 				Validators:    []validator.String{stringvalidator.OneOf("active", "canceled", "incomplete", "incomplete_expired", "past_due", "paused", "trialing", "unpaid")},
+			},
+			"status_details": schema.SingleNestedAttribute{
+				Computed:      true,
+				Description:   "Describes changes to the subscription's status.",
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+				Attributes: map[string]schema.Attribute{
+					"paused": schema.SingleNestedAttribute{
+						Computed:      true,
+						Description:   "Indicates when and why the subscription transitioned to the paused status.",
+						PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+						Attributes: map[string]schema.Attribute{
+							"subscription": schema.SingleNestedAttribute{
+								Computed:      true,
+								Description:   "Information on the `type=subscription` pause.",
+								PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
+								Attributes: map[string]schema.Attribute{
+									"type": schema.StringAttribute{
+										Computed:      true,
+										Description:   "The reason that the subscription was paused.",
+										PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+										Validators:    []validator.String{stringvalidator.OneOf("final_payment_failure", "first_payment_failure", "pause_requested", "system", "trial_end_without_payment_method")},
+									},
+								},
+							},
+							"transitioned_at": schema.Int64Attribute{
+								Computed:      true,
+								Description:   "Unix timestamp in seconds of when the subscription status transitioned to `paused`.",
+								PlanModifiers: []planmodifier.Int64{int64planmodifier.UseStateForUnknown()},
+							},
+							"type": schema.StringAttribute{
+								Computed:      true,
+								Description:   "The type of pause.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("subscription")},
+							},
+						},
+					},
+				},
 			},
 			"test_clock": schema.StringAttribute{
 				Computed:      true,
@@ -1178,10 +1377,19 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 						Required:    true,
 						Description: "Defines how a subscription behaves when a trial ends.",
 						Attributes: map[string]schema.Attribute{
+							"billing_cycle_anchor": schema.StringAttribute{
+								Optional:      true,
+								Computed:      true,
+								Description:   "Indicates how the subscription's billing cycle anchor is reset when a trial ends. If not set, the default is `now`.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("now", "unchanged")},
+							},
 							"missing_payment_method": schema.StringAttribute{
-								Required:    true,
-								Description: "Indicates how the subscription should change when the trial ends if the user did not provide a payment method.",
-								Validators:  []validator.String{stringvalidator.OneOf("cancel", "create_invoice", "pause")},
+								Optional:      true,
+								Computed:      true,
+								Description:   "Indicates how the subscription should change when the trial ends if the user did not provide a payment method.",
+								PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								Validators:    []validator.String{stringvalidator.OneOf("cancel", "create_invoice", "pause")},
 							},
 						},
 					},
@@ -1350,12 +1558,12 @@ func (r *SubscriptionResource) Schema(_ context.Context, _ resource.SchemaReques
 			},
 			"trial_from_plan": schema.BoolAttribute{
 				Optional:    true,
-				Description: "Indicates if a plan's `trial_period_days` should be applied to the subscription. Setting `trial_end` per subscription is preferred, and this defaults to `false`. Setting this flag to `true` together with `trial_end` is not allowed. See [Using trial periods on subscriptions](https://docs.stripe.com/billing/subscriptions/trials) to learn more.",
+				Description: "Indicates if a plan's `trial_period_days` should be applied to the subscription. Setting `trial_end` per subscription is preferred, and this defaults to `false`. Setting this flag to `true` together with `trial_end` is not allowed. See [Using trial periods on subscriptions](https://docs.stripe.com/billing/subscriptions/trials/free-trials) to learn more.",
 				WriteOnly:   true,
 			},
 			"trial_period_days": schema.Int64Attribute{
 				Optional:      true,
-				Description:   "Integer representing the number of trial period days before the customer is charged for the first time. This will always overwrite any trials that might apply via a subscribed plan. See [Using trial periods on subscriptions](https://docs.stripe.com/billing/subscriptions/trials) to learn more.",
+				Description:   "Integer representing the number of trial period days before the customer is charged for the first time. This will always overwrite any trials that might apply via a subscribed plan. See [Using trial periods on subscriptions](https://docs.stripe.com/billing/subscriptions/trials/free-trials) to learn more.",
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 				WriteOnly:     true,
 			},
@@ -1405,7 +1613,7 @@ func (r *SubscriptionResource) Create(ctx context.Context, req resource.CreateRe
 		resp.Diagnostics.AddError("Error flattening Subscription create response", err.Error())
 		return
 	}
-	hydrateWriteOnlyPaths(&createdState, &config, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}, []string{"Items", "*", "billing_thresholds"}, []string{"Items", "*", "billing_thresholds", "usage_gte"}, []string{"Items", "*", "discounts"}, []string{"Items", "*", "discounts", "*", "coupon"}, []string{"Items", "*", "discounts", "*", "discount"}, []string{"Items", "*", "discounts", "*", "promotion_code"}, []string{"Items", "*", "metadata"}, []string{"Items", "*", "price"}, []string{"Items", "*", "price_data"}, []string{"Items", "*", "price_data", "currency"}, []string{"Items", "*", "price_data", "product"}, []string{"Items", "*", "price_data", "recurring"}, []string{"Items", "*", "price_data", "recurring", "interval"}, []string{"Items", "*", "price_data", "recurring", "interval_count"}, []string{"Items", "*", "price_data", "tax_behavior"}, []string{"Items", "*", "price_data", "unit_amount"}, []string{"Items", "*", "price_data", "unit_amount_decimal"}, []string{"Items", "*", "quantity"}, []string{"Items", "*", "tax_rates"}})
+	hydrateWriteOnlyPaths(&createdState, &config, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}, []string{"Items", "*", "billing_thresholds"}, []string{"Items", "*", "billing_thresholds", "usage_gte"}, []string{"Items", "*", "current_trial"}, []string{"Items", "*", "current_trial", "trial_offer"}, []string{"Items", "*", "discounts"}, []string{"Items", "*", "discounts", "*", "coupon"}, []string{"Items", "*", "discounts", "*", "discount"}, []string{"Items", "*", "discounts", "*", "promotion_code"}, []string{"Items", "*", "metadata"}, []string{"Items", "*", "price"}, []string{"Items", "*", "price_data"}, []string{"Items", "*", "price_data", "currency"}, []string{"Items", "*", "price_data", "product"}, []string{"Items", "*", "price_data", "recurring"}, []string{"Items", "*", "price_data", "recurring", "interval"}, []string{"Items", "*", "price_data", "recurring", "interval_count"}, []string{"Items", "*", "price_data", "tax_behavior"}, []string{"Items", "*", "price_data", "unit_amount"}, []string{"Items", "*", "price_data", "unit_amount_decimal"}, []string{"Items", "*", "quantity"}, []string{"Items", "*", "tax_rates"}})
 	normalizeUnknownValues(&createdState)
 
 	diffPlan := plan
@@ -1445,7 +1653,7 @@ func (r *SubscriptionResource) Create(ctx context.Context, req resource.CreateRe
 		resp.Diagnostics.AddError("Error flattening Subscription create response", err.Error())
 		return
 	}
-	hydrateWriteOnlyPaths(&plan, &config, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}, []string{"Items", "*", "billing_thresholds"}, []string{"Items", "*", "billing_thresholds", "usage_gte"}, []string{"Items", "*", "discounts"}, []string{"Items", "*", "discounts", "*", "coupon"}, []string{"Items", "*", "discounts", "*", "discount"}, []string{"Items", "*", "discounts", "*", "promotion_code"}, []string{"Items", "*", "metadata"}, []string{"Items", "*", "price"}, []string{"Items", "*", "price_data"}, []string{"Items", "*", "price_data", "currency"}, []string{"Items", "*", "price_data", "product"}, []string{"Items", "*", "price_data", "recurring"}, []string{"Items", "*", "price_data", "recurring", "interval"}, []string{"Items", "*", "price_data", "recurring", "interval_count"}, []string{"Items", "*", "price_data", "tax_behavior"}, []string{"Items", "*", "price_data", "unit_amount"}, []string{"Items", "*", "price_data", "unit_amount_decimal"}, []string{"Items", "*", "quantity"}, []string{"Items", "*", "tax_rates"}})
+	hydrateWriteOnlyPaths(&plan, &config, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}, []string{"Items", "*", "billing_thresholds"}, []string{"Items", "*", "billing_thresholds", "usage_gte"}, []string{"Items", "*", "current_trial"}, []string{"Items", "*", "current_trial", "trial_offer"}, []string{"Items", "*", "discounts"}, []string{"Items", "*", "discounts", "*", "coupon"}, []string{"Items", "*", "discounts", "*", "discount"}, []string{"Items", "*", "discounts", "*", "promotion_code"}, []string{"Items", "*", "metadata"}, []string{"Items", "*", "price"}, []string{"Items", "*", "price_data"}, []string{"Items", "*", "price_data", "currency"}, []string{"Items", "*", "price_data", "product"}, []string{"Items", "*", "price_data", "recurring"}, []string{"Items", "*", "price_data", "recurring", "interval"}, []string{"Items", "*", "price_data", "recurring", "interval_count"}, []string{"Items", "*", "price_data", "tax_behavior"}, []string{"Items", "*", "price_data", "unit_amount"}, []string{"Items", "*", "price_data", "unit_amount_decimal"}, []string{"Items", "*", "quantity"}, []string{"Items", "*", "tax_rates"}})
 	clearWriteOnlyPaths(&plan, [][]string{[]string{"AddInvoiceItems"}, []string{"AddInvoiceItems", "*", "discountable"}, []string{"AddInvoiceItems", "*", "discounts"}, []string{"AddInvoiceItems", "*", "discounts", "*", "coupon"}, []string{"AddInvoiceItems", "*", "discounts", "*", "discount"}, []string{"AddInvoiceItems", "*", "discounts", "*", "promotion_code"}, []string{"AddInvoiceItems", "*", "metadata"}, []string{"AddInvoiceItems", "*", "period"}, []string{"AddInvoiceItems", "*", "period", "end"}, []string{"AddInvoiceItems", "*", "period", "end", "timestamp"}, []string{"AddInvoiceItems", "*", "period", "end", "type"}, []string{"AddInvoiceItems", "*", "period", "start"}, []string{"AddInvoiceItems", "*", "period", "start", "timestamp"}, []string{"AddInvoiceItems", "*", "period", "start", "type"}, []string{"AddInvoiceItems", "*", "price"}, []string{"AddInvoiceItems", "*", "price_data"}, []string{"AddInvoiceItems", "*", "price_data", "currency"}, []string{"AddInvoiceItems", "*", "price_data", "product"}, []string{"AddInvoiceItems", "*", "price_data", "tax_behavior"}, []string{"AddInvoiceItems", "*", "price_data", "unit_amount"}, []string{"AddInvoiceItems", "*", "price_data", "unit_amount_decimal"}, []string{"AddInvoiceItems", "*", "quantity"}, []string{"AddInvoiceItems", "*", "tax_rates"}, []string{"BackdateStartDate"}, []string{"OffSession"}, []string{"PaymentBehavior"}, []string{"ProrationBehavior"}, []string{"TrialFromPlan"}, []string{"TrialPeriodDays"}})
 	normalizeUnknownValues(&plan)
 	diags = resp.State.Set(ctx, plan)
@@ -1481,7 +1689,7 @@ func (r *SubscriptionResource) Read(ctx context.Context, req resource.ReadReques
 		resp.Diagnostics.AddError("Error flattening Subscription read response", err.Error())
 		return
 	}
-	hydrateWriteOnlyPaths(&state, &priorState, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}, []string{"Items", "*", "billing_thresholds"}, []string{"Items", "*", "billing_thresholds", "usage_gte"}, []string{"Items", "*", "discounts"}, []string{"Items", "*", "discounts", "*", "coupon"}, []string{"Items", "*", "discounts", "*", "discount"}, []string{"Items", "*", "discounts", "*", "promotion_code"}, []string{"Items", "*", "metadata"}, []string{"Items", "*", "price"}, []string{"Items", "*", "price_data"}, []string{"Items", "*", "price_data", "currency"}, []string{"Items", "*", "price_data", "product"}, []string{"Items", "*", "price_data", "recurring"}, []string{"Items", "*", "price_data", "recurring", "interval"}, []string{"Items", "*", "price_data", "recurring", "interval_count"}, []string{"Items", "*", "price_data", "tax_behavior"}, []string{"Items", "*", "price_data", "unit_amount"}, []string{"Items", "*", "price_data", "unit_amount_decimal"}, []string{"Items", "*", "quantity"}, []string{"Items", "*", "tax_rates"}})
+	hydrateWriteOnlyPaths(&state, &priorState, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}, []string{"Items", "*", "billing_thresholds"}, []string{"Items", "*", "billing_thresholds", "usage_gte"}, []string{"Items", "*", "current_trial"}, []string{"Items", "*", "current_trial", "trial_offer"}, []string{"Items", "*", "discounts"}, []string{"Items", "*", "discounts", "*", "coupon"}, []string{"Items", "*", "discounts", "*", "discount"}, []string{"Items", "*", "discounts", "*", "promotion_code"}, []string{"Items", "*", "metadata"}, []string{"Items", "*", "price"}, []string{"Items", "*", "price_data"}, []string{"Items", "*", "price_data", "currency"}, []string{"Items", "*", "price_data", "product"}, []string{"Items", "*", "price_data", "recurring"}, []string{"Items", "*", "price_data", "recurring", "interval"}, []string{"Items", "*", "price_data", "recurring", "interval_count"}, []string{"Items", "*", "price_data", "tax_behavior"}, []string{"Items", "*", "price_data", "unit_amount"}, []string{"Items", "*", "price_data", "unit_amount_decimal"}, []string{"Items", "*", "quantity"}, []string{"Items", "*", "tax_rates"}})
 	clearWriteOnlyPaths(&state, [][]string{[]string{"AddInvoiceItems"}, []string{"AddInvoiceItems", "*", "discountable"}, []string{"AddInvoiceItems", "*", "discounts"}, []string{"AddInvoiceItems", "*", "discounts", "*", "coupon"}, []string{"AddInvoiceItems", "*", "discounts", "*", "discount"}, []string{"AddInvoiceItems", "*", "discounts", "*", "promotion_code"}, []string{"AddInvoiceItems", "*", "metadata"}, []string{"AddInvoiceItems", "*", "period"}, []string{"AddInvoiceItems", "*", "period", "end"}, []string{"AddInvoiceItems", "*", "period", "end", "timestamp"}, []string{"AddInvoiceItems", "*", "period", "end", "type"}, []string{"AddInvoiceItems", "*", "period", "start"}, []string{"AddInvoiceItems", "*", "period", "start", "timestamp"}, []string{"AddInvoiceItems", "*", "period", "start", "type"}, []string{"AddInvoiceItems", "*", "price"}, []string{"AddInvoiceItems", "*", "price_data"}, []string{"AddInvoiceItems", "*", "price_data", "currency"}, []string{"AddInvoiceItems", "*", "price_data", "product"}, []string{"AddInvoiceItems", "*", "price_data", "tax_behavior"}, []string{"AddInvoiceItems", "*", "price_data", "unit_amount"}, []string{"AddInvoiceItems", "*", "price_data", "unit_amount_decimal"}, []string{"AddInvoiceItems", "*", "quantity"}, []string{"AddInvoiceItems", "*", "tax_rates"}, []string{"BackdateStartDate"}, []string{"OffSession"}, []string{"PaymentBehavior"}, []string{"ProrationBehavior"}, []string{"TrialFromPlan"}, []string{"TrialPeriodDays"}})
 	normalizeUnknownValues(&state)
 	diags = resp.State.Set(ctx, state)
@@ -1548,7 +1756,7 @@ func (r *SubscriptionResource) Update(ctx context.Context, req resource.UpdateRe
 		resp.Diagnostics.AddError("Error flattening Subscription update response", err.Error())
 		return
 	}
-	hydrateWriteOnlyPaths(&plan, &config, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}, []string{"Items", "*", "billing_thresholds"}, []string{"Items", "*", "billing_thresholds", "usage_gte"}, []string{"Items", "*", "discounts"}, []string{"Items", "*", "discounts", "*", "coupon"}, []string{"Items", "*", "discounts", "*", "discount"}, []string{"Items", "*", "discounts", "*", "promotion_code"}, []string{"Items", "*", "metadata"}, []string{"Items", "*", "price"}, []string{"Items", "*", "price_data"}, []string{"Items", "*", "price_data", "currency"}, []string{"Items", "*", "price_data", "product"}, []string{"Items", "*", "price_data", "recurring"}, []string{"Items", "*", "price_data", "recurring", "interval"}, []string{"Items", "*", "price_data", "recurring", "interval_count"}, []string{"Items", "*", "price_data", "tax_behavior"}, []string{"Items", "*", "price_data", "unit_amount"}, []string{"Items", "*", "price_data", "unit_amount_decimal"}, []string{"Items", "*", "quantity"}, []string{"Items", "*", "tax_rates"}})
+	hydrateWriteOnlyPaths(&plan, &config, [][]string{[]string{"Discounts", "*", "coupon"}, []string{"Discounts", "*", "discount"}, []string{"Discounts", "*", "promotion_code"}, []string{"Items", "*", "billing_thresholds"}, []string{"Items", "*", "billing_thresholds", "usage_gte"}, []string{"Items", "*", "current_trial"}, []string{"Items", "*", "current_trial", "trial_offer"}, []string{"Items", "*", "discounts"}, []string{"Items", "*", "discounts", "*", "coupon"}, []string{"Items", "*", "discounts", "*", "discount"}, []string{"Items", "*", "discounts", "*", "promotion_code"}, []string{"Items", "*", "metadata"}, []string{"Items", "*", "price"}, []string{"Items", "*", "price_data"}, []string{"Items", "*", "price_data", "currency"}, []string{"Items", "*", "price_data", "product"}, []string{"Items", "*", "price_data", "recurring"}, []string{"Items", "*", "price_data", "recurring", "interval"}, []string{"Items", "*", "price_data", "recurring", "interval_count"}, []string{"Items", "*", "price_data", "tax_behavior"}, []string{"Items", "*", "price_data", "unit_amount"}, []string{"Items", "*", "price_data", "unit_amount_decimal"}, []string{"Items", "*", "quantity"}, []string{"Items", "*", "tax_rates"}})
 	clearWriteOnlyPaths(&plan, [][]string{[]string{"AddInvoiceItems"}, []string{"AddInvoiceItems", "*", "discountable"}, []string{"AddInvoiceItems", "*", "discounts"}, []string{"AddInvoiceItems", "*", "discounts", "*", "coupon"}, []string{"AddInvoiceItems", "*", "discounts", "*", "discount"}, []string{"AddInvoiceItems", "*", "discounts", "*", "promotion_code"}, []string{"AddInvoiceItems", "*", "metadata"}, []string{"AddInvoiceItems", "*", "period"}, []string{"AddInvoiceItems", "*", "period", "end"}, []string{"AddInvoiceItems", "*", "period", "end", "timestamp"}, []string{"AddInvoiceItems", "*", "period", "end", "type"}, []string{"AddInvoiceItems", "*", "period", "start"}, []string{"AddInvoiceItems", "*", "period", "start", "timestamp"}, []string{"AddInvoiceItems", "*", "period", "start", "type"}, []string{"AddInvoiceItems", "*", "price"}, []string{"AddInvoiceItems", "*", "price_data"}, []string{"AddInvoiceItems", "*", "price_data", "currency"}, []string{"AddInvoiceItems", "*", "price_data", "product"}, []string{"AddInvoiceItems", "*", "price_data", "tax_behavior"}, []string{"AddInvoiceItems", "*", "price_data", "unit_amount"}, []string{"AddInvoiceItems", "*", "price_data", "unit_amount_decimal"}, []string{"AddInvoiceItems", "*", "quantity"}, []string{"AddInvoiceItems", "*", "tax_rates"}, []string{"BackdateStartDate"}, []string{"OffSession"}, []string{"PaymentBehavior"}, []string{"ProrationBehavior"}, []string{"TrialFromPlan"}, []string{"TrialPeriodDays"}})
 	normalizeUnknownValues(&plan)
 	diags = resp.State.Set(ctx, plan)
@@ -1568,7 +1776,9 @@ func expandSubscriptionCreate(plan SubscriptionResourceModel) (*stripe.Subscript
 	params := &stripe.SubscriptionCreateParams{}
 
 	if !plan.ApplicationFeePercent.IsNull() && !plan.ApplicationFeePercent.IsUnknown() {
-		params.ApplicationFeePercent = stripe.Float64(plan.ApplicationFeePercent.ValueFloat64())
+		if !assignAttrValueToNamedField(params, "ApplicationFeePercent", plan.ApplicationFeePercent) {
+			return nil, fmt.Errorf("failed to assign attribute %q on %T", "application_fee_percent", params)
+		}
 	}
 	if !plan.AutomaticTax.IsNull() && !plan.AutomaticTax.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "AutomaticTax", plan.AutomaticTax) {
@@ -1730,7 +1940,11 @@ func expandSubscriptionUpdate(plan SubscriptionResourceModel, state Subscription
 	params := &stripe.SubscriptionUpdateParams{}
 
 	if !plan.ApplicationFeePercent.Equal(state.ApplicationFeePercent) && !plan.ApplicationFeePercent.IsNull() && !plan.ApplicationFeePercent.IsUnknown() {
-		params.ApplicationFeePercent = stripe.Float64(plan.ApplicationFeePercent.ValueFloat64())
+		if !assignAttrValueToNamedField(params, "ApplicationFeePercent", plan.ApplicationFeePercent) {
+			if !plan.ApplicationFeePercent.Equal(state.ApplicationFeePercent) {
+				return nil, fmt.Errorf("failed to assign changed attribute %q on %T", "application_fee_percent", params)
+			}
+		}
 	}
 	if !plan.AutomaticTax.Equal(state.AutomaticTax) && !plan.AutomaticTax.IsNull() && !plan.AutomaticTax.IsUnknown() {
 		if !assignAttrValueToNamedField(params, "AutomaticTax", plan.AutomaticTax) {
@@ -2288,7 +2502,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			hadRawCancellationDetails = true
 			if rawValueCancellationDetails != nil {
 				sourceCancellationDetails := applyConfiguredKeyedListShapes(rawValueCancellationDetails, attrValueToPlain(state.CancellationDetails))
-				if valueCancellationDetails, err := flattenPlainValue(sourceCancellationDetails, types.ObjectType{AttrTypes: map[string]attr.Type{"comment": types.StringType, "feedback": types.StringType, "reason": types.StringType}}, "cancellation_details", "raw response"); err != nil {
+				if valueCancellationDetails, err := flattenPlainValue(sourceCancellationDetails, types.ObjectType{AttrTypes: map[string]attr.Type{"comment": types.StringType, "feedback": types.StringType, "feedback_option": types.StringType, "reason": types.StringType}}, "cancellation_details", "raw response"); err != nil {
 					return err
 				} else {
 					if typedCancellationDetails, ok := valueCancellationDetails.(types.Object); ok {
@@ -2304,7 +2518,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 					sourceCancellationDetails := applyConfiguredKeyedListShapes(responseValueCancellationDetails, attrValueToPlain(state.CancellationDetails))
 					if valueCancellationDetails, err := flattenPlainValue(
 						sourceCancellationDetails,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"comment": types.StringType, "feedback": types.StringType, "reason": types.StringType}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"comment": types.StringType, "feedback": types.StringType, "feedback_option": types.StringType, "reason": types.StringType}},
 						"cancellation_details",
 						"response struct",
 					); err != nil {
@@ -2319,7 +2533,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			}
 		}
 		if !assignedCancellationDetails && hadRawCancellationDetails {
-			if nullCancellationDetails, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"comment": types.StringType, "feedback": types.StringType, "reason": types.StringType}}); ok {
+			if nullCancellationDetails, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"comment": types.StringType, "feedback": types.StringType, "feedback_option": types.StringType, "reason": types.StringType}}); ok {
 				if typedCancellationDetails, ok := nullCancellationDetails.(types.Object); ok {
 					state.CancellationDetails = typedCancellationDetails
 				}
@@ -2598,7 +2812,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			hadRawInvoiceSettings = true
 			if rawValueInvoiceSettings != nil {
 				sourceInvoiceSettings := applyConfiguredKeyedListShapes(rawValueInvoiceSettings, attrValueToPlain(state.InvoiceSettings))
-				if valueInvoiceSettings, err := flattenPlainValue(sourceInvoiceSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}, "invoice_settings", "raw response"); err != nil {
+				if valueInvoiceSettings, err := flattenPlainValue(sourceInvoiceSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "custom_fields": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"name": types.StringType, "value": types.StringType}}}, "description": types.StringType, "footer": types.StringType, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}, "invoice_settings", "raw response"); err != nil {
 					return err
 				} else {
 					if typedInvoiceSettings, ok := valueInvoiceSettings.(types.Object); ok {
@@ -2614,7 +2828,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 					sourceInvoiceSettings := applyConfiguredKeyedListShapes(responseValueInvoiceSettings, attrValueToPlain(state.InvoiceSettings))
 					if valueInvoiceSettings, err := flattenPlainValue(
 						sourceInvoiceSettings,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "custom_fields": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"name": types.StringType, "value": types.StringType}}}, "description": types.StringType, "footer": types.StringType, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}},
 						"invoice_settings",
 						"response struct",
 					); err != nil {
@@ -2629,7 +2843,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			}
 		}
 		if !assignedInvoiceSettings && hadRawInvoiceSettings {
-			if nullInvoiceSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}); ok {
+			if nullInvoiceSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"account_tax_ids": types.ListType{ElemType: types.StringType}, "custom_fields": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"name": types.StringType, "value": types.StringType}}}, "description": types.StringType, "footer": types.StringType, "issuer": types.ObjectType{AttrTypes: map[string]attr.Type{"account": types.StringType, "type": types.StringType}}}}); ok {
 				if typedInvoiceSettings, ok := nullInvoiceSettings.(types.Object); ok {
 					state.InvoiceSettings = typedInvoiceSettings
 				}
@@ -2639,7 +2853,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 	{
 		if rawValueItems, rawOk := plainValueAtPath(raw, "items"); rawOk {
 			rawPlainItems := extractListObjectData(rawValueItems)
-			if valueItems, err := flattenPlainValue(preserveEquivalentDecimalStringLeaves(suppressUnconfiguredDecimalMirrorLeaves(applyConfiguredKeyedListShapes(rawPlainItems, attrValueToPlain(state.Items)), attrValueToPlain(state.Items)), attrValueToPlain(state.Items)), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "billing_thresholds": types.ObjectType{AttrTypes: map[string]attr.Type{"usage_gte": types.Int64Type}}, "discounts": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "discount": types.StringType, "promotion_code": types.StringType}}}, "metadata": types.MapType{ElemType: types.StringType}, "price": types.StringType, "price_data": types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "product": types.StringType, "recurring": types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.Float64Type}}, "quantity": types.Int64Type, "tax_rates": types.ListType{ElemType: types.StringType}}}}, "items", "raw response"); err != nil {
+			if valueItems, err := flattenPlainValue(preserveEquivalentDecimalStringLeaves(suppressUnconfiguredDecimalMirrorLeaves(applyConfiguredKeyedListShapes(rawPlainItems, attrValueToPlain(state.Items)), attrValueToPlain(state.Items)), attrValueToPlain(state.Items)), types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "billing_thresholds": types.ObjectType{AttrTypes: map[string]attr.Type{"usage_gte": types.Int64Type}}, "current_trial": types.ObjectType{AttrTypes: map[string]attr.Type{"trial_offer": types.StringType}}, "discounts": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "discount": types.StringType, "promotion_code": types.StringType}}}, "metadata": types.MapType{ElemType: types.StringType}, "price": types.StringType, "price_data": types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "product": types.StringType, "recurring": types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.Float64Type}}, "quantity": types.Int64Type, "tax_rates": types.ListType{ElemType: types.StringType}}}}, "items", "raw response"); err != nil {
 				return err
 			} else {
 				if typedItems, ok := valueItems.(types.List); ok {
@@ -2651,7 +2865,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 				fallbackPlainItems := extractListObjectData(responseValueItems)
 				if valueItems, err := flattenPlainValue(
 					preserveEquivalentDecimalStringLeaves(suppressUnconfiguredDecimalMirrorLeaves(applyConfiguredKeyedListShapes(fallbackPlainItems, attrValueToPlain(state.Items)), attrValueToPlain(state.Items)), attrValueToPlain(state.Items)),
-					types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "billing_thresholds": types.ObjectType{AttrTypes: map[string]attr.Type{"usage_gte": types.Int64Type}}, "discounts": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "discount": types.StringType, "promotion_code": types.StringType}}}, "metadata": types.MapType{ElemType: types.StringType}, "price": types.StringType, "price_data": types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "product": types.StringType, "recurring": types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.Float64Type}}, "quantity": types.Int64Type, "tax_rates": types.ListType{ElemType: types.StringType}}}},
+					types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "billing_thresholds": types.ObjectType{AttrTypes: map[string]attr.Type{"usage_gte": types.Int64Type}}, "current_trial": types.ObjectType{AttrTypes: map[string]attr.Type{"trial_offer": types.StringType}}, "discounts": types.ListType{ElemType: types.ObjectType{AttrTypes: map[string]attr.Type{"coupon": types.StringType, "discount": types.StringType, "promotion_code": types.StringType}}}, "metadata": types.MapType{ElemType: types.StringType}, "price": types.StringType, "price_data": types.ObjectType{AttrTypes: map[string]attr.Type{"currency": types.StringType, "product": types.StringType, "recurring": types.ObjectType{AttrTypes: map[string]attr.Type{"interval": types.StringType, "interval_count": types.Int64Type}}, "tax_behavior": types.StringType, "unit_amount": types.Int64Type, "unit_amount_decimal": types.Float64Type}}, "quantity": types.Int64Type, "tax_rates": types.ListType{ElemType: types.StringType}}}},
 					"items",
 					"response struct",
 				); err != nil {
@@ -2844,7 +3058,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			hadRawPaymentSettings = true
 			if rawValuePaymentSettings != nil {
 				sourcePaymentSettings := applyConfiguredKeyedListShapes(rawValuePaymentSettings, attrValueToPlain(state.PaymentSettings))
-				if valuePaymentSettings, err := flattenPlainValue(sourcePaymentSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType}}, "network": types.StringType, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_after_seconds": types.Int64Type, "mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_includes_iof": types.StringType, "end_date": types.StringType, "payment_schedule": types.StringType}}}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}, "save_default_payment_method": types.StringType}}, "payment_settings", "raw response"); err != nil {
+				if valuePaymentSettings, err := flattenPlainValue(sourcePaymentSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "billie": types.ObjectType{AttrTypes: map[string]attr.Type{"company_details": types.ObjectType{AttrTypes: map[string]attr.Type{"registered_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "registered_name": types.StringType, "registration_number": types.StringType, "registration_type": types.StringType, "vat": types.StringType}}}}, "blik": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_at": types.Int64Type}}}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType}}, "network": types.StringType, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_after_seconds": types.Int64Type, "mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_includes_iof": types.StringType, "end_date": types.StringType, "payment_schedule": types.StringType}}}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}, "save_default_payment_method": types.StringType}}, "payment_settings", "raw response"); err != nil {
 					return err
 				} else {
 					if typedPaymentSettings, ok := valuePaymentSettings.(types.Object); ok {
@@ -2860,7 +3074,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 					sourcePaymentSettings := applyConfiguredKeyedListShapes(responseValuePaymentSettings, attrValueToPlain(state.PaymentSettings))
 					if valuePaymentSettings, err := flattenPlainValue(
 						sourcePaymentSettings,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType}}, "network": types.StringType, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_after_seconds": types.Int64Type, "mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_includes_iof": types.StringType, "end_date": types.StringType, "payment_schedule": types.StringType}}}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}, "save_default_payment_method": types.StringType}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "billie": types.ObjectType{AttrTypes: map[string]attr.Type{"company_details": types.ObjectType{AttrTypes: map[string]attr.Type{"registered_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "registered_name": types.StringType, "registration_number": types.StringType, "registration_type": types.StringType, "vat": types.StringType}}}}, "blik": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_at": types.Int64Type}}}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType}}, "network": types.StringType, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_after_seconds": types.Int64Type, "mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_includes_iof": types.StringType, "end_date": types.StringType, "payment_schedule": types.StringType}}}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}, "save_default_payment_method": types.StringType}},
 						"payment_settings",
 						"response struct",
 					); err != nil {
@@ -2875,7 +3089,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			}
 		}
 		if !assignedPaymentSettings && hadRawPaymentSettings {
-			if nullPaymentSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType}}, "network": types.StringType, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_after_seconds": types.Int64Type, "mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_includes_iof": types.StringType, "end_date": types.StringType, "payment_schedule": types.StringType}}}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}, "save_default_payment_method": types.StringType}}); ok {
+			if nullPaymentSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"payment_method_options": types.ObjectType{AttrTypes: map[string]attr.Type{"acss_debit": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"transaction_type": types.StringType}}, "verification_method": types.StringType}}, "bancontact": types.ObjectType{AttrTypes: map[string]attr.Type{"preferred_language": types.StringType}}, "billie": types.ObjectType{AttrTypes: map[string]attr.Type{"company_details": types.ObjectType{AttrTypes: map[string]attr.Type{"registered_address": types.ObjectType{AttrTypes: map[string]attr.Type{"city": types.StringType, "country": types.StringType, "line1": types.StringType, "line2": types.StringType, "postal_code": types.StringType, "state": types.StringType}}, "registered_name": types.StringType, "registration_number": types.StringType, "registration_type": types.StringType, "vat": types.StringType}}}}, "blik": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_at": types.Int64Type}}}}, "card": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType}}, "network": types.StringType, "request_three_d_secure": types.StringType}}, "customer_balance": types.ObjectType{AttrTypes: map[string]attr.Type{"bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"eu_bank_transfer": types.ObjectType{AttrTypes: map[string]attr.Type{"country": types.StringType}}, "type": types.StringType}}, "funding_type": types.StringType}}, "payto": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "purpose": types.StringType}}}}, "pix": types.ObjectType{AttrTypes: map[string]attr.Type{"expires_after_seconds": types.Int64Type, "mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_includes_iof": types.StringType, "end_date": types.StringType, "payment_schedule": types.StringType}}}}, "upi": types.ObjectType{AttrTypes: map[string]attr.Type{"mandate_options": types.ObjectType{AttrTypes: map[string]attr.Type{"amount": types.Int64Type, "amount_type": types.StringType, "description": types.StringType, "end_date": types.Int64Type}}}}, "us_bank_account": types.ObjectType{AttrTypes: map[string]attr.Type{"financial_connections": types.ObjectType{AttrTypes: map[string]attr.Type{"filters": types.ObjectType{AttrTypes: map[string]attr.Type{"account_subcategories": types.ListType{ElemType: types.StringType}}}, "permissions": types.ListType{ElemType: types.StringType}, "prefetch": types.ListType{ElemType: types.StringType}}}, "verification_method": types.StringType}}}}, "payment_method_types": types.ListType{ElemType: types.StringType}, "save_default_payment_method": types.StringType}}); ok {
 				if typedPaymentSettings, ok := nullPaymentSettings.(types.Object); ok {
 					state.PaymentSettings = typedPaymentSettings
 				}
@@ -2949,7 +3163,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			hadRawPendingUpdate = true
 			if rawValuePendingUpdate != nil {
 				sourcePendingUpdate := applyConfiguredKeyedListShapes(rawValuePendingUpdate, attrValueToPlain(state.PendingUpdate))
-				if valuePendingUpdate, err := flattenPlainValue(sourcePendingUpdate, types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.Int64Type, "discount": types.StringType, "expires_at": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "trial_end": types.Int64Type, "trial_from_plan": types.BoolType}}, "pending_update", "raw response"); err != nil {
+				if valuePendingUpdate, err := flattenPlainValue(sourcePendingUpdate, types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.Int64Type, "cancel_at_period_end": types.BoolType, "discount": types.StringType, "expires_at": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "trial_end": types.Int64Type, "trial_from_plan": types.BoolType}}, "pending_update", "raw response"); err != nil {
 					return err
 				} else {
 					if typedPendingUpdate, ok := valuePendingUpdate.(types.Object); ok {
@@ -2965,7 +3179,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 					sourcePendingUpdate := applyConfiguredKeyedListShapes(responseValuePendingUpdate, attrValueToPlain(state.PendingUpdate))
 					if valuePendingUpdate, err := flattenPlainValue(
 						sourcePendingUpdate,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.Int64Type, "discount": types.StringType, "expires_at": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "trial_end": types.Int64Type, "trial_from_plan": types.BoolType}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.Int64Type, "cancel_at_period_end": types.BoolType, "discount": types.StringType, "expires_at": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "trial_end": types.Int64Type, "trial_from_plan": types.BoolType}},
 						"pending_update",
 						"response struct",
 					); err != nil {
@@ -2980,7 +3194,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			}
 		}
 		if !assignedPendingUpdate && hadRawPendingUpdate {
-			if nullPendingUpdate, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.Int64Type, "discount": types.StringType, "expires_at": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "trial_end": types.Int64Type, "trial_from_plan": types.BoolType}}); ok {
+			if nullPendingUpdate, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.Int64Type, "cancel_at_period_end": types.BoolType, "discount": types.StringType, "expires_at": types.Int64Type, "metadata": types.MapType{ElemType: types.StringType}, "trial_end": types.Int64Type, "trial_from_plan": types.BoolType}}); ok {
 				if typedPendingUpdate, ok := nullPendingUpdate.(types.Object); ok {
 					state.PendingUpdate = typedPendingUpdate
 				}
@@ -3090,6 +3304,51 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 		}
 	}
 	{
+		assignedStatusDetails := false
+		hadRawStatusDetails := false
+		if rawValueStatusDetails, rawOk := plainValueAtPath(raw, "status_details"); rawOk {
+			hadRawStatusDetails = true
+			if rawValueStatusDetails != nil {
+				sourceStatusDetails := applyConfiguredKeyedListShapes(rawValueStatusDetails, attrValueToPlain(state.StatusDetails))
+				if valueStatusDetails, err := flattenPlainValue(sourceStatusDetails, types.ObjectType{AttrTypes: map[string]attr.Type{"paused": types.ObjectType{AttrTypes: map[string]attr.Type{"subscription": types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}, "transitioned_at": types.Int64Type, "type": types.StringType}}}}, "status_details", "raw response"); err != nil {
+					return err
+				} else {
+					if typedStatusDetails, ok := valueStatusDetails.(types.Object); ok {
+						state.StatusDetails = typedStatusDetails
+						assignedStatusDetails = true
+					}
+				}
+			}
+		}
+		if !assignedStatusDetails {
+			if !hasRaw {
+				if responseValueStatusDetails, ok := plainFromResponseField(obj, "StatusDetails"); ok {
+					sourceStatusDetails := applyConfiguredKeyedListShapes(responseValueStatusDetails, attrValueToPlain(state.StatusDetails))
+					if valueStatusDetails, err := flattenPlainValue(
+						sourceStatusDetails,
+						types.ObjectType{AttrTypes: map[string]attr.Type{"paused": types.ObjectType{AttrTypes: map[string]attr.Type{"subscription": types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}, "transitioned_at": types.Int64Type, "type": types.StringType}}}},
+						"status_details",
+						"response struct",
+					); err != nil {
+						return err
+					} else {
+						if typedStatusDetails, ok := valueStatusDetails.(types.Object); ok {
+							state.StatusDetails = typedStatusDetails
+							assignedStatusDetails = true
+						}
+					}
+				}
+			}
+		}
+		if !assignedStatusDetails && hadRawStatusDetails {
+			if nullStatusDetails, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"paused": types.ObjectType{AttrTypes: map[string]attr.Type{"subscription": types.ObjectType{AttrTypes: map[string]attr.Type{"type": types.StringType}}, "transitioned_at": types.Int64Type, "type": types.StringType}}}}); ok {
+				if typedStatusDetails, ok := nullStatusDetails.(types.Object); ok {
+					state.StatusDetails = typedStatusDetails
+				}
+			}
+		}
+	}
+	{
 		if true {
 			if rawValueTestClock, rawOk := plainValueAtPath(raw, "test_clock"); rawOk {
 				if typedTestClock, ok := plainToStringIDValue(rawValueTestClock); ok {
@@ -3177,7 +3436,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			hadRawTrialSettings = true
 			if rawValueTrialSettings != nil {
 				sourceTrialSettings := applyConfiguredKeyedListShapes(rawValueTrialSettings, attrValueToPlain(state.TrialSettings))
-				if valueTrialSettings, err := flattenPlainValue(sourceTrialSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}}, "trial_settings", "raw response"); err != nil {
+				if valueTrialSettings, err := flattenPlainValue(sourceTrialSettings, types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "missing_payment_method": types.StringType}}}}, "trial_settings", "raw response"); err != nil {
 					return err
 				} else {
 					if typedTrialSettings, ok := valueTrialSettings.(types.Object); ok {
@@ -3193,7 +3452,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 					sourceTrialSettings := applyConfiguredKeyedListShapes(responseValueTrialSettings, attrValueToPlain(state.TrialSettings))
 					if valueTrialSettings, err := flattenPlainValue(
 						sourceTrialSettings,
-						types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}},
+						types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "missing_payment_method": types.StringType}}}},
 						"trial_settings",
 						"response struct",
 					); err != nil {
@@ -3208,7 +3467,7 @@ func flattenSubscription(obj *stripe.Subscription, state *SubscriptionResourceMo
 			}
 		}
 		if !assignedTrialSettings && hadRawTrialSettings {
-			if nullTrialSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"missing_payment_method": types.StringType}}}}); ok {
+			if nullTrialSettings, ok := nullTerraformValue(types.ObjectType{AttrTypes: map[string]attr.Type{"end_behavior": types.ObjectType{AttrTypes: map[string]attr.Type{"billing_cycle_anchor": types.StringType, "missing_payment_method": types.StringType}}}}); ok {
 				if typedTrialSettings, ok := nullTrialSettings.(types.Object); ok {
 					state.TrialSettings = typedTrialSettings
 				}
