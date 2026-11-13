@@ -1,0 +1,31 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "2a03f287-2a69-0d75-28e3-0b2f55450979",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "metronome_product",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "billable_metric_id": null,
+            "composite_product_ids": null,
+            "composite_tags": null,
+            "id": "product",
+            "name": "fixture",
+            "type": "FIXED"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

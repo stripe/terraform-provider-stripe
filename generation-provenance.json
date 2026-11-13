@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "channel": "ga",
+  "generatorRevision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+  "generatorWorkingTreeDirty": false,
+  "generatorBaseRevision": "888f051862072fd10cf22a9d521598ca00aff663",
+  "providerBaseRevision": "8cddb302c0df59e0644f2dff795bcbcf3ad3621d",
+  "stripeGoBaseRevision": "a1e3932f68a22e2bbd8300a30d6a0b54625ff50a",
+  "metronomeSourceRevision": "4abb7576cbf86763322a5aa1c33e89b4ee6c67e6",
+  "metronomeGoSourceRevision": "09e24603469dd6a4e678cde80b2be3aff5036353",
+  "metronomeGoModuleVersion": "v3.13.0",
+  "metronomeGoModuleChecksum": "h1:tESzDYrd/l4t8qllAqjr9AMMXJWykYKTo/siKGbGNkw=",
+  "metronomeGoModChecksum": "h1:av/XmTcRvtWg9zuNMmEE+nH82e3sjS0aRS2n3Ri/Fzs=",
+  "toolchain": {
+    "node": "v26.10.0",
+    "yarn": "1.22.19",
+    "go": "go version go1.26.4 darwin/arm64",
+    "gofmt": "go version go1.26.4 darwin/arm64",
+    "terraformPluginDocs": "v0.24.0",
+    "terraform": "1.16.5"
+  },
+  "inputs": {
+    "stripeV1": {
+      "path": "openapi/cache/metronome-terraform/stripe-v1.sdk.yaml",
+      "revision": "v2320",
+      "sha256": "8237f69136098dd348a86cdedcea7c9769fca3620ffc1a12d449ebdabec086aa"
+    },
+    "stripeV2": {
+      "path": "openapi/cache/metronome-terraform/stripe-v2.sdk.yaml",
+      "revision": "a8035c50794ea6bd6c168d56ca905583f9f746b5",
+      "sha256": "99b1c9aba1f1dbc9872586a2fb743fea0f4e664ca5792688ad18046a528b2b2c"
+    },
+    "metronomeSpec": {
+      "path": "packages/terraform/src/metronome/api/metronome-openapi.json",
+      "revision": "4abb7576cbf86763322a5aa1c33e89b4ee6c67e6",
+      "sha256": "3413bbf41c1cdc005f335094f92d3da28a3e1e6e84c5cfd277073d328eb471f8"
+    },
+    "metronomePolicies": {
+      "path": "packages/terraform/src/metronome/sdk-bindings.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "8012c845f29209d210b8741a5b99306a742eb5002c8140b49041f5753e29a38d"
+    },
+    "generatorLockfile": {
+      "path": "yarn.lock",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "7d19c3fad9dc432d70656524249b6dee85da7c98229118719b17364c0868554d"
+    }
+  },
+  "allMetronomeInputs": [
+    {
+      "path": "packages/terraform/src/metronome/api/credential-mapping-exceptions.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "16e55e09414f8c3be312df0b90a870d2210eae8f66eab9d2296fd659f97ff64a"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/credential-operations.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "226955c1ad41bef4eba38813649c33c8759cdedec9ce8f87aed0d847f0f46cf3"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/lifecycle-schema-policy.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "b3637f633f6efd4696c5e9511d4a5f71de8437fb9cbd954f76fc7fce9b060c4b"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/managed-resources.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "77df0ad476e98ff8f40e281a224277d6a11077f1ecae651b6559d1fbfe299f7e"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/managed-schema-policy.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "d561aaed593dda66af4999b87111526ae5a84896988b6594737ba5bc77284de1"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/metronome-openapi.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "3413bbf41c1cdc005f335094f92d3da28a3e1e6e84c5cfd277073d328eb471f8"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/operation-inventory.generated.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "3fac6c4250eb17215ac5092a651739a52793232fc5510aca8670fe657d3037ca"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/read-operations.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "ba338a42565b26e100d7f0cf183eba94c8c020395ee099d98542928ea599245c"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/security-review.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "fa93e8414281cb3e327716160f98d833a4507145e255a99630162a382ee81857"
+    },
+    {
+      "path": "packages/terraform/src/metronome/api/terraform-mapping.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "ae6e753d13f9e213232e58aa983f8aae3b5a634a9a332655af58a62920e5f94b"
+    },
+    {
+      "path": "packages/terraform/src/metronome/sdk-bindings.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "8012c845f29209d210b8741a5b99306a742eb5002c8140b49041f5753e29a38d"
+    },
+    {
+      "path": "packages/terraform/src/metronome/sdk-endpoints.json",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "753b60cbcb9616a95a836a61a4227cd968caa0e9487dacea45487a051945463f"
+    },
+    {
+      "path": "packages/terraform/src/metronome/LICENSE",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "f2f05e8a4356d9463f79d1136348dfc771a3ffdfedfca20ddc6f64e3b6cef211"
+    },
+    {
+      "path": "packages/terraform/src/metronome/SDK-LICENSE",
+      "revision": "f2a5b66a6eb51cf0c8e9413d77a0da6b806c153d",
+      "sha256": "0bc0d566cc9469c66caaff773a960cf926e15f26e670f05444b26510fa41a826"
+    }
+  ],
+  "baselineReproduction": {
+    "status": "reproduced",
+    "protectedFileCount": 1180,
+    "evidence": {
+      "path": "packages/terraform/src/compatibility/0.3.0/baseline-reproduction.json",
+      "revision": "13577a2743a2f8ccf95e55820cd36714187e7dea",
+      "sha256": "addb5f2cd7f5f29d172b0356616f5fb333a509a00ecc01d147b856abaa759abb"
+    }
+  },
+  "documentation": {
+    "tool": "tfplugindocs v0.24.0",
+    "scope": "Metronome surfaces and combined provider overview; frozen Stripe pages retained"
+  },
+  "liveSandbox": {
+    "executed": false,
+    "activationExecuted": false
+  }
+}

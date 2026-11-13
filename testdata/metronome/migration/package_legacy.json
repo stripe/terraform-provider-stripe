@@ -1,0 +1,35 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "87390b54-7456-71d2-6ead-a7f8874d0c4a",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "metronome_package",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "contract_name": "contract",
+            "id": "package",
+            "name": "fixture",
+            "package": null,
+            "rate_card_id": "card",
+            "recurring_commit": null,
+            "request": null,
+            "request_json": null,
+            "stripe_billing": true,
+            "uniqueness_key": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

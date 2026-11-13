@@ -1,0 +1,43 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "7d0204ca-c336-eeae-f08f-2c1766abd97c",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "metronome_customer_billing_configuration",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "configuration": {
+              "value": {
+                "external_customer_id": "external"
+              },
+              "type": [
+                "object",
+                {
+                  "external_customer_id": "string"
+                }
+              ]
+            },
+            "customer_id": "customer",
+            "deletion_protection": true,
+            "delivery_method": null,
+            "delivery_method_id": "delivery",
+            "id": "configuration",
+            "provider_name": "stripe",
+            "tax_provider": null
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

@@ -1,0 +1,45 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 1,
+  "lineage": "b50b8351-2246-a2ef-6dd7-42bc3f518f4f",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "metronome_customer_credit",
+      "name": "fixture",
+      "provider": "provider[\"registry.terraform.io/tonyxiao/metronome\"].migration",
+      "instances": [
+        {
+          "index_key": "instance",
+          "schema_version": 0,
+          "attributes": {
+            "access_schedule": {
+              "access_type": "SPEND",
+              "credit_type_id": "unit",
+              "schedule_items": [
+                {
+                  "amount": 9007199254740993.125,
+                  "ending_before": "2026-12-01T00:00:00Z",
+                  "starting_at": "2026-11-01T00:00:00Z"
+                }
+              ]
+            },
+            "applicable_product_ids": null,
+            "commit_type": "CREDIT",
+            "customer_id": "customer",
+            "deletion_protection": true,
+            "id": "balance",
+            "name": "fixture",
+            "priority": 10,
+            "product_id": "product",
+            "uniqueness_key": "balance:migration"
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

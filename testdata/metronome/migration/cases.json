@@ -1,0 +1,264 @@
+[
+  {
+    "name": "metric",
+    "kind": "billable_metric",
+    "hcl": "name = \"fixture\"\nevent_type = \"request\"\naggregation_type = \"COUNT\"",
+    "import_id": "metric",
+    "responses": [
+      {
+        "method": "GET",
+        "path": "/v1/billable-metrics/metric",
+        "response": "{\"data\":{\"id\":\"metric\",\"name\":\"fixture\",\"aggregation_type\":\"count\",\"event_type_filter\":{\"in_values\":[\"request\"]}}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "product",
+    "kind": "product",
+    "hcl": "name = \"fixture\"\ntype = \"FIXED\"",
+    "import_id": "product",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/contract-pricing/products/get",
+        "response": "{\"data\":{\"id\":\"product\",\"type\":\"FIXED\",\"current\":{\"name\":\"fixture\"}}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "unit",
+    "kind": "credit_type",
+    "hcl": "name = \"fixture\"",
+    "import_id": "unit",
+    "responses": [
+      {
+        "method": "GET",
+        "path": "/v1/credit-types/list",
+        "response": "{\"data\":[{\"id\":\"unit\",\"name\":\"fixture\",\"is_currency\":false}]}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "field",
+    "kind": "custom_field_key",
+    "hcl": "entity = \"customer\"\nkey = \"region\"\nenforce_uniqueness = false",
+    "import_id": "customer/region",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/customFields/listKeys",
+        "response": "{\"data\":[{\"entity\":\"customer\",\"key\":\"region\",\"enforce_uniqueness\":false}]}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "notification",
+    "kind": "offset_notification",
+    "hcl": "name = \"fixture\"\npolicy = {\n type = \"contract.start\"\n offset = \"P1D\"\n}",
+    "import_id": "notice",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v2/notifications/get",
+        "response": "{\"data\":{\"id\":\"notice\",\"name\":\"fixture\",\"policy\":{\"type\":\"contract.start\",\"offset\":\"P1D\"}}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "customer",
+    "kind": "customer",
+    "hcl": "name = \"fixture\"\ningest_aliases = [\"alias\"]",
+    "import_id": "customer",
+    "responses": [
+      {
+        "method": "GET",
+        "path": "/v1/customers/customer",
+        "response": "{\"data\":{\"id\":\"customer\",\"name\":\"fixture\",\"ingest_aliases\":[\"alias\"]}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "contract",
+    "kind": "contract",
+    "hcl": "customer_id = \"customer\"\nrate_card_id = \"card\"\nname = \"fixture\"\nstarting_at = \"2026-11-01T00:00:00Z\"\nuniqueness_key = \"contract:migration\"",
+    "import_id": "customer/contract",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v2/contracts/get",
+        "response": "{\"data\":{\"id\":\"contract\",\"customer_id\":\"customer\",\"rate_card_id\":\"card\",\"name\":\"fixture\",\"starting_at\":\"2026-11-01T00:00:00Z\",\"uniqueness_key\":\"contract:migration\"}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "alert",
+    "kind": "customer_alert",
+    "hcl": "customer_id = \"customer\"\nname = \"fixture\"\nalert_type = \"low_remaining_contract_credit_balance_reached\"\nthreshold = 9007199254740993.125\ncredit_type_id = \"unit\"\ndeletion_protection = false",
+    "import_id": "",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/alerts/create",
+        "response": "{\"data\":{\"id\":\"alert\"}}"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/customer-alerts/get",
+        "response": "{\"data\":{\"alert\":{\"id\":\"alert\",\"name\":\"fixture\",\"type\":\"low_remaining_contract_credit_balance_reached\",\"threshold\":9007199254740993.125,\"status\":\"enabled\",\"credit_type\":{\"id\":\"unit\"}}}}"
+      }
+    ],
+    "module": true
+  },
+  {
+    "name": "credit",
+    "kind": "customer_credit",
+    "hcl": "customer_id = \"customer\"\nproduct_id = \"product\"\nname = \"fixture\"\npriority = 10\nuniqueness_key = \"balance:migration\"\naccess_schedule = {\n access_type = \"SPEND\"\n credit_type_id = \"unit\"\n schedule_items = [{\n  amount = 9007199254740993.125\n  starting_at = \"2026-11-01T00:00:00Z\"\n  ending_before = \"2026-12-01T00:00:00Z\"\n }]\n}",
+    "import_id": "customer/balance",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/contracts/customerCredits/list",
+        "response": "{\"data\":[{\"id\":\"balance\",\"type\":\"CREDIT\",\"name\":\"fixture\",\"priority\":10,\"uniqueness_key\":\"balance:migration\",\"product\":{\"id\":\"product\"},\"access_schedule\":{\"access_type\":\"SPEND\",\"credit_type\":{\"id\":\"unit\"},\"schedule_items\":[{\"amount\":9007199254740993.125,\"starting_at\":\"2026-11-01T00:00:00Z\",\"ending_before\":\"2026-12-01T00:00:00Z\"}]},\"rate_type\":\"LIST_RATE\"}]}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "commit",
+    "kind": "customer_commit",
+    "hcl": "customer_id = \"customer\"\nproduct_id = \"product\"\nname = \"fixture\"\npriority = 10\nuniqueness_key = \"balance:migration\"\naccess_schedule = {\n access_type = \"SPEND\"\n credit_type_id = \"unit\"\n schedule_items = [{\n  amount = 9007199254740993.125\n  starting_at = \"2026-11-01T00:00:00Z\"\n  ending_before = \"2026-12-01T00:00:00Z\"\n }]\n}\ncommit_type = \"PREPAID\"",
+    "import_id": "customer/balance",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/contracts/customerCommits/list",
+        "response": "{\"data\":[{\"id\":\"balance\",\"type\":\"PREPAID\",\"name\":\"fixture\",\"priority\":10,\"uniqueness_key\":\"balance:migration\",\"product\":{\"id\":\"product\"},\"access_schedule\":{\"access_type\":\"SPEND\",\"credit_type\":{\"id\":\"unit\"},\"schedule_items\":[{\"amount\":9007199254740993.125,\"starting_at\":\"2026-11-01T00:00:00Z\",\"ending_before\":\"2026-12-01T00:00:00Z\"}]},\"rate_type\":\"LIST_RATE\"}]}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "billing",
+    "kind": "customer_billing_configuration",
+    "hcl": "customer_id = \"customer\"\nprovider_name = \"stripe\"\nconfiguration = { external_customer_id = \"external\" }\ndelivery_method_id = \"delivery\"",
+    "import_id": "customer/configuration",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/getCustomerBillingProviderConfigurations",
+        "response": "{\"data\":[{\"id\":\"configuration\",\"customer_id\":\"customer\",\"billing_provider\":\"stripe\",\"configuration\":{\"external_customer_id\":\"external\"},\"delivery_method_id\":\"delivery\"}]}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "revenue",
+    "kind": "customer_revenue_configuration",
+    "hcl": "customer_id = \"customer\"\nprovider_name = \"netsuite\"\nconfiguration = { external_customer_id = \"external\" }\ndelivery_method_id = \"delivery\"",
+    "import_id": "customer/configuration",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/getCustomerRevenueSystemConfigurations",
+        "response": "{\"data\":[{\"id\":\"configuration\",\"customer_id\":\"customer\",\"provider\":\"netsuite\",\"configuration\":{\"external_customer_id\":\"external\"},\"delivery_method_id\":\"delivery\"}]}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "card",
+    "kind": "rate_card",
+    "hcl": "name = \"fixture\"\ncredit_type_id = \"usd\"",
+    "import_id": "{\"id\":\"card\",\"rates\":null}",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/contract-pricing/rate-cards/get",
+        "response": "{\"data\":{\"id\":\"card\",\"name\":\"fixture\",\"fiat_credit_type\":{\"id\":\"usd\"}}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "card_rates",
+    "kind": "rate_card",
+    "hcl": "name = \"fixture\"\ncredit_type_id = \"usd\"\nrates = [jsondecode(\"{\\\"product_id\\\":\\\"product\\\",\\\"rate_type\\\":\\\"FLAT\\\",\\\"price\\\":1.125,\\\"entitled\\\":true,\\\"starting_at\\\":\\\"2026-11-01T00:00:00Z\\\"}\")]",
+    "import_id": "{\"id\": \"card\", \"rates\": [{\"product_id\": \"product\", \"rate_type\": \"FLAT\", \"price\": 1.125, \"entitled\": true, \"starting_at\": \"2026-11-01T00:00:00Z\"}]}",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/contract-pricing/rate-cards/get",
+        "response": "{\"data\":{\"id\":\"card\",\"name\":\"fixture\",\"fiat_credit_type\":{\"id\":\"usd\"}}}"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/contract-pricing/rate-cards/getRateSchedule",
+        "response": "{\"data\":[{\"product_id\":\"product\",\"starting_at\":\"2026-11-01T00:00:00Z\",\"entitled\":true,\"rate\":{\"rate_type\":\"FLAT\",\"price\":1.125,\"credit_type\":{\"id\":\"usd\"}}}]}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "package_legacy",
+    "kind": "package",
+    "hcl": "name = \"fixture\"\ncontract_name = \"contract\"\nrate_card_id = \"card\"\nstripe_billing = true",
+    "import_id": "package",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/packages/get",
+        "response": "{\"data\":{\"id\":\"package\",\"name\":\"fixture\",\"contract_name\":\"contract\",\"rate_card_id\":\"card\",\"billing_provider\":\"stripe\",\"delivery_method\":\"direct_to_billing_provider\",\"usage_statement_schedule\":{\"frequency\":\"MONTHLY\",\"day\":\"CONTRACT_START\"}}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "package_package",
+    "kind": "package",
+    "hcl": "package = jsondecode(\"{\\\"name\\\":\\\"fixture\\\",\\\"contract_name\\\":\\\"contract\\\",\\\"rate_card_id\\\":\\\"card\\\",\\\"billing_provider\\\":\\\"stripe\\\",\\\"delivery_method\\\":\\\"direct_to_billing_provider\\\",\\\"usage_statement_schedule\\\":{\\\"frequency\\\":\\\"MONTHLY\\\",\\\"day\\\":\\\"CONTRACT_START\\\"}}\")",
+    "import_id": "{\"id\":\"package\",\"package\":{\"name\":\"fixture\",\"contract_name\":\"contract\",\"rate_card_id\":\"card\",\"billing_provider\":\"stripe\",\"delivery_method\":\"direct_to_billing_provider\",\"usage_statement_schedule\":{\"frequency\":\"MONTHLY\",\"day\":\"CONTRACT_START\"}}}",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/packages/get",
+        "response": "{\"data\":{\"id\":\"package\",\"name\":\"fixture\",\"contract_name\":\"contract\",\"rate_card_id\":\"card\",\"billing_provider\":\"stripe\",\"delivery_method\":\"direct_to_billing_provider\",\"usage_statement_schedule\":{\"frequency\":\"MONTHLY\",\"day\":\"CONTRACT_START\"}}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "package_request",
+    "kind": "package",
+    "hcl": "request = jsondecode(\"{\\\"name\\\":\\\"fixture\\\",\\\"contract_name\\\":\\\"contract\\\",\\\"rate_card_id\\\":\\\"card\\\",\\\"billing_provider\\\":\\\"stripe\\\",\\\"delivery_method\\\":\\\"direct_to_billing_provider\\\",\\\"usage_statement_schedule\\\":{\\\"frequency\\\":\\\"MONTHLY\\\",\\\"day\\\":\\\"CONTRACT_START\\\"}}\")",
+    "import_id": "{\"id\":\"package\",\"request\":{\"name\":\"fixture\",\"contract_name\":\"contract\",\"rate_card_id\":\"card\",\"billing_provider\":\"stripe\",\"delivery_method\":\"direct_to_billing_provider\",\"usage_statement_schedule\":{\"frequency\":\"MONTHLY\",\"day\":\"CONTRACT_START\"}}}",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/packages/get",
+        "response": "{\"data\":{\"id\":\"package\",\"name\":\"fixture\",\"contract_name\":\"contract\",\"rate_card_id\":\"card\",\"billing_provider\":\"stripe\",\"delivery_method\":\"direct_to_billing_provider\",\"usage_statement_schedule\":{\"frequency\":\"MONTHLY\",\"day\":\"CONTRACT_START\"}}}"
+      }
+    ],
+    "module": false
+  },
+  {
+    "name": "package_request_json",
+    "kind": "package",
+    "hcl": "request_json = \"{\\\"name\\\":\\\"fixture\\\",\\\"contract_name\\\":\\\"contract\\\",\\\"rate_card_id\\\":\\\"card\\\",\\\"billing_provider\\\":\\\"stripe\\\",\\\"delivery_method\\\":\\\"direct_to_billing_provider\\\",\\\"usage_statement_schedule\\\":{\\\"frequency\\\":\\\"MONTHLY\\\",\\\"day\\\":\\\"CONTRACT_START\\\"}}\"",
+    "import_id": "{\"id\":\"package\",\"request_json\":\"{\\\"name\\\":\\\"fixture\\\",\\\"contract_name\\\":\\\"contract\\\",\\\"rate_card_id\\\":\\\"card\\\",\\\"billing_provider\\\":\\\"stripe\\\",\\\"delivery_method\\\":\\\"direct_to_billing_provider\\\",\\\"usage_statement_schedule\\\":{\\\"frequency\\\":\\\"MONTHLY\\\",\\\"day\\\":\\\"CONTRACT_START\\\"}}\"}",
+    "responses": [
+      {
+        "method": "POST",
+        "path": "/v1/packages/get",
+        "response": "{\"data\":{\"id\":\"package\",\"name\":\"fixture\",\"contract_name\":\"contract\",\"rate_card_id\":\"card\",\"billing_provider\":\"stripe\",\"delivery_method\":\"direct_to_billing_provider\",\"usage_statement_schedule\":{\"frequency\":\"MONTHLY\",\"day\":\"CONTRACT_START\"}}}"
+      }
+    ],
+    "module": false
+  }
+]

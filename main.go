@@ -13,7 +13,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 
-	"github.com/stripe/terraform-provider-stripe/internal/provider"
+	provider "github.com/stripe/terraform-provider-stripe/internal/combinedprovider"
 )
 
 var version string = "dev"
