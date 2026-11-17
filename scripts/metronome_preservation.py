@@ -73,7 +73,7 @@ ADDITION_DIRECTORIES = (
 ADDITION_FILES = {
     ".github/workflows/metronome-terraform.yml", ".metronome-generated-assets.json",
     "LICENSE.metronome", "LICENSE.metronome-sdk",
-    "docs/guides/metronome.md", "scripts/metronome_offline.py",
+    "docs/guides/metronome.md", "scripts/test_metronome.py",
     "scripts/metronome_preservation.py", "metronome_environment_test.go",
     "metronome_acceptance_test.go", "metronome_actions_acceptance_test.go",
     "metronome_customer_contract_acceptance_test.go",

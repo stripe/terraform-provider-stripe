@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the credential-free Terraform integration gate and reject missing/skipped suites."""
+"""Run the Terraform integration tests and reject missing or skipped suites."""
 
 import json
 import os
@@ -30,7 +30,7 @@ def main():
     ))["terraform_version"]
     if version != "1.16.5":
         raise ValueError(f"Required Terraform version is 1.16.5, got {version}")
-    with tempfile.TemporaryDirectory(prefix="metronome-offline-") as directory:
+    with tempfile.TemporaryDirectory(prefix="metronome-tests-") as directory:
         log = Path(directory) / "tests.jsonl"
         with log.open("wb") as output:
             result = subprocess.run(
@@ -46,7 +46,7 @@ def main():
             for event in events:
                 if event.get("Output"):
                     print(event["Output"], end="", file=sys.stderr)
-            raise ValueError(f"Offline gate failed: exit={result.returncode}, missing={missing}, skipped={skipped}")
+            raise ValueError(f"Terraform tests failed: exit={result.returncode}, missing={missing}, skipped={skipped}")
         report = {
             "status": "passed", "terraform": version,
             "requiredSuites": sorted(REQUIRED), "passedTestsAndSubtests": len(passed),
@@ -63,5 +63,5 @@ if __name__ == "__main__":
     try:
         main()
     except (ValueError, OSError, subprocess.CalledProcessError) as error:
-        print(f"Metronome offline gate failed: {error}", file=sys.stderr)
+        print(f"Metronome tests failed: {error}", file=sys.stderr)
         sys.exit(1)

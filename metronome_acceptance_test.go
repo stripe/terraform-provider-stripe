@@ -59,7 +59,7 @@ func TestMetronomeExplicitResourcesLifecycle(t *testing.T) {
 
 func testExplicitResourcesLifecycle(t *testing.T, exampleName, rateCardAddress, expectedProKey string, requestJSON, typedCreate, typedRepresentationChange bool) {
 	if _, err := exec.LookPath("terraform"); err != nil {
-		t.Fatal("required offline gate cannot find Terraform")
+		t.Fatal("Terraform integration tests require the Terraform executable")
 	}
 	workingDir, err := os.Getwd()
 	if err != nil {
@@ -77,7 +77,7 @@ func testExplicitResourcesLifecycle(t *testing.T, exampleName, rateCardAddress, 
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mu.Lock()
 		defer mu.Unlock()
-		if r.Header.Get("Authorization") != "Bearer sk_test_offline" {
+		if r.Header.Get("Authorization") != "Bearer sk_test_fixture" {
 			http.Error(w, "unauthorized", 401)
 			return
 		}
@@ -296,7 +296,7 @@ func testExplicitResourcesLifecycle(t *testing.T, exampleName, rateCardAddress, 
 	if err := os.WriteFile(filepath.Join(root, "main.tf"), []byte(hcl), 0600); err != nil {
 		t.Fatal(err)
 	}
-	env := terraformTestEnvironment("TF_CLI_CONFIG_FILE="+cliPath, "STRIPE_API_KEY=sk_test_offline", "SSL_CERT_FILE="+certPath, "TF_IN_AUTOMATION=1", "TF_VAR_credit_type_id=usd-cents", "TF_VAR_rate_start_at=2026-01-01T00:00:00.000Z", "TF_VAR_rate_start=2026-01-01T00:00:00Z")
+	env := terraformTestEnvironment("TF_CLI_CONFIG_FILE="+cliPath, "STRIPE_API_KEY=sk_test_fixture", "SSL_CERT_FILE="+certPath, "TF_IN_AUTOMATION=1", "TF_VAR_credit_type_id=usd-cents", "TF_VAR_rate_start_at=2026-01-01T00:00:00.000Z", "TF_VAR_rate_start=2026-01-01T00:00:00Z")
 	run := func(args ...string) (string, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 		defer cancel()

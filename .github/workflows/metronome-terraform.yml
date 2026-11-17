@@ -25,8 +25,8 @@ jobs:
           python3 scripts/metronome_preservation.py \
             --baseline-repo . --base-revision "$base_revision" --candidate-revision "$candidate_revision"
 
-  offline:
-    name: Provider runtime and Terraform offline (${{ matrix.go }})
+  tests:
+    name: Provider runtime and Terraform tests (${{ matrix.go }})
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     strategy:
@@ -50,8 +50,8 @@ jobs:
         run: |
           go test -count=1 ./internal/...
           go vet ./...
-      - name: Require every offline lifecycle, bridge, installation, and action suite
-        run: python3 scripts/metronome_offline.py
+      - name: Run required Terraform integration tests
+        run: python3 scripts/test_metronome.py
       - name: Verify Terraform example formatting and license input
         run: |
           terraform fmt -check -recursive examples/metronome

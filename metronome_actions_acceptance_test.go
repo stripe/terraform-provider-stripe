@@ -27,7 +27,7 @@ func TestMetronomeGeneratedReadAndExplicitActionInvocation(t *testing.T) {
 		if os.Getenv("METRONOME_REQUIRE_ACTION_TEST") == "1" {
 			t.Fatal("required action gate cannot find Terraform")
 		}
-		t.Fatal("required offline gate cannot find Terraform")
+		t.Fatal("Terraform integration tests require the Terraform executable")
 	}
 	versionOutput, err := exec.Command(terraform, "version", "-json").Output()
 	if err != nil {
@@ -52,11 +52,11 @@ func TestMetronomeGeneratedReadAndExplicitActionInvocation(t *testing.T) {
 		if os.Getenv("METRONOME_REQUIRE_ACTION_TEST") == "1" {
 			t.Fatal("release action gate requires Terraform 1.14+")
 		}
-		t.Fatal("required offline action gate needs Terraform 1.14+")
+		t.Fatal("Terraform action tests require Terraform 1.14+")
 	}
 	var reads, writes atomic.Int32
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Authorization") != "Bearer sk_test_offline" {
+		if r.Header.Get("Authorization") != "Bearer sk_test_fixture" {
 			t.Error("missing auth")
 		}
 		switch r.URL.EscapedPath() {
@@ -129,7 +129,7 @@ action "stripe_metronome_set_customer_name_v1" "rename" {
 		defer cancel()
 		cmd := exec.CommandContext(ctx, terraform, args...)
 		cmd.Dir = temp
-		cmd.Env = terraformTestEnvironment("TF_CLI_CONFIG_FILE="+cliPath, "STRIPE_API_KEY=sk_test_offline", "TF_IN_AUTOMATION=1")
+		cmd.Env = terraformTestEnvironment("TF_CLI_CONFIG_FILE="+cliPath, "STRIPE_API_KEY=sk_test_fixture", "TF_IN_AUTOMATION=1")
 		out, err := cmd.CombinedOutput()
 		if err != nil {
 			t.Fatalf("terraform %v: %v\n%s", args, err, out)

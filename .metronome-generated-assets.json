@@ -3,7 +3,7 @@
   "files": [
     {
       "path": ".github/workflows/metronome-terraform.yml",
-      "sha256": "6982be7309467883149790e114504237d0eb0927de0d4a67aabb3a3605c1cb88"
+      "sha256": "350e0675eea79e9440b01bf6a3ed3d0ddb17a22560d315e63bad9bf0dd1d6989"
     },
     {
       "path": "docs/actions/metronome_add_custom_field_key_v1.md",
@@ -610,12 +610,12 @@
       "sha256": "0bc0d566cc9469c66caaff773a960cf926e15f26e670f05444b26510fa41a826"
     },
     {
-      "path": "scripts/metronome_offline.py",
-      "sha256": "0fc39d5d54e087453d584ea3608038f0c441ab9dd2ec22e20a89ace5afea51e9"
+      "path": "scripts/metronome_preservation.py",
+      "sha256": "ad65a47c3b847dfee8d79e68460d40446a373631011953f0aaf41136f16d5f99"
     },
     {
-      "path": "scripts/metronome_preservation.py",
-      "sha256": "c9394fec4bca86b48858da611d68c97e5f9c35137e006d8229c567596750e3cc"
+      "path": "scripts/test_metronome.py",
+      "sha256": "e475691839f3911548e9c47c9d0ae813161c59a768dba35bcf0b5267175cce28"
     }
   ]
 }

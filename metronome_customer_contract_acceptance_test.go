@@ -23,7 +23,7 @@ import (
 
 func TestMetronomeTerraformCustomerContractLifecycle(t *testing.T) {
 	if _, err := exec.LookPath("terraform"); err != nil {
-		t.Fatal("required offline gate cannot find Terraform")
+		t.Fatal("Terraform integration tests require the Terraform executable")
 	}
 	const customerID = "11111111-1111-4111-8111-111111111111"
 	const contractID = "22222222-2222-4222-8222-222222222222"
@@ -143,7 +143,7 @@ func TestMetronomeTerraformCustomerContractLifecycle(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(root, "main.tf"), []byte(config), 0600); err != nil {
 		t.Fatal(err)
 	}
-	env := terraformTestEnvironment("TF_CLI_CONFIG_FILE="+cliPath, "TF_DATA_DIR="+filepath.Join(temp, "terraform-data"), "STRIPE_API_KEY=sk_test_offline", "TF_IN_AUTOMATION=1", "TF_VAR_package_id="+packageID, "TF_VAR_start_at=2026-10-03T00:00:00Z")
+	env := terraformTestEnvironment("TF_CLI_CONFIG_FILE="+cliPath, "TF_DATA_DIR="+filepath.Join(temp, "terraform-data"), "STRIPE_API_KEY=sk_test_fixture", "TF_IN_AUTOMATION=1", "TF_VAR_package_id="+packageID, "TF_VAR_start_at=2026-10-03T00:00:00Z")
 	run := func(args ...string) (string, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 		defer cancel()

@@ -30,12 +30,12 @@ import (
 	"github.com/stripe/terraform-provider-stripe/internal/providerdata"
 )
 
-type offlineActivationProvider struct {
+type activationTestProvider struct {
 	*combinedprovider.Provider
 	backend stripe.RawRequestBackend
 }
 
-func (p *offlineActivationProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+func (p *activationTestProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	p.Provider.Configure(ctx, req, resp)
 	if data, ok := resp.ResourceData.(*providerdata.Data); ok {
 		data.ActivationBackend = p.backend
@@ -60,7 +60,7 @@ func TestMetronomeProviderProcess(t *testing.T) {
 	transport.TLSClientConfig = &tls.Config{RootCAs: roots, MinVersion: tls.VersionTLS12}
 	backend := stripe.GetBackendWithConfig(stripe.APIBackend, &stripe.BackendConfig{URL: stripe.String(os.Getenv("METRONOME_TEST_ACTIVATION_ORIGIN")), HTTPClient: &http.Client{Transport: transport, Timeout: 10 * time.Second}, MaxNetworkRetries: stripe.Int64(0), LeveledLogger: &stripe.LeveledLogger{Level: stripe.LevelNull}}).(stripe.RawRequestBackend)
 	err = providerserver.Serve(context.Background(), func() provider.Provider {
-		return &offlineActivationProvider{Provider: combinedprovider.New("offline")().(*combinedprovider.Provider), backend: backend}
+		return &activationTestProvider{Provider: combinedprovider.New("test")().(*combinedprovider.Provider), backend: backend}
 	}, providerserver.ServeOpts{Address: "registry.terraform.io/stripe/stripe"})
 	if err != nil {
 		t.Fatal(err)
@@ -71,7 +71,7 @@ func requiredTerraform(t *testing.T) {
 	t.Helper()
 	out, err := exec.Command("terraform", "version", "-json").Output()
 	if err != nil {
-		t.Fatalf("required offline Terraform is unavailable: %v", err)
+		t.Fatalf("Terraform integration test executable is unavailable: %v", err)
 	}
 	var version struct {
 		Version string `json:"terraform_version"`
@@ -80,7 +80,7 @@ func requiredTerraform(t *testing.T) {
 		t.Fatal(err)
 	}
 	if version.Version != "1.16.5" {
-		t.Fatalf("required offline Terraform is 1.16.5, got %s", version.Version)
+		t.Fatalf("Terraform integration tests require version 1.16.5, got %s", version.Version)
 	}
 }
 
