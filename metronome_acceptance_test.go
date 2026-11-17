@@ -25,12 +25,12 @@ import (
 // It never touches the shared sandbox account.
 func TestMetronomeExplicitResourcesLifecycle(t *testing.T) {
 	for _, tc := range []struct {
-		name           string
-		rateCard       string
-		proKey         string
-		requestJSON    bool
-		typedCreate    bool
-		typedMigration bool
+		name                      string
+		rateCard                  string
+		proKey                    string
+		requestJSON               bool
+		typedCreate               bool
+		typedRepresentationChange bool
 	}{
 		{name: "subscription-only", rateCard: "stripe_metronome_rate_card.subscription"},
 		{name: "composite-percentage", rateCard: "stripe_metronome_rate_card.usd"},
@@ -39,7 +39,7 @@ func TestMetronomeExplicitResourcesLifecycle(t *testing.T) {
 		{name: "api-mirror-mixed", rateCard: "stripe_metronome_rate_card.mixed", proKey: "openrouter:mixed:markup-30:v1"},
 		{name: "api-mirror-mixed", rateCard: "stripe_metronome_rate_card.mixed", proKey: "openrouter:mixed:markup-30:v1", requestJSON: true},
 		{name: "api-mirror-mixed", rateCard: "stripe_metronome_rate_card.mixed", proKey: "openrouter:mixed:markup-30:v1", typedCreate: true},
-		{name: "api-mirror-mixed", rateCard: "stripe_metronome_rate_card.mixed", proKey: "openrouter:mixed:markup-30:v1", typedMigration: true},
+		{name: "api-mirror-mixed", rateCard: "stripe_metronome_rate_card.mixed", proKey: "openrouter:mixed:markup-30:v1", typedRepresentationChange: true},
 	} {
 		name := tc.name
 		if tc.requestJSON {
@@ -48,16 +48,16 @@ func TestMetronomeExplicitResourcesLifecycle(t *testing.T) {
 		if tc.typedCreate {
 			name += "-typed"
 		}
-		if tc.typedMigration {
+		if tc.typedRepresentationChange {
 			name += "-migrate-typed"
 		}
 		t.Run(name, func(t *testing.T) {
-			testExplicitResourcesLifecycle(t, tc.name, tc.rateCard, tc.proKey, tc.requestJSON, tc.typedCreate, tc.typedMigration)
+			testExplicitResourcesLifecycle(t, tc.name, tc.rateCard, tc.proKey, tc.requestJSON, tc.typedCreate, tc.typedRepresentationChange)
 		})
 	}
 }
 
-func testExplicitResourcesLifecycle(t *testing.T, exampleName, rateCardAddress, expectedProKey string, requestJSON, typedCreate, typedMigration bool) {
+func testExplicitResourcesLifecycle(t *testing.T, exampleName, rateCardAddress, expectedProKey string, requestJSON, typedCreate, typedRepresentationChange bool) {
 	if _, err := exec.LookPath("terraform"); err != nil {
 		t.Fatal("required offline gate cannot find Terraform")
 	}
@@ -317,20 +317,20 @@ func testExplicitResourcesLifecycle(t *testing.T, exampleName, rateCardAddress, 
 	if out, err := run("plan", "-detailed-exitcode", "-no-color"); err != nil {
 		t.Fatalf("terraform refresh plan: %v\n%s", err, out)
 	}
-	if typedMigration {
+	if typedRepresentationChange {
 		hcl = strings.Replace(hcl, mixedRequest, mixedTyped, 1)
 		if !strings.Contains(hcl, mixedTyped) {
-			t.Fatal("typed migration marker missing")
+			t.Fatal("typed representation change marker missing")
 		}
 		if err := os.WriteFile(filepath.Join(root, "main.tf"), []byte(hcl), 0600); err != nil {
 			t.Fatal(err)
 		}
-		if out, err := run("plan", "-out=typed-migration.tfplan", "-no-color"); err != nil {
-			t.Fatalf("typed migration plan: %v\n%s", err, out)
+		if out, err := run("plan", "-out=typed-representation.tfplan", "-no-color"); err != nil {
+			t.Fatalf("typed representation change plan: %v\n%s", err, out)
 		}
-		planJSON, err := run("show", "-json", "typed-migration.tfplan")
+		planJSON, err := run("show", "-json", "typed-representation.tfplan")
 		if err != nil {
-			t.Fatalf("typed migration plan JSON: %v\n%s", err, planJSON)
+			t.Fatalf("typed representation change plan JSON: %v\n%s", err, planJSON)
 		}
 		var planned struct {
 			ResourceChanges []struct {
@@ -352,17 +352,17 @@ func testExplicitResourcesLifecycle(t *testing.T, exampleName, rateCardAddress, 
 			}
 			seen = true
 			if len(change.Change.Actions) != 1 || change.Change.Actions[0] != "update" || change.Change.After["id"] != "pro-id" || change.Change.AfterUnknown["id"] == true {
-				t.Fatalf("typed migration changed package identity: %+v", change.Change)
+				t.Fatalf("typed representation change changed package identity: %+v", change.Change)
 			}
 		}
 		if !seen {
-			t.Fatal("typed migration did not plan a state update")
+			t.Fatal("typed representation change did not plan a state update")
 		}
-		if out, err := run("apply", "-auto-approve", "-no-color", "typed-migration.tfplan"); err != nil {
-			t.Fatalf("typed migration apply: %v\n%s", err, out)
+		if out, err := run("apply", "-auto-approve", "-no-color", "typed-representation.tfplan"); err != nil {
+			t.Fatalf("typed representation change apply: %v\n%s", err, out)
 		}
 		if out, err := run("plan", "-detailed-exitcode", "-no-color"); err != nil {
-			t.Fatalf("typed migration refresh plan: %v\n%s", err, out)
+			t.Fatalf("typed representation change refresh plan: %v\n%s", err, out)
 		}
 	}
 

@@ -1,11 +1,11 @@
 ---
-page_title: "Metronome setup and migration"
+page_title: "Metronome setup"
 subcategory: "Metronome"
 description: |-
-  Activate shared Stripe-key access and migrate existing Metronome Terraform state.
+  Activate shared Stripe-key access and configure Metronome resources.
 ---
 
-# Metronome setup and migration
+# Metronome setup
 
 Metronome uses the provider's Stripe API key as a Bearer token. Set
 `STRIPE_API_KEY` or the sensitive top-level `api_key` attribute. Each provider
@@ -67,7 +67,7 @@ call a remote delete endpoint.
 Module dependencies order creation, but an existing module's resources can
 need Metronome access during refresh before the bridge can be repaired.
 Activate the intended account in a separate bootstrap configuration first, or
-perform the explicit targeted step below before a normal plan or migration:
+perform the explicit targeted step below before a normal plan:
 
 ```shell
 terraform apply -target=stripe_metronome_account_bridge.billing
@@ -81,36 +81,6 @@ monitor readiness. To adopt an already activated account without an upsert:
 ```shell
 terraform import stripe_metronome_account_bridge.billing acct_example/test
 ```
-
-## Move standalone state
-
-Back up the state and bootstrap shared-key access first. Keep the old provider
-available while Terraform processes the move. The reviewed migration contract
-accepts schema version 0 of these standalone managed types: billable metric,
-product, rate card, package, customer, customer contract, customer commit,
-customer credit, alert, custom field, credit type, billing provider
-configuration, revenue system configuration, and notification configuration.
-Other source schema versions fail explicitly.
-
-Change each resource type from `metronome_*` to `stripe_metronome_*`, select the
-appropriate `stripe` provider alias, and add a `moved` block for its full address:
-
-```terraform
-moved {
-  from = metronome_customer.customers["example"]
-  to   = stripe_metronome_customer.customers["example"]
-}
-```
-
-For a child module, include `module.billing.` in both addresses. Each moved
-resource must retain the same configured attributes. Keep dynamic package
-representations unchanged during the move; change representations in a later
-plan. Review the plan for preserved IDs and no resource creation, update, or
-deletion, then apply the move and confirm a subsequent plan has no changes.
-This path supports alerts, which cannot be imported. It also covers typed,
-dynamic, and JSON package state and rate cards with managed rates. Do not use
-`terraform state replace-provider` alone: it does not rename resource types or
-invoke the destination's state-migration contract.
 
 ## Transport settings and actions
 

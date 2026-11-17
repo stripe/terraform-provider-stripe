@@ -285,7 +285,7 @@ func rejectUnrepresentedFields(object map[string]any, allowed []string, defaults
 	return nil
 }
 
-func verifyLegacyPackage(remote []byte) error {
+func verifyFlattenedPackage(remote []byte) error {
 	value, err := decodeJSON(remote)
 	if err != nil {
 		return err
@@ -299,7 +299,7 @@ func verifyLegacyPackage(remote []byte) error {
 	}
 	billing, delivery := root["billing_provider"], root["delivery_method"]
 	if !emptyAPIValue(billing) && (billing != "stripe" || delivery != "direct_to_billing_provider") {
-		return fmt.Errorf("legacy package supports only Stripe direct billing or no billing provider")
+		return fmt.Errorf("flattened package supports only Stripe direct billing or no billing provider")
 	}
 	if emptyAPIValue(billing) && !emptyAPIValue(delivery) {
 		return fmt.Errorf("delivery method without billing provider is unsupported")
@@ -315,7 +315,7 @@ func verifyLegacyPackage(remote []byte) error {
 		}
 		duration, _ := commit["commit_duration"].(map[string]any)
 		if duration["unit"] != "PERIODS" {
-			return fmt.Errorf("legacy commit duration must use PERIODS")
+			return fmt.Errorf("flattened commit duration must use PERIODS")
 		}
 		for _, key := range []string{"access_amount", "invoice_amount"} {
 			amount, _ := commit[key].(map[string]any)

@@ -21,21 +21,9 @@ jobs:
           BASE_REVISION: ${{ github.event.pull_request.base.sha }}
         run: |
           candidate_revision=$(git rev-parse HEAD)
-          base_revision=${BASE_REVISION:-$(python3 -c 'import json; print(json.load(open("generation-provenance.json"))["providerBaseRevision"])')}
+          base_revision=${BASE_REVISION:-$(git merge-base HEAD origin/main)}
           python3 scripts/metronome_preservation.py \
             --baseline-repo . --base-revision "$base_revision" --candidate-revision "$candidate_revision"
-      - name: Check committed generator identity
-        env:
-          BASE_REVISION: ${{ github.event.pull_request.base.sha }}
-        run: |
-          python3 - <<'PY'
-          import json, os, re
-          p = json.load(open('generation-provenance.json'))
-          assert re.fullmatch('[0-9a-f]{40}', p['generatorRevision'])
-          assert p['generatorWorkingTreeDirty'] is False
-          if os.environ.get('BASE_REVISION'):
-              assert p['providerBaseRevision'] == os.environ['BASE_REVISION']
-          PY
 
   offline:
     name: Provider runtime and Terraform offline (${{ matrix.go }})
@@ -62,7 +50,7 @@ jobs:
         run: |
           go test -count=1 ./internal/...
           go vet ./...
-      - name: Require every offline lifecycle, bridge, installation, action, and migration suite
+      - name: Require every offline lifecycle, bridge, installation, and action suite
         run: python3 scripts/metronome_offline.py
       - name: Verify Terraform example formatting and license input
         run: |

@@ -19,12 +19,12 @@ Metronome package. Prefer the typed package attribute, generated from CreatePack
 
 - `contract_name` (String)
 - `name` (String)
-- `package` (Attributes) Typed CreatePackagePayload from the pinned Metronome OpenAPI specification. Use this, request, request_json, or legacy fields exclusively. (see [below for nested schema](#nestedatt--package))
+- `package` (Attributes) Typed CreatePackagePayload from the pinned Metronome OpenAPI specification. Use this, request, request_json, or flattened fields exclusively. (see [below for nested schema](#nestedatt--package))
 - `rate_card_id` (String)
 - `recurring_commit` (Attributes) One monthly prepaid commit; omit for a usage-only package. (see [below for nested schema](#nestedatt--recurring_commit))
 - `request` (Dynamic) API-shaped HCL escape hatch. Use package for typed fields.
 - `request_json` (String) JSON createPackage request escape hatch.
-- `stripe_billing` (Boolean) Legacy monthly configuration: use Stripe direct billing.
+- `stripe_billing` (Boolean) Flattened monthly configuration: use Stripe direct billing.
 - `uniqueness_key` (String) Optional duplicate-prevention key, including the package: prefix. Omit it for repeatable create/destroy; Metronome generates the package ID stored in state. Explicit keys remain reserved after archive and replacements require a new key. Raw modes put the key inside their payload.
 
 ### Read-Only

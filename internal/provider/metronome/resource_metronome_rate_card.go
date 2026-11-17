@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	bindingruntime "github.com/stripe/terraform-provider-stripe/internal/terraformruntime"
 	"time"
@@ -48,7 +47,7 @@ func (r *MetronomeRateCardResource) Metadata(_ context.Context, req resource.Met
 
 func (r *MetronomeRateCardResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "A Metronome rate card with optional explicit rates or one legacy entitled FLAT rate. External add_rate actions are appropriate when rates are unmanaged or outside the managed product/start/frequency entries. Changes to managed rates can require card replacement. Destroy archives the card.",
+		Description: "A Metronome rate card with optional explicit rates or one entitled FLAT rate. External add_rate actions are appropriate when rates are unmanaged or outside the managed product/start/frequency entries. Changes to managed rates can require card replacement. Destroy archives the card.",
 		Attributes: map[string]schema.Attribute{
 			"credit_type_conversions": schema.ListNestedAttribute{
 				Optional:      true,
@@ -85,12 +84,12 @@ func (r *MetronomeRateCardResource) Schema(_ context.Context, _ resource.SchemaR
 			},
 			"price_cents": schema.Int64Attribute{
 				Optional:      true,
-				Description:   "Legacy convenience: minor units per metric unit. Required with usage_product_id.",
+				Description:   "Minor units per metric unit for a single rate. Required with usage_product_id.",
 				PlanModifiers: []planmodifier.Int64{int64planmodifier.RequiresReplace()},
 			},
 			"rate_mode": schema.StringAttribute{
 				Computed:      true,
-				Description:   "Provider tracking mode: none, legacy, or list.",
+				Description:   "Provider tracking mode: none, single, or list.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"rates": schema.ListNestedAttribute{
@@ -138,7 +137,7 @@ func (r *MetronomeRateCardResource) Schema(_ context.Context, _ resource.SchemaR
 			},
 			"usage_product_id": schema.StringAttribute{
 				Optional:      true,
-				Description:   "Legacy convenience: usage product for a single FLAT rate. Omit to create the card alone.",
+				Description:   "Usage product for a single FLAT rate. Omit to create the card alone.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 		},
@@ -426,31 +425,4 @@ func (r *MetronomeRateCardResource) ImportState(ctx context.Context, req resourc
 		return
 	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, values.Object)...)
-}
-
-func (r *MetronomeRateCardResource) MoveState(_ context.Context) []resource.StateMover {
-	return []resource.StateMover{{StateMover: func(ctx context.Context, req resource.MoveStateRequest, resp *resource.MoveStateResponse) {
-		if req.SourceProviderAddress != "registry.terraform.io/tonyxiao/metronome" || req.SourceTypeName != "metronome_rate_card" {
-			return
-		}
-		switch req.SourceSchemaVersion {
-		case 0:
-		default:
-			resp.Diagnostics.AddError("Unsupported Metronome source state", "The standalone schema version is not in the reviewed migration contract.")
-			return
-		}
-		if req.SourceRawState == nil {
-			resp.Diagnostics.AddError("Missing source state", "No legacy resource state was supplied.")
-			return
-		}
-		var definition resource.SchemaResponse
-		r.Schema(ctx, resource.SchemaRequest{}, &definition)
-		raw, err := req.SourceRawState.Unmarshal(definition.Schema.Type().TerraformType(ctx))
-		if err != nil {
-			resp.Diagnostics.AddError("Invalid legacy Metronome state", err.Error())
-			return
-		}
-		resp.TargetState = tfsdk.State{Schema: definition.Schema, Raw: raw}
-		resp.TargetPrivate = req.SourcePrivate
-	}}}
 }

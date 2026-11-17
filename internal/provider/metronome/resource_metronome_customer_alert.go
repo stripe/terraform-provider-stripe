@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/numberplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	bindingruntime "github.com/stripe/terraform-provider-stripe/internal/terraformruntime"
 )
@@ -349,31 +348,4 @@ func (r *MetronomeCustomerAlertResource) Delete(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("Could not archive Metronome resource", err.Error())
 		return
 	}
-}
-
-func (r *MetronomeCustomerAlertResource) MoveState(_ context.Context) []resource.StateMover {
-	return []resource.StateMover{{StateMover: func(ctx context.Context, req resource.MoveStateRequest, resp *resource.MoveStateResponse) {
-		if req.SourceProviderAddress != "registry.terraform.io/tonyxiao/metronome" || req.SourceTypeName != "metronome_customer_alert" {
-			return
-		}
-		switch req.SourceSchemaVersion {
-		case 0:
-		default:
-			resp.Diagnostics.AddError("Unsupported Metronome source state", "The standalone schema version is not in the reviewed migration contract.")
-			return
-		}
-		if req.SourceRawState == nil {
-			resp.Diagnostics.AddError("Missing source state", "No legacy resource state was supplied.")
-			return
-		}
-		var definition resource.SchemaResponse
-		r.Schema(ctx, resource.SchemaRequest{}, &definition)
-		raw, err := req.SourceRawState.Unmarshal(definition.Schema.Type().TerraformType(ctx))
-		if err != nil {
-			resp.Diagnostics.AddError("Invalid legacy Metronome state", err.Error())
-			return
-		}
-		resp.TargetState = tfsdk.State{Schema: definition.Schema, Raw: raw}
-		resp.TargetPrivate = req.SourcePrivate
-	}}}
 }

@@ -13,7 +13,6 @@ REQUIRED = {
     "TestMetronomeExplicitResourcesLifecycle",
     "TestMetronomeGeneratedReadAndExplicitActionInvocation",
     "TestMetronomeTerraformCustomerContractLifecycle",
-    "TestMetronomeCrossProviderMigration",
     "TestMetronomeBridgeModuleOrderingAndTargetedBootstrap",
     "TestMetronomeInstalledProviderWithoutCredentials",
 }
@@ -42,17 +41,16 @@ def main():
         passed = {e["Test"] for e in events if e.get("Action") == "pass" and "Test" in e}
         skipped = sorted({e["Test"] for e in events if e.get("Action") == "skip" and e.get("Test", "").startswith("TestMetronome")})
         missing = sorted(REQUIRED - passed)
-        migrations = sorted(name for name in passed if name.startswith("TestMetronomeCrossProviderMigration/"))
-        if result.returncode or missing or skipped or len(migrations) != 18:
+        if result.returncode or missing or skipped:
             print(result.stderr.decode(), file=sys.stderr)
             for event in events:
                 if event.get("Output"):
                     print(event["Output"], end="", file=sys.stderr)
-            raise ValueError(f"Offline gate failed: exit={result.returncode}, missing={missing}, skipped={skipped}, migrations={len(migrations)}")
+            raise ValueError(f"Offline gate failed: exit={result.returncode}, missing={missing}, skipped={skipped}")
         report = {
             "status": "passed", "terraform": version,
             "requiredSuites": sorted(REQUIRED), "passedTestsAndSubtests": len(passed),
-            "migrationCases": len(migrations), "skippedRequiredTests": skipped,
+            "skippedRequiredTests": skipped,
             "liveAPIs": False,
         }
         print(json.dumps(report, indent=2))

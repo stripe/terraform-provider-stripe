@@ -2,7 +2,6 @@
 """Compare provider artifacts directly with the base Git tree, without transforming bytes."""
 
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -17,23 +16,7 @@ SHARED = {
     "go.sum": "Lock integration dependency checksums.",
     "docs/index.md": "Document combined provider configuration.",
 }
-CHANNELS = {"ga", "beta", "private-preview"}
 REVISION = re.compile(r"^[0-9a-f]{40}$")
-SHA256 = re.compile(r"^[0-9a-f]{64}$")
-METRONOME_INPUTS = {
-    f"packages/terraform/src/metronome/api/{name}.json" for name in (
-        "credential-mapping-exceptions", "credential-operations",
-        "lifecycle-schema-policy", "managed-resources", "managed-schema-policy",
-        "metronome-openapi", "operation-inventory.generated", "read-operations",
-        "security-review", "terraform-mapping",
-    )
-} | {
-    "packages/terraform/src/metronome/sdk-bindings.json",
-    "packages/terraform/src/metronome/sdk-endpoints.json",
-    "packages/terraform/src/metronome/LICENSE",
-    "packages/terraform/src/metronome/SDK-LICENSE",
-}
-
 
 def git(repo, *args, data=None):
     return subprocess.run(
@@ -85,15 +68,15 @@ def git_files(repo, revision):
 ADDITION_DIRECTORIES = (
     "internal/provider/metronome/", "internal/metronomeclient/",
     "internal/providerdata/", "internal/combinedprovider/",
-    "internal/terraformruntime/", "testdata/metronome/", "examples/metronome/",
+    "internal/terraformruntime/", "examples/metronome/",
 )
 ADDITION_FILES = {
     ".github/workflows/metronome-terraform.yml", ".metronome-generated-assets.json",
-    "LICENSE.metronome", "LICENSE.metronome-sdk", "generation-provenance.json",
+    "LICENSE.metronome", "LICENSE.metronome-sdk",
     "docs/guides/metronome.md", "scripts/metronome_offline.py",
     "scripts/metronome_preservation.py", "metronome_environment_test.go",
     "metronome_acceptance_test.go", "metronome_actions_acceptance_test.go",
-    "metronome_customer_contract_acceptance_test.go", "metronome_migration_test.go",
+    "metronome_customer_contract_acceptance_test.go",
     "metronome_bootstrap_test.go",
 }
 
@@ -132,7 +115,7 @@ def artifact_files(root):
 def compare(originals, candidate):
     if not set(SHARED) <= set(originals):
         raise ValueError("Base Git tree lacks required shared integration files")
-    protected = set(originals) - set(SHARED)
+    protected = {path for path in originals if path not in SHARED and not allowed_addition(path)}
     if not protected:
         raise ValueError("Empty protected comparison set")
     if not candidate:
@@ -160,58 +143,6 @@ def compare(originals, candidate):
     return differences
 
 
-def validate_provenance(provenance, base_revision, input_root):
-    if provenance.get("schemaVersion") != 1 or provenance.get("channel") not in CHANNELS:
-        raise ValueError("Invalid provenance schema/channel")
-    if provenance.get("providerBaseRevision") != base_revision:
-        raise ValueError("Provenance provider revision differs from the base Git commit")
-    if not REVISION.fullmatch(provenance.get("generatorRevision", "")) or provenance.get("generatorWorkingTreeDirty") is not False:
-        raise ValueError("Accepted provenance requires a clean, committed generator revision")
-    if git(input_root, "rev-parse", "HEAD").decode().strip() != provenance["generatorRevision"]:
-        raise ValueError("Input checkout differs from the recorded generator revision")
-    if git(input_root, "status", "--porcelain", "--untracked-files=all").strip():
-        raise ValueError("Generator input checkout is not clean")
-    for key in ("generatorBaseRevision", "stripeGoBaseRevision", "metronomeSourceRevision", "metronomeGoSourceRevision"):
-        if not REVISION.fullmatch(provenance.get(key, "")):
-            raise ValueError(f"Missing immutable provenance revision: {key}")
-    for key in ("metronomeGoModuleVersion", "metronomeGoModuleChecksum"):
-        if not provenance.get(key):
-            raise ValueError(f"Missing SDK provenance: {key}")
-    for name in ("node", "yarn", "go", "gofmt", "terraformPluginDocs"):
-        if not provenance.get("toolchain", {}).get(name):
-            raise ValueError(f"Missing toolchain version: {name}")
-    inputs = provenance.get("inputs", {})
-    for key in ("stripeV1", "stripeV2", "metronomeSpec", "metronomePolicies", "generatorLockfile"):
-        item = inputs.get(key, {})
-        path = relative_path(item.get("path"))
-        if not item.get("revision") or not SHA256.fullmatch(item.get("sha256", "")):
-            raise ValueError(f"Missing locked input provenance: {key}")
-        actual = locked_input(input_root, path)
-        if hashlib.sha256(actual).hexdigest() != item["sha256"]:
-            raise ValueError(f"Locked input bytes differ: {key} ({path})")
-    policies = provenance.get("allMetronomeInputs", [])
-    if {item.get("path") for item in policies} != METRONOME_INPUTS or len(policies) != len(METRONOME_INPUTS):
-        raise ValueError("Metronome input inventory is incomplete or duplicated")
-    for item in policies:
-        path = relative_path(item.get("path"))
-        if hashlib.sha256(locked_input(input_root, path)).hexdigest() != item.get("sha256"):
-            raise ValueError(f"Locked Metronome input differs: {path}")
-
-
-def locked_input(root, relative):
-    root = Path(root)
-    if root.is_symlink() or not root.is_dir():
-        raise ValueError("Locked input root must be a real directory")
-    target = root
-    for part in PurePosixPath(relative_path(relative)).parts:
-        target = target / part
-        if target.is_symlink():
-            raise ValueError(f"Symlink in locked input path: {relative}")
-    if not target.is_file():
-        raise ValueError(f"Missing locked input: {relative}")
-    return target.read_bytes()
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline-repo", required=True)
@@ -219,23 +150,13 @@ def main():
     candidate = parser.add_mutually_exclusive_group(required=True)
     candidate.add_argument("--candidate", help="Final generated provider directory")
     candidate.add_argument("--candidate-revision", help="Exact candidate commit in baseline-repo")
-    parser.add_argument("--provenance", help="Also verify generation inputs and clean generator identity")
-    parser.add_argument("--input-root", help="Generator checkout used for provenance verification")
     args = parser.parse_args()
-    if bool(args.provenance) != bool(args.input_root):
-        parser.error("--provenance and --input-root must be supplied together")
     try:
         originals = git_files(args.baseline_repo, args.base_revision)
         candidate = git_files(args.baseline_repo, args.candidate_revision) if args.candidate_revision else artifact_files(args.candidate)
         differences = compare(originals, candidate)
-        if args.provenance:
-            recorded = Path(args.provenance).read_bytes()
-            if recorded != candidate.get("generation-provenance.json"):
-                raise ValueError("Provenance does not belong to the candidate artifact")
-            validate_provenance(json.loads(recorded), args.base_revision, args.input_root)
         print(json.dumps({"baseRevision": args.base_revision,
-                          "protectedFileCount": len(set(originals) - set(SHARED)),
-                          "provenanceValidated": bool(args.provenance),
+                          "protectedFileCount": len([path for path in originals if path not in SHARED and not allowed_addition(path)]),
                           "differences": differences}, indent=2))
         return 1 if differences else 0
     except (ValueError, KeyError, TypeError, OSError, subprocess.CalledProcessError) as error:

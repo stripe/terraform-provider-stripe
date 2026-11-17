@@ -3,12 +3,12 @@
 page_title: "stripe_metronome_rate_card Resource - stripe"
 subcategory: ""
 description: |-
-  A Metronome rate card with optional explicit rates or one legacy entitled FLAT rate. External add_rate actions are appropriate when rates are unmanaged or outside the managed product/start/frequency entries. Changes to managed rates can require card replacement. Destroy archives the card.
+  A Metronome rate card with optional explicit rates or one entitled FLAT rate. External add_rate actions are appropriate when rates are unmanaged or outside the managed product/start/frequency entries. Changes to managed rates can require card replacement. Destroy archives the card.
 ---
 
 # stripe_metronome_rate_card (Resource)
 
-A Metronome rate card with optional explicit rates or one legacy entitled FLAT rate. External add_rate actions are appropriate when rates are unmanaged or outside the managed product/start/frequency entries. Changes to managed rates can require card replacement. Destroy archives the card.
+A Metronome rate card with optional explicit rates or one entitled FLAT rate. External add_rate actions are appropriate when rates are unmanaged or outside the managed product/start/frequency entries. Changes to managed rates can require card replacement. Destroy archives the card.
 
 
 
@@ -24,15 +24,15 @@ A Metronome rate card with optional explicit rates or one legacy entitled FLAT r
 - `credit_type_conversions` (Attributes List) Custom pricing-unit conversions into fiat minor units. Changing this immutable conversion list replaces the card. Omitted conversions are unmanaged; explicit lists track only their listed credit types. (see [below for nested schema](#nestedatt--credit_type_conversions))
 - `credit_type_id` (String) Metronome credit type ID. Omit to use the account's default USD (cents) credit type.
 - `description` (String)
-- `price_cents` (Number) Legacy convenience: minor units per metric unit. Required with usage_product_id.
+- `price_cents` (Number) Minor units per metric unit for a single rate. Required with usage_product_id.
 - `rates` (Attributes List) Explicit rates to add when creating the card. Each is an addRate API call. Rates cannot be deleted individually; replacing the card archives it. (see [below for nested schema](#nestedatt--rates))
 - `starting_at` (String) UTC hour-boundary effective timestamp. Omit to start at the beginning of the current UTC hour when created.
-- `usage_product_id` (String) Legacy convenience: usage product for a single FLAT rate. Omit to create the card alone.
+- `usage_product_id` (String) Usage product for a single FLAT rate. Omit to create the card alone.
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `rate_mode` (String) Provider tracking mode: none, legacy, or list.
+- `rate_mode` (String) Provider tracking mode: none, single, or list.
 
 <a id="nestedatt--credit_type_conversions"></a>
 ### Nested Schema for `credit_type_conversions`

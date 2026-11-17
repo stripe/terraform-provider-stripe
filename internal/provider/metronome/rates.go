@@ -48,7 +48,7 @@ func validateRateCard(_ context.Context, v *values) error {
 		return errors.New("usage_product_id and price_cents must be set together")
 	}
 	if product != nil && !isUnknownAPI(product) && len(arr(r["rates"])) > 0 {
-		return errors.New("use rates or legacy single-rate fields")
+		return errors.New("use rates or single-rate fields")
 	}
 	if price != nil && !isUnknownAPI(price) {
 		n, ok := rat(price)
@@ -58,7 +58,7 @@ func validateRateCard(_ context.Context, v *values) error {
 	}
 	if start, ok := r["starting_at"].(string); ok {
 		if product == nil {
-			return errors.New("starting_at requires the legacy usage rate")
+			return errors.New("starting_at requires the single usage rate")
 		}
 		at, err := time.Parse("2006-01-02T15:04:05.000Z", start)
 		if err != nil || !at.Equal(at.Truncate(time.Hour)) {
@@ -111,7 +111,7 @@ func prepareRateCard(ctx context.Context, v *values) error {
 	}
 	mode := "none"
 	if v.Known("usage_product_id") {
-		mode = "legacy"
+		mode = "single"
 		if !v.Known("starting_at") {
 			if err = v.SetJSON(ctx, "starting_at", time.Now().UTC().Truncate(time.Hour).Format("2006-01-02T15:04:05.000Z")); err != nil {
 				return err
@@ -136,7 +136,7 @@ func rateRequests(_ context.Context, v *values) ([]any, error) {
 		return nil, errors.New("rate card default credit type is missing")
 	}
 	var items []any
-	if v.String("rate_mode") == "legacy" {
+	if v.String("rate_mode") == "single" {
 		items = append(items, map[string]any{"rate_card_id": v.String("id"), "product_id": v.String("usage_product_id"), "credit_type_id": v.String("credit_type_id"), "starting_at": v.String("starting_at"), "rate_type": "FLAT", "entitled": true, "price": r["price_cents"]})
 	}
 	for _, item := range arr(r["rates"]) {
@@ -199,7 +199,7 @@ func rateScheduleRequest(_ context.Context, v, prior *values, body map[string]an
 		return bindingruntime.SkipRequest{}, nil
 	}
 	body["starting_at"] = "1970-01-01T00:00:00.000Z"
-	if v.String("rate_mode") == "legacy" && v.Known("starting_at") {
+	if v.String("rate_mode") == "single" && v.Known("starting_at") {
 		body["starting_at"] = v.String("starting_at")
 	}
 	return body, nil
@@ -221,7 +221,7 @@ func readRateSchedule(ctx context.Context, v *values, remote any) error {
 		if len(arr(r["rates"])) > 0 {
 			mode = "list"
 		} else if v.Known("usage_product_id") {
-			mode = "legacy"
+			mode = "single"
 		} else if len(rates) == 0 {
 			mode = "none"
 		} else {
@@ -233,7 +233,7 @@ func readRateSchedule(ctx context.Context, v *values, remote any) error {
 					return errors.New("explicit rate import required; bare IDs support one product with entitled whole-unit FLAT rates")
 				}
 			}
-			mode = "legacy"
+			mode = "single"
 		}
 	}
 	if err = v.SetJSON(ctx, "rate_mode", mode); err != nil {
@@ -290,7 +290,7 @@ func readRateSchedule(ctx context.Context, v *values, remote any) error {
 		}
 		if match != nil {
 			if v.Known("starting_at") {
-				return errors.New("ambiguous legacy rate")
+				return errors.New("ambiguous single rate")
 			}
 			if get(rate, "product_id") != get(match, "product_id") {
 				return errors.New("bare import requires rates for one usage product")

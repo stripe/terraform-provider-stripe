@@ -77,7 +77,7 @@ func validatePackage(_ context.Context, v *values) error {
 	if modes == 1 {
 		for _, key := range []string{"name", "contract_name", "rate_card_id", "uniqueness_key", "stripe_billing", "recurring_commit"} {
 			if r[key] != nil && !isUnknownAPI(r[key]) {
-				return errors.New("API-shaped package requests cannot be combined with legacy fields")
+				return errors.New("API-shaped package requests cannot be combined with flattened fields")
 			}
 		}
 		payload, _, err := packagePayload(v, true)
@@ -90,17 +90,17 @@ func validatePackage(_ context.Context, v *values) error {
 		return err
 	}
 	if r["stripe_billing"] == nil {
-		return errors.New("legacy package requires stripe_billing")
+		return errors.New("flattened package requires stripe_billing")
 	}
 	if key, ok := r["uniqueness_key"].(string); ok && (!strings.HasPrefix(key, "package:") || strings.TrimSpace(packageKeyWithoutNamespace(key)) == "") {
-		return errors.New("legacy uniqueness_key requires package: and a nonempty key")
+		return errors.New("flattened uniqueness_key requires package: and a nonempty key")
 	}
 	c := obj(r["recurring_commit"])
 	if c == nil {
 		return nil
 	}
 	if r["stripe_billing"] == false {
-		return errors.New("legacy recurring commits require stripe_billing=true")
+		return errors.New("flattened recurring commits require stripe_billing=true")
 	}
 	for _, key := range []string{"monthly_price_cents", "monthly_grant_cents", "grant_duration_periods", "priority", "rollover_fraction"} {
 		if isUnknownAPI(c[key]) {
@@ -193,12 +193,12 @@ func readPackage(ctx context.Context, v *values, remote any) error {
 		}
 		return verifyPackageRequest(request, raw)
 	}
-	if err = verifyLegacyPackage(raw); err != nil {
+	if err = verifyFlattenedPackage(raw); err != nil {
 		return err
 	}
 	r := obj(remote)
 	if get(r, "usage_statement_schedule", "frequency") != "MONTHLY" || get(r, "usage_statement_schedule", "day") != "CONTRACT_START" || len(arr(r["recurring_commits"])) > 1 {
-		return errors.New("legacy package requires monthly contract-start statements and at most one recurring commit")
+		return errors.New("flattened package requires monthly contract-start statements and at most one recurring commit")
 	}
 	updates := map[string]any{"name": r["name"], "contract_name": r["contract_name"], "rate_card_id": r["rate_card_id"], "stripe_billing": r["billing_provider"] == "stripe" && r["delivery_method"] == "direct_to_billing_provider", "recurring_commit": nil}
 	if (!v.Known("name") || v.Known("uniqueness_key")) && !samePackageKey(v.String("uniqueness_key"), str(r["uniqueness_key"])) {
@@ -208,7 +208,7 @@ func readPackage(ctx context.Context, v *values, remote any) error {
 		c := obj(commits[0])
 		access, invoice := obj(c["access_amount"]), obj(c["invoice_amount"])
 		if c["recurrence_frequency"] != "MONTHLY" || c["proration"] != "NONE" || get(c, "starting_at_offset", "unit") != "DAYS" || !numberEqual(get(c, "starting_at_offset", "value"), json.Number("0")) || access["credit_type_id"] != invoice["credit_type_id"] || !numberEqual(access["quantity"], json.Number("1")) || !numberEqual(invoice["quantity"], json.Number("1")) {
-			return errors.New("remote recurring commit differs from the legacy monthly prepaid model")
+			return errors.New("remote recurring commit differs from the flattened monthly prepaid model")
 		}
 		product := c["product_id"]
 		if emptyAPIValue(product) {
