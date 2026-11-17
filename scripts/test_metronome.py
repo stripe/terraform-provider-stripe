@@ -34,7 +34,7 @@ def main():
         log = Path(directory) / "tests.jsonl"
         with log.open("wb") as output:
             result = subprocess.run(
-                ["go", "test", "-json", "-count=1", "-run", "^TestMetronome", "-timeout", "30m", "."],
+                ["go", "test", "-json", "-count=1", "-run", "^TestMetronome", "-timeout", "30m", "./internal/acctest/cases/metronome"],
                 cwd=root, env=environment, stdout=output, stderr=subprocess.PIPE,
             )
         events = [json.loads(line) for line in log.read_text().splitlines() if line]

@@ -3,7 +3,7 @@
   "files": [
     {
       "path": ".github/workflows/metronome-terraform.yml",
-      "sha256": "350e0675eea79e9440b01bf6a3ed3d0ddb17a22560d315e63bad9bf0dd1d6989"
+      "sha256": "630ce7e57bcd5554d6bb50e4ffc9abaa04510bfc9eb62fe7ad2bf88a2074a65e"
     },
     {
       "path": "docs/actions/metronome_add_custom_field_key_v1.md",
@@ -602,6 +602,22 @@
       "sha256": "6e32c188c2134ae0c358959400c112af06e9da47d13b110b323df3089fcb0e9f"
     },
     {
+      "path": "internal/acctest/testdata/metronome/bootstrap/billing/main.tf",
+      "sha256": "ef8261bc4cf83932818ca64acd0e9fba8ae7b5f9c74eef2f3ee3183f4f08fcb4"
+    },
+    {
+      "path": "internal/acctest/testdata/metronome/bootstrap/main.tf",
+      "sha256": "bf773670571fded57190d7a19478da9cb5dbf0da88b7beab4c398ad57bda4fab"
+    },
+    {
+      "path": "internal/acctest/testdata/metronome/installed_provider.tf",
+      "sha256": "0c32927d61367a34d68f0cc3c6e7bd687ea88a97b86ed97cee42ea1efbb76cab"
+    },
+    {
+      "path": "internal/acctest/testdata/metronome/read_action.tf",
+      "sha256": "f6f7c41848d7ac50d7d1ec8ec768a5d9dc82546feda57c09850e89db4eaede34"
+    },
+    {
       "path": "LICENSE.metronome",
       "sha256": "f2f05e8a4356d9463f79d1136348dfc771a3ffdfedfca20ddc6f64e3b6cef211"
     },
@@ -611,11 +627,11 @@
     },
     {
       "path": "scripts/metronome_preservation.py",
-      "sha256": "ad65a47c3b847dfee8d79e68460d40446a373631011953f0aaf41136f16d5f99"
+      "sha256": "c783f068a658c118c6263b5408e863063cbbe7bb84e96917f282c5836cbf4625"
     },
     {
       "path": "scripts/test_metronome.py",
-      "sha256": "e475691839f3911548e9c47c9d0ae813161c59a768dba35bcf0b5267175cce28"
+      "sha256": "e91651f4c2cb70321caac9313ae3824124970c001d1a143500a7d242df478c85"
     }
   ]
 }

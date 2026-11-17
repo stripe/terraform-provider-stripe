@@ -48,12 +48,13 @@ jobs:
           terraform_wrapper: false
       - name: Go runtime regression and vet
         run: |
-          go test -count=1 ./internal/...
+          mapfile -t packages < <(go list ./internal/... | awk '!/\/internal\/acctest\/cases\/metronome$/')
+          go test -count=1 "${packages[@]}"
           go vet ./...
       - name: Run required Terraform integration tests
         run: python3 scripts/test_metronome.py
       - name: Verify Terraform example formatting and license input
         run: |
-          terraform fmt -check -recursive examples/metronome
+          terraform fmt -check -recursive examples/metronome internal/acctest/testdata/metronome
           test -s LICENSE.metronome
           test -s LICENSE.metronome-sdk

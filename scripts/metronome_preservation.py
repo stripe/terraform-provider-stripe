@@ -69,15 +69,14 @@ ADDITION_DIRECTORIES = (
     "internal/provider/metronome/", "internal/metronomeclient/",
     "internal/providerdata/", "internal/combinedprovider/",
     "internal/terraformruntime/", "examples/metronome/",
+    "internal/acctest/cases/metronome/", "internal/acctest/runner/metronome/",
+    "internal/acctest/testdata/metronome/",
 )
 ADDITION_FILES = {
     ".github/workflows/metronome-terraform.yml", ".metronome-generated-assets.json",
     "LICENSE.metronome", "LICENSE.metronome-sdk",
     "docs/guides/metronome.md", "scripts/test_metronome.py",
-    "scripts/metronome_preservation.py", "metronome_environment_test.go",
-    "metronome_acceptance_test.go", "metronome_actions_acceptance_test.go",
-    "metronome_customer_contract_acceptance_test.go",
-    "metronome_bootstrap_test.go",
+    "scripts/metronome_preservation.py",
 }
 
 
