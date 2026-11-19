@@ -14,6 +14,6 @@ provider "stripe" {
 }
 
 module "billing" {
-  source     = "./billing"
-  providers  = { stripe = stripe.billing }
+  source    = "./billing"
+  providers = { stripe = stripe.billing }
 }

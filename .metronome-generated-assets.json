@@ -611,7 +611,7 @@
     },
     {
       "path": "internal/acctest/testdata/metronome/shared_account/main.tf",
-      "sha256": "16ffa3e04b304bb99d69acfbbc353e6f701b93a4a54d5e9ff6de3712a234160d"
+      "sha256": "0f7ac19717b1ee02cb329a761f19d63fdd4fd9ab2463fbffcd68a8f29f32c536"
     },
     {
       "path": "LICENSE.metronome",
