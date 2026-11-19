@@ -535,15 +535,11 @@
     },
     {
       "path": "docs/guides/metronome.md",
-      "sha256": "be9595239b833d856da00c83cd9c909b4d25bae795da3006120d7d959d0c1d6a"
+      "sha256": "bdf794428f5dde77c000ddd92f849cdcf8ac5b30374d301c18c08e64df616058"
     },
     {
       "path": "docs/index.md",
-      "sha256": "ccf58e9dec6174751bd66b92c7c928404a37f71f4e7f5bb6fb58c6cad16bc744"
-    },
-    {
-      "path": "docs/resources/metronome_account_bridge.md",
-      "sha256": "0e8ba03fb16dfdd2686bb20c205ecaab28a69317b73e43a613dcf234ef0ef519"
+      "sha256": "1563e1affa141a01d6b5f799ce439b5809982694a0a043cff43bdced11a0be5b"
     },
     {
       "path": "docs/resources/metronome_billable_metric.md",
@@ -602,20 +598,20 @@
       "sha256": "6e32c188c2134ae0c358959400c112af06e9da47d13b110b323df3089fcb0e9f"
     },
     {
-      "path": "internal/acctest/testdata/metronome/bootstrap/billing/main.tf",
-      "sha256": "ef8261bc4cf83932818ca64acd0e9fba8ae7b5f9c74eef2f3ee3183f4f08fcb4"
-    },
-    {
-      "path": "internal/acctest/testdata/metronome/bootstrap/main.tf",
-      "sha256": "bf773670571fded57190d7a19478da9cb5dbf0da88b7beab4c398ad57bda4fab"
-    },
-    {
       "path": "internal/acctest/testdata/metronome/installed_provider.tf",
       "sha256": "0c32927d61367a34d68f0cc3c6e7bd687ea88a97b86ed97cee42ea1efbb76cab"
     },
     {
       "path": "internal/acctest/testdata/metronome/read_action.tf",
       "sha256": "f6f7c41848d7ac50d7d1ec8ec768a5d9dc82546feda57c09850e89db4eaede34"
+    },
+    {
+      "path": "internal/acctest/testdata/metronome/shared_account/billing/main.tf",
+      "sha256": "dd455d983b43b04e3c84911f905f68b2f32980ce7c05c7f95c23804a59dfc28e"
+    },
+    {
+      "path": "internal/acctest/testdata/metronome/shared_account/main.tf",
+      "sha256": "16ffa3e04b304bb99d69acfbbc353e6f701b93a4a54d5e9ff6de3712a234160d"
     },
     {
       "path": "LICENSE.metronome",
@@ -631,7 +627,7 @@
     },
     {
       "path": "scripts/test_metronome.py",
-      "sha256": "e91651f4c2cb70321caac9313ae3824124970c001d1a143500a7d242df478c85"
+      "sha256": "987dcb4e5fc4c3f662617589a14b01c9beb8480385f3563528da07e233ddeb47"
     }
   ]
 }

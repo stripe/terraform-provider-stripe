@@ -1591,7 +1591,7 @@ func (r *MetronomePackageResource) Create(ctx context.Context, req resource.Crea
 		RequestHook: packageRequest, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: true, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, persist); err != nil {
 		resp.Diagnostics.AddError("Could not create Metronome resource", err.Error())
 		return
@@ -1619,7 +1619,7 @@ func (r *MetronomePackageResource) Read(ctx context.Context, req resource.ReadRe
 		RequestHook: nil, ResponseHook: readPackage, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, nil); err != nil {
 		if bindingruntime.IsMissing(err) {
 			resp.State.RemoveResource(ctx)
@@ -1691,7 +1691,7 @@ func (r *MetronomePackageResource) Delete(ctx context.Context, req resource.Dele
 		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: true, OnError: nil,
+		IgnoreResponse: true, OnError: nil,
 	}}, values, nil, nil); err != nil && !bindingruntime.IsMissing(err) {
 		resp.Diagnostics.AddError("Could not archive Metronome resource", err.Error())
 		return
@@ -1715,7 +1715,7 @@ func (r *MetronomePackageResource) ImportState(ctx context.Context, req resource
 		RequestHook: nil, ResponseHook: readPackage, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, nil); err != nil {
 		resp.Diagnostics.AddError("Could not verify import", err.Error())
 		return

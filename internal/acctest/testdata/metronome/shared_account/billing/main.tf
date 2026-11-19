@@ -5,6 +5,8 @@ terraform {
   }
 }
 
+data "stripe_metronome_list_credit_types_v1" "existing" {}
+
 resource "stripe_metronome_credit_type" "credits" {
   name = "module credits"
 }

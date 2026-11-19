@@ -152,7 +152,7 @@ func (r *MetronomeCustomFieldKeyResource) Create(ctx context.Context, req resour
 		RequestHook: nil, ResponseHook: checkCustomKeyAbsent, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	},
 		{
 			Operation: bindingruntime.Operation{ID: "addCustomFieldKey-v1", Service: "metronome", Method: "POST", Path: "/v1/customFields/addKey", Read: false},
@@ -165,7 +165,7 @@ func (r *MetronomeCustomFieldKeyResource) Create(ctx context.Context, req resour
 			RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: true, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: true, OnError: nil,
+			IgnoreResponse: true, OnError: nil,
 		},
 		{
 			Operation: bindingruntime.Operation{ID: "listCustomFieldKeys-v1", Service: "metronome", Method: "POST", Path: "/v1/customFields/listKeys", Read: true},
@@ -176,7 +176,7 @@ func (r *MetronomeCustomFieldKeyResource) Create(ctx context.Context, req resour
 			RequestHook: nil, ResponseHook: checkCreatedCustomKey, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: false, OnError: nil,
+			IgnoreResponse: false, OnError: nil,
 		}}, values, nil, persist); err != nil {
 		resp.Diagnostics.AddError("Could not create Metronome resource", err.Error())
 		return
@@ -206,7 +206,7 @@ func (r *MetronomeCustomFieldKeyResource) Read(ctx context.Context, req resource
 		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, nil); err != nil {
 		if bindingruntime.IsMissing(err) {
 			resp.State.RemoveResource(ctx)
@@ -274,7 +274,7 @@ func (r *MetronomeCustomFieldKeyResource) Delete(ctx context.Context, req resour
 		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	},
 		{
 			Operation: bindingruntime.Operation{ID: "disableCustomFieldKey-v1", Service: "metronome", Method: "POST", Path: "/v1/customFields/removeKey", Read: false},
@@ -286,7 +286,7 @@ func (r *MetronomeCustomFieldKeyResource) Delete(ctx context.Context, req resour
 			RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: true, OnError: nil,
+			IgnoreResponse: true, OnError: nil,
 		}}, values, nil, nil); err != nil && !bindingruntime.IsMissing(err) {
 		resp.Diagnostics.AddError("Could not archive Metronome resource", err.Error())
 		return

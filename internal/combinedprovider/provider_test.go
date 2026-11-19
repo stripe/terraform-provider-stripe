@@ -6,6 +6,11 @@ package combinedprovider
 
 import (
 	"context"
+	"encoding/pem"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -59,29 +64,54 @@ func configureFixture(t *testing.T, source string, overrides map[string]attr.Val
 }
 
 func TestCredentialResolutionAndServiceIsolation(t *testing.T) {
+	authorizations := make(chan string, 10)
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authorizations <- r.Header.Get("Authorization")
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"data":[]}`))
+	}))
+	defer server.Close()
+	ca := filepath.Join(t.TempDir(), "ca.pem")
+	if err := os.WriteFile(ca, pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: server.Certificate().Raw}), 0600); err != nil {
+		t.Fatal(err)
+	}
+	checkKey := func(data *providerdata.Data, key string) {
+		t.Helper()
+		_, err := data.Execute(context.Background(), bindingruntime.Operation{ID: "listCreditTypes-v1", Service: "metronome", Method: "GET", Path: "/v1/credit-types/list", Read: true}, nil, nil, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if <-authorizations != "Bearer "+key {
+			t.Fatal("Metronome used another provider instance's Stripe key")
+		}
+	}
 	t.Setenv("STRIPE_API_KEY", "sk_test_environment")
 	t.Setenv("STRIPE_ACCOUNT", "")
 	t.Setenv("METRONOME_API_TOKEN", "ignored-native-token")
 	t.Setenv("METRONOME_BEARER_TOKEN", "ignored-native-token")
-	t.Setenv("METRONOME_BASE_URL", "")
-	t.Setenv("METRONOME_CA_CERT_FILE", "")
+	t.Setenv("METRONOME_BASE_URL", server.URL)
+	t.Setenv("METRONOME_CA_CERT_FILE", ca)
 	for _, source := range []string{`{}`, `{"api_key":null}`, `{"api_key":""}`} {
 		data := configureFixture(t, source, nil)
-		if data.StripeKey != "sk_test_environment" || data.StripeStatus.State != "ready" || data.MetronomeStatus.State != "ready" {
+		if data.StripeStatus.State != "ready" || data.MetronomeStatus.State != "ready" {
 			t.Fatalf("shared key fallback failed: Stripe=%s Metronome=%s", data.StripeStatus.State, data.MetronomeStatus.State)
 		}
+		checkKey(data, "sk_test_environment")
 	}
 	one := configureFixture(t, `{"api_key":"sk_test_one"}`, nil)
 	two := configureFixture(t, `{"api_key":"sk_test_two"}`, nil)
-	if one.StripeKey != "sk_test_one" || two.StripeKey != "sk_test_two" || one.Stripe == two.Stripe || one.Metronome == two.Metronome {
+	if one.Stripe == two.Stripe || one.Metronome == two.Metronome {
 		t.Fatal("provider aliases share clients or ignore explicit keys")
 	}
+	checkKey(one, "sk_test_one")
+	checkKey(two, "sk_test_two")
+	checkKey(one, "sk_test_one")
 	invalid := configureFixture(t, `{"metronome":{"ca_cert_file":"/nonexistent/metronome-fixture-ca"}}`, nil)
 	if invalid.StripeStatus.State != "ready" || invalid.MetronomeStatus.State != "invalid" || invalid.Stripe == nil {
 		t.Fatal("invalid unused Metronome settings disabled Stripe")
 	}
 	unknown := configureFixture(t, `{}`, map[string]attr.Value{"api_key": types.StringUnknown()})
-	if unknown.StripeStatus.State != "unknown" || unknown.MetronomeStatus.State != "unknown" || unknown.StripeKey != "" || unknown.Metronome != nil {
+	if unknown.StripeStatus.State != "unknown" || unknown.MetronomeStatus.State != "unknown" || unknown.Stripe != nil || unknown.Metronome != nil {
 		t.Fatal("unknown key selected ambient credentials")
 	}
 	metType := map[string]attr.Type{"base_url": types.StringType, "ca_cert_file": types.StringType}
@@ -132,7 +162,7 @@ func TestCombinedProviderPreservesEveryStripeProtocolSchema(t *testing.T) {
 			t.Errorf("Stripe ephemeral schema changed: %s", name)
 		}
 	}
-	if len(after.ResourceSchemas)-len(before.ResourceSchemas) != 15 || len(after.DataSourceSchemas)-len(before.DataSourceSchemas) != 59 || len(after.ActionSchemas)-len(before.ActionSchemas) != 73 {
+	if len(after.ResourceSchemas)-len(before.ResourceSchemas) != 14 || len(after.DataSourceSchemas)-len(before.DataSourceSchemas) != 59 || len(after.ActionSchemas)-len(before.ActionSchemas) != 73 {
 		t.Fatalf("combined surface inventory is wrong: resources=%d reads=%d actions=%d", len(after.ResourceSchemas), len(after.DataSourceSchemas), len(after.ActionSchemas))
 	}
 	if len(after.Provider.Block.Attributes) != len(before.Provider.Block.Attributes)+1 {

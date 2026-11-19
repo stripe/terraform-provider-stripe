@@ -16,9 +16,6 @@ resource "stripe_product" "service" {
   name = "Metered service"
 }
 
-resource "stripe_metronome_account_bridge" "billing" {}
-
 module "billing" {
-  source     = "./billing"
-  depends_on = [stripe_metronome_account_bridge.billing]
+  source = "./billing"
 }

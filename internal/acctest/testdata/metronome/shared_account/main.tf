@@ -13,12 +13,7 @@ provider "stripe" {
   }
 }
 
-resource "stripe_metronome_account_bridge" "billing" {
-  provider = stripe.billing
-}
-
 module "billing" {
   source     = "./billing"
   providers  = { stripe = stripe.billing }
-  depends_on = [stripe_metronome_account_bridge.billing]
 }

@@ -207,7 +207,7 @@ func (r *MetronomeRateCardResource) Create(ctx context.Context, req resource.Cre
 		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: true, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	},
 		{
 			Operation: bindingruntime.Operation{ID: "getRateCard-v1", Service: "metronome", Method: "POST", Path: "/v1/contract-pricing/rate-cards/get", Read: true},
@@ -218,7 +218,7 @@ func (r *MetronomeRateCardResource) Create(ctx context.Context, req resource.Cre
 			RequestHook: nil, ResponseHook: readRateCard, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "credit_type_id", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: false, OnError: nil,
+			IgnoreResponse: false, OnError: nil,
 		},
 		{
 			Operation: bindingruntime.Operation{ID: "addRate-v1", Service: "metronome", Method: "POST", Path: "/v1/contract-pricing/rate-cards/addRate", Read: false},
@@ -229,7 +229,7 @@ func (r *MetronomeRateCardResource) Create(ctx context.Context, req resource.Cre
 			RequestHook: nil, ResponseHook: nil, ForEach: rateRequests, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: true, OnError: nil,
+			IgnoreResponse: true, OnError: nil,
 		},
 		{
 			Operation: bindingruntime.Operation{ID: "getRateCard-v1", Service: "metronome", Method: "POST", Path: "/v1/contract-pricing/rate-cards/get", Read: true},
@@ -240,7 +240,7 @@ func (r *MetronomeRateCardResource) Create(ctx context.Context, req resource.Cre
 			RequestHook: nil, ResponseHook: readRateCard, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: false, OnError: nil,
+			IgnoreResponse: false, OnError: nil,
 		}}, values, nil, persist); err != nil {
 		if values.Known("id") {
 			cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
@@ -254,7 +254,7 @@ func (r *MetronomeRateCardResource) Create(ctx context.Context, req resource.Cre
 				RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 				WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 				ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-				WaitForReady: false, IgnoreResponse: true, OnError: nil,
+				IgnoreResponse: true, OnError: nil,
 			}}, values, nil, nil)
 			if cleanupErr == nil || bindingruntime.IsMissing(cleanupErr) {
 				resp.State.RemoveResource(ctx)
@@ -288,7 +288,7 @@ func (r *MetronomeRateCardResource) Read(ctx context.Context, req resource.ReadR
 		RequestHook: nil, ResponseHook: readRateCard, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	},
 		{
 			Operation: bindingruntime.Operation{ID: "getRateSchedule-v1", Service: "metronome", Method: "POST", Path: "/v1/contract-pricing/rate-cards/getRateSchedule", Read: true},
@@ -299,7 +299,7 @@ func (r *MetronomeRateCardResource) Read(ctx context.Context, req resource.ReadR
 			RequestHook: rateScheduleRequest, ResponseHook: readRateSchedule, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: false, OnError: nil,
+			IgnoreResponse: false, OnError: nil,
 		}}, values, nil, nil); err != nil {
 		if bindingruntime.IsMissing(err) {
 			resp.State.RemoveResource(ctx)
@@ -351,7 +351,7 @@ func (r *MetronomeRateCardResource) Update(ctx context.Context, req resource.Upd
 		RequestHook: rateCardUpdateRequest, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: true, OnError: nil,
+		IgnoreResponse: true, OnError: nil,
 	}}, values, prior, persist); err != nil {
 		resp.Diagnostics.AddError("Could not update Metronome resource", err.Error())
 		return
@@ -379,7 +379,7 @@ func (r *MetronomeRateCardResource) Delete(ctx context.Context, req resource.Del
 		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: true, OnError: nil,
+		IgnoreResponse: true, OnError: nil,
 	}}, values, nil, nil); err != nil && !bindingruntime.IsMissing(err) {
 		resp.Diagnostics.AddError("Could not archive Metronome resource", err.Error())
 		return
@@ -403,7 +403,7 @@ func (r *MetronomeRateCardResource) ImportState(ctx context.Context, req resourc
 		RequestHook: nil, ResponseHook: verifyRateCardImport, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	},
 		{
 			Operation: bindingruntime.Operation{ID: "getRateSchedule-v1", Service: "metronome", Method: "POST", Path: "/v1/contract-pricing/rate-cards/getRateSchedule", Read: true},
@@ -414,7 +414,7 @@ func (r *MetronomeRateCardResource) ImportState(ctx context.Context, req resourc
 			RequestHook: rateScheduleRequest, ResponseHook: verifyRateImport, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: false, OnError: nil,
+			IgnoreResponse: false, OnError: nil,
 		}}, values, nil, nil); err != nil {
 		resp.Diagnostics.AddError("Could not verify import", err.Error())
 		return

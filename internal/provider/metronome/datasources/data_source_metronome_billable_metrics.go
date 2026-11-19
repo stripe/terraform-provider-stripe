@@ -91,7 +91,7 @@ func (r *MetronomeBillableMetricsDataSource) Read(ctx context.Context, req datas
 		RequestHook: nil, ResponseHook: readBillableMetrics, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, nil); err != nil {
 		resp.Diagnostics.AddError("Could not read Metronome data", err.Error())
 		return

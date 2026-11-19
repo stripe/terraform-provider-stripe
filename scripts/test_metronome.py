@@ -13,7 +13,7 @@ REQUIRED = {
     "TestMetronomeExplicitResourcesLifecycle",
     "TestMetronomeGeneratedReadAndExplicitActionInvocation",
     "TestMetronomeTerraformCustomerContractLifecycle",
-    "TestMetronomeBridgeModuleOrderingAndTargetedBootstrap",
+    "TestMetronomeModuleWithAutomaticProvisioning",
     "TestMetronomeInstalledProviderWithoutCredentials",
 }
 

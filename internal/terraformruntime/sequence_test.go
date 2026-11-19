@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -35,7 +34,7 @@ type statusError int
 func (e statusError) Error() string { return "test API failure" }
 func testValues(t *testing.T, source string) *Values {
 	t.Helper()
-	kind := types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "name": types.StringType, "aliases": types.ListType{ElemType: types.StringType}, "readiness_timeout": types.StringType}}
+	kind := types.ObjectType{AttrTypes: map[string]attr.Type{"id": types.StringType, "name": types.StringType, "aliases": types.ListType{ElemType: types.StringType}}}
 	v, err := FromJSON(context.Background(), kind, Literal(source), nil)
 	if err != nil {
 		t.Fatal(err)
@@ -69,23 +68,22 @@ func TestPartialUpdatePersistsOnlyCompletedFields(t *testing.T) {
 	}
 }
 
-func TestCreateIdentityIsPersistedBeforeReadinessFailure(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Millisecond)
-	defer cancel()
-	v := testValues(t, `{"name":"bridge","readiness_timeout":"7m"}`)
+func TestCreateIdentityIsPersistedBeforeFollowupFailure(t *testing.T) {
+	ctx := context.Background()
+	v := testValues(t, `{"name":"customer"}`)
 	calls := 0
 	saved := ""
 	transport := transportFunc(func(_ context.Context, op Operation, _ map[string]string, _ url.Values, _ json.RawMessage) (json.RawMessage, error) {
 		calls++
-		if op.ID == "activate" {
-			return []byte(`{"id":"acct_test/test"}`), nil
+		if op.ID == "create" {
+			return []byte(`{"id":"customer-id"}`), nil
 		}
-		return nil, statusError(403)
+		return nil, statusError(503)
 	})
-	steps := []Step{{Operation: Operation{ID: "activate"}, Response: []ResponseField{{Attribute: "id", Path: []string{"id"}, Required: true}}, Persist: true}, {Operation: Operation{ID: "probe", Read: true}, WaitForReady: true, MissingStatuses: []int{401, 403, 404}}}
+	steps := []Step{{Operation: Operation{ID: "create"}, Response: []ResponseField{{Attribute: "id", Path: []string{"id"}, Required: true}}, Persist: true}, {Operation: Operation{ID: "read", Read: true}}}
 	err := Run(ctx, transport, steps, v, nil, func(_ context.Context, state *Values) error { saved = state.String("id"); return nil })
-	if err == nil || saved != "acct_test/test" || calls != 2 {
-		t.Fatalf("activation state was lost on canceled readiness: saved=%q calls=%d err=%v", saved, calls, err)
+	if err == nil || saved != "customer-id" || calls != 2 {
+		t.Fatalf("created identity was lost on follow-up failure: saved=%q calls=%d err=%v", saved, calls, err)
 	}
 }
 
@@ -98,8 +96,8 @@ func TestReadErrorClassificationPreservesNonMissingFailures(t *testing.T) {
 				}
 				return nil, statusError(status)
 			})
-			err := Run(context.Background(), transport, []Step{{Operation: Operation{Read: true}, MissingStatuses: []int{401, 403, 404}}}, testValues(t, `{}`), nil, nil)
-			if err == nil || IsMissing(err) != (status == 401 || status == 403 || status == 404) {
+			err := Run(context.Background(), transport, []Step{{Operation: Operation{Read: true}}}, testValues(t, `{}`), nil, nil)
+			if err == nil || IsMissing(err) != (status == 404) {
 				t.Fatalf("status %d had unsafe classification: %v", status, err)
 			}
 		})
@@ -155,13 +153,13 @@ func TestExplicitPaginationAndRepeatedCursorGuard(t *testing.T) {
 	}
 }
 
-func TestMalformedSuccessIsNotRetriedDuringReadiness(t *testing.T) {
+func TestMalformedSuccessIsNotRetried(t *testing.T) {
 	calls := 0
 	transport := transportFunc(func(context.Context, Operation, map[string]string, url.Values, json.RawMessage) (json.RawMessage, error) {
 		calls++
 		return []byte(`not JSON`), nil
 	})
-	err := Run(context.Background(), transport, []Step{{Operation: Operation{Read: true}, WaitForReady: true, MissingStatuses: []int{401, 403, 404}}}, testValues(t, `{}`), nil, nil)
+	err := Run(context.Background(), transport, []Step{{Operation: Operation{Read: true}}}, testValues(t, `{}`), nil, nil)
 	if err == nil || calls != 1 {
 		t.Fatalf("malformed response retried: %v %d", err, calls)
 	}

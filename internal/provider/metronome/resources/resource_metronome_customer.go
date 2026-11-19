@@ -128,7 +128,7 @@ func (r *MetronomeCustomerResource) Create(ctx context.Context, req resource.Cre
 		RequestHook: nil, ResponseHook: checkAliasOwnership, ForEach: customerAliases, ForEachQuery: "ingest_alias",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	},
 		{
 			Operation: bindingruntime.Operation{ID: "createCustomer-v1", Service: "metronome", Method: "POST", Path: "/v1/customers", Read: false},
@@ -140,7 +140,7 @@ func (r *MetronomeCustomerResource) Create(ctx context.Context, req resource.Cre
 			RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: true, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: false, OnError: nil,
+			IgnoreResponse: false, OnError: nil,
 		}}, values, nil, persist); err != nil {
 		resp.Diagnostics.AddError("Could not create Metronome resource", err.Error())
 		return
@@ -168,7 +168,7 @@ func (r *MetronomeCustomerResource) Read(ctx context.Context, req resource.ReadR
 		RequestHook: nil, ResponseHook: readCustomer, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, nil); err != nil {
 		if bindingruntime.IsMissing(err) {
 			resp.State.RemoveResource(ctx)
@@ -223,7 +223,7 @@ func (r *MetronomeCustomerResource) Update(ctx context.Context, req resource.Upd
 		RequestHook: nil, ResponseHook: checkAliasOwnership, ForEach: customerAliases, ForEachQuery: "ingest_alias",
 		WhenChanged: []string{"ingest_aliases"}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	},
 		{
 			Operation: bindingruntime.Operation{ID: "setCustomerName-v1", Service: "metronome", Method: "POST", Path: "/v1/customers/{customer_id}/setName", Read: false},
@@ -235,7 +235,7 @@ func (r *MetronomeCustomerResource) Update(ctx context.Context, req resource.Upd
 			RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{"name"}, WhenMissing: "", Persist: true, PersistAttributes: []string{"name"},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: true, OnError: nil,
+			IgnoreResponse: true, OnError: nil,
 		},
 		{
 			Operation: bindingruntime.Operation{ID: "setIngestAliases-v1", Service: "metronome", Method: "POST", Path: "/v1/customers/{customer_id}/setIngestAliases", Read: false},
@@ -247,7 +247,7 @@ func (r *MetronomeCustomerResource) Update(ctx context.Context, req resource.Upd
 			RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{"ingest_aliases"}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: true, OnError: nil,
+			IgnoreResponse: true, OnError: nil,
 		}}, values, prior, persist); err != nil {
 		resp.Diagnostics.AddError("Could not update Metronome resource", err.Error())
 		return
@@ -279,7 +279,7 @@ func (r *MetronomeCustomerResource) Delete(ctx context.Context, req resource.Del
 		RequestHook: nil, ResponseHook: readCustomer, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	},
 		{
 			Operation: bindingruntime.Operation{ID: "listContracts-v2", Service: "metronome", Method: "POST", Path: "/v2/contracts/list", Read: true},
@@ -292,7 +292,7 @@ func (r *MetronomeCustomerResource) Delete(ctx context.Context, req resource.Del
 			RequestHook: nil, ResponseHook: checkCustomerContracts, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{-1},
-			WaitForReady: false, IgnoreResponse: false, OnError: nil,
+			IgnoreResponse: false, OnError: nil,
 		},
 		{
 			Operation: bindingruntime.Operation{ID: "setIngestAliases-v1", Service: "metronome", Method: "POST", Path: "/v1/customers/{customer_id}/setIngestAliases", Read: false},
@@ -304,7 +304,7 @@ func (r *MetronomeCustomerResource) Delete(ctx context.Context, req resource.Del
 			RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: true, OnError: nil,
+			IgnoreResponse: true, OnError: nil,
 		},
 		{
 			Operation: bindingruntime.Operation{ID: "archiveCustomer-v1", Service: "metronome", Method: "POST", Path: "/v1/customers/archive", Read: false},
@@ -315,7 +315,7 @@ func (r *MetronomeCustomerResource) Delete(ctx context.Context, req resource.Del
 			RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 			WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 			ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-			WaitForReady: false, IgnoreResponse: true, OnError: []bindingruntime.Step{{
+			IgnoreResponse: true, OnError: []bindingruntime.Step{{
 				Operation: bindingruntime.Operation{ID: "getCustomer-v1", Service: "metronome", Method: "GET", Path: "/v1/customers/{customer_id}", Read: true},
 				Request:   []bindingruntime.Mapping{{Attribute: "id", Constant: nil, Path: []string{"customer_id"}, Location: "path", Wrap: false, OmitUnknown: false}},
 				Response:  []bindingruntime.ResponseField{},
@@ -324,7 +324,7 @@ func (r *MetronomeCustomerResource) Delete(ctx context.Context, req resource.Del
 				RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 				WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 				ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-				WaitForReady: false, IgnoreResponse: false, OnError: nil,
+				IgnoreResponse: false, OnError: nil,
 			},
 				{
 					Operation: bindingruntime.Operation{ID: "setIngestAliases-v1", Service: "metronome", Method: "POST", Path: "/v1/customers/{customer_id}/setIngestAliases", Read: false},
@@ -336,7 +336,7 @@ func (r *MetronomeCustomerResource) Delete(ctx context.Context, req resource.Del
 					RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 					WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 					ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-					WaitForReady: false, IgnoreResponse: true, OnError: nil,
+					IgnoreResponse: true, OnError: nil,
 				}},
 		}}, values, nil, nil); err != nil && !bindingruntime.IsMissing(err) {
 		resp.Diagnostics.AddError("Could not archive Metronome resource", err.Error())

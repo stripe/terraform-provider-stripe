@@ -64,7 +64,6 @@ func (p *Provider) Configure(ctx context.Context, req provider.ConfigureRequest,
 	if resolvedKey == "" && !key.IsUnknown() {
 		resolvedKey = os.Getenv("STRIPE_API_KEY")
 	}
-	data.StripeKey = resolvedKey
 	data.StripeAccount = account.ValueString()
 	if data.StripeAccount == "" && !account.IsUnknown() {
 		data.StripeAccount = os.Getenv("STRIPE_ACCOUNT")
@@ -99,7 +98,6 @@ func (p *Provider) Configure(ctx context.Context, req provider.ConfigureRequest,
 			} else {
 				data.Stripe = client
 				data.StripeStatus = providerdata.Status{State: "ready"}
-				data.ActivationBackend = providerdata.NewActivationBackend()
 			}
 		}
 	}
@@ -217,8 +215,7 @@ func (p *Provider) Resources(_ context.Context) []func() resource.Resource {
 		metronomeresources.NewMetronomeCustomerBillingConfigurationResource,
 		metronomeresources.NewMetronomeCustomerRevenueConfigurationResource,
 		metronomeresources.NewMetronomeRateCardResource,
-		metronomeresources.NewMetronomePackageResource,
-		metronomeresources.NewMetronomeAccountBridgeResource}
+		metronomeresources.NewMetronomePackageResource}
 }
 func (p *Provider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{metronomedatasources.NewMetronomeGetApprovalRequestV1DataSource,

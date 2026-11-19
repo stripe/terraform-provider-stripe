@@ -164,7 +164,7 @@ func (r *MetronomeOffsetNotificationResource) Create(ctx context.Context, req re
 		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: true, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, persist); err != nil {
 		resp.Diagnostics.AddError("Could not create Metronome resource", err.Error())
 		return
@@ -192,7 +192,7 @@ func (r *MetronomeOffsetNotificationResource) Read(ctx context.Context, req reso
 		RequestHook: nil, ResponseHook: readNotification, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, nil); err != nil {
 		if bindingruntime.IsMissing(err) {
 			resp.State.RemoveResource(ctx)
@@ -264,7 +264,7 @@ func (r *MetronomeOffsetNotificationResource) Delete(ctx context.Context, req re
 		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: true, OnError: nil,
+		IgnoreResponse: true, OnError: nil,
 	}}, values, nil, nil); err != nil && !bindingruntime.IsMissing(err) {
 		resp.Diagnostics.AddError("Could not archive Metronome resource", err.Error())
 		return

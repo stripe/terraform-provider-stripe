@@ -9,10 +9,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type Operation struct {
@@ -57,7 +55,6 @@ type Step struct {
 	PersistAttributes  []string
 	ArchivedPaths      [][]string
 	MissingStatuses    []int
-	WaitForReady       bool
 	IgnoreResponse     bool
 	OnError            []Step
 }
@@ -202,74 +199,47 @@ func runStep(ctx context.Context, t Transport, s Step, v, prior *Values, item an
 	if s.Operation.Method == "GET" && len(body) == 0 && s.RequestHook == nil && item == nil {
 		payload = nil
 	}
-	ctx, cancel := pollContext(ctx, s, v)
-	defer cancel()
-	for {
-		raw, err := callPages(ctx, t, s, paths, query, payload, v)
-		if err == nil {
-			if s.IgnoreResponse {
-				return nil
-			}
-			for _, path := range s.ArchivedPaths {
-				value, _ := at(raw, path)
-				if value != nil && value != "" && value != false {
-					return ErrMissing
-				}
-			}
-			if s.ResponseHook != nil {
-				if err = s.ResponseHook(ctx, v, raw); err != nil {
-					return err
-				}
-			}
-			for _, mapping := range s.Response {
-				previous := v.Get(mapping.Attribute)
-				if mapping.PreserveConfigured && previous != nil && !previous.IsNull() && !previous.IsUnknown() {
-					continue
-				}
-				value, found := at(raw, mapping.Path)
-				if !found && mapping.Required {
-					return fmt.Errorf("response omitted %s", strings.Join(mapping.Path, "."))
-				}
-				if !found && mapping.PreserveMissing {
-					continue
-				}
-				if mapping.EmptyStringIsNull && value == "" {
-					value = nil
-				}
-				if mapping.Required && (value == nil || value == "") {
-					return errors.New("response omitted a required identity or field")
-				}
-				if err = v.SetJSON(ctx, mapping.Attribute, value); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-		status := t.HTTPStatus(err)
-		var network net.Error
-		if !s.WaitForReady || (!missingStatus(s, status) && status != 429 && (status < 500 || status >= 600) && !errors.As(err, &network)) {
-			return classify(s, status, err)
-		}
-		timer := time.NewTimer(2 * time.Second)
-		select {
-		case <-ctx.Done():
-			timer.Stop()
-			return errors.New("activation completed but Metronome readiness timed out; keep this resource in state and retry after authorization caches expire")
-		case <-timer.C:
+	raw, err := callPages(ctx, t, s, paths, query, payload, v)
+	if err != nil {
+		return classify(s, t.HTTPStatus(err), err)
+	}
+	if s.IgnoreResponse {
+		return nil
+	}
+	for _, path := range s.ArchivedPaths {
+		value, _ := at(raw, path)
+		if value != nil && value != "" && value != false {
+			return ErrMissing
 		}
 	}
-}
-func pollContext(ctx context.Context, s Step, v *Values) (context.Context, context.CancelFunc) {
-	if !s.WaitForReady {
-		return context.WithCancel(ctx)
-	}
-	timeout := 7 * time.Minute
-	if text := v.String("readiness_timeout"); text != "" {
-		if duration, err := time.ParseDuration(text); err == nil {
-			timeout = duration
+	if s.ResponseHook != nil {
+		if err = s.ResponseHook(ctx, v, raw); err != nil {
+			return err
 		}
 	}
-	return context.WithTimeout(ctx, timeout)
+	for _, mapping := range s.Response {
+		previous := v.Get(mapping.Attribute)
+		if mapping.PreserveConfigured && previous != nil && !previous.IsNull() && !previous.IsUnknown() {
+			continue
+		}
+		value, found := at(raw, mapping.Path)
+		if !found && mapping.Required {
+			return fmt.Errorf("response omitted %s", strings.Join(mapping.Path, "."))
+		}
+		if !found && mapping.PreserveMissing {
+			continue
+		}
+		if mapping.EmptyStringIsNull && value == "" {
+			value = nil
+		}
+		if mapping.Required && (value == nil || value == "") {
+			return errors.New("response omitted a required identity or field")
+		}
+		if err = v.SetJSON(ctx, mapping.Attribute, value); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 func missingStatus(s Step, status int) bool {
 	statuses := s.MissingStatuses

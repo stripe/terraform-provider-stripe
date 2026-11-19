@@ -128,7 +128,7 @@ func (r *MetronomeBillableMetricResource) Create(ctx context.Context, req resour
 		RequestHook: metricRequest, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: true, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, persist); err != nil {
 		resp.Diagnostics.AddError("Could not create Metronome resource", err.Error())
 		return
@@ -156,7 +156,7 @@ func (r *MetronomeBillableMetricResource) Read(ctx context.Context, req resource
 		RequestHook: nil, ResponseHook: readMetric, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{[]string{"archived_at"}}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, nil, nil); err != nil {
 		if bindingruntime.IsMissing(err) {
 			resp.State.RemoveResource(ctx)
@@ -207,7 +207,7 @@ func (r *MetronomeBillableMetricResource) Update(ctx context.Context, req resour
 		RequestHook: nil, ResponseHook: checkIdentity, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{"name"}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: false, OnError: nil,
+		IgnoreResponse: false, OnError: nil,
 	}}, values, prior, persist); err != nil {
 		resp.Diagnostics.AddError("Could not update Metronome resource", err.Error())
 		return
@@ -235,7 +235,7 @@ func (r *MetronomeBillableMetricResource) Delete(ctx context.Context, req resour
 		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
-		WaitForReady: false, IgnoreResponse: true, OnError: nil,
+		IgnoreResponse: true, OnError: nil,
 	}}, values, nil, nil); err != nil && !bindingruntime.IsMissing(err) {
 		resp.Diagnostics.AddError("Could not archive Metronome resource", err.Error())
 		return
