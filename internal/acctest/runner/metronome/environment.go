@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -36,7 +37,14 @@ func RequireTerraform(t *testing.T) {
 	if err = json.Unmarshal(out, &version); err != nil {
 		t.Fatal(err)
 	}
-	if version.Version != "1.16.5" {
-		t.Fatalf("Terraform integration tests require version 1.16.5, got %s", version.Version)
+	parts := strings.Split(version.Version, ".")
+	major, minor, patch := 0, 0, 0
+	if len(parts) == 3 {
+		major, _ = strconv.Atoi(parts[0])
+		minor, _ = strconv.Atoi(parts[1])
+		patch, _ = strconv.Atoi(parts[2])
+	}
+	if major != 1 || minor < 15 || (minor == 15 && patch < 4) {
+		t.Fatalf("Terraform integration tests require Terraform 1.15.4 or later, got %s", version.Version)
 	}
 }

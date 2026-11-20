@@ -14,8 +14,8 @@ import (
 	"strings"
 	"testing"
 
-	metronomeclient "github.com/stripe/terraform-provider-stripe/internal/metronomeclient"
 	bindingruntime "github.com/stripe/terraform-provider-stripe/internal/terraformruntime"
+	metronomeclient "github.com/stripe/terraform-provider-stripe/metronome-go"
 )
 
 func TestMetronomeUsesSharedKeyWithoutStripeRequests(t *testing.T) {

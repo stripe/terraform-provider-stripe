@@ -4,7 +4,6 @@ module github.com/stripe/terraform-provider-stripe
 go 1.25.0
 
 require (
-	github.com/Metronome-Industries/metronome-go/v3 v3.13.0
 	github.com/hashicorp/terraform-json v0.27.2
 	github.com/hashicorp/terraform-plugin-docs v0.24.0
 	github.com/hashicorp/terraform-plugin-framework v1.19.0
@@ -12,6 +11,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.31.0
 	github.com/hashicorp/terraform-plugin-testing v1.15.0
 	github.com/stripe/stripe-go/v87 v87.0.0-local
+	github.com/stripe/terraform-provider-stripe/metronome-go v0.0.0-local
 )
 
 require (
@@ -65,10 +65,6 @@ require (
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
-	github.com/tidwall/gjson v1.18.0 // indirect
-	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
@@ -93,3 +89,5 @@ require (
 )
 
 replace github.com/stripe/stripe-go/v87 => ./stripe-go
+
+replace github.com/stripe/terraform-provider-stripe/metronome-go => ./metronome-go

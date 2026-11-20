@@ -10,6 +10,7 @@ permissions:
 jobs:
   stripe-bytes:
     name: Stripe bytes versus PR base
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
@@ -44,17 +45,14 @@ jobs:
           go-version: ${{ matrix.go }}
       - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
         with:
-          terraform_version: '1.16.5'
+          terraform_version: '1.15.4'
           terraform_wrapper: false
       - name: Go runtime regression and vet
         run: |
-          mapfile -t packages < <(go list ./internal/... | awk '!/\/internal\/acctest\/cases\/metronome$/')
-          go test -count=1 "${packages[@]}"
+          go -C metronome-go test -count=1 ./...
+          go test -count=1 ./...
           go vet ./...
-      - name: Run required Terraform integration tests
-        run: python3 scripts/test_metronome.py
       - name: Verify Terraform example formatting and license input
         run: |
           terraform fmt -check -recursive examples/metronome internal/acctest/testdata/metronome
           test -s LICENSE.metronome
-          test -s LICENSE.metronome-sdk

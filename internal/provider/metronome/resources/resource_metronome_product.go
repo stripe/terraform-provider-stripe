@@ -212,7 +212,7 @@ func (r *MetronomeProductResource) Update(ctx context.Context, req resource.Upda
 		Response: []bindingruntime.ResponseField{},
 		Root:     []string{"data"}, Selector: map[string]string{},
 		Paginate: false, PaginationLocation: "query", PaginationCursor: "next_page",
-		RequestHook: nil, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
+		RequestHook: productUpdateRequest, ResponseHook: nil, ForEach: nil, ForEachQuery: "",
 		WhenChanged: []string{}, WhenMissing: "", Persist: false, PersistAttributes: []string{},
 		ArchivedPaths: [][]string{}, MissingStatuses: []int{},
 		IgnoreResponse: true, OnError: nil,

@@ -18,12 +18,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	stripe "github.com/stripe/stripe-go/v87"
-	metronomeclient "github.com/stripe/terraform-provider-stripe/internal/metronomeclient"
 	original "github.com/stripe/terraform-provider-stripe/internal/provider"
 	metronomeactions "github.com/stripe/terraform-provider-stripe/internal/provider/metronome/actions"
 	metronomedatasources "github.com/stripe/terraform-provider-stripe/internal/provider/metronome/datasources"
 	metronomeresources "github.com/stripe/terraform-provider-stripe/internal/provider/metronome/resources"
 	"github.com/stripe/terraform-provider-stripe/internal/providerdata"
+	metronomeclient "github.com/stripe/terraform-provider-stripe/metronome-go"
 	"os"
 )
 

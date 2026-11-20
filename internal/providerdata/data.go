@@ -13,8 +13,8 @@ import (
 	"net/url"
 
 	stripe "github.com/stripe/stripe-go/v87"
-	metronomeclient "github.com/stripe/terraform-provider-stripe/internal/metronomeclient"
 	bindingruntime "github.com/stripe/terraform-provider-stripe/internal/terraformruntime"
+	metronomeclient "github.com/stripe/terraform-provider-stripe/metronome-go"
 )
 
 type Status struct{ State, Detail string }

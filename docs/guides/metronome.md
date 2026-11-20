@@ -1,6 +1,6 @@
 ---
-page_title: "Metronome setup"
-subcategory: "Metronome"
+page_title: 'Metronome setup'
+subcategory: 'Metronome'
 description: |-
   Configure Metronome resources using a shared Stripe API key.
 ---
@@ -13,7 +13,7 @@ provisions access automatically when API requests use the Stripe key.
 Configure the provider and use Metronome resources directly.
 
 Each provider alias has its own clients and key. `METRONOME_API_KEY` and
-`METRONOME_API_TOKEN` are not fallbacks. Use Terraform 1.16.5 or later for the
+`METRONOME_API_TOKEN` are not fallbacks. Use Terraform 1.15.4 or later for the
 combined integration.
 
 ## Use a module

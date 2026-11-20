@@ -81,6 +81,10 @@ func retainTime(previous, value any) any {
 	if sameTime(str(previous), str(value)) {
 		return previous
 	}
+	// Imported timestamps have no configured spelling to preserve.
+	if timestamp, err := time.Parse(time.RFC3339Nano, str(value)); err == nil {
+		return timestamp.UTC().Format(time.RFC3339Nano)
+	}
 	return value
 }
 func knownChange(v, prior *values, keys ...string) bool {
@@ -179,6 +183,13 @@ func validateProduct(_ context.Context, v *values) error {
 		}
 	}
 	return nil
+}
+
+// Product updates require an hour boundary. A name edit takes effect in the
+// current hour so the subsequent refresh observes the newly applied name.
+func productUpdateRequest(_ context.Context, _, _ *values, body map[string]any) (any, error) {
+	body["starting_at"] = time.Now().UTC().Truncate(time.Hour).Format(time.RFC3339)
+	return body, nil
 }
 func readProduct(ctx context.Context, v *values, remote any) error {
 	if err := checkIdentity(ctx, v, remote); err != nil {

@@ -4,7 +4,7 @@
   "files": [
     {
       "path": ".github/workflows/metronome-terraform.yml",
-      "sha256": "630ce7e57bcd5554d6bb50e4ffc9abaa04510bfc9eb62fe7ad2bf88a2074a65e"
+      "sha256": "73086c84a04baa65262117e80774af4517cd5ccdf7baf3799c08b64ced28b1ee"
     },
     {
       "path": "docs/actions/metronome_add_custom_field_key_v1.md",
@@ -536,11 +536,11 @@
     },
     {
       "path": "docs/guides/metronome.md",
-      "sha256": "bdf794428f5dde77c000ddd92f849cdcf8ac5b30374d301c18c08e64df616058"
+      "sha256": "112eedd519d181bb5da14e3216b3daa2d84e4ea8bacde99769f94a6f20aeb813"
     },
     {
       "path": "docs/index.md",
-      "sha256": "1563e1affa141a01d6b5f799ce439b5809982694a0a043cff43bdced11a0be5b"
+      "sha256": "33704ddc2378ddca510b4bb14782ec7e7dbdf4ec60c4939cb2ef8fb525276da2"
     },
     {
       "path": "docs/resources/metronome_billable_metric.md",
@@ -600,7 +600,7 @@
     },
     {
       "path": "internal/acctest/testdata/metronome/installed_provider.tf",
-      "sha256": "0c32927d61367a34d68f0cc3c6e7bd687ea88a97b86ed97cee42ea1efbb76cab"
+      "sha256": "025b680a6174195e49123b590e97e535e0266911a184fe5ee4fce288c732a087"
     },
     {
       "path": "internal/acctest/testdata/metronome/read_action.tf",
@@ -608,27 +608,19 @@
     },
     {
       "path": "internal/acctest/testdata/metronome/shared_account/billing/main.tf",
-      "sha256": "dd455d983b43b04e3c84911f905f68b2f32980ce7c05c7f95c23804a59dfc28e"
+      "sha256": "a710c5afac1a1c7ab5485a9541caa2f30ca135eca6577b17e012907c4bdf1827"
     },
     {
       "path": "internal/acctest/testdata/metronome/shared_account/main.tf",
-      "sha256": "0f7ac19717b1ee02cb329a761f19d63fdd4fd9ab2463fbffcd68a8f29f32c536"
+      "sha256": "6cd82ca4538a5725799bae9d358a59a0f306f6da54c4fe63fd7e57cf2f8191a5"
     },
     {
       "path": "LICENSE.metronome",
       "sha256": "f2f05e8a4356d9463f79d1136348dfc771a3ffdfedfca20ddc6f64e3b6cef211"
     },
     {
-      "path": "LICENSE.metronome-sdk",
-      "sha256": "0bc0d566cc9469c66caaff773a960cf926e15f26e670f05444b26510fa41a826"
-    },
-    {
       "path": "scripts/metronome_preservation.py",
-      "sha256": "c783f068a658c118c6263b5408e863063cbbe7bb84e96917f282c5836cbf4625"
-    },
-    {
-      "path": "scripts/test_metronome.py",
-      "sha256": "987dcb4e5fc4c3f662617589a14b01c9beb8480385f3563528da07e233ddeb47"
+      "sha256": "98d3397f6a7eea74f4ba1efc75835b63a22a27b0606d7411a6b645406a7a9fd8"
     }
   ]
 }

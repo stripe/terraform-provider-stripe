@@ -66,16 +66,16 @@ def git_files(repo, revision):
 
 
 ADDITION_DIRECTORIES = (
-    "internal/provider/metronome/", "internal/metronomeclient/",
+    "internal/provider/metronome/", "metronome-go/",
     "internal/providerdata/", "internal/combinedprovider/",
     "internal/terraformruntime/", "examples/metronome/",
-    "internal/acctest/cases/metronome/", "internal/acctest/runner/metronome/",
+    "internal/acctest/cases/metronome/", "internal/acctest/cases/managed/metronome/", "internal/acctest/cases/action/metronome/", "internal/acctest/runner/metronome/",
     "internal/acctest/testdata/metronome/",
 )
 ADDITION_FILES = {
     ".github/workflows/metronome-terraform.yml", ".metronome-generated-assets.json",
-    "LICENSE.metronome", "LICENSE.metronome-sdk",
-    "docs/guides/metronome.md", "scripts/test_metronome.py",
+    "LICENSE.metronome",
+    "docs/guides/metronome.md",
     "scripts/metronome_preservation.py",
 }
 

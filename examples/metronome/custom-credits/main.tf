@@ -3,7 +3,7 @@
 //
 
 terraform {
-  required_version = ">= 1.16.5"
+  required_version = ">= 1.15.4"
   required_providers {
     stripe = { source = "stripe/stripe" }
   }

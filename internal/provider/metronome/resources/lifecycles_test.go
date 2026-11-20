@@ -22,14 +22,34 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	metronomeclient "github.com/stripe/terraform-provider-stripe/internal/metronomeclient"
 	"github.com/stripe/terraform-provider-stripe/internal/providerdata"
 	bindingruntime "github.com/stripe/terraform-provider-stripe/internal/terraformruntime"
+	metronomeclient "github.com/stripe/terraform-provider-stripe/metronome-go"
 )
 
 type apiCall struct {
 	method, path, query, body, response string
 	status                              int
+}
+
+func TestContractTimestampRefreshAndImport(t *testing.T) {
+	for _, tc := range []struct {
+		name, previous string
+		remote, want   any
+	}{
+		{"refresh preserves configured spelling", "2026-11-21T19:00:00Z", "2026-11-21T19:00:00+00:00", "2026-11-21T19:00:00Z"},
+		{"refresh preserves configured offset", "2026-11-21T11:00:00-08:00", "2026-11-21T19:00:00Z", "2026-11-21T11:00:00-08:00"},
+		{"import normalizes UTC offset", "", "2026-11-21T19:00:00+00:00", "2026-11-21T19:00:00Z"},
+		{"import preserves precision", "", "2026-11-21T11:00:00.123456789-08:00", "2026-11-21T19:00:00.123456789Z"},
+		{"refresh records changed instant", "2026-11-21T19:00:00Z", "2026-11-21T20:00:00+00:00", "2026-11-21T20:00:00Z"},
+		{"absent end remains null", "", nil, nil},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := retainTime(tc.previous, tc.remote); got != tc.want {
+				t.Fatalf("timestamp: got %v, want %v", got, tc.want)
+			}
+		})
+	}
 }
 
 func resourceFixture(t *testing.T, factory func() resource.Resource, calls []apiCall) resource.Resource {

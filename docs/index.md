@@ -11,11 +11,11 @@ Manage Stripe and Metronome resources with Terraform. Both API clients use the
 top-level `api_key` or `STRIPE_API_KEY`. Metronome receives that key as a Bearer
 token. Standalone Metronome API tokens are not used.
 
-Use Terraform 1.16.5 or later for Metronome resources and actions.
+Use Terraform 1.15.4 or later for Metronome resources and actions.
 
 ```terraform
 terraform {
-  required_version = ">= 1.16.5"
+  required_version = ">= 1.15.4"
   required_providers {
     stripe = { source = "stripe/stripe" }
   }
