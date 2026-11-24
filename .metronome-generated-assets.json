@@ -147,10 +147,6 @@
       "sha256": "0cfeb29dfb58a5f1a41f1741df692f7c0a32035db152cdef590a969049a99c7d"
     },
     {
-      "path": "docs/actions/metronome_delete_stripe_billing_settings_v1.md",
-      "sha256": "bc5e590a511d13e30edd81226354e8cf32ed2719c23b4854ac7813eefb1dc5f4"
-    },
-    {
       "path": "docs/actions/metronome_deny_approval_request_v1.md",
       "sha256": "bd7800b2082c36b8be0143d004449be4933b5ff0d97dfbe41ed6cabfbf164399"
     },
@@ -187,10 +183,6 @@
       "sha256": "14f5dad3c806db69ac7ae7cef0ff148ce0b94bfd623e46d62234a5f7027fe213"
     },
     {
-      "path": "docs/actions/metronome_integration_cloudwatch_logger_v1.md",
-      "sha256": "0a73e4e083a3f46ec2d1433fba9e6270f149e1b03e55b61451102ebe8010e3c2"
-    },
-    {
       "path": "docs/actions/metronome_move_rate_card_products_v1.md",
       "sha256": "a74413e75579a1d68c4e6535d37073247caef85c3c6f3e9f8a99e72298b1f623"
     },
@@ -219,10 +211,6 @@
       "sha256": "4c603da2d779a7730b91aa192f89b071686e92686ba71d4d69cbc7252b62ea4c"
     },
     {
-      "path": "docs/actions/metronome_set_customer_billable_status_v1.md",
-      "sha256": "e08265632a73c0a497014eeb5b910e9e823d463262760d87783c2d210a899a3d"
-    },
-    {
       "path": "docs/actions/metronome_set_customer_name_v1.md",
       "sha256": "c692ad4ff0e4e895311f1dc5915d2c0815ce06e691bee39c69215a5be161c0fa"
     },
@@ -245,10 +233,6 @@
     {
       "path": "docs/actions/metronome_submit_approval_requests_v1.md",
       "sha256": "fd15377c27448db00ab20b269eac08c07b291b60710f55aa4cb460313149dc3f"
-    },
-    {
-      "path": "docs/actions/metronome_update_active_recharge_config_v1.md",
-      "sha256": "fb0990ff781d268c0e75067f9d7f0fc5ea75d6c1d6aea0d947390e3efd9ab526"
     },
     {
       "path": "docs/actions/metronome_update_billable_metric_v1.md",
@@ -375,10 +359,6 @@
       "sha256": "42517aa9759a34eab22e39bb1ebabb8f88c95c35686c051c0a3322d925f64bb9"
     },
     {
-      "path": "docs/data-sources/metronome_get_purchased_seats_v1.md",
-      "sha256": "dc26e25431fd55f916492d0aa5d59b004d0737402020bb95458f9fde94cbc1b5"
-    },
-    {
       "path": "docs/data-sources/metronome_get_rate_card_named_schedule_v1.md",
       "sha256": "6774e429e83c254eaa07d68efec0f24af1e37d57f262da6a3f78eae0736679db"
     },
@@ -393,10 +373,6 @@
     {
       "path": "docs/data-sources/metronome_get_rates_v1.md",
       "sha256": "e4146973009d99e855485955210412d8f78b6b95f30a6ee62e59eada8949a7f4"
-    },
-    {
-      "path": "docs/data-sources/metronome_get_seats_usage_v1.md",
-      "sha256": "1b12b0c17a4f008edbe8e965682fa4515f492415b57726cc5f8f999c39ca660d"
     },
     {
       "path": "docs/data-sources/metronome_get_services_v1.md",

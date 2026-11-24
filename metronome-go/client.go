@@ -27,7 +27,6 @@ type Client struct {
 	V1NamedSchedules    *v1NamedSchedulesService
 	V1Usage             *v1UsageService
 	V1Webhooks          *v1WebhooksService
-	V1ThresholdBilling  *v1ThresholdBillingService
 }
 
 func newClient(b Backend, key string) *Client {
@@ -52,7 +51,6 @@ func newClient(b Backend, key string) *Client {
 		V1NamedSchedules:    &v1NamedSchedulesService{B: b, Key: key},
 		V1Usage:             &v1UsageService{B: b, Key: key},
 		V1Webhooks:          &v1WebhooksService{B: b, Key: key},
-		V1ThresholdBilling:  &v1ThresholdBillingService{B: b, Key: key},
 	}
 }
 
@@ -160,14 +158,8 @@ func (c *Client) invoke(ctx context.Context, operation Operation, pathParams map
 	case "createRateCard-v1":
 		_, err := c.V1RateCards.CreateRateCard(ctx, &V1RateCardsCreateRateCardParams{Params: Params{raw: raw}})
 		return err
-	case "createStripeBillingSettings-v1":
-		_, err := c.V1Settings.CreateStripeBillingSettings(ctx, &V1SettingsCreateStripeBillingSettingsParams{Params: Params{raw: raw}})
-		return err
 	case "deleteCustomFields-v1":
 		_, err := c.V1CustomFields.DeleteCustomFields(ctx, &V1CustomFieldsDeleteCustomFieldsParams{Params: Params{raw: raw}})
-		return err
-	case "deleteStripeBillingSettings-v1":
-		_, err := c.V1Settings.DeleteStripeBillingSettings(ctx, &V1SettingsDeleteStripeBillingSettingsParams{Params: Params{raw: raw}})
 		return err
 	case "denyApprovalRequest-v1":
 		_, err := c.V1ApprovalRequests.DenyApprovalRequest(ctx, pathParams["id"], &V1ApprovalRequestsDenyApprovalRequestParams{Params: Params{raw: raw}})
@@ -253,9 +245,6 @@ func (c *Client) invoke(ctx context.Context, operation Operation, pathParams map
 	case "getProduct-v1":
 		_, err := c.V1Products.GetProduct(ctx, &V1ProductsGetProductParams{Params: Params{raw: raw}})
 		return err
-	case "getPurchasedSeats-v1":
-		_, err := c.V1Usage.GetPurchasedSeats(ctx, pathParams["customer_id"], &V1UsageGetPurchasedSeatsParams{Params: Params{raw: raw}})
-		return err
 	case "getRateCard-v1":
 		_, err := c.V1RateCards.GetRateCard(ctx, &V1RateCardsGetRateCardParams{Params: Params{raw: raw}})
 		return err
@@ -267,9 +256,6 @@ func (c *Client) invoke(ctx context.Context, operation Operation, pathParams map
 		return err
 	case "getRateSchedule-v1":
 		_, err := c.V1RateCards.GetRateSchedule(ctx, &V1RateCardsGetRateScheduleParams{Params: Params{raw: raw}})
-		return err
-	case "getSeatsUsage-v1":
-		_, err := c.V1Usage.GetSeatsUsage(ctx, &V1UsageGetSeatsUsageParams{Params: Params{raw: raw}})
 		return err
 	case "getServices-v1":
 		_, err := c.V1Security.GetServices(ctx, &V1SecurityGetServicesParams{Params: Params{raw: raw}})
@@ -291,9 +277,6 @@ func (c *Client) invoke(ctx context.Context, operation Operation, pathParams map
 		return err
 	case "ingest-v1":
 		_, err := c.V1Usage.Ingest(ctx, &V1UsageIngestParams{Params: Params{raw: raw}})
-		return err
-	case "integrationCloudwatchLogger-v1":
-		_, err := c.V1API.IntegrationCloudwatchLogger(ctx, &V1APIIntegrationCloudwatchLoggerParams{Params: Params{raw: raw}})
 		return err
 	case "listAllBillableMetrics-v1":
 		_, err := c.V1BillableMetrics.ListAllBillableMetrics(ctx, &V1BillableMetricsListAllBillableMetricsParams{Params: Params{raw: raw}})
@@ -391,23 +374,11 @@ func (c *Client) invoke(ctx context.Context, operation Operation, pathParams map
 	case "resetCustomerAlerts-v1":
 		_, err := c.V1Alerts.ResetCustomerAlerts(ctx, &V1AlertsResetCustomerAlertsParams{Params: Params{raw: raw}})
 		return err
-	case "rotateDeltaStreamSecret-v1":
-		_, err := c.V1Settings.RotateDeltaStreamSecret(ctx, &V1SettingsRotateDeltaStreamSecretParams{Params: Params{raw: raw}})
-		return err
 	case "scheduleProServicesInvoice-v1":
 		_, err := c.V1Contracts.ScheduleProServicesInvoice(ctx, &V1ContractsScheduleProServicesInvoiceParams{Params: Params{raw: raw}})
 		return err
 	case "searchEvents-v1":
 		_, err := c.V1Usage.SearchEvents(ctx, &V1UsageSearchEventsParams{Params: Params{raw: raw}})
-		return err
-	case "setBillingProviderApiKey-v1":
-		_, err := c.V1Settings.SetBillingProviderAPIKey(ctx, pathParams["billing_provider_type"], &V1SettingsSetBillingProviderAPIKeyParams{Params: Params{raw: raw}})
-		return err
-	case "setClientWebhookSecret-v1":
-		_, err := c.V1Settings.SetClientWebhookSecret(ctx, &V1SettingsSetClientWebhookSecretParams{Params: Params{raw: raw}})
-		return err
-	case "setCustomerBillableStatus-v1":
-		_, err := c.V1Customers.SetCustomerBillableStatus(ctx, &V1CustomersSetCustomerBillableStatusParams{Params: Params{raw: raw}})
 		return err
 	case "setCustomerBillingProviderConfigurations-v1":
 		_, err := c.V1Customers.SetCustomerBillingProviderConfigurations(ctx, &V1CustomersSetCustomerBillingProviderConfigurationsParams{Params: Params{raw: raw}})
@@ -435,9 +406,6 @@ func (c *Client) invoke(ctx context.Context, operation Operation, pathParams map
 		return err
 	case "submitApprovalRequests-v1":
 		_, err := c.V1ApprovalRequests.SubmitApprovalRequests(ctx, &V1ApprovalRequestsSubmitApprovalRequestsParams{Params: Params{raw: raw}})
-		return err
-	case "updateActiveRechargeConfig-v1":
-		_, err := c.V1ThresholdBilling.UpdateActiveRechargeConfig(ctx, &V1ThresholdBillingUpdateActiveRechargeConfigParams{Params: Params{raw: raw}})
 		return err
 	case "updateBillableMetric-v1":
 		_, err := c.V1BillableMetrics.UpdateBillableMetric(ctx, pathParams["billable_metric_id"], &V1BillableMetricsUpdateBillableMetricParams{Params: Params{raw: raw}})
@@ -471,9 +439,6 @@ func (c *Client) invoke(ctx context.Context, operation Operation, pathParams map
 		return err
 	case "updateRateCardNamedSchedule-v1":
 		_, err := c.V1NamedSchedules.UpdateRateCardNamedSchedule(ctx, &V1NamedSchedulesUpdateRateCardNamedScheduleParams{Params: Params{raw: raw}})
-		return err
-	case "updateStripeBillingSettings-v1":
-		_, err := c.V1Settings.UpdateStripeBillingSettings(ctx, &V1SettingsUpdateStripeBillingSettingsParams{Params: Params{raw: raw}})
 		return err
 	case "upsertAnrokApiToken-v1":
 		_, err := c.V1Settings.UpsertAnrokAPIToken(ctx, &V1SettingsUpsertAnrokAPITokenParams{Params: Params{raw: raw}})

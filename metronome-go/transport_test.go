@@ -88,7 +88,7 @@ func TestEveryReviewedSDKBinding(t *testing.T) {
 			}
 		})
 	}
-	if len(sdkOperations) != 142 {
+	if len(sdkOperations) != 131 {
 		t.Fatalf("operation coverage changed: %d", len(sdkOperations))
 	}
 }

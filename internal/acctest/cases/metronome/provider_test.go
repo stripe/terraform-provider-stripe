@@ -231,7 +231,7 @@ func TestMetronomeInstalledProviderWithoutCredentials(t *testing.T) {
 		name     string
 		surfaces map[string]json.RawMessage
 		expected int
-	}{{"resources", p.Resources, 14}, {"data sources", p.DataSources, 59}, {"actions", p.Actions, 73}} {
+	}{{"resources", p.Resources, 14}, {"data sources", p.DataSources, 57}, {"actions", p.Actions, 69}} {
 		count := 0
 		for name := range test.surfaces {
 			if strings.HasPrefix(name, "stripe_metronome_") {

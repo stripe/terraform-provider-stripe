@@ -27,18 +27,6 @@ func (c v1APIService) CreateBillableMetric(ctx context.Context, params *V1APICre
 	return v1createbillablemetricresponse, err
 }
 
-// Log events from integration services to Cloudwatch
-func (c v1APIService) IntegrationCloudwatchLogger(ctx context.Context, params *V1APIIntegrationCloudwatchLoggerParams) (*V1IntegrationCloudwatchLoggerResponse, error) {
-	if params == nil {
-		params = &V1APIIntegrationCloudwatchLoggerParams{}
-	}
-	params.Context = ctx
-	v1integrationcloudwatchloggerresponse := &V1IntegrationCloudwatchLoggerResponse{}
-	err := c.B.Call(
-		http.MethodPost, "/v1/integrations/log", c.Key, params, v1integrationcloudwatchloggerresponse)
-	return v1integrationcloudwatchloggerresponse, err
-}
-
 // Lists all packages with details including name, aliases, duration, and terms. To view contracts on a specific package, use the `listContractsOnPackage` endpoint.
 func (c v1APIService) ListPackages(ctx context.Context, params *V1APIListPackagesParams) (*V1ListPackagesResponse, error) {
 	if params == nil {

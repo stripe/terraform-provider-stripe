@@ -189,18 +189,6 @@ func (c v1CustomersService) ListCustomers(ctx context.Context, params *V1Custome
 	return v1listcustomersresponse, err
 }
 
-// Set a customer's billable status. This endpoint's availability is dependent on your client's configuration. Metronome 1.0 plan invoices are not supported.
-func (c v1CustomersService) SetCustomerBillableStatus(ctx context.Context, params *V1CustomersSetCustomerBillableStatusParams) (*V1SetCustomerBillableStatusResponse, error) {
-	if params == nil {
-		params = &V1CustomersSetCustomerBillableStatusParams{}
-	}
-	params.Context = ctx
-	v1setcustomerbillablestatusresponse := &V1SetCustomerBillableStatusResponse{}
-	err := c.B.Call(
-		http.MethodPost, "/v1/customers/setBillableStatus", c.Key, params, v1setcustomerbillablestatusresponse)
-	return v1setcustomerbillablestatusresponse, err
-}
-
 // Create a billing configuration for a customer. Once created, these configurations are available to associate to a contract and dictates which downstream system to collect payment in or send the invoice to. You can create multiple configurations per customer. The configuration formats are distinct for each downstream provider.
 //
 // ### Use this endpoint to:

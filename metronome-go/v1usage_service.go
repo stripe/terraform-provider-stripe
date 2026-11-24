@@ -64,31 +64,6 @@ func (c v1UsageService) GetPagedUsage(ctx context.Context, params *V1UsageGetPag
 	return v1getpagedusageresponse, err
 }
 
-// Returns the number of seats purchased for the current period.
-func (c v1UsageService) GetPurchasedSeats(ctx context.Context, id string, params *V1UsageGetPurchasedSeatsParams) (*V1GetPurchasedSeatsResponse, error) {
-	if params == nil {
-		params = &V1UsageGetPurchasedSeatsParams{}
-	}
-	params.Context = ctx
-	path := FormatURLPath("/v1/customers/%s/purchasedSeats", id)
-	v1getpurchasedseatsresponse := &V1GetPurchasedSeatsResponse{}
-	err := c.B.Call(
-		http.MethodGet, path, c.Key, params, v1getpurchasedseatsresponse)
-	return v1getpurchasedseatsresponse, err
-}
-
-// Fetch seats usage data for the specified customer, broken into intervals of the specified length.
-func (c v1UsageService) GetSeatsUsage(ctx context.Context, params *V1UsageGetSeatsUsageParams) (*V1GetSeatsUsageResponse, error) {
-	if params == nil {
-		params = &V1UsageGetSeatsUsageParams{}
-	}
-	params.Context = ctx
-	v1getseatsusageresponse := &V1GetSeatsUsageResponse{}
-	err := c.B.Call(
-		http.MethodPost, "/v1/usage/seats", c.Key, params, v1getseatsusageresponse)
-	return v1getseatsusageresponse, err
-}
-
 // Retrieve aggregated usage data across multiple customers and billable metrics in a single query. This batch endpoint enables you to fetch usage patterns at scale, broken down by time windows, making it ideal for building analytics dashboards, generating reports, and monitoring platform-wide usage trends.
 //
 // ### Use this endpoint to:

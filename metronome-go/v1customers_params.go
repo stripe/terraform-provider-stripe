@@ -197,15 +197,6 @@ type V1CustomersListCustomersParams struct {
 	SalesforceAccountIDs []*string `form:"salesforce_account_ids" json:"salesforce_account_ids,omitempty"`
 }
 
-// Set a customer's billable status. This endpoint's availability is dependent on your client's configuration. Metronome 1.0 plan invoices are not supported.
-type V1CustomersSetCustomerBillableStatusParams struct {
-	Params         `form:"*"`
-	BillableStatus *string `form:"billable_status" json:"billable_status"`
-	CustomerID     *string `form:"customer_id" json:"customer_id"`
-	// For usage invoices, any invoices where the service periods starts on or after this date will be included. For all other invoice types, only invoices where the issue_date falls on or after this date will be included.
-	EffectiveAt *string `form:"effective_at" json:"effective_at"`
-}
-
 // Rules that stop matching invoices from being sent to the billing provider. Only supported for Stripe billing provider configurations. When omitted, every invoice is sent to the billing provider.
 type V1CustomersSetCustomerBillingProviderConfigurationsDataUnbillableInvoicesConfigurationParams struct {
 	// Restricts the rule to invoices in this fiat currency. Omit for a catch-all rule that applies to every currency of the `invoice_type`. Required when `max_amount` is set.

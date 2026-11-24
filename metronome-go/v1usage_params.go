@@ -69,30 +69,6 @@ type V1UsageGetPagedUsageParams struct {
 	// A window_size of "day" or "hour" will return the usage for the specified period segmented into daily or hourly aggregates. A window_size of "none" will return a single usage aggregate for the entirety of the specified period.
 	WindowSize *string `form:"window_size" json:"window_size"`
 }
-
-// Returns the number of seats purchased for the current period.
-type V1UsageGetPurchasedSeatsParams struct {
-	Params `form:"*"`
-}
-
-// Fetch seats usage data for the specified customer, broken into intervals of the specified length.
-type V1UsageGetSeatsUsageParams struct {
-	Params     `form:"*"`
-	CustomerID *string `form:"customer_id" json:"customer_id"`
-	// Must be aligned to UTC midnight and at least one day after `starting_on`.
-	EndingBefore *string `form:"ending_before" json:"ending_before,omitempty"`
-	// Max number of results that should be returned
-	Limit *int64 `form:"limit" json:"limit,omitempty"`
-	// Cursor that indicates where the next page of results should start.
-	NextPage     *string `form:"next_page" json:"next_page,omitempty"`
-	SeatMetricID *string `form:"seat_metric_id" json:"seat_metric_id"`
-	// Must be aligned to UTC midnight, e.g. `2024-01-01T00:00:00Z`.
-	StartingOn *string `form:"starting_on" json:"starting_on,omitempty"`
-	// The type of usage to return, max or latest value.
-	UsageType *string `form:"usage_type" json:"usage_type"`
-	// A window_size of "day" or "hour" will return the usage for the specified period segmented into daily or hourly aggregates. A window_size of "none" will return a single usage aggregate for the entirety of the specified period.
-	WindowSize *string `form:"window_size" json:"window_size"`
-}
 type V1UsageGetUsageBatchBillableMetricGroupByParams struct {
 	// The name of the group_by key to use
 	Key *string `form:"key" json:"key"`

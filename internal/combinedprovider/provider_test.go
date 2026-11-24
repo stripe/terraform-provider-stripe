@@ -162,7 +162,7 @@ func TestCombinedProviderPreservesEveryStripeProtocolSchema(t *testing.T) {
 			t.Errorf("Stripe ephemeral schema changed: %s", name)
 		}
 	}
-	if len(after.ResourceSchemas)-len(before.ResourceSchemas) != 14 || len(after.DataSourceSchemas)-len(before.DataSourceSchemas) != 59 || len(after.ActionSchemas)-len(before.ActionSchemas) != 73 {
+	if len(after.ResourceSchemas)-len(before.ResourceSchemas) != 14 || len(after.DataSourceSchemas)-len(before.DataSourceSchemas) != 57 || len(after.ActionSchemas)-len(before.ActionSchemas) != 69 {
 		t.Fatalf("combined surface inventory is wrong: resources=%d reads=%d actions=%d", len(after.ResourceSchemas), len(after.DataSourceSchemas), len(after.ActionSchemas))
 	}
 	if len(after.Provider.Block.Attributes) != len(before.Provider.Block.Attributes)+1 {
