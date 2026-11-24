@@ -1,0 +1,58 @@
+name: Metronome integration
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stripe-bytes:
+    name: Stripe bytes versus PR base
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Compare every existing path with the PR base
+        env:
+          BASE_REVISION: ${{ github.event.pull_request.base.sha }}
+        run: |
+          candidate_revision=$(git rev-parse HEAD)
+          base_revision=${BASE_REVISION:-$(git merge-base HEAD origin/main)}
+          python3 scripts/metronome_preservation.py \
+            --baseline-repo . --base-revision "$base_revision" --candidate-revision "$candidate_revision"
+
+  tests:
+    name: Provider runtime and Terraform tests (${{ matrix.go }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.25.0', '1.26.4']
+    env:
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
+        with:
+          terraform_version: '1.15.4'
+          terraform_wrapper: false
+      - name: Go runtime regression and vet
+        run: |
+          go -C metronome-go test -count=1 ./...
+          go test -count=1 ./...
+          go vet ./...
+      - name: Verify Terraform example formatting and license input
+        run: |
+          terraform fmt -check -recursive examples/metronome internal/acctest/testdata/metronome
+          test -s LICENSE.metronome
